@@ -1,6 +1,13 @@
 import React from 'react';
 import reactLogo from '../../assets/logos/logo.svg';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+import routes from './data/RouterConfiguration';
 
 const Main = ({
   collapsed,
@@ -22,12 +29,26 @@ const Main = ({
       </header>
 
       <div className="block ">
-        <p>Testing</p>
+        <Switch>
+          {
+            routes.map((route, index) => {
+              return (
+                <Route
+                  key={index}
+                  path={route.path}
+                  exact={route.exact}
+                >
+                  {route.element} 
+                </Route>
+              )
+            })
+          }
+        </Switch>
       </div>
 
       <footer>
         <small>
-          © {new Date().getFullYear()} 
+          © {new Date().getFullYear()}
         </small>
         <br />
         <div className="social-bagdes">

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   ProSidebar,
   Menu,
@@ -8,9 +9,14 @@ import {
   SidebarFooter,
   SidebarContent,
 } from 'react-pro-sidebar';
+import sidebar_items from './data/SidebarConfiguration';
+import SubMenuItems from "./SubMenuItems"
+
+// utility and icons
+import { isStringNullOrEmpty } from "../../tools/Helpers"
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 
-const Aside = ({  collapsed, rtl, toggled, handleToggleSidebar }) => {
+const Aside = ({ collapsed, rtl, toggled, handleToggleSidebar }) => {
   return (
     <ProSidebar
       image={false} // can set the image background under this option
@@ -39,48 +45,26 @@ const Aside = ({  collapsed, rtl, toggled, handleToggleSidebar }) => {
 
       <SidebarContent>
         <Menu iconShape="circle">
-          <MenuItem
-            icon={<MenuOutlinedIcon />}
-            suffix={<span className="badge red">Testing</span>}
-          >
-            Testing
-          </MenuItem>
-          <MenuItem icon={<MenuOutlinedIcon />}> Testing </MenuItem>
+          {
+            sidebar_items.length > 0 && sidebar_items.map((item, index) => {
+              return (
+                typeof item.submenus === "undefined" || item.submenus === null  ?
+                  <MenuItem
+                    prefix={typeof item.prefix !== "undefined" && item.prefix !== null ? item.prefix : null}
+                    icon={typeof item.icon !== "undefined" && item.icon !== null ? item.icon : ""}
+                    suffix={typeof item.suffix !== "undefined" && item.suffix !== null ? item.suffix : null}
+                  >
+                    {item.title} {!isStringNullOrEmpty(item.to) ? <Link to={item.to} /> : ""}
+                  </MenuItem>
+                  :
+                  <SubMenuItems item={item} />
+
+              )
+            })
+          }
         </Menu>
-        <Menu iconShape="circle">
-          <SubMenu
-            suffix={<span className="badge yellow">3</span>}
-            title={"Testing"}
-            icon={<MenuOutlinedIcon />}
-          >
-            <MenuItem>{"Testing"} 1</MenuItem>
-            <MenuItem>{"Testing"} 2</MenuItem>
-            <MenuItem>{"Testing"} 3</MenuItem>
-          </SubMenu>
-          <SubMenu
-            prefix={<span className="badge gray">3</span>}
-            title={"Testing"}
-            icon={<MenuOutlinedIcon />}
-          >
-            <MenuItem>{"Testing"} 1</MenuItem>
-            <MenuItem>{"Testing"} 2</MenuItem>
-            <MenuItem>{"Testing"} 3</MenuItem>
-          </SubMenu>
-          <SubMenu title={"Multi Level"} icon={<MenuOutlinedIcon />}>
-            <MenuItem>{"Testing"} 1 </MenuItem>
-            <MenuItem>{"Testing"} 2 </MenuItem>
-            <SubMenu title={`${"Testing"} 3`}>
-              <MenuItem>{"Testing"} 3.1 </MenuItem>
-              <MenuItem>{"Testing"} 3.2 </MenuItem>
-              <SubMenu title={`${"Testing"} 3.3`}>
-                <MenuItem>{"Testing"} 3.3.1 </MenuItem>
-                <MenuItem>{"Testing"} 3.3.2 </MenuItem>
-                <MenuItem>{"Testing"} 3.3.3 </MenuItem>
-              </SubMenu>
-            </SubMenu>
-          </SubMenu>
-        </Menu>
-      </SidebarContent>
+      </SidebarContent >
+
 
       <SidebarFooter style={{ textAlign: 'center' }}>
         <div
@@ -100,7 +84,7 @@ const Aside = ({  collapsed, rtl, toggled, handleToggleSidebar }) => {
           </a>
         </div>
       </SidebarFooter>
-    </ProSidebar>
+    </ProSidebar >
   );
 };
 

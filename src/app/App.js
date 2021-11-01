@@ -5,7 +5,9 @@ import Layout from '../components/sidebar/Layout';
 import './App.scss';
 
 const App = () => (
-  <Layout />
+  <Router>
+    <Layout />
+  </Router>
 );
 
 export default App;
