@@ -24,7 +24,11 @@ export const setLogonUser = (loginUser) => {
 }
 
 export const isUserLogon = () => {
-    return (typeof localStorage.getItem("userToken") !== "undefined" && localStorage.getItem("userToken") !== null) ? true : false
+    // if want to bypass the auth, then uncomment this
+    return true
+
+    // else we will go for normal operation with the function below
+    // return (typeof localStorage.getItem("userToken") !== "undefined" && localStorage.getItem("userToken") !== null) ? true : false
 }
 
 export const resetLogonUser = () => {

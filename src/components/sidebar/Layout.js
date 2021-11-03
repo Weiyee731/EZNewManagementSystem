@@ -28,10 +28,10 @@ function Layout({ setLocale }) {
 
 
   return (
-    <div>
+    <div className={`app ${rtl ? 'rtl' : ''} ${toggled ? 'toggled' : ''}`}>
       {
         isLogon === true ?
-          <div className={`app ${rtl ? 'rtl' : ''} ${toggled ? 'toggled' : ''}`}>
+          <>
 
             <Aside
               image={false} // can set the background image for the sidebar here
@@ -49,7 +49,7 @@ function Layout({ setLocale }) {
               handleCollapsedChange={handleCollapsedChange}
               handleRtlChange={handleRtlChange}
             />
-          </div>
+          </>
           :
           <Login />
       }
