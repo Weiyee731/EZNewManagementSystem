@@ -1,7 +1,20 @@
 import React from "react"
 
 // validation functions
-export const isStringNullOrEmpty = (value) => {return ( typeof value === 'undefined' ) ? true : (value === null || value == null ) ? true : ( typeof value === "string" && value.trim() === "") ? true : false }
+export const isStringNullOrEmpty = (value) => { return (typeof value === 'undefined') ? true : (value === null || value == null) ? true : (typeof value === "string" && value.trim() === "") ? true : false }
+export const isObjectUndefinedOrNull = (obj) => { return (typeof obj === 'undefined' && obj === null) ? true : false }
+export const isArrayNotEmpty = (list) => {
+    try {
+        if (typeof list !== 'undefined' && Array.isArray(list) && list.length > 0)
+            return true
+        else
+            return false
+    }
+    catch (e) {
+        console.log(e)
+        return false
+    }
+}
 export const isContactValid = (contact) => { return (typeof contact !== 'undefined' && contact !== '' && /^(0|1)[0-46-9.\-]*[0-9.\-]{7,8}?$/.test(contact)) }
 export const isEmailValid = (email) => { return (typeof email === 'undefined' || email === '' || !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) ? false : true }
 export const isLongitude = (longitude) => { return isFinite(longitude) && Math.abs(longitude) <= 180; }
@@ -42,15 +55,15 @@ export const convertDateTimeTo112Format_Moment = (date) => {
 // text transformation functions
 export const capitalizeFirstLetterOfSentences = (text) => { return (typeof text !== "undefined" ? text.slice(0, 1).toUpperCase() + text.slice(1, text.length) : "") }
 export const capitalizeEveryFirstLetter = (text) => { return (typeof text !== "undefined" ? text.replace(/\b(\w)/g, s => s.toUpperCase()) : "") }
-export const convertArrayToStringWithSpecialCharacter = (list, sc) => { 
+export const convertArrayToStringWithSpecialCharacter = (list, sc) => {
     sc = (sc !== null) ? sc : ", "
-    if(!Array.isArray(list))
+    if (!Array.isArray(list))
         return "";
-    else{
+    else {
         let text = ""
-        for(let i = 0; i < list.length; i++){
+        for (let i = 0; i < list.length; i++) {
             text += list[i]
-            if(i == list.length - 1 )
+            if (i == list.length - 1)
                 break;
             else
                 text += sc
@@ -77,7 +90,7 @@ export const getFileExtension = (file) => {
         try {
             if (file.length > 0) {
                 let fileExts = []
-                file.map(el => { return fileExts.push(el.name.split('.').pop())})
+                file.map(el => { return fileExts.push(el.name.split('.').pop()) })
                 return fileExts
             }
             else {
@@ -179,6 +192,8 @@ export const roundOffTotal = (val) => {
 }
 
 
+// localStorage
+export const resetLocalStorage = () => { localStorage.clear() }
 
 // self-class function
 const leftPad = (number, targetLength) => {
