@@ -2,7 +2,7 @@ import { GitAction } from "../action/gitAction";
 
 const INITIAL_STATE = {
   loading: false,
-  currentUser: [],
+  logonUser: [],
 };
 
 export function counterReducer(state = INITIAL_STATE, action) {
@@ -13,7 +13,7 @@ export function counterReducer(state = INITIAL_STATE, action) {
     case GitAction.LoginSuccess:
       return Object.assign({}, state, {
         loading: false,
-        currentUser: action.payload
+        logonUser: action.payload
       });
 
     case GitAction.Logout:
@@ -21,7 +21,7 @@ export function counterReducer(state = INITIAL_STATE, action) {
     case GitAction.UserLoggedOut:
       return Object.assign({}, state, {
         loading: false,
-        currentUser: action.payload
+        logonUser: action.payload
       });
 
 
