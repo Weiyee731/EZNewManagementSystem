@@ -18,21 +18,24 @@ import { isStringNullOrEmpty } from "../../tools/Helpers"
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 
 const Aside = ({ rtl, toggled, handleToggleSidebar }) => {
-  const [isCollapsed, setCollapse] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(false) // check the sidebar is actually collapsed 
+  const [collapsed, setCollapsed] = useState(false)
 
   const handleCollapseSidebar = (value) => {
-    setCollapse(typeof value !== "undefined" && value !== null ? value : !isCollapsed);
+    setIsCollapsed(typeof value !== "undefined" && value !== null ? value : !isCollapsed);
+    setCollapsed(typeof value !== "undefined" && value !== null ? value : !isCollapsed);
   };
-
 
   return (
     <ProSidebar
       image={false} // can set the image background under this option
       rtl={rtl}
       toggled={toggled}
-      collapsed={isCollapsed}
+      collapsed={collapsed}
       breakPoint="md"
       onToggle={handleToggleSidebar}
+      onMouseEnter={() => { isCollapsed && setCollapsed(false) }}
+      onMouseLeave={() => { isCollapsed && setCollapsed(true)  }}
     >
       <SidebarHeader>
         <SidebarButtons handleCollapseSidebar={handleCollapseSidebar} isCollapsed={isCollapsed} />
@@ -41,8 +44,8 @@ const Aside = ({ rtl, toggled, handleToggleSidebar }) => {
         }
       </SidebarHeader>
 
-      <SidebarContent>
-        <Menu iconShape="circle">
+      <SidebarContent className="thin-scrollbar">
+        <Menu iconShape="circle" innerSubMenuArrows={false} popperArrow={false} subMenuBullets={false}>
           {
             sidebar_items.length > 0 && sidebar_items.map((item, index) => {
               return (
@@ -56,7 +59,7 @@ const Aside = ({ rtl, toggled, handleToggleSidebar }) => {
                     {item.title} {!isStringNullOrEmpty(item.to) ? <Link to={item.to} /> : ""}
                   </MenuItem>
                   :
-                  <SubMenuItems key={'submenu-' + item.title} item={item} handleCollapseSidebar={handleCollapseSidebar} />
+                  <SubMenuItems key={'submenu-' + item.title} item={item} />
 
               )
             })

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import Aside from './Aside';
 import Main from './Main';
-import { isUserLogon } from "../auth/AuthManagement"
-import Login from "../../pages/Login/Login"
+import { isUserLogon } from "../auth/AuthManagement";
+import Login from "../../pages/Login/Login";
+import "./styles/sidebar.css";
 
 function Layout() {
   const [rtl, setRtl] = useState(false);

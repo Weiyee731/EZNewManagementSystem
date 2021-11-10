@@ -11,3 +11,65 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.vertical-line-left-white{
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.vertical-line-right-white{
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.horizontal-line-top-white{
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.horizontal-line-bottom-white{
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.vertical-line-left-black{
+  border-left: 1px solid rgba(22, 22, 22, 0.2);
+}
+
+.vertical-line-right-black{
+  border-right: 1px solid rgba(22, 22, 22, 0.2);
+}
+
+.horizontal-line-bottom-black{
+  border-bottom: 1px solid rgba(22, 22, 22, 0.2);
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  scroll-behavior: smooth;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.thin-scrollbar{
+  scroll-behavior: smooth;
+}
+
+.thin-scrollbar::-webkit-scrollbar {
+  width: 1px;
+  height: 100px;
+}
+
+/* Track */
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: white; 
+}
+ 
+/* Handle */
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(33, 33, 33, 0.5); 
+}
+
+/* Handle on hover */
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(33, 33, 33, 1); 
+}

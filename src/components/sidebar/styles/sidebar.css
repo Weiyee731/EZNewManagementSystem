@@ -1,0 +1,13 @@
+.pro-sidebar-layout, .hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+    scroll-behavior: smooth;
+  }
+  
+  .pro-sidebar-layout::-webkit-scrollbar, .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .pro-sidebar-layout, .thin-scrollbar{
+    scroll-behavior: smooth;
+  }

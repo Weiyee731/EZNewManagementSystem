@@ -12,13 +12,12 @@ const SubMenuItems = (props) => {
             icon={typeof item.icon !== "undefined" && item.icon !== null ? item.icon : ""}
             suffix={typeof item.suffix !== "undefined" && item.suffix !== null ? item.suffix : null}
             title={item.title}
-            onClick={() => props.handleCollapseSidebar(false)}
         >
             {
                 typeof item.submenus !== "undefined" && item.submenus !== null && item.submenus.map((menuitem, index) => {
                     return (
                         typeof menuitem.submenus !== "undefined" && menuitem.submenus !== null && menuitem.submenus.length > 0 ?
-                            <SubMenuItems key={'submenu-' + menuitem.item} item={menuitem} onClick={() => props.handleCollapseSidebar(false)} />
+                            <SubMenuItems key={'submenu-' + menuitem.item} item={menuitem} />
                             :
                             <MenuItem
                                 key={"submenu-items-" + index}
