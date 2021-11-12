@@ -3,6 +3,8 @@ import { connect } from "react-redux";
 import { GitAction } from "../../../store/action/gitAction";
 import { browserHistory } from "react-router";
 
+import FullWidthTabs from '../../../components/TabsComponent/Tabs';
+
 function mapStateToProps(state) {
     return {
         foods: state.counterReducer["foods"],
@@ -20,6 +22,31 @@ const INITIAL_STATE = {
 
 }
 
+function Table1() {
+
+    return (
+        <div>
+            Something 1
+        </div>
+    )
+}
+
+function Table2() {
+
+    return (
+        <div>
+            Something 2
+        </div>
+    )
+}
+
+const TabsHeaders = ["Tab 1", "Tab 2"]
+const TabsBody = [<Table1 />, <Table2 />]
+const TabsSettings = {
+    Headers: TabsHeaders,
+    Body: TabsBody
+}
+
 class OverallStock extends Component {
     constructor(props) {
         super(props);
@@ -34,10 +61,14 @@ class OverallStock extends Component {
 
     }
 
+
     render() {
         return (
-            <div>
+            <div className="container-fluid">
                 <h1>OverallStock</h1>
+                <div className='w-100'>
+                    <FullWidthTabs settings={TabsSettings} />
+                </div>
             </div>
         )
     }
