@@ -3,6 +3,8 @@ import { connect } from "react-redux";
 import { GitAction } from "../../store/action/gitAction";
 import { browserHistory } from "react-router";
 
+import TableComponents from "../../components/TableComponents/TableComponents"
+
 function mapStateToProps(state) {
     return {
         foods: state.counterReducer["foods"],
@@ -36,8 +38,10 @@ class Statements extends Component {
 
     render() {
         return (
-            <div>
-                <h1>Statements</h1>
+            <div className="w-100 container-fluid">
+                <TableComponents
+                    dense={true}
+                />
             </div>
         )
     }
