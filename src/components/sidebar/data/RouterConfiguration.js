@@ -9,6 +9,7 @@ import DataManagement from "../../../pages/DataManagement/DataManagement";
 import AllPayments from "../../../pages/Payments/AllPayments/AllPayments";
 import BalanceSettlement from "../../../pages/Payments/BalanceSettlement/BalanceSettlement";
 import Statements from "../../../pages/Statements/Statements";
+import UserDetail from "../../../pages/UserManagement/UserDetail"
 
 const routes = [
     {
@@ -65,6 +66,11 @@ const routes = [
         path: "/Statements",
         exact: true,
         element: <Statements />,
+    },
+    {
+        path: "/UserDetail/:name/:fat",
+        exact: true,
+        element: <UserDetail />,
     },
 
 ]
