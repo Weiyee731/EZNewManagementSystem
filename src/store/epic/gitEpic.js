@@ -22,11 +22,20 @@ export class GitEpic {
 
   UserLogin = action$ =>
     action$.ofType(GitAction.Login).switchMap(async ({ payload }) => {
+      console.log(
+        url + 
+        "User_Login?" +
+        "username=" + payload.username +
+        "&password=" + payload.password
+      )
       try {
         const response = await fetch(url +
-          "User_Login?username=" + payload.Username +
-          "&Password=" + payload.Password
+          "User_Login?" +
+          "username=" + payload.username +
+          "&password=" + payload.password
         );
+
+
 
         let json = await response.json();
         json = JSON.parse(json)
@@ -46,6 +55,9 @@ export class GitEpic {
 
   UserLogout = action$ =>
     action$.ofType(GitAction.Logout).switchMap(async ({ payload }) => {
+      // console.log(url + 
+      //   double_click_and_paste_url_here
+      // )
       try {
         const response = await fetch(url +
           "User_Logout?UserId=" + payload.UserId
@@ -67,6 +79,101 @@ export class GitEpic {
       }
     });
 
+  UserRegistration = action$ =>
+    // console.log(url + 
+    //   double_click_and_paste_url_here
+    // )
+    action$.ofType(GitAction.RegisterUser).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "User_Register?" +
+          "userFirstName=" + payload.userFirstName +
+          "&userLastName=" + payload.userLastName +
+          "&username=" + payload.username +
+          "&userEmail=" + payload.userEmail +
+          "&password=" + payload.password
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UserRegistered,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: 1001.1 => UserLogin")
+        return {
+          type: GitAction.UserRegistered,
+          payload: [],
+        };
+      }
+    });
+
+  FetchUserProfileByID = action$ =>
+    // console.log(url + 
+    //   double_click_and_paste_url_here
+    // )
+    action$.ofType(GitAction.GetUserProfile).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "User_ProfileByID?" +
+          "USERID=" + payload.USERID
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.GotUserProfile,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: 1001.1 => UserLogin")
+        return {
+          type: GitAction.GotUserProfile,
+          payload: [],
+        };
+      }
+    });
+
+
+
   ///////////////////////////////////////////////////  user account credentials ///////////////////////////////////////////////////
+
+
+
+
+
+  ///////////////////////////////////////////////////  sidebar configurations ///////////////////////////////////////////////////
+  FetchSidebarConfigurations = action$ =>
+    // console.log(url + 
+    //   double_click_and_paste_url_here
+    // )
+    action$.ofType(GitAction.FetchSidebar).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "User_ViewPage?" +
+          "ROLEGROUPID=" + payload.ROLEGROUPID +
+          "&USERID=" + payload.USERID
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.SidebarFetched,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: 1001.1 => UserLogin")
+        return {
+          type: GitAction.SidebarFetched,
+          payload: [],
+        };
+      }
+    });
+
+  ///////////////////////////////////////////////////  sidebar configurations ///////////////////////////////////////////////////
 }
 export let gitEpic = new GitEpic();

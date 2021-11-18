@@ -7,6 +7,9 @@ const rootEpic = combineEpics(
   //========================== USER ==========================//
   gitEpic.UserLogin,
   gitEpic.UserLogout,
+  gitEpic.UserRegistration,
+  gitEpic.FetchUserProfileByID,
+  gitEpic.FetchSidebarConfigurations,
 );
 
 const rootReducer = combineReducers({ counterReducer });

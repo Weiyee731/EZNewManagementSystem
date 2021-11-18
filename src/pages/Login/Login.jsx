@@ -25,6 +25,7 @@ import "./Login.css"
 function mapStateToProps(state) {
     return {
         logonUser: state.counterReducer["logonUser"],
+        loading: state.counterReducer["loading"],
     };
 }
 
@@ -52,7 +53,9 @@ class Dashboard extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (isArrayNotEmpty(this.props.logonUser)) {
+        console.log(this.props.logonUser)
+        console.log(this.props.loading)
+        if (!this.props.loading && isArrayNotEmpty(this.props.logonUser)) {
             //success
 
         }
@@ -83,13 +86,14 @@ class Dashboard extends Component {
     }
 
     OnSubmitLogin = () => {
-
+        console.log('yes')
+        console.log(this.isInputsVerified())
         if (this.isInputsVerified()) {
             let object = {
-                Username: this.state.username,
-                Password: this.state.password,
+                username: this.state.username,
+                password: this.state.password,
             }
-            // this.props.CallUserLogin(object)
+            this.props.CallUserLogin(object)
         }
     }
 
