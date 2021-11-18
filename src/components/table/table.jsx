@@ -237,18 +237,6 @@ export default function EnhancedTable(props) {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - (filteredRows.length > 0 ? filteredRows.length : props.rows.length)) : 0;
 
-  const requestSearch = (searchedVal) => {
-    const filteredRows = props.rows.filter((row) => {
-      return row.name.toLowerCase().includes(searchedVal.toLowerCase());
-    });
-    setFilterRows(filteredRows);
-  };
-
-  const cancelSearch = () => {
-    setSearched("");
-    requestSearch(searched);
-  };
-
   return (
     <Box sx={{ width: '100%' }}>
       <div
@@ -271,15 +259,6 @@ export default function EnhancedTable(props) {
           title={props.title}
           handleDeleteRow={props.handleDeleteRow}
         />
-        {/* <SearchBar
-          style={{
-            marginLeft: '10px',
-            marginRight: '10px'
-          }}
-          value={searched}
-          onChange={(searchVal) => requestSearch(searchVal)}
-          onCancelSearch={() => cancelSearch()}
-        /> */}
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -302,13 +281,13 @@ export default function EnhancedTable(props) {
               {stableSort(filteredRows.length > 0 ? filteredRows : props.rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row);
+                  const isItemSelected = isSelected(row.name);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => isSelectable ? handleClick(event, row) : props.handleRowDetail(row)}
+                      onClick={(event) => isSelectable ? handleClick(event, row.name) : props.handleRowDetail(row)}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
