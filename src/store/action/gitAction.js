@@ -68,5 +68,37 @@ export class GitAction {
   }
 
 
+  ///////////////////////////////////////////////////  stock management  ///////////////////////////////////////////////////
+
+  static FetchStocks = "FETCH_ALL_STOCKS";
+  static StocksFetched = "ALL_STOCKS_FETCHED";
+  static ResetStocksList = "RESET-STOCKS_LIST";
+  static CallFetchAllStock(propsData) {
+    return {
+      type: GitAction.FetchStocks,
+      payload: propsData
+    };
+  }
+  static CallResetStocks() {
+    return {
+      type: GitAction.ResetStocksList,
+    };
+  }
+
+  static InsertNewStock = "INSERT_NEW_STOCK";
+  static NeWStockInserted = "NEW_STOCK_INSERTED";
+  static ResetStockReturn = "RESET-STOCK_RETURN";
+  static CallInsertStock(propsData) {
+    return {
+      type: GitAction.InsertNewStock,
+      payload: propsData
+    };
+  }
+  static CallResetStockReturn() {
+    return {
+      type: GitAction.ResetStockReturn,
+    };
+  }
+
 }
 

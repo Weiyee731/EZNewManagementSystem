@@ -5,13 +5,13 @@ import { browserHistory } from "react-router";
 
 function mapStateToProps(state) {
     return {
-        foods: state.counterReducer["foods"],
+        stocks: state.counterReducer["stocks"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        CallTesting: () => dispatch(GitAction.CallTesting()),
+        CallFetchAllStock: (propsData) => dispatch(GitAction.CallFetchAllStock(propsData)),
     };
 }
 
@@ -24,14 +24,16 @@ class Dashboard extends Component {
     constructor(props) {
         super(props);
         this.state = INITIAL_STATE
+
+        this.props.CallFetchAllStock({USERID: 1})
     }
 
     componentDidMount() {
-
+        
     }
 
     componentDidUpdate(prevProps, prevState) {
-
+        console.log(this.props.stocks)
     }
 
     render() {

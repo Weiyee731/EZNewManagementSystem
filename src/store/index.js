@@ -4,12 +4,13 @@ import { counterReducer } from "./reducer/gitReducer"; //reducers
 import { gitEpic } from "./epic/gitEpic"; //epics
 
 const rootEpic = combineEpics(
-  //========================== USER ==========================//
-  gitEpic.UserLogin,
-  gitEpic.UserLogout,
-  gitEpic.UserRegistration,
-  gitEpic.FetchUserProfileByID,
-  gitEpic.FetchSidebarConfigurations,
+  gitEpic.User_Login,
+  gitEpic.User_Logout,
+  gitEpic.User_Register,
+  gitEpic.User_ProfileByID,
+  gitEpic.User_ViewPage,
+  gitEpic.Inventory_ViewStockList,
+  gitEpic.Inventory_InsertStock,
 );
 
 const rootReducer = combineReducers({ counterReducer });

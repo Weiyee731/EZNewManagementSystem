@@ -3,8 +3,12 @@ import { GitAction } from "../action/gitAction";
 const INITIAL_STATE = {
   loading: false,
   logonUser: [],
-  userProfile:[], 
+  userProfile: [],
+
   sidebars: [],
+
+  stocks: [],
+  stockReturn: [],
 
 
   ///////// RETURN VALUE ///////// 
@@ -62,6 +66,28 @@ export function counterReducer(state = INITIAL_STATE, action) {
     case GitAction.ResetSidebar:
       return Object.assign({}, state, { sidebars: [] });
 
+
+    ///////////////////////////////////////////////////  stock management ///////////////////////////////////////////////////
+
+    case GitAction.FetchStocks:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.StocksFetched:
+      return Object.assign({}, state, {
+        loading: false,
+        stocks: action.payload
+      });
+    case GitAction.ResetStocksList:
+      return Object.assign({}, state, { stocks: [] });
+
+    case GitAction.InsertNewStock:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.NeWStockInserted:
+      return Object.assign({}, state, {
+        loading: false,
+        stockReturn: action.payload
+      });
+    case GitAction.ResetStockReturn:
+      return Object.assign({}, state, { stockReturn: [] });
 
     /////////////////////////////////////////////////// Default ///////////////////////////////////////////////////
     default:

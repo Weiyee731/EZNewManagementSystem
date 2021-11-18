@@ -20,10 +20,10 @@ const url = ServerConfiguration.testingServerUrl;
 export class GitEpic {
   ///////////////////////////////////////////////////  user account credentials ///////////////////////////////////////////////////
 
-  UserLogin = action$ =>
+  User_Login = action$ =>
     action$.ofType(GitAction.Login).switchMap(async ({ payload }) => {
       console.log(
-        url + 
+        url +
         "User_Login?" +
         "username=" + payload.username +
         "&password=" + payload.password
@@ -45,7 +45,7 @@ export class GitEpic {
         };
       }
       catch (error) {
-        toast.error("Error Code: 1001.1 => UserLogin")
+        toast.error("Error Code: User_Login")
         return {
           type: GitAction.LoginSuccess,
           payload: [],
@@ -53,7 +53,7 @@ export class GitEpic {
       }
     });
 
-  UserLogout = action$ =>
+  User_Logout = action$ =>
     action$.ofType(GitAction.Logout).switchMap(async ({ payload }) => {
       // console.log(url + 
       //   double_click_and_paste_url_here
@@ -71,7 +71,7 @@ export class GitEpic {
         };
       }
       catch (error) {
-        toast.error("Error Code: 1001.2 => UserLogout")
+        toast.error("Error Code: User_Logout")
         return {
           type: GitAction.LoggedOutSuccess,
           payload: [],
@@ -79,11 +79,12 @@ export class GitEpic {
       }
     });
 
-  UserRegistration = action$ =>
-    // console.log(url + 
-    //   double_click_and_paste_url_here
-    // )
+  User_Register = action$ =>
+
     action$.ofType(GitAction.RegisterUser).switchMap(async ({ payload }) => {
+      // console.log(url + 
+      //   double_click_and_paste_url_here
+      // )
       try {
         const response = await fetch(url +
           "User_Register?" +
@@ -102,7 +103,7 @@ export class GitEpic {
         };
       }
       catch (error) {
-        toast.error("Error Code: 1001.1 => UserLogin")
+        toast.error("Error Code: RegisterUser")
         return {
           type: GitAction.UserRegistered,
           payload: [],
@@ -110,11 +111,11 @@ export class GitEpic {
       }
     });
 
-  FetchUserProfileByID = action$ =>
-    // console.log(url + 
-    //   double_click_and_paste_url_here
-    // )
+  User_ProfileByID = action$ =>
     action$.ofType(GitAction.GetUserProfile).switchMap(async ({ payload }) => {
+      // console.log(url + 
+      //   double_click_and_paste_url_here
+      // )
       try {
         const response = await fetch(url +
           "User_ProfileByID?" +
@@ -129,7 +130,7 @@ export class GitEpic {
         };
       }
       catch (error) {
-        toast.error("Error Code: 1001.1 => UserLogin")
+        toast.error("Error Code: GetUserProfile")
         return {
           type: GitAction.GotUserProfile,
           payload: [],
@@ -146,11 +147,11 @@ export class GitEpic {
 
 
   ///////////////////////////////////////////////////  sidebar configurations ///////////////////////////////////////////////////
-  FetchSidebarConfigurations = action$ =>
-    // console.log(url + 
-    //   double_click_and_paste_url_here
-    // )
+  User_ViewPage = action$ =>
     action$.ofType(GitAction.FetchSidebar).switchMap(async ({ payload }) => {
+      // console.log(url + 
+      //   double_click_and_paste_url_here
+      // )
       try {
         const response = await fetch(url +
           "User_ViewPage?" +
@@ -166,7 +167,7 @@ export class GitEpic {
         };
       }
       catch (error) {
-        toast.error("Error Code: 1001.1 => UserLogin")
+        toast.error("Error Code: FetchSidebar")
         return {
           type: GitAction.SidebarFetched,
           payload: [],
@@ -175,5 +176,69 @@ export class GitEpic {
     });
 
   ///////////////////////////////////////////////////  sidebar configurations ///////////////////////////////////////////////////
+
+
+  ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
+  Inventory_ViewStockList = action$ =>
+    action$.ofType(GitAction.FetchStocks).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Inventory_ViewStockList?" +
+        "USERID=" + payload.USERID
+      )
+      try {
+        const response = await fetch(url +
+          "Inventory_ViewStockList?" +
+          "USERID=" + payload.USERID
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.StocksFetched,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: FetchStocks")
+        return {
+          type: GitAction.StocksFetched,
+          payload: [],
+        };
+      }
+    });
+
+  Inventory_InsertStock = action$ =>
+    action$.ofType(GitAction.InsertNewStock).switchMap(async ({ payload }) => {
+      // console.log(url + 
+      //   double_click_and_paste_url_here
+      // )
+      try {
+        const response = await fetch(url +
+          "Inventory_InsertStock?" +
+          "USERID=" + payload.USERID +
+          "&TRACKINGNUMBER=" + payload.TRACKINGNUMBER +
+          "&PRODUCTWEIGHT=" + payload.PRODUCTWEIGHT +
+          "&PRODUCTHEIGHT=" + payload.PRODUCTHEIGHT +
+          "&PRODUCTWIDTH=" + payload.PRODUCTWIDTH +
+          "&PRODUCTDEEP=" + payload.PRODUCTDEEP +
+          "&CARRYABLE=" + payload.CARRYABLE
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.NeWStockInserted,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_InsertStock")
+        return {
+          type: GitAction.NeWStockInserted,
+          payload: [],
+        };
+      }
+    });
+  ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
 }
 export let gitEpic = new GitEpic();
