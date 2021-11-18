@@ -86,7 +86,7 @@ export class GitAction {
   }
 
   static InsertNewStock = "INSERT_NEW_STOCK";
-  static NeWStockInserted = "NEW_STOCK_INSERTED";
+  static NewStockInserted = "NEW_STOCK_INSERTED";
   static ResetStockReturn = "RESET-STOCK_RETURN";
   static CallInsertStock(propsData) {
     return {
@@ -97,6 +97,23 @@ export class GitAction {
   static CallResetStockReturn() {
     return {
       type: GitAction.ResetStockReturn,
+    };
+  }
+
+
+  ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
+  static InsertNewTransaction = "INSERT_NEW_TRANSACTION";
+  static NewTransactionInserted = "NEW_TRANSACTION_INSERTED";
+  static ResetTransactionReturn = "RESET-TRANSACTION_RETURN";
+  static CallInsertTransaction(propsData) {
+    return {
+      type: GitAction.InsertNewTransaction,
+      payload: propsData
+    };
+  }
+  static CallResetTransaction() {
+    return {
+      type: GitAction.ResetTransactionReturn,
     };
   }
 

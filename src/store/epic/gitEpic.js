@@ -227,18 +227,54 @@ export class GitEpic {
         let json = await response.json();
         json = JSON.parse(json)
         return {
-          type: GitAction.NeWStockInserted,
+          type: GitAction.NewStockInserted,
           payload: json,
         };
       }
       catch (error) {
         toast.error("Error Code: Inventory_InsertStock")
         return {
-          type: GitAction.NeWStockInserted,
+          type: GitAction.NewStockInserted,
           payload: [],
         };
       }
     });
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
+
+
+  ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
+
+  Transaction_InsertTransaction = action$ =>
+    action$.ofType(GitAction.InsertNewTransaction).switchMap(async ({ payload }) => {
+      // console.log(url + 
+      //   double_click_and_paste_url_here
+      // )
+      try {
+        const response = await fetch(url +
+          "Transaction_InsertTransaction?" +
+          "USERID=" + payload.USERID +
+          "&ORDERTOTALMOUNT=" + payload.ORDERTOTALMOUNT +
+          "&ORDERPAIDMOUNT=" + payload.ORDERPAIDMOUNT +
+          "&STOCKID=" + payload.STOCKID
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.NewTransactionInserted,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Transaction_InsertTransaction")
+        return {
+          type: GitAction.NewTransactionInserted,
+          payload: [],
+        };
+      }
+    });
+
+  ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
+
 }
 export let gitEpic = new GitEpic();

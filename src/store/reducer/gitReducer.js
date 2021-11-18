@@ -4,15 +4,11 @@ const INITIAL_STATE = {
   loading: false,
   logonUser: [],
   userProfile: [],
-
+  registrationReturn: [],
   sidebars: [],
-
   stocks: [],
   stockReturn: [],
-
-
-  ///////// RETURN VALUE ///////// 
-  registrationReturn: [],
+  transactionReturn: [],
 };
 
 export function counterReducer(state = INITIAL_STATE, action) {
@@ -81,13 +77,26 @@ export function counterReducer(state = INITIAL_STATE, action) {
 
     case GitAction.InsertNewStock:
       return Object.assign({}, state, { loading: true });
-    case GitAction.NeWStockInserted:
+    case GitAction.NewStockInserted:
       return Object.assign({}, state, {
         loading: false,
         stockReturn: action.payload
       });
     case GitAction.ResetStockReturn:
       return Object.assign({}, state, { stockReturn: [] });
+
+    /////////////////////////////////////////////////// Transaction Management ///////////////////////////////////////////////////
+    
+    case GitAction.InsertNewTransaction:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.NewTransactionInserted:
+      return Object.assign({}, state, {
+        loading: false,
+        transactionReturn: action.payload
+      });
+    case GitAction.ResetTransactionReturn:
+      return Object.assign({}, state, { transactionReturn: [] });
+
 
     /////////////////////////////////////////////////// Default ///////////////////////////////////////////////////
     default:
