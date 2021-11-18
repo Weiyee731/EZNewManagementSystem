@@ -40,7 +40,14 @@ class Statements extends Component {
         return (
             <div className="w-100 container-fluid">
                 <TableComponents
-                    dense={true}
+                    tableOptions={{
+                        dense: true,
+                        tableOrderBy: 'asc',
+                        stickyTableHeader: false,
+                        stickyTableHeight: 600,
+                    }}
+                    
+                    paginationOptions={[15, 100, 250, { label: 'All', value: -1 }]}
                 />
             </div>
         )

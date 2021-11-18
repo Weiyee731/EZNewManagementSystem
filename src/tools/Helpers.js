@@ -4,7 +4,6 @@ import React from "react"
 export const isStringNullOrEmpty = (value) => { return (typeof value === 'undefined') ? true : (value === null || value == null) ? true : (typeof value === "string" && value.trim() === "") ? true : false }
 export const isObjectUndefinedOrNull = (obj) => { return (typeof obj === 'undefined' || obj === null) ? true : false }
 export const isArrayNotEmpty = (list) => {
-    console.log(list)
     try {
         if (typeof list !== 'undefined' && Array.isArray(list) && list.length > 0)
             return true

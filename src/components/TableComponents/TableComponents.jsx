@@ -55,8 +55,6 @@ const rows = [
     createData('Oreo', 437, 18.0, 63, 4.0),
 ];
 
-
-
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) return -1;
     if (b[orderBy] > a[orderBy]) return 1;
@@ -213,14 +211,14 @@ const EnhancedTableToolbar = (props) => {
             {
                 numSelected > 0 ? (
                     <Tooltip title="Delete">
-                        <IconButton>
-                            <DeleteIcon onClick={() => { console.log('delete button') }} />
+                        <IconButton onClick={() => { console.log('delete button') }} >
+                            <DeleteIcon />
                         </IconButton>
                     </Tooltip>
                 ) : (
                     <Tooltip title="Add New Items">
-                        <IconButton>
-                            <AddIcon onClick={() => { console.log('add button') }} />
+                        <IconButton onClick={() => { console.log('add button') }}>
+                            <AddIcon  />
                         </IconButton>
                     </Tooltip>
                 )
@@ -234,13 +232,18 @@ EnhancedTableToolbar.propTypes = {
 };
 
 export default function TableComponents(props) {
-    const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
-    const [dense, setDense] = React.useState(isObjectUndefinedOrNull(props.dense) ? false : props.dense);
-    const [rowsPerPage, setRowsPerPage] = React.useState(25);
 
+    // render from props
+    const [stickyTableHeader, setTableHeaderSticky] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.stickyTableHeader === null ? true : props.tableOptions.stickyTableHeader );
+    const [stickyTableHeight, setTableStickyHeight] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.stickyTableHeight === null ? 300 : props.tableOptions.stickyTableHeight );
+    const [order, setOrder] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.tableOrderBy === null ? 'asc' : props.tableOptions.tableOrderBy );
+    const [dense, setDense] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.dense === null ? false : props.tableOptions.dense);
+    const [pagePaginationOptions, setPagePaginationOptions] = React.useState((isArrayNotEmpty(props.paginationOptions)) ? props.paginationOptions : [25, 50, 100, { label: 'All', value: -1 }]);
+    const [rowsPerPage, setRowsPerPage] = React.useState((isArrayNotEmpty(props.paginationOptions) ? props.paginationOptions[0] : 25));
+    
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -283,20 +286,21 @@ export default function TableComponents(props) {
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
+
     };
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
-
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    const TableData = (rowsPerPage !== -1) ? stableSort(rows, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage ) : stableSort(rows, getComparator(order, orderBy))
 
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
                 <EnhancedTableToolbar numSelected={selected.length} />
-                <TableContainer>
+                <TableContainer sx={(stickyTableHeader) ? { maxHeight: stickyTableHeight } : {maxHeight: '100%'}}>
                     <Table
-                        stickyHeader
+                        stickyHeader={stickyTableHeader}
                         sx={{ width: "100%" }}
                         aria-labelledby="tableTitle"
                         size={dense ? 'small' : 'medium'}
@@ -311,9 +315,7 @@ export default function TableComponents(props) {
                         />
                         <TableBody>
                             {
-                                stableSort(rows, getComparator(order, orderBy))
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    .map((row, index) => {
+                                TableData.map((row, index) => {
                                         const isItemSelected = isSelected(row.name);
                                         const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -363,7 +365,7 @@ export default function TableComponents(props) {
                     </Table>
                 </TableContainer>
                 <TablePagination
-                    rowsPerPageOptions={(isArrayNotEmpty(props.paginationOptions)) ? props.paginationOptions : [5, 100, 250, { label: 'All', value: -1 }]}
+                    rowsPerPageOptions={pagePaginationOptions}
                     component="div"
                     colSpan={3}
                     count={rows.length}
