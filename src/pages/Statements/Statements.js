@@ -2,6 +2,9 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { GitAction } from "../../store/action/gitAction";
 import TableCell from '@mui/material/TableCell';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import AddIcon from '@mui/icons-material/Add';
 import { browserHistory } from "react-router";
 
 import TableComponents from "../../components/TableComponents/TableComponents"
@@ -118,6 +121,23 @@ class Statements extends Component {
         )
     }
 
+    renderTableActionButton = () => {
+        return (
+            <div className="d-flex">
+                <Tooltip sx={{ marginLeft: 5 }} title="Add New Items">
+                    <IconButton onClick={(event) => { this.onAddButtonClick() }}>
+                        <AddIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Buton">
+                    <IconButton onClick={(event) => { this.onAddButtonClick() }}>
+                        <AddIcon />
+                    </IconButton>
+                </Tooltip>
+            </div>
+        )
+    }
+
     onTableRowClick = (event, row) => {
         console.log(row)
     }
@@ -136,28 +156,29 @@ class Statements extends Component {
             <div className="w-100 container-fluid">
                 <TableComponents
                     // table settings 
-                    title="Table Name"
+                    tableTopLeft={<h3 style={{ fontWeight: 600 }}>Table Name</h3>}  // optional, it can pass as string or as children elements
+                    // tableTopRight={this.renderTableActionButton}                 // optional, it will brings the elements to the table's top right corner
+
                     tableOptions={{
-                        dense: true,
-                        tableOrderBy: 'asc',
-                        sortingIndex: "fat",    //default sorting index based on header id
-                        stickyTableHeader: false,
-                        stickyTableHeight: 600,
+                        dense: true,                // optional, default is false
+                        tableOrderBy: 'asc',        // optional, default is asc
+                        sortingIndex: "fat",        // require, it must the same as the desired table header
+                        stickyTableHeader: true,    // optional, default is true
+                        stickyTableHeight: 300,     // optional, default is 300px
                     }}
-                    paginationOptions={[5, 100, 250, { label: 'All', value: -1 }]}
-                    tableHeaders={headCells}
+                    paginationOptions={[5, 100, 250, { label: 'All', value: -1 }]} // optional, by default it will hide the table pagination. You should set settings for pagination options as in array, eg.: [5, 100, 250, { label: 'All', value: -1 }]
+                    tableHeaders={headCells}        //required
                     tableRows={{
-                        renderTableRows: this.renderTableRows,
-                        tableCellsNumber: 6,
-                        checkbox: true,
-                        checkboxColor: "primary",
-                        onRowClickSelect: true
+                        renderTableRows: this.renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
+                        checkbox: true,                          // optional, by default is true
+                        checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
+                        onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                     }}
-                    selectedIndexKey={"pid"}
-                    Data={rows}
-                    onTableRowClick={this.onTableRowClick}
-                    onActionButtonClick={this.onAddButtonClick}
-                    onDeleteButtonClick={this.onDeleteButtonClick}
+                    selectedIndexKey={"pid"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
+                    Data={rows}                                  // required, the data that listing in the table
+                    onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
+                    onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
+                    onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items
                 />
             </div>
         )

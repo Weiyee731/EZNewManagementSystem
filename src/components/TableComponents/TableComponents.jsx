@@ -16,10 +16,7 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
@@ -115,7 +112,7 @@ EnhancedTableHead.propTypes = {
 };
 
 const EnhancedTableToolbar = (props) => {
-    const { selectedRows, title, OnActionButtonClick, OnDeleteButtonClick } = props;
+    const { selectedRows, tableTopLeft, OnActionButtonClick, OnDeleteButtonClick, tableTopRight } = props;
     const numSelected = selectedRows.length
 
     return (
@@ -140,12 +137,11 @@ const EnhancedTableToolbar = (props) => {
                     </Typography>
                 ) : (
                     <Typography
-                        sx={{ flex: '1 1 100%', fontWeight: 600 }}
-                        variant="h5"
+                        sx={{ flex: '1 1 100%' }}
                         id="tableTitle"
                         component="div"
                     >
-                        {title}
+                        {tableTopLeft}
                     </Typography>
                 )
             }
@@ -158,11 +154,13 @@ const EnhancedTableToolbar = (props) => {
                         </IconButton>
                     </Tooltip>
                 ) : (
-                    <Tooltip title="Add New Items">
-                        <IconButton onClick={(event) => { OnActionButtonClick(selectedRows) }}>
-                            <AddIcon />
-                        </IconButton>
-                    </Tooltip>
+                    tableTopRight === null ?
+                        <Tooltip title="Add New Items">
+                            <IconButton onClick={(event) => { typeof OnActionButtonClick === "function" && OnActionButtonClick(selectedRows) }}>
+                                <AddIcon />
+                            </IconButton>
+                        </Tooltip>
+                        : tableTopRight
                 )
             }
         </Toolbar>
@@ -191,10 +189,11 @@ export default function TableComponents(props) {
     const [stickyTableHeader, setTableHeaderSticky] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.stickyTableHeader === null ? true : props.tableOptions.stickyTableHeader);
     const [stickyTableHeight, setTableStickyHeight] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.stickyTableHeight === null ? 300 : props.tableOptions.stickyTableHeight);
     const [dense, setDense] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.dense === null ? false : props.tableOptions.dense);
+    const [tableTopRight, setTableTopRight] = React.useState(isObjectUndefinedOrNull(props.tableTopRight) || props.tableTopRight === null ? null : props.tableTopRight);
 
     //pagination settings
     const [rowsPerPage, setRowsPerPage] = React.useState((isArrayNotEmpty(props.paginationOptions) ? props.paginationOptions[0] : 25));
-    const [pagePaginationOptions, setPagePaginationOptions] = React.useState((isArrayNotEmpty(props.paginationOptions)) ? props.paginationOptions : [25, 50, 100, { label: 'All', value: -1 }]);
+    const [pagePaginationOptions, setPagePaginationOptions] = React.useState((isArrayNotEmpty(props.paginationOptions)) ? props.paginationOptions : []);
 
     //table and table data settings
     const [order, setOrder] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.tableOrderBy === null ? 'asc' : props.tableOptions.tableOrderBy);
@@ -253,7 +252,8 @@ export default function TableComponents(props) {
             <Paper sx={{ width: '100%', mb: 2 }}>
                 <EnhancedTableToolbar
                     selectedRows={selected}
-                    title={props.title}
+                    tableTopLeft={props.tableTopLeft}
+                    tableTopRight={tableTopRight}
                     OnActionButtonClick={props.onActionButtonClick}
                     OnDeleteButtonClick={props.onDeleteButtonClick}
                 />
@@ -317,17 +317,21 @@ export default function TableComponents(props) {
                         </TableBody>
                     </Table>
                 </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={pagePaginationOptions}
-                    component="div"
-                    colSpan={3}
-                    count={rows.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    ActionsComponent={TablePaginationActions}
-                />
+                {
+                    pagePaginationOptions.length !== 0 &&
+                    <TablePagination
+                        rowsPerPageOptions={pagePaginationOptions}
+                        component="div"
+                        colSpan={3}
+                        count={rows.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        ActionsComponent={TablePaginationActions}
+                    />
+                }
+
             </Paper>
         </Box>
     );
@@ -385,3 +389,50 @@ function TablePaginationActions(props) {
         </Box>
     );
 }
+
+
+
+/***************************************
+ * Example:
+ *
+ * 1. how to set the table cells according to desired settngs
+ * renderTableRows = (data, index) => {
+        return (
+            <>
+                <TableCell
+                    component="th"
+                    id={`enhanced-table-checkbox-${index}`}
+                    scope="row"
+                    padding="normal"
+                >
+                    {data.name}
+                </TableCell>
+                <TableCell align="center">{data.calories}</TableCell>
+                <TableCell align="center">{data.fat}</TableCell>
+                <TableCell align="center">{data.carbs}</TableCell>
+                <TableCell align="center">{data.protein}</TableCell>
+            </>
+        )
+    }
+ *
+ * 2. how to render the top right side of the table corner
+ *   renderTableActionButton = () => {
+        return (
+            <div className="d-flex">
+                <Tooltip sx={{ marginLeft: 5 }} title="Add New Items">
+                    <IconButton onClick={(event) => { this.onAddButtonClick() }}>
+                        <AddIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Buton">
+                    <IconButton onClick={(event) => { this.onAddButtonClick() }}>
+                        <AddIcon />
+                    </IconButton>
+                </Tooltip>
+            </div>
+        )
+    }
+ *
+ *
+ *
+ */
