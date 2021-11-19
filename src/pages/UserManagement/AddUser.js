@@ -27,7 +27,7 @@ const INITIAL_STATE = {
 
 }
 
-class UserDetail extends Component {
+class AddUser extends Component {
   constructor(props) {
     super(props);
     this.state = INITIAL_STATE
@@ -42,7 +42,6 @@ class UserDetail extends Component {
   }
 
   render() {
-    console.log(this.props)
     return (
       <div>
         <Card>
@@ -57,7 +56,7 @@ class UserDetail extends Component {
                 <ArrowBackIcon />
               </IconButton>
               <Typography variant="h5" component="div">
-                Edit Profile
+                Add New User
               </Typography>
             </div>
             <div className="row">
@@ -67,7 +66,7 @@ class UserDetail extends Component {
                   required
                   id="outlined-required"
                   label="Full Name"
-                  defaultValue={this.props.match.params.name}
+                  defaultValue="Hello World"
                 />
               </div>
               <div className="col-lg-6 col-md-6 col-sm-12">
@@ -119,4 +118,4 @@ class UserDetail extends Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(UserDetail));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(AddUser));

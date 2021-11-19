@@ -10,6 +10,7 @@ import AllPayments from "../../../pages/Payments/AllPayments/AllPayments";
 import BalanceSettlement from "../../../pages/Payments/BalanceSettlement/BalanceSettlement";
 import Statements from "../../../pages/Statements/Statements";
 import UserDetail from "../../../pages/UserManagement/UserDetail"
+import AddUser from "../../../pages/UserManagement/AddUser";
 
 const routes = [
     {
@@ -71,6 +72,11 @@ const routes = [
         path: "/UserDetail/:name/:fat",
         exact: true,
         element: <UserDetail />,
+    },
+    {
+        path: "/AddUser",
+        exact: true,
+        element: <AddUser />,
     },
 
 ]

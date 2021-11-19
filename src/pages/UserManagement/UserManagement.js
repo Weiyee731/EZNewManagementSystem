@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { GitAction } from "../../store/action/gitAction";
 import { withRouter } from 'react-router'
 import EnhancedTable from "../../components/table/table";
+import AlertDialog from "../../components/modal/Modal"
 
 function mapStateToProps(state) {
     return {
@@ -28,7 +29,8 @@ function createData(name, calories, fat, carbs, protein) {
 }
 
 const INITIAL_STATE = {
-
+    open: false,
+    selectedRows: []
 }
 
 class UserManagement extends Component {
@@ -45,8 +47,16 @@ class UserManagement extends Component {
 
     }
 
-    handleDeleteRow = (row) => {
-        console.log(row)
+    handleDeleteRow = () => {
+        console.log(this.state.selectedRows)
+        this.handleToggleDialog()
+    }
+
+    handleToggleDialog = (row) => {
+        this.setState({
+            open: !this.state.open,
+            selectedRows: row
+        })
     }
 
     handleRowDetail = (row) => {
@@ -54,7 +64,12 @@ class UserManagement extends Component {
         this.props.history.push(`/UserDetail/${row.name}/${row.fat}`)
     }
 
+    handleAdd = () => {
+        this.props.history.push(`/AddUser`)
+    }
+
     render() {
+        const { open } = this.state
         const headCells = [
             {
                 id: 'name',
@@ -110,8 +125,16 @@ class UserManagement extends Component {
                     title={"User Management"}
                     headCells={headCells}
                     rows={rows}
-                    handleDeleteRow={this.handleDeleteRow}
+                    handleToggleDialog={this.handleToggleDialog}
                     handleRowDetail={this.handleRowDetail}
+                    handleAdd={this.handleAdd}
+                />
+                <AlertDialog
+                    open={open}
+                    handleToggleDialog={this.handleToggleDialog}
+                    handleConfirmFunc={this.handleDeleteRow}
+                    title={"Delete item(s)"}
+                    message={"Are you sure want to delete the selected item(s)?"}
                 />
             </div>
         )
