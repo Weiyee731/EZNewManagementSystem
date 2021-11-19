@@ -218,7 +218,7 @@ const EnhancedTableToolbar = (props) => {
                 ) : (
                     <Tooltip title="Add New Items">
                         <IconButton onClick={() => { console.log('add button') }}>
-                            <AddIcon  />
+                            <AddIcon />
                         </IconButton>
                     </Tooltip>
                 )
@@ -237,13 +237,13 @@ export default function TableComponents(props) {
     const [page, setPage] = React.useState(0);
 
     // render from props
-    const [stickyTableHeader, setTableHeaderSticky] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.stickyTableHeader === null ? true : props.tableOptions.stickyTableHeader );
-    const [stickyTableHeight, setTableStickyHeight] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.stickyTableHeight === null ? 300 : props.tableOptions.stickyTableHeight );
-    const [order, setOrder] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.tableOrderBy === null ? 'asc' : props.tableOptions.tableOrderBy );
+    const [stickyTableHeader, setTableHeaderSticky] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.stickyTableHeader === null ? true : props.tableOptions.stickyTableHeader);
+    const [stickyTableHeight, setTableStickyHeight] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.stickyTableHeight === null ? 300 : props.tableOptions.stickyTableHeight);
+    const [order, setOrder] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.tableOrderBy === null ? 'asc' : props.tableOptions.tableOrderBy);
     const [dense, setDense] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.dense === null ? false : props.tableOptions.dense);
     const [pagePaginationOptions, setPagePaginationOptions] = React.useState((isArrayNotEmpty(props.paginationOptions)) ? props.paginationOptions : [25, 50, 100, { label: 'All', value: -1 }]);
     const [rowsPerPage, setRowsPerPage] = React.useState((isArrayNotEmpty(props.paginationOptions) ? props.paginationOptions[0] : 25));
-    
+
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -262,7 +262,6 @@ export default function TableComponents(props) {
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
         let newSelected = [];
-
         if (selectedIndex === -1) {
             newSelected = newSelected.concat(selected, name);
         } else if (selectedIndex === 0) {
@@ -275,30 +274,21 @@ export default function TableComponents(props) {
                 selected.slice(selectedIndex + 1),
             );
         }
-
         setSelected(newSelected);
     };
 
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-
-    };
-
+    const handleChangePage = (event, newPage) => { setPage(newPage); };
+    const handleChangeRowsPerPage = (event) => { setRowsPerPage(parseInt(event.target.value, 10)); setPage(0); };
     const isSelected = (name) => selected.indexOf(name) !== -1;
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-    const TableData = (rowsPerPage !== -1) ? stableSort(rows, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage ) : stableSort(rows, getComparator(order, orderBy))
+    const TableData = (rowsPerPage !== -1) ? stableSort(rows, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : stableSort(rows, getComparator(order, orderBy))
 
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
                 <EnhancedTableToolbar numSelected={selected.length} />
-                <TableContainer sx={(stickyTableHeader) ? { maxHeight: stickyTableHeight } : {maxHeight: '100%'}}>
+                <TableContainer sx={(stickyTableHeader) ? { maxHeight: stickyTableHeight } : { maxHeight: '100%' }}>
                     <Table
                         stickyHeader={stickyTableHeader}
                         sx={{ width: "100%" }}
@@ -316,43 +306,43 @@ export default function TableComponents(props) {
                         <TableBody>
                             {
                                 TableData.map((row, index) => {
-                                        const isItemSelected = isSelected(row.name);
-                                        const labelId = `enhanced-table-checkbox-${index}`;
+                                    const isItemSelected = isSelected(row.name);
+                                    const labelId = `enhanced-table-checkbox-${index}`;
 
-                                        return (
-                                            <TableRow
-                                                hover
-                                                onClick={(event) => handleClick(event, row.name)}
-                                                role="checkbox"
-                                                aria-checked={isItemSelected}
-                                                tabIndex={-1}
-                                                key={row.name}
-                                                selected={isItemSelected}
+                                    return (
+                                        <TableRow
+                                            hover
+                                            onClick={(event) => handleClick(event, row.name)}
+                                            role="checkbox"
+                                            aria-checked={isItemSelected}
+                                            tabIndex={-1}
+                                            key={row.name}
+                                            selected={isItemSelected}
+                                        >
+                                            <TableCell padding="checkbox">
+                                                <Checkbox
+                                                    color="primary"
+                                                    checked={isItemSelected}
+                                                    inputProps={{
+                                                        'aria-labelledby': labelId,
+                                                    }}
+                                                />
+                                            </TableCell>
+                                            <TableCell
+                                                component="th"
+                                                id={labelId}
+                                                scope="row"
+                                                padding="none"
                                             >
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox
-                                                        color="primary"
-                                                        checked={isItemSelected}
-                                                        inputProps={{
-                                                            'aria-labelledby': labelId,
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell
-                                                    component="th"
-                                                    id={labelId}
-                                                    scope="row"
-                                                    padding="none"
-                                                >
-                                                    {row.name}
-                                                </TableCell>
-                                                <TableCell align="right">{row.calories}</TableCell>
-                                                <TableCell align="right">{row.fat}</TableCell>
-                                                <TableCell align="right">{row.carbs}</TableCell>
-                                                <TableCell align="right">{row.protein}</TableCell>
-                                            </TableRow>
-                                        );
-                                    })
+                                                {row.name}
+                                            </TableCell>
+                                            <TableCell align="right">{row.calories}</TableCell>
+                                            <TableCell align="right">{row.fat}</TableCell>
+                                            <TableCell align="right">{row.carbs}</TableCell>
+                                            <TableCell align="right">{row.protein}</TableCell>
+                                        </TableRow>
+                                    );
+                                })
                             }
                             {
                                 emptyRows > 0 && (
@@ -401,7 +391,7 @@ function TablePaginationActions(props) {
     const handleNextButtonClick = (event) => { onPageChange(event, page + 1); };
     const handleLastPageButtonClick = (event) => { onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1)); };
     return (
-        <Box sx={{ flexShrink: 0, ml: 1}}>
+        <Box sx={{ flexShrink: 0, ml: 1 }}>
             <IconButton
                 onClick={handleFirstPageButtonClick}
                 disabled={page === 0}
