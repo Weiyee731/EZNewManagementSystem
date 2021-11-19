@@ -19,6 +19,7 @@ import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import { visuallyHidden } from '@mui/utils';
 
 function descendingComparator(a, b, orderBy) {
@@ -110,7 +111,7 @@ EnhancedTableHead.propTypes = {
 };
 
 const EnhancedTableToolbar = (props) => {
-  const { numSelected, selectedRow, title, handleDeleteRow } = props;
+  const { numSelected, selectedRow, title, handleToggleDialog, handleAdd } = props;
 
   return (
     <Toolbar
@@ -143,12 +144,18 @@ const EnhancedTableToolbar = (props) => {
         </Typography>
       )}
 
-      {numSelected > 0 && (
+      {numSelected > 0 ? (
         <Tooltip title="Delete">
           <IconButton
-            onClick={() => handleDeleteRow(selectedRow)}
+            onClick={() => handleToggleDialog(selectedRow)}
           >
             <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <Tooltip title="Add">
+          <IconButton>
+            <AddIcon onClick={() => handleAdd()} />
           </IconButton>
         </Tooltip>
       )}
@@ -160,7 +167,7 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
   selectedRow: PropTypes.array.isRequired,
   title: PropTypes.string.isRequired,
-  handleDeleteRow: PropTypes.func.isRequired
+  handleToggleDialog: PropTypes.func.isRequired
 };
 
 export default function EnhancedTable(props) {
@@ -256,7 +263,8 @@ export default function EnhancedTable(props) {
           numSelected={selected.length}
           selectedRow={selected}
           title={props.title}
-          handleDeleteRow={props.handleDeleteRow}
+          handleToggleDialog={props.handleToggleDialog}
+          handleAdd={props.handleAdd}
         />
         <TableContainer>
           <Table
