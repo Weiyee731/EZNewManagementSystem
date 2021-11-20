@@ -22,13 +22,13 @@ const Main = ({
       <div className="btn-toggle" onClick={() => handleToggleSidebar(true)}>
         <MenuOutlinedIcon />
       </div>
-      <header>
-        <h1>
-          <img width={80} src={reactLogo} alt="react logo" /> EZ Logitstic Management
-        </h1>
-      </header>
 
-      <div className="block ">
+      {/* You can design your header here */}
+      {/* <header>
+       
+      </header> */}
+
+      <div className="block">
         <Switch>
           {
             routes.map((route, index) => {

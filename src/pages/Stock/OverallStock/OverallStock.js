@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { GitAction } from "../../../store/action/gitAction";
 import { browserHistory } from "react-router";
 
+import SearchBar from "../../../components/SearchBar/SearchBar"
 import FullWidthTabs from '../../../components/TabsComponent/Tabs';
 
 function mapStateToProps(state) {
@@ -61,11 +62,12 @@ class OverallStock extends Component {
 
     }
 
-
     render() {
         return (
             <div className="container-fluid">
-                <h1>OverallStock</h1>
+                <SearchBar 
+                
+                />
                 <div className='w-100'>
                     <FullWidthTabs settings={TabsSettings} />
                 </div>
