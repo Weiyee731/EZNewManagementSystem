@@ -144,7 +144,7 @@ export class GitEpic {
       try {
         const response = await fetch(url +
           "User_ViewProfileByID?" +
-          "USERID=" + payload.USERID
+          "USERID=" + payload.UserID
         );
 
         let json = await response.json();
