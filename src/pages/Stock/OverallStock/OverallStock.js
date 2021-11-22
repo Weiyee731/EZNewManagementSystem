@@ -25,67 +25,135 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-
-
-
 const headCells = [
     {
-        id: 'name',
+        id: 'TrackingNo',
         align: 'left',
         disablePadding: false,
-        label: 'Dessert ',
+        label: 'Tracking No. ',
     },
     {
-        id: 'calories',
-        align: 'center',
+        id: 'Weight',
+        align: 'left',
         disablePadding: false,
-        label: 'Calories',
+        label: 'Weight (KG)',
     },
     {
-        id: 'fat',
-        align: 'center',
+        id: 'Depth',
+        align: 'left',
         disablePadding: false,
-        label: 'Fat (g)',
+        label: 'Depth',
     },
     {
-        id: 'carbs',
-        align: 'center',
+        id: 'Width',
+        align: 'left',
         disablePadding: false,
-        label: 'Carbs (g)',
+        label: 'Width',
     },
     {
-        id: 'protein',
-        align: 'center',
+        id: 'Height',
+        align: 'left',
         disablePadding: false,
-        label: 'Protein (g)',
+        label: 'Height',
+    },
+    {
+        id: 'Dimension',
+        align: 'left',
+        disablePadding: false,
+        label: 'Dimension',
+    },
+    {
+        id: 'Item',
+        align: 'left',
+        disablePadding: false,
+        label: 'Item',
+    },
+    {
+        id: 'Member',
+        align: 'left',
+        disablePadding: false,
+        label: 'Member',
+    },
+    {
+        id: 'Division',
+        align: 'left',
+        disablePadding: false,
+        label: 'Division',
+    },
+    {
+        id: 'Stockdate',
+        align: 'left',
+        disablePadding: false,
+        label: 'Stock Date',
+    },
+    {
+        id: 'packagingDate',
+        align: 'left',
+        disablePadding: false,
+        label: 'Packaging Date',
+    },
+    {
+        id: 'ContainerNo',
+        align: 'left',
+        disablePadding: false,
+        label: 'Container',
+    },
+    {
+        id: 'Remarks',
+        align: 'left',
+        disablePadding: false,
+        label: 'Remarks',
     },
 ];
-
-function createData(pid, name, calories, fat, carbs, protein) {
+function createData(stockId, TrackingNo, Weight, Depth, Width, Height, Item, Member, Division, Stockdate, packagingDate, ContainerNo, Remarks) {
     return {
-        pid,
-        name,
-        calories,
-        fat,
-        carbs,
-        protein,
+        stockId,
+        TrackingNo,
+        Width,
+        Height,
+        Depth,
+        Weight,
+        Item,
+        Member,
+        Stockdate,
+        packagingDate,
+        ContainerNo,
+        Division,
+        Remarks,
     };
 }
 
 const rows = [
-    createData(1, 'Cupcake', 305, 3.7, 67, 4.3),
-    createData(2, 'Donut', 452, 25.0, 51, 4.9),
-    createData(3, 'Eclair', 262, 16.0, 24, 6.0),
-    createData(4, 'Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData(5, 'Gingerbread', 356, 16.0, 49, 3.9),
-    createData(6, 'Honeycomb', 408, 3.2, 87, 6.5),
-    createData(7, 'Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData(8, 'Jelly Bean', 375, 0.0, 94, 0.0),
-    createData(9, 'KitKat', 518, 26.0, 65, 7.0),
-    createData(10, 'Lollipop', 392, 0.2, 98, 0.0),
-    createData(11, 'Marshmallow', 318, 0, 81, 2.0),
-    createData(12, 'Nougat', 360, 19.0, 9, 37.0),
-    createData(13, 'Oreo', 437, 18.0, 63, 4.0),
+    createData(1, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(2, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(3, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(4, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(5, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(6, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(7, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(8, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(9, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(10, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(11, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(12, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(13, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(14, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(15, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(16, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(17, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(18, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(19, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(20, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(21, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(22, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(23, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(24, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(25, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(26, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(27, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(28, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(29, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
+    createData(30, 'A123456', 3.7, 3.7, 4.3, 1.5, 'box', 'M123456', 'KU', '14/11/2021', '14/11/2021', 'C354123', 'remarks'),
 ];
 
 const INITIAL_STATE = {
@@ -100,6 +168,7 @@ class OverallStock extends Component {
 
         this.props.CallFetchAllStock({ USERID: 1 })
         this.changeTab = this.changeTab.bind(this)
+        this.onAddButtonClick = this.onAddButtonClick.bind(this)
     }
 
     componentDidMount() {
@@ -140,38 +209,30 @@ class OverallStock extends Component {
     }
 
     renderTableRows = (data, index) => {
+        const fontsize = '9pt'
         return (
             <>
                 <TableCell
                     component="th"
-                    id={`enhanced-table-checkbox-${index}`}
+                    id={`table-checkbox-${index}`}
                     scope="row"
-                    padding="normal"
+                    sx={{ fontSize: fontsize }}
                 >
-                    {data.name}
+                    {data.TrackingNo}
                 </TableCell>
-                <TableCell align="center">{data.calories}</TableCell>
-                <TableCell align="center">{data.fat}</TableCell>
-                <TableCell align="center">{data.carbs}</TableCell>
-                <TableCell align="center">{data.protein}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Weight.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Depth.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Width.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Height.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.Depth * data.Width * data.Height).toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Member}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Division}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Stockdate}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.packagingDate}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ContainerNo}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Remarks}</TableCell>
             </>
-        )
-    }
-
-    renderTableActionButton = () => {
-        return (
-            <div className="d-flex">
-                <Tooltip sx={{ marginLeft: 5 }} title="Add New Items">
-                    <IconButton onClick={(event) => { this.onAddButtonClick() }}>
-                        <AddIcon />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="Buton">
-                    <IconButton onClick={(event) => { this.onAddButtonClick() }}>
-                        <AddIcon />
-                    </IconButton>
-                </Tooltip>
-            </div>
         )
     }
 
@@ -203,28 +264,25 @@ class OverallStock extends Component {
                 <hr />
                 <TableComponents
                     // table settings 
-                    // tableTopLeft={<h3 style={{ fontWeight: 600 }}>Table Name</h3>}  // optional, it can pass as string or as children elements
-                    // tableTopRight={this.renderTableActionButton}                 // optional, it will brings the elements to the table's top right corner
-
                     tableOptions={{
                         dense: true,                // optional, default is false
                         tableOrderBy: 'asc',        // optional, default is asc
-                        sortingIndex: "fat",        // require, it must the same as the desired table header
+                        sortingIndex: "TrackingNo",        // require, it must the same as the desired table header
                         stickyTableHeader: true,    // optional, default is true
-                        stickyTableHeight: getWindowDimensions().screenHeight,     // optional, default is 300px
+                        stickyTableHeight: (getWindowDimensions().screenHeight * 0.7),     // optional, default is 300px
                     }}
                     paginationOptions={[50, 100, 250, { label: 'All', value: -1 }]} // optional, by default it will hide the table pagination. You should set settings for pagination options as in array, eg.: [5, 100, 250, { label: 'All', value: -1 }]
                     tableHeaders={headCells}        //required
                     tableRows={{
                         renderTableRows: this.renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
-                        checkbox: true,                          // optional, by default is true
+                        checkbox: false,                          // optional, by default is true
                         checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
                         onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                     }}
-                    selectedIndexKey={"pid"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
+                    selectedIndexKey={"stockId"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
                     Data={rows}                                  // required, the data that listing in the table
                     onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
-                    onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
+                    // onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                     onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items
                 />
             </div>

@@ -55,9 +55,8 @@ function stableSort(array, comparator) {
 function EnhancedTableHead(props) {
     const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, tableHeaders, renderCheckbox, checkboxColor } = props;
     const createSortHandler = (property) => (event) => { onRequestSort(event, property); };
-
     return (
-        <TableHead>
+        <TableHead >
             <TableRow>
                 {
                     renderCheckbox === true &&
@@ -71,7 +70,6 @@ function EnhancedTableHead(props) {
                         />
                     </TableCell>
                 }
-
                 {
                     isArrayNotEmpty(tableHeaders) && tableHeaders.map((headCell) => (
                         <TableCell
@@ -79,8 +77,10 @@ function EnhancedTableHead(props) {
                             align={isStringNullOrEmpty(headCell.align) ? "left" : headCell.align}
                             padding={headCell.disablePadding ? 'none' : 'normal'}
                             sortDirection={orderBy === headCell.id ? order : false}
+                            sx={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}   // change table header bg color
                         >
                             <TableSortLabel
+                                className="fw-bold"
                                 active={orderBy === headCell.id}
                                 direction={orderBy === headCell.id ? order : 'asc'}
                                 onClick={createSortHandler(headCell.id)}
@@ -118,6 +118,7 @@ const EnhancedTableToolbar = (props) => {
     return (
         <Toolbar
             sx={{
+
                 pl: { sm: 2 },
                 pr: { xs: 1, sm: 1 },
                 ...(numSelected > 0 && {
@@ -145,7 +146,6 @@ const EnhancedTableToolbar = (props) => {
                     </Typography>
                 )
             }
-
             {
                 numSelected > 0 ? (
                     <Tooltip title="Delete">
@@ -155,8 +155,9 @@ const EnhancedTableToolbar = (props) => {
                     </Tooltip>
                 ) : (
                     tableTopRight === null ?
+                        typeof OnActionButtonClick === "function" &&
                         <Tooltip title="Add New Items">
-                            <IconButton onClick={(event) => { typeof OnActionButtonClick === "function" && OnActionButtonClick(selectedRows) }}>
+                            <IconButton onClick={(event) => { OnActionButtonClick(selectedRows) }}>
                                 <AddIcon />
                             </IconButton>
                         </Tooltip>
@@ -194,7 +195,7 @@ export default function TableComponents(props) {
     //pagination settings
     const [rowsPerPage, setRowsPerPage] = React.useState((isArrayNotEmpty(props.paginationOptions) ? props.paginationOptions[0] : 25));
     const [pagePaginationOptions, setPagePaginationOptions] = React.useState((isArrayNotEmpty(props.paginationOptions)) ? props.paginationOptions : []);
-    
+
     //table and table data settings
     const [order, setOrder] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.tableOrderBy === null ? 'asc' : props.tableOptions.tableOrderBy);
     const [orderBy, setOrderBy] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.sortingIndex === null ? "" : props.tableOptions.sortingIndex);
@@ -246,18 +247,21 @@ export default function TableComponents(props) {
     const TableData = (rowsPerPage !== -1) ? stableSort(rows, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : stableSort(rows, getComparator(order, orderBy))
     const checkboxColor = !isObjectUndefinedOrNull(props.tableRows.checkboxColor) ? props.tableRows.checkboxColor : "primary"
     const emptyRowColSpan = renderCheckbox ? tableHeaders.length + 1 : tableHeaders.length
-
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar
-                    selectedRows={selected}
-                    tableTopLeft={props.tableTopLeft}
-                    tableTopRight={tableTopRight}
-                    OnActionButtonClick={props.onActionButtonClick}
-                    OnDeleteButtonClick={props.onDeleteButtonClick}
-                />
-                <TableContainer sx={(stickyTableHeader) ? { maxHeight: stickyTableHeight } : { maxHeight: '100%' }}>
+                {
+                    (typeof props.OnActionButtonClick !== "undefined" || tableTopRight !== null) &&
+                    <EnhancedTableToolbar
+                        selectedRows={selected}
+                        tableTopLeft={props.tableTopLeft}
+                        tableTopRight={tableTopRight}
+                        OnActionButtonClick={props.onActionButtonClick}
+                        OnDeleteButtonClick={props.onDeleteButtonClick}
+                    />
+                }
+
+                <TableContainer sx={{ maxHeight: (stickyTableHeader) ? stickyTableHeight : "100%" }}>
                     <Table
                         stickyHeader={stickyTableHeader}
                         sx={{ width: "100%" }}
@@ -274,7 +278,6 @@ export default function TableComponents(props) {
                             tableHeaders={tableHeaders}
                             renderCheckbox={renderCheckbox}
                             checkboxColor={checkboxColor}
-
                         />
                         <TableBody>
                             {
