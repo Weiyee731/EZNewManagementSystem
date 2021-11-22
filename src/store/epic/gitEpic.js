@@ -276,6 +276,58 @@ export class GitEpic {
 
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
 
+  Transaction_ViewTransaction = action$ =>
+  action$.ofType(GitAction.FetchTransaction).switchMap(async ({ payload }) => {
+    // console.log(url + 
+    //   double_click_and_paste_url_here
+    // )
+    try {
+      const response = await fetch(url +
+        "Transaction_ViewTransaction"
+      );
+
+      let json = await response.json();
+      json = JSON.parse(json)
+      return {
+        type: GitAction.TransactionFetched,
+        payload: json,
+      };
+    }
+    catch (error) {
+      toast.error("Error Code: Transaction_ViewTransaction")
+      return {
+        type: GitAction.TransactionFetched,
+        payload: [],
+      };
+    }
+  });
+
+  Transaction_ViewTransactionByID = action$ =>
+  action$.ofType(GitAction.FetchTransactionByID).switchMap(async ({ payload }) => {
+    // console.log(url + 
+    //   double_click_and_paste_url_here
+    // )
+    try {
+      const response = await fetch(url +
+        "Transaction_ViewTransactionByID?TRANSACTIONID=" + payload.TRANSACTIONID
+      );
+
+      let json = await response.json();
+      json = JSON.parse(json)
+      return {
+        type: GitAction.TransactionByIDFetched,
+        payload: json,
+      };
+    }
+    catch (error) {
+      toast.error("Error Code: Transaction_ViewTransactionByID")
+      return {
+        type: GitAction.TransactionByIDFetched,
+        payload: [],
+      };
+    }
+  });
+
   Transaction_InsertTransaction = action$ =>
     action$.ofType(GitAction.InsertNewTransaction).switchMap(async ({ payload }) => {
       // console.log(url + 

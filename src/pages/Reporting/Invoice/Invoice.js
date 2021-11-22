@@ -18,13 +18,13 @@ import SearchBar from "../../../components/SearchBar/SearchBar"
 
 function mapStateToProps(state) {
     return {
-        user: state.counterReducer["user"],
+        transactions: state.counterReducer["transactions"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        CallUserProfile: () => dispatch(GitAction.CallUserProfile()),
+        CallFetchAllTransaction: (data) => dispatch(GitAction.CallFetchAllTransaction(data)),
     };
 }
 
@@ -43,70 +43,86 @@ const style = {
 
 const headCells = [
     {
-        id: 'UserCode',
-        align: 'left',
-        disablePadding: false,
-        label: 'Code',
+      id: 'OrderDate',
+      align: 'left',
+      disablePadding: false,
+      label: 'Invoice Date',
     },
     {
-        id: 'AreaCode',
-        align: 'center',
-        disablePadding: false,
-        label: 'Area',
+      id: 'TransactionName',
+      align: 'left',
+      disablePadding: false,
+      label: 'Invoice No.',
     },
     {
-        id: 'Fullname',
-        align: 'center',
-        disablePadding: false,
-        label: 'Name',
+      id: 'UserCode',
+      align: 'left',
+      disablePadding: false,
+      label: 'Code',
     },
     {
-        id: 'UserContactNo',
-        align: 'center',
-        disablePadding: false,
-        label: 'Contact No.',
+      id: 'AreaCode',
+      align: 'center',
+      disablePadding: false,
+      label: 'Area',
     },
     {
-        id: 'UserEmailAddress',
-        align: 'center',
-        disablePadding: false,
-        label: 'E-Mail',
+      id: 'Fullname',
+      align: 'center',
+      disablePadding: false,
+      label: 'Name',
     },
-];
+    {
+      id: 'OrderTotalAmount',
+      align: 'center',
+      disablePadding: false,
+      label: 'Total Amount',
+    },
+    {
+      id: 'OrderPaidAmount',
+      align: 'center',
+      disablePadding: false,
+      label: 'Paid',
+    },
+    {
+      id: 'OrderStatus',
+      align: 'center',
+      disablePadding: false,
+      label: 'Status',
+    },
+  ];
 class Invoice extends Component {
     constructor(props) {
         super(props);
         this.state = {
             AddModalOpen: false,
-            UserListing: [],
-            UserListingfiltered: []
+            TransactionListing: [],
+            TransactionListingFiltered: []
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
-        this.props.CallUserProfile();
+        this.props.CallFetchAllTransaction(this.state);
     }
 
 
 
     componentDidMount() {
-        console.log("www")
-        if (this.props.user.length !== this.state.UserListing.length) {
-            if (this.props.user !== undefined && this.props.user[0] !== undefined) {
-                this.setState({ UserListing: this.props.user, UserListingfiltered: this.props.user });
+        if (this.props.transactions.length !== this.state.TransactionListing.length) {
+            if (this.props.transactions !== undefined && this.props.transactions[0] !== undefined) {
+                this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
             }
         }
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log("www")
-        if (prevProps.user.length !== this.props.user.length) {
-            console.log(this.props.user !== undefined && this.props.user[0] !== undefined)
-            if (this.props.user !== undefined && this.props.user[0] !== undefined) {
-                this.setState({ UserListing: this.props.user, UserListingfiltered: this.props.user });
+        if (prevProps.transactions.length !== this.props.transactions.length) {
+            console.log(this.props.transactions !== undefined && this.props.transactions[0] !== undefined)
+            if (this.props.transactions !== undefined && this.props.transactions[0] !== undefined) {
+                this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
             }
         } else {
-            if (prevProps.user.length !== this.state.UserListing.length) {
-                this.setState({ UserListing: prevProps.user, UserListingfiltered: prevProps.user });
+            if (prevProps.transactions.length !== this.state.TransactionListing.length) {
+                this.setState({ TransactionListing: prevProps.transactions, TransactionListingFiltered: prevProps.transactions });
             }
         }
     }
@@ -114,18 +130,14 @@ class Invoice extends Component {
     renderTableRows = (data, index) => {
         return (
             <>
-                <TableCell
-                    component="th"
-                    id={`enhanced-table-checkbox-${index}`}
-                    scope="row"
-                    padding="normal"
-                >
-                    {data.UserCode}
-                </TableCell>
-                <TableCell align="center">{data.AreaCode}</TableCell>
-                <TableCell align="center">{data.Fullname}</TableCell>
-                <TableCell align="center">{data.UserContactNo}</TableCell>
-                <TableCell align="center">{data.UserEmailAddress}</TableCell>
+                <TableCell component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{data.OrderDate}</TableCell>
+                <TableCell>{data.TransactionName}</TableCell>
+                <TableCell>{data.UserCode}</TableCell>
+                <TableCell>{data.AreaCode}</TableCell>
+                <TableCell>{data.Fullname}</TableCell>
+                <TableCell align="center"><Box color={data.OrderColor}>{data.OrderTotalAmount}</Box></TableCell>
+                <TableCell align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
+                <TableCell align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
             </>
         )
     }
@@ -143,7 +155,7 @@ class Invoice extends Component {
     }
 
     onTableRowClick = (event, row) => {
-        this.props.history.push(`/UserDetail/${row.UserID}/${row.UserCode}`)
+        this.props.history.push(`/InvoiceDetail/${row.UserID}`)
     }
 
     handleClose = () => {
@@ -163,8 +175,8 @@ class Invoice extends Component {
 
     render() {
         const onChange = (e) => {
-            const FilterArr = this.state.UserListing.filter((searchedItem) =>searchedItem.UserCode.toLowerCase().includes(e.target.value))
-            this.setState({ UserListingfiltered: FilterArr });
+            const FilterArr = this.state.TransactionListing.filter((searchedItem) =>searchedItem.UserCode.toLowerCase().includes(e.target.value))
+            this.setState({ TransactionListingFiltered: FilterArr });
         }
 
         return (
@@ -192,7 +204,7 @@ class Invoice extends Component {
                             onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                         }}
                         selectedIndexKey={"pid"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
-                        Data={this.state.UserListingfiltered}                                  // required, the data that listing in the table
+                        Data={this.state.TransactionListingFiltered}                                  // required, the data that listing in the table
                         onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                         onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                         onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items
@@ -280,4 +292,4 @@ class Invoice extends Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Invoice);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Invoice));
