@@ -182,6 +182,7 @@ TableComponents.propTypes = {
 };
 
 export default function TableComponents(props) {
+    
     const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
 
@@ -200,11 +201,17 @@ export default function TableComponents(props) {
     const [order, setOrder] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.tableOrderBy === null ? 'asc' : props.tableOptions.tableOrderBy);
     const [orderBy, setOrderBy] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.sortingIndex === null ? "" : props.tableOptions.sortingIndex);
     const [objectKey, setObjectKey] = React.useState(!isStringNullOrEmpty(props.selectedIndexKey) ? props.selectedIndexKey : "id")
-    const [rows, setRows] = React.useState((isArrayNotEmpty(props.Data) ? props.Data : []));
+    const [rows, setRows] = React.useState(props.Data);
     const [tableHeaders, setTableHeaders] = React.useState((isArrayNotEmpty(props.tableHeaders) ? props.tableHeaders : []));
     const [renderCheckbox, setRenderCheckbox] = React.useState(!isObjectUndefinedOrNull(props.tableRows.checkbox) ? props.tableRows.checkbox : true);
     const [onRowSelect, setOnRowSelect] = React.useState(!isObjectUndefinedOrNull(props.tableRows.onRowClickSelect) ? props.tableRows.onRowClickSelect : false);
 
+    if(props.Data.length > 0)
+    {
+        if(rows.length <= 0){
+            setRows(props.Data)
+        }
+    }
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');

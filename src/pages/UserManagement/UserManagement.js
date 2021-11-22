@@ -91,7 +91,8 @@ class UserManagement extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            AddModalOpen: false
+            AddModalOpen: false,
+            UserListing: []
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
@@ -101,11 +102,24 @@ class UserManagement extends Component {
 
 
     componentDidMount() {
-
+        if (this.props.user.length !== this.state.UserListing.length) {
+            if (this.props.user !== undefined && this.props.user[0] !== undefined) {
+                this.setState({ UserListing: this.props.user });
+            }
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
-
+        if (prevProps.user.length !== this.props.user.length) {
+            console.log(this.props.user !== undefined && this.props.user[0] !== undefined)
+            if (this.props.user !== undefined && this.props.user[0] !== undefined) {
+                this.setState({ UserListing: this.props.user });
+            }
+        }else{
+            if (prevProps.user.length !== this.state.UserListing.length) {
+                this.setState({ UserListing: prevProps.user });
+            }
+        }
     }
 
     renderTableRows = (data, index) => {
@@ -158,13 +172,16 @@ class UserManagement extends Component {
 
     onDeleteButtonClick = (items) => {
         console.log('delete button')
-        console.log(this.props.user)
+        
     }
 
     render() {
         return (
             <>
                 <div className="w-100 container-fluid">
+                    {/* {console.log(this.state.UserListing)}
+                    {console.log(this.props.user)}
+                     */}
                     <TableComponents
                         // table settings 
                         tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}  // optional, it can pass as string or as children elements
@@ -186,7 +203,7 @@ class UserManagement extends Component {
                             onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                         }}
                         selectedIndexKey={"pid"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
-                        Data={this.props.user}                                  // required, the data that listing in the table
+                        Data={this.state.UserListing}                                  // required, the data that listing in the table
                         onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                         onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                         onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items
