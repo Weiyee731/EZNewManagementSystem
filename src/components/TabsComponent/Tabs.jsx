@@ -5,10 +5,10 @@ import { useTheme } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 import { isArrayNotEmpty } from "../../tools/Helpers"
+import "./Tabs.css";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -22,8 +22,8 @@ function TabPanel(props) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
+        <Box sx={{ p: 2 }}>
+          {children}
         </Box>
       )}
     </div>
@@ -56,27 +56,27 @@ export default function FullWidthTabs(props) {
   };
 
   React.useEffect(() => {
-    console.log(props.settings)
+
   }, [])
 
-  console.log(isArrayNotEmpty(props.Headers))
-
-  const { Headers, Body } = props.settings
+  const { Headers, Body } = props
   return (
     <Box sx={{ bgcolor: 'background.paper', width: '100%' }}>
       <AppBar position="static">
         <Tabs
           value={value}
           onChange={handleChange}
-          indicatorColor="secondary"
+          indicatorColor="primary"
           textColor="inherit"
           variant="fullWidth"
           aria-label="full width tabs example"
           centered
+          sx={{ bgcolor: "#0c1e35", color: "white" }}
+          selectionFollowsFocus
         >
           {
             isArrayNotEmpty(Headers) && Headers.map((el, index) => {
-              return <Tab key={index} label={el} {...a11yProps(index)} />
+              return <Tab wrapped key={index} label={el} {...a11yProps(index)} />
             })
           }
         </Tabs>
@@ -103,3 +103,25 @@ export default function FullWidthTabs(props) {
 FullWidthTabs.propTypes = {
   settings: PropTypes.object,
 };
+
+/***************************************
+ * Tutorial on using this components
+ *
+ * 1. In render function(), just follow the settings below
+ *  <div className='w-100'>
+      <FullWidthTabs 
+          Headers={TabsHeaders}
+          Body={TabsBody}
+      />
+    </div>
+
+    whereby the settings is
+
+    const TabsHeaders = ["All", "Tab 2"]        //headers, in strings
+    const TabsBody = [<Table1 />, <Table2 />]   //body, the components that will be rendered in the tab
+ *
+ *
+ *
+ *
+ *
+ */

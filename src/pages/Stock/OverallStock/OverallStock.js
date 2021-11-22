@@ -5,16 +5,17 @@ import { browserHistory } from "react-router";
 
 import SearchBar from "../../../components/SearchBar/SearchBar"
 import FullWidthTabs from '../../../components/TabsComponent/Tabs';
+import TableComponents from "../../../components/TableComponents/TableComponents";
 
 function mapStateToProps(state) {
     return {
-        foods: state.counterReducer["foods"],
+        stocks: state.counterReducer["stocks"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        CallTesting: () => dispatch(GitAction.CallTesting()),
+        CallFetchAllStock: (propsData) => dispatch(GitAction.CallFetchAllStock(propsData)),
     };
 }
 
@@ -24,16 +25,14 @@ const INITIAL_STATE = {
 }
 
 function Table1() {
-
     return (
         <div>
-            Something 1
+            
         </div>
     )
 }
 
 function Table2() {
-
     return (
         <div>
             Something 2
@@ -41,12 +40,8 @@ function Table2() {
     )
 }
 
-const TabsHeaders = ["Tab 1", "Tab 2"]
+const TabsHeaders = ["All", "Tab 2"]
 const TabsBody = [<Table1 />, <Table2 />]
-const TabsSettings = {
-    Headers: TabsHeaders,
-    Body: TabsBody
-}
 
 class OverallStock extends Component {
     constructor(props) {
@@ -66,10 +61,13 @@ class OverallStock extends Component {
         return (
             <div className="container-fluid">
                 <SearchBar 
-                
+
                 />
                 <div className='w-100'>
-                    <FullWidthTabs settings={TabsSettings} />
+                    <FullWidthTabs 
+                        Headers={TabsHeaders}
+                        Body={TabsBody}
+                    />
                 </div>
             </div>
         )
