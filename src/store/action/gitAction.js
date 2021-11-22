@@ -130,5 +130,24 @@ export class GitAction {
     };
   }
 
+  static FetchTransaction = "FETCH_ALL_TRANSACTION";
+  static TransactionFetched = "ALL_TRANSACTION_FETCHED";
+  static CallFetchAllTransaction(propsData) {
+    return {
+      type: GitAction.FetchTransaction,
+      payload: propsData
+    };
+  }
+
+  static FetchTransactionByID = "FETCH_ALL_TRANSACTION_BYID";
+  static TransactionByIDFetched = "ALL_TRANSACTION_BYID_FETCHED";
+  static CallFetchAllTransactionByID(propsData) {
+    return {
+      type: GitAction.FetchTransactionByID,
+      payload: propsData
+    };
+  }
+  
+
 }
 

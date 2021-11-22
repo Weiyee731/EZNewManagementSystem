@@ -17,7 +17,7 @@ const SearchBox = (props) => {
             id="search-bar"
             placeholder={isStringNullOrEmpty(props.placeholder) ? "Type to search" : props.placeholder}
             helperText={isStringNullOrEmpty(props.helperText) ? "" : props.helperText}
-            onChange={props.onChange}
+            onChange={(e) => props.onChange(e)}
             size="small"
             margin="dense"
             variant="outlined"

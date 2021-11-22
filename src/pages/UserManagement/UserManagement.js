@@ -9,27 +9,13 @@ import AddIcon from '@mui/icons-material/Add';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Input from '@mui/material/Input';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
-import Select from '@mui/material/Select';
-import Dropzone from "react-dropzone";
-import axios from "axios";
 import TableComponents from "../../components/TableComponents/TableComponents"
-import Avatar from '@mui/material/Avatar';
-import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
 import Backdrop from '@mui/material/Backdrop';
 import { getWindowDimensions } from "../../tools/Helpers";
+import SearchBar from "../../components/SearchBar/SearchBar"
 
 const style = {
     position: 'absolute',
@@ -93,7 +79,8 @@ class UserManagement extends Component {
         super(props);
         this.state = {
             AddModalOpen: false,
-            UserListing: []
+            UserListing: [],
+            UserListingfiltered:[]
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
@@ -104,7 +91,7 @@ class UserManagement extends Component {
     componentDidMount() {
         if (this.props.user.length !== this.state.UserListing.length) {
             if (this.props.user !== undefined && this.props.user[0] !== undefined) {
-                this.setState({ UserListing: this.props.user });
+                this.setState({ UserListing: this.props.user, UserListingfiltered: this.props.user });
             }
         }
     }
@@ -113,11 +100,11 @@ class UserManagement extends Component {
         if (prevProps.user.length !== this.props.user.length) {
             console.log(this.props.user !== undefined && this.props.user[0] !== undefined)
             if (this.props.user !== undefined && this.props.user[0] !== undefined) {
-                this.setState({ UserListing: this.props.user });
+                this.setState({ UserListing: this.props.user, UserListingfiltered: this.props.user });
             }
         } else {
             if (prevProps.user.length !== this.state.UserListing.length) {
-                this.setState({ UserListing: prevProps.user });
+                this.setState({ UserListing: prevProps.user, UserListingfiltered: prevProps.user });
             }
         }
     }
@@ -149,11 +136,6 @@ class UserManagement extends Component {
                         <AddIcon />
                     </IconButton>
                 </Tooltip>
-                <Tooltip title="Buton">
-                    <IconButton onClick={(event) => { this.onAddButtonClick() }}>
-                        <AddIcon />
-                    </IconButton>
-                </Tooltip>
             </div>
         )
     }
@@ -176,16 +158,20 @@ class UserManagement extends Component {
     }
 
     render() {
+
+        const onChange = (e) => {
+            const FilterArr = this.state.UserListing.filter((searchedItem) =>searchedItem.UserCode.toLowerCase().includes(e.target.value))
+            this.setState({ UserListingfiltered: FilterArr });
+        }
+
         return (
             <>
                 <div className="w-100 container-fluid">
-                    {/* {console.log(this.state.UserListing)}
-                    {console.log(this.props.user)}
-                     */}
+                    <SearchBar  onChange={onChange}  />
                     <TableComponents
                         // table settings 
                         tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}  // optional, it can pass as string or as children elements
-                        // tableTopRight={this.renderTableActionButton}                 // optional, it will brings the elements to the table's top right corner
+                        tableTopRight={this.renderTableActionButton}                 // optional, it will brings the elements to the table's top right corner
 
                         tableOptions={{
                             dense: false,                // optional, default is false
@@ -198,12 +184,12 @@ class UserManagement extends Component {
                         tableHeaders={headCells}        //required
                         tableRows={{
                             renderTableRows: this.renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
-                            checkbox: true,                          // optional, by default is true
+                            checkbox: false,                          // optional, by default is true
                             checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
                             onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                         }}
                         selectedIndexKey={"UserID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
-                        Data={this.state.UserListing}                                  // required, the data that listing in the table
+                        Data={this.state.UserListingfiltered}                                  // required, the data that listing in the table
                         onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                         onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                         onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items

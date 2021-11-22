@@ -3,12 +3,14 @@ import { GitAction } from "../action/gitAction";
 const INITIAL_STATE = {
   loading: false,
   logonUser: [],
-  user:[],
+  user: [],
   userProfile: [],
   registrationReturn: [],
   sidebars: [],
   stocks: [],
   stockReturn: [],
+  transactions: [],
+  transaction: [],
   transactionReturn: [],
 };
 
@@ -43,7 +45,7 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, { registrationReturn: [] });
 
     case GitAction.GetUserProfile:
-      
+
       return Object.assign({}, state, { loading: true });
     case GitAction.GotUserProfile:
       return Object.assign({}, state, {
@@ -53,7 +55,7 @@ export function counterReducer(state = INITIAL_STATE, action) {
     case GitAction.ResetUserProfile:
       return Object.assign({}, state, { userProfile: [] });
 
-      case GitAction.GetUserProfileByID:
+    case GitAction.GetUserProfileByID:
       return Object.assign({}, state, { loading: true });
     case GitAction.GotUserProfileByID:
       return Object.assign({}, state, {
@@ -99,7 +101,7 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, { stockReturn: [] });
 
     /////////////////////////////////////////////////// Transaction Management ///////////////////////////////////////////////////
-    
+
     case GitAction.InsertNewTransaction:
       return Object.assign({}, state, { loading: true });
     case GitAction.NewTransactionInserted:
@@ -109,8 +111,20 @@ export function counterReducer(state = INITIAL_STATE, action) {
       });
     case GitAction.ResetTransactionReturn:
       return Object.assign({}, state, { transactionReturn: [] });
-
-
+    case GitAction.FetchTransaction:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.TransactionFetched:
+      return Object.assign({}, state, {
+        loading: false,
+        transactions: action.payload
+      });
+    case GitAction.FetchTransactionByID:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.TransactionByIDFetched:
+      return Object.assign({}, state, {
+        loading: false,
+        transaction: action.payload
+      });
     /////////////////////////////////////////////////// Default ///////////////////////////////////////////////////
     default:
       return state;

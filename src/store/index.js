@@ -13,6 +13,8 @@ const rootEpic = combineEpics(
   gitEpic.Inventory_ViewStockList,
   gitEpic.Inventory_InsertStock,
   gitEpic.Transaction_InsertTransaction,
+  gitEpic.Transaction_ViewTransaction,
+  gitEpic.Transaction_ViewTransactionByID,
 );
 
 const rootReducer = combineReducers({ counterReducer });

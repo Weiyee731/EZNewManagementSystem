@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useEffect} from 'react';
 import PropTypes from 'prop-types';
 import { alpha, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -23,7 +24,7 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import AddIcon from '@mui/icons-material/Add';
-
+import SearchBar from "../SearchBar/SearchBar"
 import { isObjectUndefinedOrNull, isArrayNotEmpty, isStringNullOrEmpty } from "../../tools/Helpers"
 
 function descendingComparator(a, b, orderBy) {
@@ -206,11 +207,10 @@ export default function TableComponents(props) {
     const [renderCheckbox, setRenderCheckbox] = React.useState(!isObjectUndefinedOrNull(props.tableRows.checkbox) ? props.tableRows.checkbox : true);
     const [onRowSelect, setOnRowSelect] = React.useState(!isObjectUndefinedOrNull(props.tableRows.onRowClickSelect) ? props.tableRows.onRowClickSelect : false);
 
-    if (props.Data.length > 0) {
-        if (rows.length <= 0) {
-            setRows(props.Data)
-        }
-    }
+    useEffect(() => {
+        setRows(props.Data)
+    },[props.Data]);
+
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -255,6 +255,7 @@ export default function TableComponents(props) {
     const emptyRowColSpan = renderCheckbox ? tableHeaders.length + 1 : tableHeaders.length
     return (
         <Box sx={{ width: '100%' }}>
+
             <Paper sx={{ width: '100%', mb: 2 }}>
                 {
                     <EnhancedTableToolbar
