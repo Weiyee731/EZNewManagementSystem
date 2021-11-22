@@ -39,10 +39,19 @@ export class GitEpic {
 
         let json = await response.json();
         json = JSON.parse(json)
-        return {
-          type: GitAction.LoginSuccess,
-          payload: json,
-        };
+        const response2 = await fetch(url +
+            "User_ViewPage?" +
+            "ROLEGROUPID=" + json[0].UserTypeID +
+            "&USERID=" + json[0].UserID
+          );
+          let json2 = await response2.json();
+          json2 = JSON.parse(json2)
+          return {
+            payload2: json2,
+            type: GitAction.LoginSuccess,
+            payload: json,
+          };
+
       }
       catch (error) {
         toast.error("Error Code: User_Login")
