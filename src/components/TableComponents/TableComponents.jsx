@@ -78,6 +78,9 @@ function EnhancedTableHead(props) {
                             key={headCell.id}
                             align={isStringNullOrEmpty(headCell.align) ? "left" : headCell.align}
                             padding={headCell.disablePadding ? 'none' : 'normal'}
+                            //cheetat
+                            className={headCell.className?headCell.className:[]}
+                            //
                             sortDirection={orderBy === headCell.id ? order : false}
                         >
                             <TableSortLabel
