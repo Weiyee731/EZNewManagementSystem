@@ -9,10 +9,9 @@ import PropTypes from "prop-types";
 import "./Searchbar.css"
 
 const SearchBox = (props) => {
-    console.log(isObjectUndefinedOrNull(props.style))
     return (
         <TextField
-            className="searchbar-input"
+            className={(isStringNullOrEmpty(props.className)) ? "searchbar-input" : props.className}
             fullWidth
             label={isStringNullOrEmpty(props.label) ? "" : props.label}
             id="search-bar"
@@ -37,9 +36,10 @@ const SearchBox = (props) => {
 
 SearchBox.propTypes = {
     style: PropTypes.object,
-    placeholder: PropTypes.string.isRequired,
+    placeholder: PropTypes.string,
     helperText: PropTypes.string,
-    onChange: PropTypes.func.isRequired,
+    onChange: PropTypes.func,
+    className: PropTypes.string,
 
 }
 export default SearchBox;
