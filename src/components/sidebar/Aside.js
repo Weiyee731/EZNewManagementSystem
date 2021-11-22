@@ -23,20 +23,20 @@ import Button from '@mui/material/Button';
 
 function mapStateToProps(state) {
   return {
-      user: state.counterReducer["user"],
+    user: state.counterReducer["user"],
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-      CallUserProfile: () => dispatch(GitAction.CallUserProfile()),
+    CallUserProfile: () => dispatch(GitAction.CallUserProfile()),
   };
 }
 
 const Aside = ({ rtl, toggled, handleToggleSidebar, sidebar }) => {
   const [isCollapsed, setIsCollapsed] = useState(false) // check the sidebar is actually collapsed 
   const [collapsed, setCollapsed] = useState(false)
-  
+
   const handleCollapseSidebar = (value) => {
     setIsCollapsed(typeof value !== "undefined" && value !== null ? value : !isCollapsed);
     setCollapsed(typeof value !== "undefined" && value !== null ? value : !isCollapsed);
@@ -51,7 +51,7 @@ const Aside = ({ rtl, toggled, handleToggleSidebar, sidebar }) => {
       breakPoint="md"
       onToggle={handleToggleSidebar}
       onMouseEnter={() => { isCollapsed && setCollapsed(false) }}
-      onMouseLeave={() => { isCollapsed && setCollapsed(true)  }}
+      onMouseLeave={() => { isCollapsed && setCollapsed(true) }}
     >
       <SidebarHeader>
         <SidebarButtons handleCollapseSidebar={handleCollapseSidebar} isCollapsed={isCollapsed} />
@@ -59,7 +59,7 @@ const Aside = ({ rtl, toggled, handleToggleSidebar, sidebar }) => {
           !isCollapsed && <SidebarProfile />
         }
       </SidebarHeader>
-        {console.log(sidebar)}
+
       <SidebarContent className="thin-scrollbar">
         <Menu iconShape="circle" innerSubMenuArrows={false} popperArrow={false} subMenuBullets={false}>
           {
@@ -83,10 +83,8 @@ const Aside = ({ rtl, toggled, handleToggleSidebar, sidebar }) => {
         </Menu>
       </SidebarContent >
       <SidebarFooter style={{ textAlign: 'center' }}>
-        <div
-          className="sidebar-btn-wrapper"
-          style={{ padding: '20px 24px', }}>
-          <Button onClick={(e)=>{resetLogonUser()} }><LogoutIcon /></Button>
+        <div className="sidebar-btn-wrapper" style={{ padding: '20px 24px', }}>
+          <Button onClick={(e) => { resetLogonUser() }}><LogoutIcon /></Button>
         </div>
       </SidebarFooter>
     </ProSidebar >

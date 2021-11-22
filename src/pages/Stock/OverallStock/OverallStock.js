@@ -260,8 +260,8 @@ class OverallStock extends Component {
         return (
             <div className="container-fluid">
                 <SearchBar />
-                <ToggleTabsComponent Tabs={ToggleTabs} size="small" />
                 <hr />
+                <ToggleTabsComponent Tabs={ToggleTabs} size="small" />
                 <TableComponents
                     // table settings 
                     tableOptions={{

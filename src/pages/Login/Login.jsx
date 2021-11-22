@@ -54,11 +54,8 @@ class Dashboard extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(this.props.logonUser)
-        console.log(this.props.loading)
-        console.log(this.props.sidebars)
         if (!this.props.loading && isArrayNotEmpty(this.props.logonUser)) {
-            setLogonUser(this.props.logonUser,this.props.sidebars)
+            setLogonUser(this.props.logonUser, this.props.sidebars)
         }
         else {
             //failure
@@ -87,8 +84,6 @@ class Dashboard extends Component {
     }
 
     OnSubmitLogin = () => {
-        console.log('yes')
-        console.log(this.isInputsVerified())
         if (this.isInputsVerified()) {
             let object = {
                 username: this.state.username,
