@@ -77,6 +77,9 @@ function EnhancedTableHead(props) {
                             key={headCell.id}
                             align={isStringNullOrEmpty(headCell.align) ? "left" : headCell.align}
                             padding={headCell.disablePadding ? 'none' : 'normal'}
+                            //cheetat
+                            className={headCell.className?headCell.className:[]}
+                            //
                             sortDirection={orderBy === headCell.id ? order : false}
                             sx={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}   // change table header bg color
                         >
