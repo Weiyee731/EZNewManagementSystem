@@ -26,7 +26,7 @@ const Main = ({
       {/* You can design your header here */}
       {/* <header>
 
-</header> */}
+      </header> */}
 
       <div className="block">
         <Switch>

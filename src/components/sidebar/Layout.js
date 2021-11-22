@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Aside from './Aside';
 import Main from './Main';
-import { isUserLogon,getSidebaritems } from "../auth/AuthManagement";
+import { isUserLogon, getSidebaritems } from "../auth/AuthManagement";
 import Login from "../../pages/Login/Login";
 import "./styles/sidebar.css";
 
@@ -20,6 +20,16 @@ function Layout() {
     setToggled(value);
   };
 
+  const renderSidebarItems = () => {
+    try {
+      return JSON.parse(sidebaritem)
+    }
+    catch (e) {
+      console.log('sidebar: ', e)
+      return [];
+    }
+  }
+
   return (
     <div className={`app ${rtl ? 'rtl' : ''} ${toggled ? 'toggled' : ''}`}>
       {
@@ -28,7 +38,7 @@ function Layout() {
             <Aside
               image={false} // can set the background image for the sidebar here
               rtl={rtl}
-              sidebar={JSON.parse(sidebaritem)}
+              sidebar={ renderSidebarItems() }
               toggled={toggled}
               handleToggleSidebar={handleToggleSidebar}
             />
