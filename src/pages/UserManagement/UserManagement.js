@@ -29,6 +29,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Backdrop from '@mui/material/Backdrop';
+import { getWindowDimensions } from "../../tools/Helpers";
 
 const style = {
     position: 'absolute',
@@ -96,10 +97,9 @@ class UserManagement extends Component {
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
+        this.onAddButtonClick = this.onAddButtonClick.bind(this)
         this.props.CallUserProfile();
     }
-
-
 
     componentDidMount() {
         if (this.props.user.length !== this.state.UserListing.length) {
@@ -115,7 +115,7 @@ class UserManagement extends Component {
             if (this.props.user !== undefined && this.props.user[0] !== undefined) {
                 this.setState({ UserListing: this.props.user });
             }
-        }else{
+        } else {
             if (prevProps.user.length !== this.state.UserListing.length) {
                 this.setState({ UserListing: prevProps.user });
             }
@@ -172,7 +172,7 @@ class UserManagement extends Component {
 
     onDeleteButtonClick = (items) => {
         console.log('delete button')
-        
+
     }
 
     render() {
@@ -190,9 +190,9 @@ class UserManagement extends Component {
                         tableOptions={{
                             dense: false,                // optional, default is false
                             tableOrderBy: 'asc',        // optional, default is asc
-                            sortingIndex: "fat",        // require, it must the same as the desired table header
+                            sortingIndex: "UserCode",        // require, it must the same as the desired table header
                             stickyTableHeader: true,    // optional, default is true
-                            stickyTableHeight: 300,     // optional, default is 300px
+                            stickyTableHeight: getWindowDimensions().screenHeight * 0.8,     // optional, default is 300px
                         }}
                         paginationOptions={[20, 50, 100, { label: 'All', value: -1 }]} // optional, by default it will hide the table pagination. You should set settings for pagination options as in array, eg.: [5, 100, 250, { label: 'All', value: -1 }]
                         tableHeaders={headCells}        //required
@@ -202,7 +202,7 @@ class UserManagement extends Component {
                             checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
                             onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                         }}
-                        selectedIndexKey={"pid"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
+                        selectedIndexKey={"UserID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
                         Data={this.state.UserListing}                                  // required, the data that listing in the table
                         onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                         onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
@@ -217,7 +217,7 @@ class UserManagement extends Component {
                         aria-describedby="modal-modal-description"
                         closeAfterTransition
                         BackdropComponent={Backdrop}
-                        BackdropProps={{ timeout: 500}}>
+                        BackdropProps={{ timeout: 500 }}>
                         <Box sx={style} component="main" maxWidth="xs">
                             <Typography component="h1" variant="h5">Sign up</Typography>
                             <Box component="form" noValidate sx={{ mt: 3 }}>

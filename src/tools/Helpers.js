@@ -124,10 +124,17 @@ export const getFileTypeByExtension = (ext) => {
 
             case "txt":
             case "pdf":
-            case "docx":
-            case "doc":
             case "ppt":
                 return "file";
+
+            case "docx":
+            case "doc":
+                return "docs";
+
+            case "xls":
+            case "xlsx":
+            case "csv":
+                return "excel";
 
             default:
                 console.log("getFileTypeByExtension: the value is not found in the library")
@@ -139,7 +146,7 @@ export const getFileTypeByExtension = (ext) => {
 // screen function
 export function getWindowDimensions() {
     const { innerWidth: screenWidth, innerHeight: screenHeight } = window;
-    return { screenWidth,  screenHeight };
+    return { screenWidth, screenHeight };
 }
 
 // currency / money handler functions

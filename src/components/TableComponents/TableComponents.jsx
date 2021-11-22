@@ -60,7 +60,7 @@ function EnhancedTableHead(props) {
             <TableRow>
                 {
                     renderCheckbox === true &&
-                    <TableCell padding="checkbox">
+                    <TableCell padding="checkbox" sx={{ bgcolor: 'rgb(200, 200, 200)' }} >
                         <Checkbox
                             color={checkboxColor}
                             indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -182,7 +182,7 @@ TableComponents.propTypes = {
 };
 
 export default function TableComponents(props) {
-    
+
     const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
 
@@ -206,9 +206,8 @@ export default function TableComponents(props) {
     const [renderCheckbox, setRenderCheckbox] = React.useState(!isObjectUndefinedOrNull(props.tableRows.checkbox) ? props.tableRows.checkbox : true);
     const [onRowSelect, setOnRowSelect] = React.useState(!isObjectUndefinedOrNull(props.tableRows.onRowClickSelect) ? props.tableRows.onRowClickSelect : false);
 
-    if(props.Data.length > 0)
-    {
-        if(rows.length <= 0){
+    if (props.Data.length > 0) {
+        if (rows.length <= 0) {
             setRows(props.Data)
         }
     }
@@ -258,7 +257,6 @@ export default function TableComponents(props) {
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
                 {
-                    (typeof props.OnActionButtonClick !== "undefined" || tableTopRight !== null) &&
                     <EnhancedTableToolbar
                         selectedRows={selected}
                         tableTopLeft={props.tableTopLeft}
