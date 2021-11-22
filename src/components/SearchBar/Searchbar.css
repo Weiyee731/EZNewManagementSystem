@@ -1,13 +1,25 @@
-.searchbar-input{
-    background-color: rgb(33, 33, 33);
-    border-radius: 30px;
+.searchbar-input {
+    /* background-color: rgb(33, 33, 33); */
 }
 
-.searchbar-input fieldset{
-    top: 0;
-    border-radius: 50%;
+.searchbar-input fieldset {
+    top          : 0;
 }
 
-.searchbar-input input, .searchbar-input button{
-    color: white
+/* the border radius are corelevant with each other */
+.searchbar-input fieldset, .searchbar-input{
+    border-radius   : 15px;
+    border: 1px solid rgba(33, 33, 33, 0.6);
+}
+
+.searchbar-input input,
+.searchbar-input button {
+    color  : black;
+    outline: none;
+    font-size: 10.5pt;
+    padding: 0.5em;
+}
+
+.searchbar-input .Mui-focused{
+    outline: none;
 }

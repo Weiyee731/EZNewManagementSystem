@@ -136,6 +136,11 @@ export const getFileTypeByExtension = (ext) => {
     }
 }
 
+// screen function
+export function getWindowDimensions() {
+    const { innerWidth: screenWidth, innerHeight: screenHeight } = window;
+    return { screenWidth,  screenHeight };
+}
 
 // currency / money handler functions
 export const roundOffTotal = (val) => {

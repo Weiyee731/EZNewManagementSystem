@@ -35,13 +35,27 @@ export class GitAction {
     };
   }
 
+  static GetUserProfileByID = "GET_USER_PROFILEBYID";
+  static GotUserProfileByID = "GOT_USER_PROFILEBYID";
+  static ResetUserProfileByID = "RESET-USER_PROFILEBYID";
+  static CallUserProfileByID(propsData) {
+    return {
+      type: GitAction.GetUserProfileByID,
+      payload: propsData
+    };
+  }
+  static CallResetUserProfile() {
+    return {
+      type: GitAction.ResetUserProfileByID,
+    };
+  }
+
   static GetUserProfile = "GET_USER_PROFILE";
   static GotUserProfile = "GOT_USER_PROFILE";
   static ResetUserProfile = "RESET-USER_PROFILE";
-  static CallUserProfileByID(propsData) {
+  static CallUserProfile() {
     return {
-      type: GitAction.GetUserProfile,
-      payload: propsData
+      type: GitAction.GetUserProfile
     };
   }
   static CallResetUserProfile() {
@@ -49,7 +63,6 @@ export class GitAction {
       type: GitAction.ResetUserProfile,
     };
   }
-
 
   ///////////////////////////////////////////////////  sidebar configuration  ///////////////////////////////////////////////////
   static FetchSidebar = "FETCH_SIDEBAR";
@@ -116,6 +129,25 @@ export class GitAction {
       type: GitAction.ResetTransactionReturn,
     };
   }
+
+  static FetchTransaction = "FETCH_ALL_TRANSACTION";
+  static TransactionFetched = "ALL_TRANSACTION_FETCHED";
+  static CallFetchAllTransaction(propsData) {
+    return {
+      type: GitAction.FetchTransaction,
+      payload: propsData
+    };
+  }
+
+  static FetchTransactionByID = "FETCH_ALL_TRANSACTION_BYID";
+  static TransactionByIDFetched = "ALL_TRANSACTION_BYID_FETCHED";
+  static CallFetchAllTransactionByID(propsData) {
+    return {
+      type: GitAction.FetchTransactionByID,
+      payload: propsData
+    };
+  }
+  
 
 }
 

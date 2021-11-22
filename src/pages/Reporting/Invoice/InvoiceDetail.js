@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { GitAction } from "../../store/action/gitAction";
+import { GitAction } from "../../../store/action/gitAction";
 import { withRouter } from "react-router";
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -15,16 +15,16 @@ import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import TableComponents from "../../components/TableComponents/TableComponents"
+import TableComponents from "../../../components/TableComponents/TableComponents"
 function mapStateToProps(state) {
   return {
-    userProfile: state.counterReducer["userProfile"],
+    transaction: state.counterReducer["transaction"],
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    CallUserProfileByID: (data) => dispatch(GitAction.CallUserProfileByID(data)),
+    CallFetchAllTransactionByID: (data) => dispatch(GitAction.CallFetchAllTransactionByID(data)),
   };
 }
 
@@ -79,7 +79,7 @@ const headCells = [
   },
 ];
 
-class UserDetail extends Component {
+class InvoicerDetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -97,45 +97,45 @@ class UserDetail extends Component {
   }
 
   componentDidMount() {
-    if (this.props.userProfile.length !== this.state.UserProfile.length) {
-      if (this.props.userProfile !== undefined && this.props.userProfile[0] !== undefined) {
-        console.log(this.props.userProfile)
+    if (this.props.transaction.length !== this.state.UserProfile.length) {
+      if (this.props.transaction !== undefined && this.props.transaction[0] !== undefined) {
+        console.log(this.props.transaction)
         this.setState({
-          UserProfile: this.props.userProfile,
-          FullName: this.props.userProfile[0].Fullname,
-          UserCode: this.props.userProfile[0].UserCode,
-          Email: this.props.userProfile[0].UserEmailAddress,
-          Contact: this.props.userProfile[0].UserContactNo,
-          Address: this.props.userProfile[0].UserAddress,
-          Transaction: JSON.parse(this.props.userProfile[0].Transaction),
+          UserProfile: this.props.transaction,
+          FullName: this.props.transaction[0].Fullname,
+          UserCode: this.props.transaction[0].UserCode,
+          Email: this.props.transaction[0].UserEmailAddress,
+          Contact: this.props.transaction[0].UserContactNo,
+          Address: this.props.transaction[0].UserAddress,
+          Transaction: JSON.parse(this.props.transaction[0].Transaction),
         });
       }
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.userProfile.length !== this.props.userProfile.length) {
-      if (this.props.userProfile !== undefined && this.props.userProfile[0] !== undefined) {
+    if (prevProps.transaction.length !== this.props.transaction.length) {
+      if (this.props.transaction !== undefined && this.props.transaction[0] !== undefined) {
         this.setState({
-          UserProfile: this.props.userProfile,
-          FullName: this.props.userProfile[0].Fullname,
-          UserCode: this.props.userProfile[0].UserCode,
-          Email: this.props.userProfile[0].UserEmailAddress,
-          Contact: this.props.userProfile[0].UserContactNo,
-          Address: this.props.userProfile[0].UserAddress,
-          Transaction: JSON.parse(this.props.userProfile[0].Transaction),
+          UserProfile: this.props.transaction,
+          FullName: this.props.transaction[0].Fullname,
+          UserCode: this.props.transaction[0].UserCode,
+          Email: this.props.transaction[0].UserEmailAddress,
+          Contact: this.props.transaction[0].UserContactNo,
+          Address: this.props.transaction[0].UserAddress,
+          Transaction: JSON.parse(this.props.transaction[0].Transaction),
         });
       }
     } else {
-      if (prevProps.userProfile.length !== this.state.UserProfile.length) {
+      if (prevProps.transaction.length !== this.state.UserProfile.length) {
         this.setState({
-          UserProfile: prevProps.userProfile,
-          FullName: prevProps.userProfile[0].Fullname,
-          UserCode: prevProps.userProfile[0].UserCode,
-          Email: prevProps.userProfile[0].UserEmailAddress,
-          Contact: prevProps.userProfile[0].UserContactNo,
-          Address: prevProps.userProfile[0].UserAddress,
-          Transaction: JSON.parse(prevProps.userProfile[0].Transaction),
+          UserProfile: prevProps.transaction,
+          FullName: prevProps.transaction[0].Fullname,
+          UserCode: prevProps.transaction[0].UserCode,
+          Email: prevProps.transaction[0].UserEmailAddress,
+          Contact: prevProps.transaction[0].UserContactNo,
+          Address: prevProps.transaction[0].UserAddress,
+          Transaction: JSON.parse(prevProps.transaction[0].Transaction),
         });
       }
     }
@@ -310,4 +310,4 @@ class UserDetail extends Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(UserDetail));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(InvoicerDetail));

@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Aside from './Aside';
 import Main from './Main';
-import { isUserLogon } from "../auth/AuthManagement";
+import { isUserLogon, getSidebaritems } from "../auth/AuthManagement";
 import Login from "../../pages/Login/Login";
 import "./styles/sidebar.css";
+
 
 function Layout() {
   const [rtl, setRtl] = useState(false);
   const [toggled, setToggled] = useState(false);
   const [isLogon, setIsLogon] = useState(isUserLogon());
+  const [sidebaritem, setSidebaritem] = useState(getSidebaritems());
+  const [count, setCount] = useState(-1);
 
-
-  // set sidebar to the right
   const handleRtlChange = (checked) => {
     setRtl(checked);
   };
@@ -20,14 +21,25 @@ function Layout() {
     setToggled(value);
   };
 
+  const renderSidebarItems = () => {
+    try {
+      return JSON.parse(sidebaritem)
+    }
+    catch (e) {
+      console.log('sidebar: ', e)
+      return [];
+    }
+  }
+
   return (
     <div className={`app ${rtl ? 'rtl' : ''} ${toggled ? 'toggled' : ''}`}>
       {
-        isLogon === true ?
+        isLogon === "true" ?
           <>
             <Aside
               image={false} // can set the background image for the sidebar here
               rtl={rtl}
+              sidebar={ renderSidebarItems() }
               toggled={toggled}
               handleToggleSidebar={handleToggleSidebar}
             />

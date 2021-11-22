@@ -3,11 +3,14 @@ import { GitAction } from "../action/gitAction";
 const INITIAL_STATE = {
   loading: false,
   logonUser: [],
+  user: [],
   userProfile: [],
   registrationReturn: [],
   sidebars: [],
   stocks: [],
   stockReturn: [],
+  transactions: [],
+  transaction: [],
   transactionReturn: [],
 };
 
@@ -19,7 +22,8 @@ export function counterReducer(state = INITIAL_STATE, action) {
     case GitAction.LoginSuccess:
       return Object.assign({}, state, {
         loading: false,
-        logonUser: action.payload
+        logonUser: action.payload,
+        sidebars: action.payload2
       });
 
     case GitAction.Logout:
@@ -41,13 +45,24 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, { registrationReturn: [] });
 
     case GitAction.GetUserProfile:
+
       return Object.assign({}, state, { loading: true });
     case GitAction.GotUserProfile:
       return Object.assign({}, state, {
         loading: false,
-        userProfile: action.payload
+        user: action.payload
       });
     case GitAction.ResetUserProfile:
+      return Object.assign({}, state, { userProfile: [] });
+
+    case GitAction.GetUserProfileByID:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.GotUserProfileByID:
+      return Object.assign({}, state, {
+        loading: false,
+        userProfile: action.payload
+      });
+    case GitAction.ResetUserProfileByID:
       return Object.assign({}, state, { userProfile: [] });
 
     ///////////////////////////////////////////////////  sidebar configuration ///////////////////////////////////////////////////
@@ -86,7 +101,7 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, { stockReturn: [] });
 
     /////////////////////////////////////////////////// Transaction Management ///////////////////////////////////////////////////
-    
+
     case GitAction.InsertNewTransaction:
       return Object.assign({}, state, { loading: true });
     case GitAction.NewTransactionInserted:
@@ -96,8 +111,20 @@ export function counterReducer(state = INITIAL_STATE, action) {
       });
     case GitAction.ResetTransactionReturn:
       return Object.assign({}, state, { transactionReturn: [] });
-
-
+    case GitAction.FetchTransaction:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.TransactionFetched:
+      return Object.assign({}, state, {
+        loading: false,
+        transactions: action.payload
+      });
+    case GitAction.FetchTransactionByID:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.TransactionByIDFetched:
+      return Object.assign({}, state, {
+        loading: false,
+        transaction: action.payload
+      });
     /////////////////////////////////////////////////// Default ///////////////////////////////////////////////////
     default:
       return state;

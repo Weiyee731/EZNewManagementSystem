@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useEffect} from 'react';
 import PropTypes from 'prop-types';
 import { alpha, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -23,7 +24,7 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import AddIcon from '@mui/icons-material/Add';
-
+import SearchBar from "../SearchBar/SearchBar"
 import { isObjectUndefinedOrNull, isArrayNotEmpty, isStringNullOrEmpty } from "../../tools/Helpers"
 
 function descendingComparator(a, b, orderBy) {
@@ -55,9 +56,8 @@ function stableSort(array, comparator) {
 function EnhancedTableHead(props) {
     const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, tableHeaders, renderCheckbox, checkboxColor } = props;
     const createSortHandler = (property) => (event) => { onRequestSort(event, property); };
-
     return (
-        <TableHead>
+        <TableHead >
             <TableRow>
                 {
                     renderCheckbox === true &&
@@ -71,7 +71,6 @@ function EnhancedTableHead(props) {
                         />
                     </TableCell>
                 }
-
                 {
                     isArrayNotEmpty(tableHeaders) && tableHeaders.map((headCell) => (
                         <TableCell
@@ -82,8 +81,10 @@ function EnhancedTableHead(props) {
                             className={headCell.className?headCell.className:[]}
                             //
                             sortDirection={orderBy === headCell.id ? order : false}
+                            sx={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}   // change table header bg color
                         >
                             <TableSortLabel
+                                className="fw-bold"
                                 active={orderBy === headCell.id}
                                 direction={orderBy === headCell.id ? order : 'asc'}
                                 onClick={createSortHandler(headCell.id)}
@@ -121,6 +122,7 @@ const EnhancedTableToolbar = (props) => {
     return (
         <Toolbar
             sx={{
+
                 pl: { sm: 2 },
                 pr: { xs: 1, sm: 1 },
                 ...(numSelected > 0 && {
@@ -148,7 +150,6 @@ const EnhancedTableToolbar = (props) => {
                     </Typography>
                 )
             }
-
             {
                 numSelected > 0 ? (
                     <Tooltip title="Delete">
@@ -158,8 +159,9 @@ const EnhancedTableToolbar = (props) => {
                     </Tooltip>
                 ) : (
                     tableTopRight === null ?
+                        typeof OnActionButtonClick === "function" &&
                         <Tooltip title="Add New Items">
-                            <IconButton onClick={(event) => { typeof OnActionButtonClick === "function" && OnActionButtonClick(selectedRows) }}>
+                            <IconButton onClick={(event) => { OnActionButtonClick(selectedRows) }}>
                                 <AddIcon />
                             </IconButton>
                         </Tooltip>
@@ -184,6 +186,7 @@ TableComponents.propTypes = {
 };
 
 export default function TableComponents(props) {
+
     const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
 
@@ -202,10 +205,15 @@ export default function TableComponents(props) {
     const [order, setOrder] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.tableOrderBy === null ? 'asc' : props.tableOptions.tableOrderBy);
     const [orderBy, setOrderBy] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.sortingIndex === null ? "" : props.tableOptions.sortingIndex);
     const [objectKey, setObjectKey] = React.useState(!isStringNullOrEmpty(props.selectedIndexKey) ? props.selectedIndexKey : "id")
-    const [rows, setRows] = React.useState((isArrayNotEmpty(props.Data) ? props.Data : []));
+    const [rows, setRows] = React.useState(props.Data);
     const [tableHeaders, setTableHeaders] = React.useState((isArrayNotEmpty(props.tableHeaders) ? props.tableHeaders : []));
     const [renderCheckbox, setRenderCheckbox] = React.useState(!isObjectUndefinedOrNull(props.tableRows.checkbox) ? props.tableRows.checkbox : true);
     const [onRowSelect, setOnRowSelect] = React.useState(!isObjectUndefinedOrNull(props.tableRows.onRowClickSelect) ? props.tableRows.onRowClickSelect : false);
+
+
+    useEffect(() => {
+        setRows(props.Data)
+    },[props.Data]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -249,18 +257,22 @@ export default function TableComponents(props) {
     const TableData = (rowsPerPage !== -1) ? stableSort(rows, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : stableSort(rows, getComparator(order, orderBy))
     const checkboxColor = !isObjectUndefinedOrNull(props.tableRows.checkboxColor) ? props.tableRows.checkboxColor : "primary"
     const emptyRowColSpan = renderCheckbox ? tableHeaders.length + 1 : tableHeaders.length
-
     return (
         <Box sx={{ width: '100%' }}>
+
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar
-                    selectedRows={selected}
-                    tableTopLeft={props.tableTopLeft}
-                    tableTopRight={tableTopRight}
-                    OnActionButtonClick={props.onActionButtonClick}
-                    OnDeleteButtonClick={props.onDeleteButtonClick}
-                />
-                <TableContainer sx={(stickyTableHeader) ? { maxHeight: stickyTableHeight } : { maxHeight: '100%' }}>
+                {
+                    (typeof props.OnActionButtonClick !== "undefined" || tableTopRight !== null) &&
+                    <EnhancedTableToolbar
+                        selectedRows={selected}
+                        tableTopLeft={props.tableTopLeft}
+                        tableTopRight={tableTopRight}
+                        OnActionButtonClick={props.onActionButtonClick}
+                        OnDeleteButtonClick={props.onDeleteButtonClick}
+                    />
+                }
+
+                <TableContainer sx={{ maxHeight: (stickyTableHeader) ? stickyTableHeight : "100%" }}>
                     <Table
                         stickyHeader={stickyTableHeader}
                         sx={{ width: "100%" }}
@@ -277,7 +289,6 @@ export default function TableComponents(props) {
                             tableHeaders={tableHeaders}
                             renderCheckbox={renderCheckbox}
                             checkboxColor={checkboxColor}
-
                         />
                         <TableBody>
                             {

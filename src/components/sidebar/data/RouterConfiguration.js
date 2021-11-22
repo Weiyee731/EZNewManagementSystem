@@ -5,6 +5,7 @@ import StockGoods from "../../../pages/Stock/StockGoods/StockGoods";
 import CreditNote from '../../../pages/Reporting/CreditNote/CreditNote';
 import DeliveryOrder from "../../../pages/Reporting/DeliveryOrder/DeliveryOrder";
 import Invoice from "../../../pages/Reporting/Invoice/Invoice";
+import InvoiceDetail from "../../../pages/Reporting/Invoice/InvoiceDetail";
 import DataManagement from "../../../pages/DataManagement/DataManagement";
 import AllPayments from "../../../pages/Payments/AllPayments/AllPayments";
 import BalanceSettlement from "../../../pages/Payments/BalanceSettlement/BalanceSettlement";
@@ -45,6 +46,11 @@ const routes = [
         element: <Invoice />,
     },
     {
+        path: "/InvoiceDetail/:transactionid",
+        exact: true,
+        element: <InvoiceDetail />,
+    },
+    {
         path: "/DeliveryOrder",
         exact: true,
         element: <DeliveryOrder />,
@@ -75,7 +81,7 @@ const routes = [
         element: <Statements />,
     },
     {
-        path: "/UserDetail/:name/:fat",
+        path: "/UserDetail/:userid/:usercode",
         exact: true,
         element: <UserDetail />,
     },
