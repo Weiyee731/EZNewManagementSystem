@@ -11,8 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 import SearchBar from "../../../components/SearchBar/SearchBar"
 import TableComponents from "../../../components/TableComponents/TableComponents";
 import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents";
-import { isArrayNotEmpty, isStringNullOrEmpty } from "../../../tools/Helpers";
-import { getWindowDimensions } from "../../../tools/DisplayHelper"
+import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions } from "../../../tools/Helpers";
 
 function mapStateToProps(state) {
     return {
@@ -101,15 +100,9 @@ class OverallStock extends Component {
 
         this.props.CallFetchAllStock({ USERID: 1 })
         this.changeTab = this.changeTab.bind(this)
-        this.screenOnResize = this.screenOnResize.bind(this)
     }
 
     componentDidMount() {
-        window.addEventListener('resize', this.screenOnResize());
-    }
-
-    componentDidUnmount() {
-        window.removeEventListener('resize');
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -121,10 +114,6 @@ class OverallStock extends Component {
             })
 
         }
-    }
-
-    screenOnResize = () => {
-        console.log('yes')
     }
 
     changeTab = (key) => {
@@ -207,8 +196,6 @@ class OverallStock extends Component {
             { children: "Collected", key: "Collected" },
         ]
 
-        console.log(getWindowDimensions())
-
         return (
             <div className="container-fluid">
                 <SearchBar />
@@ -224,9 +211,9 @@ class OverallStock extends Component {
                         tableOrderBy: 'asc',        // optional, default is asc
                         sortingIndex: "fat",        // require, it must the same as the desired table header
                         stickyTableHeader: true,    // optional, default is true
-                        stickyTableHeight: 300,     // optional, default is 300px
+                        stickyTableHeight: getWindowDimensions().screenHeight,     // optional, default is 300px
                     }}
-                    paginationOptions={[5, 100, 250, { label: 'All', value: -1 }]} // optional, by default it will hide the table pagination. You should set settings for pagination options as in array, eg.: [5, 100, 250, { label: 'All', value: -1 }]
+                    paginationOptions={[50, 100, 250, { label: 'All', value: -1 }]} // optional, by default it will hide the table pagination. You should set settings for pagination options as in array, eg.: [5, 100, 250, { label: 'All', value: -1 }]
                     tableHeaders={headCells}        //required
                     tableRows={{
                         renderTableRows: this.renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
