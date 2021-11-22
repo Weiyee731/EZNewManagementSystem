@@ -3,6 +3,7 @@ import { GitAction } from "../action/gitAction";
 const INITIAL_STATE = {
   loading: false,
   logonUser: [],
+  user:[],
   userProfile: [],
   registrationReturn: [],
   sidebars: [],
@@ -41,13 +42,24 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, { registrationReturn: [] });
 
     case GitAction.GetUserProfile:
+      
       return Object.assign({}, state, { loading: true });
     case GitAction.GotUserProfile:
       return Object.assign({}, state, {
         loading: false,
-        userProfile: action.payload
+        user: action.payload
       });
     case GitAction.ResetUserProfile:
+      return Object.assign({}, state, { userProfile: [] });
+
+      case GitAction.GetUserProfileByID:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.GotUserProfileByID:
+      return Object.assign({}, state, {
+        loading: false,
+        userProfile: action.payload
+      });
+    case GitAction.ResetUserProfileByID:
       return Object.assign({}, state, { userProfile: [] });
 
     ///////////////////////////////////////////////////  sidebar configuration ///////////////////////////////////////////////////

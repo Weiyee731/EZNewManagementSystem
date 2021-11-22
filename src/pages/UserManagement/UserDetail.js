@@ -13,13 +13,13 @@ import IconButton from '@mui/material/IconButton';
 
 function mapStateToProps(state) {
   return {
-    foods: state.counterReducer["foods"],
+    userProfile: state.counterReducer["userProfile"],
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    CallTesting: () => dispatch(GitAction.CallTesting()),
+    CallUserProfileByID: () => dispatch(GitAction.CallUserProfileByID(dispatch)),
   };
 }
 
@@ -30,7 +30,10 @@ const INITIAL_STATE = {
 class UserDetail extends Component {
   constructor(props) {
     super(props);
-    this.state = INITIAL_STATE
+    this.state = {
+      USERID:this.props.match.params.userid
+    }
+    this.props.CallUserProfileByID(this.state)
   }
 
   componentDidMount() {
@@ -67,7 +70,7 @@ class UserDetail extends Component {
                   required
                   id="outlined-required"
                   label="Full Name"
-                  defaultValue={this.props.match.params.name}
+                  defaultValue={this.props.userProfile[0].Fullname}
                 />
               </div>
               <div className="col-lg-6 col-md-6 col-sm-12">
@@ -75,8 +78,8 @@ class UserDetail extends Component {
                   className="w-100 my-3"
                   required
                   id="outlined-required"
-                  label="Contact No."
-                  defaultValue="Hello World"
+                  label="User Code"
+                  defaultValue={this.props.userProfile[0].Fullname}
                 />
               </div>
             </div>
@@ -84,31 +87,31 @@ class UserDetail extends Component {
               className="w-100 my-3"
               required
               id="outlined-required"
-              label="Required"
+              label="Email Address"
+              defaultValue={this.props.userProfile[0].Fullname}
+            />
+            <TextField
+              className="w-100 my-3"
+              required
+              id="outlined-required"
+              label="Contact No."
               defaultValue="Hello World"
             />
             <TextField
               className="w-100 my-3"
               required
               id="outlined-required"
-              label="Required"
+              label="Address"
               defaultValue="Hello World"
             />
-            <TextField
-              className="w-100 my-3"
-              required
-              id="outlined-required"
-              label="Required"
-              defaultValue="Hello World"
-            />
-            <Typography sx={{ mb: 1.5 }} color="text.secondary">
+            {/* <Typography sx={{ mb: 1.5 }} color="text.secondary">
               adjective
             </Typography>
             <Typography variant="body2">
               well meaning and kindly.
               <br />
               {'"a benevolent smile"'}
-            </Typography>
+            </Typography> */}
           </CardContent>
           <CardActions>
             <Button size="small">Learn More</Button>

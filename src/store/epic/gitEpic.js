@@ -111,15 +111,13 @@ export class GitEpic {
       }
     });
 
-  User_ProfileByID = action$ =>
+  User_Profile = action$ =>
     action$.ofType(GitAction.GetUserProfile).switchMap(async ({ payload }) => {
-      // console.log(url + 
-      //   double_click_and_paste_url_here
-      // )
+      console.log(url + "User_ViewProfile"
+      )
       try {
         const response = await fetch(url +
-          "User_ProfileByID?" +
-          "USERID=" + payload.USERID
+          "User_ViewProfile"
         );
 
         let json = await response.json();
@@ -138,7 +136,32 @@ export class GitEpic {
       }
     });
 
+    User_ProfileByID = action$ =>
+    action$.ofType(GitAction.GetUserProfileByID).switchMap(async ({ payload }) => {
+      // console.log(url + 
+      //   double_click_and_paste_url_here
+      // )
+      try {
+        const response = await fetch(url +
+          "User_ViewProfileByID?" +
+          "USERID=" + payload.USERID
+        );
 
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.GotUserProfileByID,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: GetUserProfileByID")
+        return {
+          type: GitAction.GotUserProfileByID,
+          payload: [],
+        };
+      }
+    });
 
   ///////////////////////////////////////////////////  user account credentials ///////////////////////////////////////////////////
 
@@ -183,12 +206,12 @@ export class GitEpic {
     action$.ofType(GitAction.FetchStocks).switchMap(async ({ payload }) => {
       console.log(url +
         "Inventory_ViewStockList?" +
-        "USERID=" + payload.USERID
+        "TRACKINGSTATUSID=" + payload.USERID
       )
       try {
         const response = await fetch(url +
           "Inventory_ViewStockList?" +
-          "USERID=" + payload.USERID
+          "TRACKINGSTATUSID=" + payload.USERID
         );
 
         let json = await response.json();
