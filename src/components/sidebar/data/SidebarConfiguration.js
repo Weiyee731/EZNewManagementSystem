@@ -45,91 +45,18 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FeedIcon from '@mui/icons-material/Feed';
 
 const sidebar_items = [
-    {
-        to: "/",
-        title: "Dashboard",
-        icon: <DashboardIcon />,
-        // prefix: <span className="badge gray">3</span>,
-        // suffix: <span className="badge red">3</span>,
-    },
-    {
-        to: "/UserManagement",
-        title: "User Management",
-        icon: <AssignmentIndIcon />,
-    },
-    {
-        to: "",
-        title: "Stock Management",
-        icon: <IndeterminateCheckBoxIcon />,
-        submenus:[
-            {
-                to: "/OverallStock",
-                title: "Overall",
-                icon: <AllInboxIcon />,
-            },
-            {
-                to: "/StockGoods",
-                title: "Stock Order Goods",
-                icon: <AssignmentTurnedInIcon />,
-            },
-        ]
-    },
-    {
-        to: "",
-        title: "Reporting",
-        icon: <InsertDriveFileIcon />,
-        submenus:[
-            {
-                to: "/Invoice",
-                title: "Invoice",
-                icon: <ReceiptLongIcon />,
-            },
-            {
-                to: "/DeliveryOrder",
-                title: "Delivery Order (DO)",
-                icon: <DescriptionIcon />,
-            },
-            {
-                to: "/CreditNote",
-                title: "Credit Note(CN)",
-                icon: <LocalAtmIcon />,
-            },
-        ]
-    },
-    {
-        to: "",
-        title: "Data Management",
-        icon: <AddBusinessIcon />,
-        submenus:[
-            {
-                to: "/ImportExcelData",
-                title: "Upload Orders (Excel)",
-                icon: <FileUploadIcon />,
-            },
-        ]
-    },
-    {
-        to: "",
-        title: "Payments",
-        icon: <AccountBalanceIcon />,
-        submenus:[
-            {
-                to: "/AllPayments",
-                title: "All Payments",
-                icon: <PaymentsIcon />,
-            },
-            {
-                to: "/BalanceSettlement",
-                title: "Payment Knockoff/Settlement",
-                icon: <ReceiptIcon />,
-            },
-        ]
-    },
-    {
-        to: "/Statements",
-        title: "Statements",
-        icon: <FeedIcon />,
-    },
+    { icon: <DashboardIcon />},
+    { icon: <AssignmentIndIcon />},
+    { icon: <IndeterminateCheckBoxIcon />},
+    { icon: <InsertDriveFileIcon />},
+    { icon: <ReceiptLongIcon /> },
+    { icon: <DescriptionIcon /> },
+    { icon: <LocalAtmIcon /> },
+    { icon: <FileUploadIcon /> },
+    { icon: <AccountBalanceIcon /> },
+    { icon: <PaymentsIcon /> },
+    { icon: <ReceiptIcon />},
+    { icon: <FeedIcon /> },
 ]
 
 export default sidebar_items

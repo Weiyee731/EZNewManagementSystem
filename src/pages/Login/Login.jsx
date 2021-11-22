@@ -25,6 +25,7 @@ import "./Login.css"
 function mapStateToProps(state) {
     return {
         logonUser: state.counterReducer["logonUser"],
+        sidebars: state.counterReducer["sidebars"],
         loading: state.counterReducer["loading"],
     };
 }
@@ -55,9 +56,9 @@ class Dashboard extends Component {
     componentDidUpdate(prevProps, prevState) {
         console.log(this.props.logonUser)
         console.log(this.props.loading)
+        console.log(this.props.sidebars)
         if (!this.props.loading && isArrayNotEmpty(this.props.logonUser)) {
-            //success
-
+            setLogonUser(this.props.logonUser,this.props.sidebars)
         }
         else {
             //failure
