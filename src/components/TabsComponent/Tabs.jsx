@@ -101,7 +101,8 @@ export default function FullWidthTabs(props) {
 }
 
 FullWidthTabs.propTypes = {
-  settings: PropTypes.object,
+  Headers: PropTypes.array.isRequired,
+  Body: PropTypes.array.isRequired,
 };
 
 /***************************************

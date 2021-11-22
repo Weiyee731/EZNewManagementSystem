@@ -24,6 +24,8 @@ class DataManagement extends Component {
     constructor(props) {
         super(props);
         this.state = INITIAL_STATE
+
+        this.uploadHandler = this.uploadHandler.bind(this)
     }
 
     componentDidMount() {
@@ -34,10 +36,19 @@ class DataManagement extends Component {
 
     }
 
+    uploadHandler = (e) => {
+        console.log(e)
+
+    }
+
     render() {
         return (
             <div>
-                <h1>Data Management</h1>
+                <input
+                    type="file"
+                    accept=".csv,.xlsx,.xls"
+                    onChange={this.uploadHandler}
+                />
             </div>
         )
     }
