@@ -69,7 +69,7 @@ const routes = [
         element: <Statements />,
     },
     {
-        path: "/UserDetail/:name/:fat",
+        path: "/UserDetail/:userid/:usercode",
         exact: true,
         element: <UserDetail />,
     },

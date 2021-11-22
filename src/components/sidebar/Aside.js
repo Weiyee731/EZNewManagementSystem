@@ -68,7 +68,7 @@ const Aside = ({ rtl, toggled, handleToggleSidebar }) => {
       </SidebarContent >
 
 
-      <SidebarFooter style={{ textAlign: 'center' }}>
+      {/* <SidebarFooter style={{ textAlign: 'center' }}>
         <div
           className="sidebar-btn-wrapper"
           style={{ padding: '20px 24px', }}
@@ -80,12 +80,9 @@ const Aside = ({ rtl, toggled, handleToggleSidebar }) => {
             rel="noopener noreferrer"
           >
             <MenuOutlinedIcon />
-            <span style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-              View Source
-            </span>
           </a>
         </div>
-      </SidebarFooter>
+      </SidebarFooter> */}
     </ProSidebar >
   );
 };
