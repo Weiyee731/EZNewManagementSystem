@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Aside from './Aside';
 import Main from './Main';
 import { isUserLogon,getSidebaritems } from "../auth/AuthManagement";
 import Login from "../../pages/Login/Login";
 import "./styles/sidebar.css";
 
+
 function Layout() {
   const [rtl, setRtl] = useState(false);
   const [toggled, setToggled] = useState(false);
   const [isLogon, setIsLogon] = useState(isUserLogon());
   const [sidebaritem, setSidebaritem] = useState(getSidebaritems());
+  const [count, setCount] = useState(-1);
 
-  // set sidebar to the right
   const handleRtlChange = (checked) => {
     setRtl(checked);
   };

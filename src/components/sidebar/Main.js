@@ -22,12 +22,6 @@ const Main = ({
       <div className="btn-toggle" onClick={() => handleToggleSidebar(true)}>
         <MenuOutlinedIcon />
       </div>
-
-      {/* You can design your header here */}
-      {/* <header>
-
-</header> */}
-
       <div className="block">
         <Switch>
           {
