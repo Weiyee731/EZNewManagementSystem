@@ -15,7 +15,13 @@ import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
+import Input from '@mui/material/Input';
+import InputLabel from '@mui/material/InputLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import FormControl from '@mui/material/FormControl';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 import TableComponents from "../../../components/TableComponents/TableComponents"
+
 function mapStateToProps(state) {
   return {
     transaction: state.counterReducer["transaction"],
@@ -83,85 +89,69 @@ class InvoicerDetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      UserProfile: [],
-      UserID: this.props.match.params.userid,
-      FullName: "",
-      UserCode: "",
+      Transaction: [],
+      TransactionID: this.props.match.params.transactionid,
+      OrderDate: "",
+      TransactionName: "",
       Email: "",
       Contact: "",
       Address: "",
-      Transaction:[]
+      OrderTotalAmount: "",
+      OrderPaidAmount: "",
+      TransactionDetail: []
     }
-    this.handleInputChange = this.handleInputChange.bind(this)
-    this.props.CallUserProfileByID(this.state)
+    this.props.CallFetchAllTransactionByID(this.state)
   }
 
   componentDidMount() {
-    if (this.props.transaction.length !== this.state.UserProfile.length) {
+    if (this.props.transaction.length !== this.state.Transaction.length) {
       if (this.props.transaction !== undefined && this.props.transaction[0] !== undefined) {
         console.log(this.props.transaction)
         this.setState({
-          UserProfile: this.props.transaction,
-          FullName: this.props.transaction[0].Fullname,
-          UserCode: this.props.transaction[0].UserCode,
+          Transaction: this.props.transaction,
+          OrderDate: this.props.transaction[0].OrderDate,
+          TransactionName: this.props.transaction[0].TransactionName,
           Email: this.props.transaction[0].UserEmailAddress,
           Contact: this.props.transaction[0].UserContactNo,
           Address: this.props.transaction[0].UserAddress,
-          Transaction: JSON.parse(this.props.transaction[0].Transaction),
+          OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
+          OrderPaidAmount: this.props.transaction[0].OrderPaidAmount,
+          TransactionDetail: JSON.parse(this.props.transaction[0].TransactionDetail),
         });
       }
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
+    console.log(this.props.transaction)
     if (prevProps.transaction.length !== this.props.transaction.length) {
       if (this.props.transaction !== undefined && this.props.transaction[0] !== undefined) {
         this.setState({
-          UserProfile: this.props.transaction,
-          FullName: this.props.transaction[0].Fullname,
-          UserCode: this.props.transaction[0].UserCode,
+          Transaction: this.props.transaction,
+          OrderDate: this.props.transaction[0].OrderDate,
+          TransactionName: this.props.transaction[0].TransactionName,
           Email: this.props.transaction[0].UserEmailAddress,
           Contact: this.props.transaction[0].UserContactNo,
           Address: this.props.transaction[0].UserAddress,
-          Transaction: JSON.parse(this.props.transaction[0].Transaction),
+          OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
+          OrderPaidAmount: this.props.transaction[0].OrderPaidAmount,
+          TransactionDetail: this.props.transaction[0].TransactionDetail !== "null" ? JSON.parse(this.props.transaction[0].TransactionDetail) : [],
         });
       }
     } else {
-      if (prevProps.transaction.length !== this.state.UserProfile.length) {
+      if (prevProps.transaction.length !== this.state.Transaction.length) {
         this.setState({
-          UserProfile: prevProps.transaction,
-          FullName: prevProps.transaction[0].Fullname,
-          UserCode: prevProps.transaction[0].UserCode,
+          Transaction: prevProps.transaction,
+          OrderDate: prevProps.transaction[0].OrderDate,
+          TransactionName: prevProps.transaction[0].TransactionName,
           Email: prevProps.transaction[0].UserEmailAddress,
           Contact: prevProps.transaction[0].UserContactNo,
           Address: prevProps.transaction[0].UserAddress,
-          Transaction: JSON.parse(prevProps.transaction[0].Transaction),
+          OrderTotalAmount: prevProps.transaction[0].OrderTotalAmount,
+          OrderPaidAmount: prevProps.transaction[0].OrderPaidAmount,
+          TransactionDetail: JSON.parse(prevProps.transaction[0].TransactionDetail),
         });
       }
-    }
-  }
-
-  handleInputChange = (e) => {
-    const elementId = e.target.id
-    switch (elementId) {
-      case "fullname":
-        this.setState({ FullName: e.target.value.trim() })
-        break;
-
-      case "usercode":
-        this.setState({ UserCode: e.target.value })
-        break;
-      case "email":
-        this.setState({ Email: e.target.value })
-        break;
-      case "contact":
-        this.setState({ Contact: e.target.value })
-        break;
-      case "address":
-        this.setState({ Address: e.target.value })
-        break;
-      default:
-        break;
     }
   }
 
@@ -205,6 +195,7 @@ class InvoicerDetail extends Component {
   }
 
   render() {
+    console.log(this.props.transaction)
     return (
       <div>
         <Card>
@@ -218,64 +209,145 @@ class InvoicerDetail extends Component {
               >
                 <ArrowBackIcon />
               </IconButton>
-              <Typography variant="h5" component="div">
-                Edit Profile
-              </Typography>
-              <CardActions>
-                <Button size="small">Learn More</Button>
-              </CardActions>
+              <div className="row">
+                <Typography variant="h5" component="div">
+                  {this.state.TransactionName}
+                </Typography>
+              </div>
             </div>
+            <div className="row">
+                <Typography variant="h7" component="div">
+                  {this.state.OrderDate}
+                </Typography>
+              </div>
             <div className="row">
               <div className="col-lg-6 col-md-6 col-sm-12">
                 <TextField
                   className="w-100 my-3"
-                  required
+                  disabled
                   value={this.state.FullName}
-                  onChange={(e) => this.handleInputChange(e)}
                   id="fullname"
                   label="Full Name"
-                  defaultValue={this.state.FullName}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AccountCircle />
+                      </InputAdornment>
+                    ),
+                  }}
+                  variant="standard"
+                  defaultValue={this.state.Contact}
                 />
               </div>
               <div className="col-lg-6 col-md-6 col-sm-12">
                 <TextField
                   className="w-100 my-3"
-                  required
+                  disabled
                   value={this.state.UserCode}
-                  onChange={(e) => this.handleInputChange(e)}
                   id="usercode"
                   label="User Code"
-                  defaultValue={this.state.UserCode}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AccountCircle />
+                      </InputAdornment>
+                    ),
+                  }}
+                  variant="standard"
+                  defaultValue={this.state.Contact}
+                />
+              </div>
+              <div className="col-lg-6 col-md-6 col-sm-12">
+                <TextField
+                  className="w-100 my-3"
+                  disabled
+                  value={this.state.Email}
+                  id="email"
+                  label="email"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AccountCircle />
+                      </InputAdornment>
+                    ),
+                  }}
+                  variant="standard"
+                  defaultValue={this.state.Contact}
+                />
+              </div>
+              <div className="col-lg-6 col-md-6 col-sm-12">
+                <TextField
+                  className="w-100 my-3"
+                  disabled
+                  value={this.state.Contact}
+                  id="contact"
+                  label="Contact No."
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AccountCircle />
+                      </InputAdornment>
+                    ),
+                  }}
+                  variant="standard"
+                  defaultValue={this.state.Contact}
                 />
               </div>
             </div>
             <TextField
               className="w-100 my-3"
-              required
-              value={this.state.Email}
-              onChange={(e) => this.handleInputChange(e)}
-              id="email"
-              label="Email Address"
-              defaultValue={this.state.Email}
-            />
-            <TextField
-              className="w-100 my-3"
-              required
-              value={this.state.Contact}
-              onChange={(e) => this.handleInputChange(e)}
-              id="contact"
-              label="Contact No."
-              defaultValue={this.state.Contact}
-            />
-            <TextField
-              className="w-100 my-3"
-              required
+              disabled
               value={this.state.Address}
-              onChange={(e) => this.handleInputChange(e)}
               id="address"
               label="Address"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <AccountCircle />
+                  </InputAdornment>
+                ),
+              }}
+              variant="standard"
               defaultValue={this.state.Address}
             />
+            <div className="row">
+              <div className="col-lg-6 col-md-6 col-sm-12">
+                <TextField
+                  className="w-100 my-3"
+                  disabled
+                  value={this.state.OrderTotalAmount}
+                  id="OrderTotal"
+                  label="Total Payable"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AccountCircle />
+                      </InputAdornment>
+                    ),
+                  }}
+                  variant="standard"
+                  defaultValue={this.state.Contact}
+                />
+              </div>
+              <div className="col-lg-6 col-md-6 col-sm-12">
+                <TextField
+                  className="w-100 my-3"
+                  disabled
+                  value={this.state.OrderPaidAmount}
+                  id="usercode"
+                  label="Paid"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AccountCircle />
+                      </InputAdornment>
+                    ),
+                  }}
+                  variant="standard"
+                  defaultValue={this.state.Contact}
+                />
+              </div>
+            </div>
           </CardContent>
 
         </Card>
@@ -289,7 +361,7 @@ class InvoicerDetail extends Component {
               tableOrderBy: 'asc',
               sortingIndex: "fat",
               stickyTableHeader: true,
-              stickyTableHeight: 300, 
+              stickyTableHeight: 300,
             }}
             paginationOptions={[20, 50, 100, { label: 'All', value: -1 }]}
             tableHeaders={headCells}
@@ -302,7 +374,7 @@ class InvoicerDetail extends Component {
             selectedIndexKey={"pid"}
             Data={this.state.Transaction}
             onTableRowClick={this.onTableRowClick}
-            
+
           />
         </div>
       </div>

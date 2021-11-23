@@ -303,29 +303,24 @@ export class GitEpic {
   });
 
   Transaction_ViewTransactionByID = action$ =>
-  action$.ofType(GitAction.FetchTransactionByID).switchMap(async ({ payload }) => {
-    // console.log(url + 
-    //   double_click_and_paste_url_here
-    // )
-    try {
-      const response = await fetch(url +
-        "Transaction_ViewTransactionByID?TRANSACTIONID=" + payload.TRANSACTIONID
-      );
-
-      let json = await response.json();
-      json = JSON.parse(json)
-      return {
-        type: GitAction.TransactionByIDFetched,
-        payload: json,
-      };
-    }
-    catch (error) {
-      toast.error("Error Code: Transaction_ViewTransactionByID")
-      return {
-        type: GitAction.TransactionByIDFetched,
-        payload: [],
-      };
-    }
+    action$.ofType(GitAction.FetchTransactionByID).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url + "Transaction_ViewTransactionByID?TRANSACTIONID=" + payload.TransactionID);
+        console.log(url + "Transaction_ViewTransactionByID?TRANSACTIONID=" + payload.TransactionID)
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.TransactionByIDFetched,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Transaction_ViewTransactionByID")
+        return {
+          type: GitAction.TransactionByIDFetched,
+          payload: [],
+        };
+      }
   });
 
   Transaction_InsertTransaction = action$ =>
