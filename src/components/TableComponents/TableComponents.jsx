@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useEffect} from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { alpha, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -42,15 +42,19 @@ function getComparator(order, orderBy) {
 // This method is created for cross-browser compatibility, if you don't
 // need to support IE11, you can use Array.prototype.sort() directly
 function stableSort(array, comparator) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-        const order = comparator(a[0], b[0]);
-        if (order !== 0) {
-            return order;
-        }
-        return a[1] - b[1];
-    });
-    return stabilizedThis.map((el) => el[0]);
+    if(isArrayNotEmpty(array)){
+        const stabilizedThis = array.map((el, index) => [el, index]);
+        stabilizedThis.sort((a, b) => {
+            const order = comparator(a[0], b[0]);
+            if (order !== 0) {
+                return order;
+            }
+            return a[1] - b[1];
+        });
+        return stabilizedThis.map((el) => el[0]);
+    }
+    else
+        return []
 }
 
 function EnhancedTableHead(props) {
@@ -77,9 +81,9 @@ function EnhancedTableHead(props) {
                             key={headCell.id}
                             align={isStringNullOrEmpty(headCell.align) ? "left" : headCell.align}
                             padding={headCell.disablePadding ? 'none' : 'normal'}
-                            //cheetat
-                            className={headCell.className?headCell.className:[]}
-                            //
+                            // //cheetat
+                            // className={headCell.className ? headCell.className : {}}
+                            // //
                             sortDirection={orderBy === headCell.id ? order : false}
                             sx={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}   // change table header bg color
                         >
@@ -212,7 +216,7 @@ export default function TableComponents(props) {
 
     useEffect(() => {
         setRows(props.Data)
-    },[props.Data]);
+    }, [props.Data]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -258,7 +262,6 @@ export default function TableComponents(props) {
     const emptyRowColSpan = renderCheckbox ? tableHeaders.length + 1 : tableHeaders.length
     return (
         <Box sx={{ width: '100%' }}>
-
             <Paper sx={{ width: '100%', mb: 2 }}>
                 {
                     <EnhancedTableToolbar
@@ -283,7 +286,7 @@ export default function TableComponents(props) {
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
                             onRequestSort={handleRequestSort}
-                            rowCount={rows.length}
+                            rowCount={isArrayNotEmpty(rows) ? rows.length : 0}
                             tableHeaders={tableHeaders}
                             renderCheckbox={renderCheckbox}
                             checkboxColor={checkboxColor}
@@ -335,7 +338,7 @@ export default function TableComponents(props) {
                         rowsPerPageOptions={pagePaginationOptions}
                         component="div"
                         colSpan={3}
-                        count={rows.length}
+                        count={(isArrayNotEmpty(rows)) ? rows.length : 0}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}
