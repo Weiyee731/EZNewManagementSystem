@@ -190,7 +190,6 @@ TableComponents.propTypes = {
 };
 
 export default function TableComponents(props) {
-
     const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
 
