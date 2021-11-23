@@ -65,7 +65,7 @@ export default function AlertDialog(props) {
 }
 
 export function ModalPopOut(props) {
-  console.log(props)
+  // console.log(props)
   return (
     <Dialog
       fullScreen={props.fullScreen ? props.fullScreen : false}    //fullscreen modal

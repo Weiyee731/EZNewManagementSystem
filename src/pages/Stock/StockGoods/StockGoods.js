@@ -18,16 +18,17 @@ import CheckIcon from '@mui/icons-material/Check';
 import '../../../scss/stock.scss';
 import { Link } from 'react-router-dom';
 import EditStockGoods from "./EditStockGoods";
+import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents";
 
 function mapStateToProps(state) {
     return {
-        foods: state.counterReducer["foods"],
+        stocks: state.counterReducer["stocks"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        CallTesting: () => dispatch(GitAction.CallTesting()),
+        CallFetchAllStock: (props) => dispatch(GitAction.CallFetchAllStock(props)),
     };
 }
 
@@ -72,7 +73,7 @@ const headCells = [
         id: 'Dimension',
         numeric: true,
         disablePadding: false,
-        label: 'Dimension',
+        label: 'Dimension (m)',
     },
     {
         id: 'Category_Name',
@@ -127,58 +128,43 @@ const headCells = [
 
 const INITIAL_STATE = {
     open: true,
+    key: "All",
     openModal: false,
     selectedRows: []
 }
 
-function createData(Courier,
-    Tracking_No,
-    Weight,
-    Depth,
-    Width,
-    Height,
-    Dimension,
-    Category_Name,
-    Quantity,
-    Member_No,
-    Division,
-    Charged_remark,
-    Stock_Date,
-    Packaging_Date, Approve) {
-    return {
-        Courier,
-        Tracking_No,
-        Weight,
-        Depth,
-        Width,
-        Height,
-        Dimension,
-        Category_Name,
-        Quantity,
-        Member_No,
-        Division,
-        Charged_remark,
-        Stock_Date,
-        Packaging_Date,
-        Approve
-    };
-}
-
-const rows = [
-    createData(1, 'Cupcake', 305, 3.7, 67, 4.3),
-    createData(2, 'Donut', 452, 25.0, 51, 4.9),
-    createData(3, 'Eclair', 262, 16.0, 24, 6.0),
-    createData(4, 'Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData(5, 'Gingerbread', 356, 16.0, 49, 3.9),
-    createData(6, 'Honeycomb', 408, 3.2, 87, 6.5),
-    createData(7, 'Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData(8, 'Jelly Bean', 375, 0.0, 94, 0.0),
-    createData(9, 'KitKat', 518, 26.0, 65, 7.0),
-    createData(10, 'Lollipop', 392, 0.2, 98, 0.0),
-    createData(11, 'Marshmallow', 318, 0, 81, 2.0),
-    createData(12, 'Nougat', 360, 19.0, 9, 37.0),
-    createData(13, 'Oreo', 437, 18.0, 63, 4.0),
-];
+// function createData(Courier,
+//     Tracking_No,
+//     Weight,
+//     Depth,
+//     Width,
+//     Height,
+//     Dimension,
+//     Category_Name,
+//     Quantity,
+//     Member_No,
+//     Division,
+//     Charged_remark,
+//     Stock_Date,
+//     Packaging_Date, Approve) {
+//     return {
+//         Courier,
+//         Tracking_No,
+//         Weight,
+//         Depth,
+//         Width,
+//         Height,
+//         Dimension,
+//         Category_Name,
+//         Quantity,
+//         Member_No,
+//         Division,
+//         Charged_remark,
+//         Stock_Date,
+//         Packaging_Date,
+//         Approve
+//     };
+// }
 
 function renderTableRows(data, index) {
     return (
@@ -191,16 +177,17 @@ function renderTableRows(data, index) {
             >
                 {data.Courier}
             </TableCell>
-            <TableCell>{data.Tracking_No}</TableCell>
-            <TableCell>{data.Weight}</TableCell>
-            <TableCell>{data.Depth}</TableCell>
-            <TableCell>{data.Width}</TableCell>
-            <TableCell>{data.Height}</TableCell>
-            <TableCell>{data.Dimension}</TableCell>
+            <TableCell>{data.TrackingNumber}</TableCell>
+            <TableCell>{data.ProductWeight}</TableCell>
+            <TableCell>{data.ProductDimensionDeep}</TableCell>
+            <TableCell>{data.ProductDimensionWidth}</TableCell>
+            <TableCell>{data.ProductDimensionHeight}</TableCell>
+            {/* <TableCell>{data.Dimension}</TableCell> */}
+            <TableCell>{data.ProductDimensionDeep}x{data.ProductDimensionWidth}x{data.ProductDimensionHeight}</TableCell>
             <TableCell>{data.Category_Name}</TableCell>
             <TableCell>{data.Quantity}</TableCell>
-            <TableCell>{data.Member_No}</TableCell>
-            <TableCell>{data.Division}</TableCell>
+            <TableCell>{data.UserCode}</TableCell>
+            <TableCell>{data.UserAreaID}</TableCell>
             <TableCell>{data.Charged_remark}</TableCell>
             <TableCell>{data.Stock_Date}</TableCell>
             <TableCell>{data.Packaging_Date}</TableCell>
@@ -213,17 +200,7 @@ function renderTableRows(data, index) {
     )
 }
 
-function editOrderPage(data, index) {
-    return (
-        <>
-
-        </>
-    )
-}
-
 function onTableRowClick(event, row) {
-    console.log(row)
-    console.log(this.props)
     this.setState({ openModal: true, selectedRows: row });
     return <Link to={{ pathname: `/EditStockGoods`, props: row }}></Link>
 
@@ -235,72 +212,30 @@ function onAddButtonClick() {
 
 function onDeleteButtonClick(items) {
     console.log('delete button')
-    console.log(items)
 }
 
-
-function Table1() {
-
-    return (
-        <div>
-            <TableComponents
-                // table settings 
-                // tableTopLeft={<h3 style={{ fontWeight: 600 }}>Table Name</h3>}  // optional, it can pass as string or as children elements
-                // tableTopRight={
-                //     <Tooltip title="Delete">
-                //         <IconButton >
-                //             {/* <AddIcon /> */}
-                //         </IconButton>
-                //     </Tooltip>}                 // optional, it will brings the elements to the table's top right corner
-
-                tableOptions={{
-                    dense: true,                // optional, default is false
-                    tableOrderBy: 'asc',        // optional, default is asc
-                    sortingIndex: "fat",          // optional, default is 300px
-                }}
-
-                tableHeaders={headCells}        //required
-                tableRows={{
-                    renderTableRows: renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
-                    checkbox: true,                          // optional, by default is true
-                    checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
-                    onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
-                }}
-                selectedIndexKey={"pid"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
-                Data={rows}                                  // required, the data that listing in the table
-                onTableRowClick={onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
-                onActionButtonClick={onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
-                onDeleteButtonClick={onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items
-            />
-        </div>
-    )
-}
-
-function Table2() {
-
-    return (
-        <div>
-            Something 2
-        </div>
-    )
-}
-
-const TabsHeaders = ["Pending Order", "Order Verified"]
-const TabsBody = [<Table1 />, <Table2 />]
-const TabsSettings = {
-    Headers: TabsHeaders,
-    Body: TabsBody
-}
 class StockGoods extends Component {
     constructor(props) {
         super(props);
         this.state = INITIAL_STATE
         onTableRowClick = onTableRowClick.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
+        this.changeTab = this.changeTab.bind(this)
+        onAddButtonClick = onAddButtonClick.bind(this)
     }
 
     componentDidMount() {
+        // this.props.CallFetchAllStock(localStorage.getItem("loginUser").UserID);
+        this.props.CallFetchAllStock({ USERID: "1" });
+        //check all value in local storage
+        //     var values = [],
+        //     keys = Object.keys(localStorage),
+        //     i = keys.length;
 
+        // while ( i-- ) {
+        //     values.push( localStorage.getItem(keys[i]) );
+        // }
+        // console.log(values)
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -312,6 +247,29 @@ class StockGoods extends Component {
         this.setState({ open: !this.state.open })
     }
 
+    changeTab = (key) => {
+        console.log(key)
+        switch (key) {
+            case "All":
+                console.log("all")
+                // this.props.stocks.map((stock, index) => { if (stock.TrackingStatusID === 1) { return stock } else { } })
+                break;
+
+            case "Unchecked":
+                console.log("Unchecked")
+                this.props.stocks.map((stock, index) => { if (stock.TrackingStatusID === 0) { console.log(stock);return stock } else { } })
+                break;
+
+            case "Checked":
+                console.log("Checked")
+                this.props.stocks.map((stock, index) => { if (stock.TrackingStatusID === 1) { console.log(stock); return stock } else { } })
+                break;
+
+            default:
+                break;
+        }
+    }
+
     handleCancel = (condition) => {
         console.log(this.props)
         if (condition !== "filter") {
@@ -320,6 +278,12 @@ class StockGoods extends Component {
     }
 
     render() {
+        const ToggleTabs = [
+            { children: "All", key: "All" },
+            { children: "Unchecked", key: "Unchecked" },
+            { children: "Checked", key: "Checked" }
+        ]
+
         const { open, openModal } = this.state
         return (
             <div className="container-fluid">
@@ -364,7 +328,6 @@ class StockGoods extends Component {
                         onBackdropClick={() => console.log('backdrop')}
                         handleToggleDialog={() => this.handleCancel("form")}
                         handleConfirmFunc={this.handleSearchfilter}
-                        // title={"Please make sure all the "}
                         message={
                             <EditStockGoods data={this.state.selectedRows} />
                         }
@@ -372,25 +335,46 @@ class StockGoods extends Component {
                 }
                 <div>
                     <div className="row">
-                        <div className="col-xl-11 col-lg-10 col-md-10 col-sm-9 col-9">
-                            <div className="row">
-                                <div className="col-12">
-                                    <SearchBar placeholder={"Search anything"} />
-                                </div>
-                                <div className="col-6 mt-2 mb-md-2">  <ResponsiveDatePickers title="Date" /></div>
-                                <div className="col-6 mt-2">  <SearchBar placeholder={"Search container number"} /></div>
-                            </div>
-                        </div>
-                        <div className="col-xl-1 col-lg-2 col-md-2 col-sm-3 col-3 d-flex align-middle mb-2">
-                            <Tooltip title="Add new order">
-                                <IconButton>
-                                    <ControlPointIcon sx={{ fontSize: "9.5vh" }} />
-                                </IconButton>
-                            </Tooltip>
-                        </div>
+
+                        <div className="col-6 mt-2 mb-md-2">  <ResponsiveDatePickers title="Date" /></div>
+                        <div className="col-6 mt-2">  <SearchBar placeholder={"Search container number"} /></div>
+                        
                     </div>
+
                     <div className='w-100'>
-                        <FullWidthTabs settings={TabsSettings} />
+                        <ToggleTabsComponent Tabs={ToggleTabs} onChange={() => this.changeTab()} size="small" />
+                            <SearchBar placeholder={"Search anything"} />
+                        <TableComponents
+                            tableTopLeft={<h3 style={{ fontWeight: 700 }}>Stocks</h3>}
+                            tableTopRight={this.renderTableActionButton}
+
+                            tableOptions={{
+                                dense: false,
+                                tableOrderBy: 'asc',
+                                sortingIndex: "fat",
+                                stickyTableHeader: true,
+                                stickyTableHeight: 300,
+                            }}
+                            paginationOptions={[20, 50, 100, { label: 'All', value: -1 }]}
+                            tableOptions={{
+                                dense: true,
+                                tableOrderBy: 'asc',
+                                sortingIndex: "fat",
+                            }}
+
+                            tableHeaders={headCells}
+                            tableRows={{
+                                renderTableRows: renderTableRows,
+                                checkbox: true,
+                                checkboxColor: "primary",
+                                onRowClickSelect: false
+                            }}
+                            selectedIndexKey={"pid"}
+                            Data={this.props.stocks}
+                            onTableRowClick={onTableRowClick}
+                            onActionButtonClick={onAddButtonClick}
+                            onDeleteButtonClick={onDeleteButtonClick}
+                        />
                     </div>
 
                 </div>
