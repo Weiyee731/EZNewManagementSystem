@@ -5,7 +5,7 @@ export const isStringNullOrEmpty = (value) => { return (typeof value === 'undefi
 export const isObjectUndefinedOrNull = (obj) => { return (typeof obj === 'undefined' || obj === null) ? true : false }
 export const isArrayNotEmpty = (list) => {
     try {
-        if (typeof list !== 'undefined' && Array.isArray(list) && list.length > 0)
+        if (typeof list !== 'undefined' && list !== null && Array.isArray(list) && list.length > 0)
             return true
         else
             return false

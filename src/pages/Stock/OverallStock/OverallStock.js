@@ -218,16 +218,16 @@ class OverallStock extends Component {
                     scope="row"
                     sx={{ fontSize: fontsize }}
                 >
-                    {data.TrackingNo}
+                    {data.TrackingNumber}
                 </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Weight.toFixed(2)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Depth.toFixed(2)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Width.toFixed(2)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Height.toFixed(2)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.Depth * data.Width * data.Height).toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight).toFixed(2)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Member}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Division}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserAreaID}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Stockdate}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.packagingDate}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ContainerNo}</TableCell>
@@ -257,6 +257,8 @@ class OverallStock extends Component {
             { children: "Collected", key: "Collected" },
         ]
 
+        const { filteredList } = this.state
+
         return (
             <div className="container-fluid">
                 <SearchBar />
@@ -279,8 +281,8 @@ class OverallStock extends Component {
                         checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
                         onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                     }}
-                    selectedIndexKey={"stockId"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
-                    Data={rows}                                  // required, the data that listing in the table
+                    selectedIndexKey={"StockID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
+                    Data={filteredList}                                  // required, the data that listing in the table
                     onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                     // onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                     onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items
