@@ -58,11 +58,6 @@ export class GitAction {
       type: GitAction.GetUserProfile
     };
   }
-  static CallResetUserProfile() {
-    return {
-      type: GitAction.ResetUserProfile,
-    };
-  }
 
   static GetUserAreaCode = "GET_USER_AREA_CODE";
   static GotUserAreaCode = "GOT_USER_AREA_CODE";

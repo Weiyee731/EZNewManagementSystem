@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { isStringNullOrEmpty } from "../../tools/Helpers"
+import { isStringNullOrEmpty, isObjectUndefinedOrNull } from "../../tools/Helpers"
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton } from '@mui/material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -57,11 +57,10 @@ export default function Dropzone(props) {
         }
     });
 
-    const removeAttachment = filename => { setFiles(files.filter(x => x.name !== filename)) }
-
+    const removeAttachment = filename => { setFiles(files.filter(x => x.name !== filename)); typeof props.onRemoveAttachment !== "undefined" && props.onRemoveAttachment(filename); }
 
     const thumbs = files.map((file, idx) => (
-        <div style={thumb} key={file.name}>
+        <div style={isObjectUndefinedOrNull(props.imageStyles) ? thumb : props.imageStyles} key={file.name}>
             <IconButton
                 size="medium"
                 sx={{ width: '20px', height: '20px', position: 'absolute', color: 'red' }}
@@ -85,7 +84,7 @@ export default function Dropzone(props) {
     }, [files]);
 
     return (
-        <section className="container">
+        <section className="container-fluid">
             <div style={styles} {...getRootProps({ className: 'dropzone' })}>
                 <input {...getInputProps()} />
                 <div className='m-auto' style={{ fontSize: isStringNullOrEmpty(placeholder.fontSize) ? '16px' : placeholder.fontSize }}>{isStringNullOrEmpty(placeholder.text) ? "" : placeholder.text}</div>
