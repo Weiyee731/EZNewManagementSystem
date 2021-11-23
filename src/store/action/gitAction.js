@@ -64,6 +64,14 @@ export class GitAction {
     };
   }
 
+  static GetUserAreaCode = "GET_USER_AREA_CODE";
+  static GotUserAreaCode = "GOT_USER_AREA_CODE";
+  static CallUserAreaCode() {
+    return {
+      type: GitAction.GetUserAreaCode
+    };
+  }
+
   ///////////////////////////////////////////////////  sidebar configuration  ///////////////////////////////////////////////////
   static FetchSidebar = "FETCH_SIDEBAR";
   static SidebarFetched = "SIDEBAR_FETCHED";

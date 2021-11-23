@@ -89,19 +89,34 @@ export class GitEpic {
     });
 
   User_Register = action$ =>
-
     action$.ofType(GitAction.RegisterUser).switchMap(async ({ payload }) => {
-      // console.log(url + 
-      //   double_click_and_paste_url_here
-      // )
+      console.log(
+        url +
+        "User_Register?" +
+        "USERCODE=" + payload.code +
+        "&USERAREAID=" + payload.areaId +
+        "&USERNAME=" + payload.username +
+        "&FULLNAME=" + payload.name +
+        "&PASSWORD=" + payload.password +
+        "&CONTACTNO=" + payload.contact +
+        "&USEREMAIL=" + payload.email +
+        "&USERADDRESS=" + payload.address +
+        "&USERLAT=" + payload.lat +
+        "&USERLONG=" + payload.long
+      )
       try {
         const response = await fetch(url +
           "User_Register?" +
-          "userFirstName=" + payload.userFirstName +
-          "&userLastName=" + payload.userLastName +
-          "&username=" + payload.username +
-          "&userEmail=" + payload.userEmail +
-          "&password=" + payload.password
+          "USERCODE=" + payload.code +
+          "&USERAREAID=" + payload.areaId +
+          "&USERNAME=" + payload.username +
+          "&FULLNAME=" + payload.name +
+          "&PASSWORD=" + payload.password +
+          "&CONTACTNO=" + payload.contact +
+          "&USEREMAIL=" + payload.email +
+          "&USERADDRESS=" + payload.address +
+          "&USERLAT=" + payload.lat +
+          "&USERLONG=" + payload.long
         );
 
         let json = await response.json();
@@ -167,6 +182,29 @@ export class GitEpic {
         toast.error("Error Code: GetUserProfileByID")
         return {
           type: GitAction.GotUserProfileByID,
+          payload: [],
+        };
+      }
+    });
+
+  User_ViewAreaCode = action$ =>
+    action$.ofType(GitAction.GetUserAreaCode).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "User_ViewAreaCode"
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.GotUserAreaCode,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: GotUserAreaCode")
+        return {
+          type: GitAction.GotUserAreaCode,
           payload: [],
         };
       }

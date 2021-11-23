@@ -28,7 +28,7 @@ export default function AlertDialog(props) {
         }}
       >
         {props.title}
-        <IconButton sx={{marginLeft: 'auto'}} onClick={() => props.handleToggleDialog()}>
+        <IconButton sx={{ marginLeft: 'auto' }} onClick={() => props.handleToggleDialog()}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
