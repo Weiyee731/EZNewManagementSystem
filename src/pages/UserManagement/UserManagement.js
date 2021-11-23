@@ -14,9 +14,14 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Backdrop from '@mui/material/Backdrop';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 import { getWindowDimensions } from "../../tools/Helpers";
 import SearchBar from "../../components/SearchBar/SearchBar"
 import AlertDialog from "../../components/modal/Modal";
+import { toast } from "react-toastify";
 
 const style = {
     position: 'absolute',
@@ -34,12 +39,16 @@ const style = {
 function mapStateToProps(state) {
     return {
         user: state.counterReducer["user"],
+        registrationReturn: state.counterReducer["registrationReturn"],
+        userAreaCode: state.counterReducer["userAreaCode"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         CallUserProfile: () => dispatch(GitAction.CallUserProfile()),
+        CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
+        CallUserRegistration: (propData) => dispatch(GitAction.CallUserRegistration(propData))
     };
 }
 
@@ -83,15 +92,21 @@ class UserManagement extends Component {
             UserListing: [],
             UserListingfiltered: [],
             name: "",
+            username: "",
+            password: "",
+            areaId: 0,
             code: "",
             email: "",
             contact: "",
-            address: ""
+            address: "",
+            lat: 0.00,
+            long: 0.00
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
         this.onAddButtonClick = this.onAddButtonClick.bind(this)
         this.props.CallUserProfile();
+        this.props.CallUserAreaCode();
     }
 
     componentDidMount() {
@@ -104,13 +119,20 @@ class UserManagement extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.user.length !== this.props.user.length) {
-            console.log(this.props.user !== undefined && this.props.user[0] !== undefined)
             if (this.props.user !== undefined && this.props.user[0] !== undefined) {
                 this.setState({ UserListing: this.props.user, UserListingfiltered: this.props.user });
             }
         } else {
             if (prevProps.user.length !== this.state.UserListing.length) {
                 this.setState({ UserListing: prevProps.user, UserListingfiltered: prevProps.user });
+            }
+        }
+
+        if (prevProps.registrationReturn !== this.props.registrationReturn) {
+            if (this.props.registrationReturn[0].ReturnVal == 1) {
+                this.onAddButtonClick()
+                alert(`${this.props.registrationReturn[0].ReturnMsg}`)
+                toast.success(`${this.props.registrationReturn[0].ReturnMsg}`)
             }
         }
     }
@@ -150,21 +172,16 @@ class UserManagement extends Component {
         this.props.history.push(`/UserDetail/${row.UserID}/${row.UserCode}`)
     }
 
-    handleClose = () => {
-        this.setState({ AddModalOpen: false });
-    }
-
     onAddButtonClick = () => {
         this.setState({ AddModalOpen: !this.state.AddModalOpen });
     }
 
     onDeleteButtonClick = (items) => {
         console.log('delete button')
-
     }
 
     onTextFieldOnChange = (e) => {
-        switch (e.target.id) {
+        switch (e.target.name) {
             case "name":
                 this.setState({
                     name: e.target.value
@@ -174,6 +191,18 @@ class UserManagement extends Component {
             case "code":
                 this.setState({
                     code: e.target.value
+                })
+                break;
+
+            case "username":
+                this.setState({
+                    username: e.target.value
+                })
+                break;
+
+            case "password":
+                this.setState({
+                    password: e.target.value
                 })
                 break;
 
@@ -189,6 +218,12 @@ class UserManagement extends Component {
                 })
                 break;
 
+            case "areaCode":
+                this.setState({
+                    areaId: e.target.value
+                })
+                break;
+
             case "address":
                 this.setState({
                     address: e.target.value
@@ -201,7 +236,7 @@ class UserManagement extends Component {
     }
 
     onSubmitNewUser = () => {
-        console.log(this.state)
+        this.props.CallUserRegistration(this.state)
     }
 
     render() {
@@ -257,7 +292,7 @@ class UserManagement extends Component {
                                 <Grid item xs={12} sm={6}>
                                     <TextField
                                         autoComplete="given-name"
-                                        name="Full Name"
+                                        name="name"
                                         required
                                         fullWidth
                                         id="name"
@@ -272,8 +307,30 @@ class UserManagement extends Component {
                                         fullWidth
                                         id="code"
                                         label="User Code"
-                                        name="UserCode"
+                                        name="code"
                                         autoComplete="family-name"
+                                        onChange={this.onTextFieldOnChange}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="username"
+                                        label="Username"
+                                        name="username"
+                                        type={'text'}
+                                        onChange={this.onTextFieldOnChange}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="password"
+                                        label="Password"
+                                        name="password"
+                                        type={'password'}
                                         onChange={this.onTextFieldOnChange}
                                     />
                                 </Grid>
@@ -292,7 +349,7 @@ class UserManagement extends Component {
                                     <TextField
                                         required
                                         fullWidth
-                                        name="Contact"
+                                        name="contact"
                                         label="Contact"
                                         id="contact"
                                         autoComplete="contact"
@@ -300,10 +357,39 @@ class UserManagement extends Component {
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="areaCode">Area Code</InputLabel>
+                                        <Select
+                                            id="areaCode"
+                                            value={this.state.areaId}
+                                            label="Area Code"
+                                            name="areaCode"
+                                            required
+                                            placeholder="Select an area code"
+                                            onChange={this.onTextFieldOnChange}
+                                        >
+                                            <MenuItem disabled value={0}>Select an area code</MenuItem>
+                                            {this.props.userAreaCode.length > 0 &&
+                                                this.props.userAreaCode.map((i, id) => {
+                                                    return (
+                                                        <MenuItem
+                                                            id="areaCode"
+                                                            key={id}
+                                                            value={i.UserAreaID}
+                                                        >
+                                                            {i.AreaName} ({i.AreaCode})
+                                                        </MenuItem>
+                                                    )
+                                                })
+                                            }
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
-                                        name="Address"
+                                        name="address"
                                         label="Address"
                                         id="address"
                                         autoComplete="address"
