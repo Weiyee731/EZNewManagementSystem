@@ -22,12 +22,6 @@ export class GitEpic {
 
   User_Login = action$ =>
     action$.ofType(GitAction.Login).switchMap(async ({ payload }) => {
-      console.log(
-        url +
-        "User_Login?" +
-        "username=" + payload.username +
-        "&password=" + payload.password
-      )
       try {
         const response = await fetch(url +
           "User_Login?" +
@@ -35,11 +29,10 @@ export class GitEpic {
           "&password=" + payload.password
         );
 
-
-
         let json = await response.json();
         json = JSON.parse(json)
-        const response2 = await fetch(url +
+        if (json[0].ReturnVal !== "0") {
+          const response2 = await fetch(url +
             "User_ViewPage?" +
             "ROLEGROUPID=" + json[0].UserTypeID +
             "&USERID=" + json[0].UserID
@@ -51,7 +44,14 @@ export class GitEpic {
             type: GitAction.LoginSuccess,
             payload: json,
           };
-
+        } else {
+          alert("Invalid credential")
+          return {
+            payload2: [],
+            type: GitAction.LoginSuccess,
+            payload: [],
+          };
+        }
       }
       catch (error) {
         toast.error("Error Code: User_Login")
@@ -145,7 +145,7 @@ export class GitEpic {
       }
     });
 
-    User_ProfileByID = action$ =>
+  User_ProfileByID = action$ =>
     action$.ofType(GitAction.GetUserProfileByID).switchMap(async ({ payload }) => {
       // console.log(url + 
       //   double_click_and_paste_url_here
@@ -277,56 +277,56 @@ export class GitEpic {
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
 
   Transaction_ViewTransaction = action$ =>
-  action$.ofType(GitAction.FetchTransaction).switchMap(async ({ payload }) => {
-    // console.log(url + 
-    //   double_click_and_paste_url_here
-    // )
-    try {
-      const response = await fetch(url +
-        "Transaction_ViewTransaction"
-      );
+    action$.ofType(GitAction.FetchTransaction).switchMap(async ({ payload }) => {
+      // console.log(url + 
+      //   double_click_and_paste_url_here
+      // )
+      try {
+        const response = await fetch(url +
+          "Transaction_ViewTransaction"
+        );
 
-      let json = await response.json();
-      json = JSON.parse(json)
-      return {
-        type: GitAction.TransactionFetched,
-        payload: json,
-      };
-    }
-    catch (error) {
-      toast.error("Error Code: Transaction_ViewTransaction")
-      return {
-        type: GitAction.TransactionFetched,
-        payload: [],
-      };
-    }
-  });
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.TransactionFetched,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Transaction_ViewTransaction")
+        return {
+          type: GitAction.TransactionFetched,
+          payload: [],
+        };
+      }
+    });
 
   Transaction_ViewTransactionByID = action$ =>
-  action$.ofType(GitAction.FetchTransactionByID).switchMap(async ({ payload }) => {
-    // console.log(url + 
-    //   double_click_and_paste_url_here
-    // )
-    try {
-      const response = await fetch(url +
-        "Transaction_ViewTransactionByID?TRANSACTIONID=" + payload.TRANSACTIONID
-      );
+    action$.ofType(GitAction.FetchTransactionByID).switchMap(async ({ payload }) => {
+      // console.log(url + 
+      //   double_click_and_paste_url_here
+      // )
+      try {
+        const response = await fetch(url +
+          "Transaction_ViewTransactionByID?TRANSACTIONID=" + payload.TRANSACTIONID
+        );
 
-      let json = await response.json();
-      json = JSON.parse(json)
-      return {
-        type: GitAction.TransactionByIDFetched,
-        payload: json,
-      };
-    }
-    catch (error) {
-      toast.error("Error Code: Transaction_ViewTransactionByID")
-      return {
-        type: GitAction.TransactionByIDFetched,
-        payload: [],
-      };
-    }
-  });
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.TransactionByIDFetched,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Transaction_ViewTransactionByID")
+        return {
+          type: GitAction.TransactionByIDFetched,
+          payload: [],
+        };
+      }
+    });
 
   Transaction_InsertTransaction = action$ =>
     action$.ofType(GitAction.InsertNewTransaction).switchMap(async ({ payload }) => {

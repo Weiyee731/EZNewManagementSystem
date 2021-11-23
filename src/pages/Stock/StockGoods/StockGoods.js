@@ -357,15 +357,19 @@ class StockGoods extends Component {
                         </div>
                     </div>}
                 />
-                {/* {console.log(openModal)} */}
-                {openModal ? (<ModalPopOut
-                    open={openModal}
-                    onBackdropClick={() => console.log('backdrop')}
-                    handleToggleDialog={() => this.handleCancel("form")}
-                    handleConfirmFunc={this.handleSearchfilter}
-                    // title={"Please make sure all the "}
-                    message={<EditStockGoods data={this.state.selectedRows} />}
-                />) : ("")}
+
+                {openModal &&
+                    <ModalPopOut
+                        open={openModal}
+                        onBackdropClick={() => console.log('backdrop')}
+                        handleToggleDialog={() => this.handleCancel("form")}
+                        handleConfirmFunc={this.handleSearchfilter}
+                        // title={"Please make sure all the "}
+                        message={
+                            <EditStockGoods data={this.state.selectedRows} />
+                        }
+                    />
+                }
                 <div>
                     <div className="row">
                         <div className="col-xl-11 col-lg-10 col-md-10 col-sm-9 col-9">
