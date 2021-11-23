@@ -11,7 +11,7 @@ import "./Searchbar.css"
 const SearchBox = (props) => {
     return (
         <TextField
-            className={(isStringNullOrEmpty(props.className)) ? "searchbar-input" : props.className}
+            className={(isStringNullOrEmpty(props.className)) ? "searchbar-input mb-2" : props.className}
             fullWidth
             label={isStringNullOrEmpty(props.label) ? "" : props.label}
             id="search-bar"

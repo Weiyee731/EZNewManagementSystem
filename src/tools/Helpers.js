@@ -1,11 +1,9 @@
-import React from "react"
-
 // validation functions
 export const isStringNullOrEmpty = (value) => { return (typeof value === 'undefined') ? true : (value === null || value == null) ? true : (typeof value === "string" && value.trim() === "") ? true : false }
 export const isObjectUndefinedOrNull = (obj) => { return (typeof obj === 'undefined' || obj === null) ? true : false }
 export const isArrayNotEmpty = (list) => {
     try {
-        if (typeof list !== 'undefined' && Array.isArray(list) && list.length > 0)
+        if (typeof list !== 'undefined' && list !== null && Array.isArray(list) && list.length > 0)
             return true
         else
             return false
@@ -124,10 +122,17 @@ export const getFileTypeByExtension = (ext) => {
 
             case "txt":
             case "pdf":
-            case "docx":
-            case "doc":
             case "ppt":
                 return "file";
+
+            case "docx":
+            case "doc":
+                return "docs";
+
+            case "xls":
+            case "xlsx":
+            case "csv":
+                return "excel";
 
             default:
                 console.log("getFileTypeByExtension: the value is not found in the library")
@@ -139,7 +144,7 @@ export const getFileTypeByExtension = (ext) => {
 // screen function
 export function getWindowDimensions() {
     const { innerWidth: screenWidth, innerHeight: screenHeight } = window;
-    return { screenWidth,  screenHeight };
+    return { screenWidth, screenHeight };
 }
 
 // currency / money handler functions

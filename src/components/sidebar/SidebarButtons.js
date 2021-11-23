@@ -5,7 +5,6 @@ import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import MenuIcon from '@mui/icons-material/Menu';
 
 export default function SidebarButtons(props) {
-    console.log(props)
     return (
         !props.isCollapsed ?
             <div className="p-2 w-100 clearfix">

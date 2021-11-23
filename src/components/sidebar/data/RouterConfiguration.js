@@ -12,6 +12,7 @@ import BalanceSettlement from "../../../pages/Payments/BalanceSettlement/Balance
 import Statements from "../../../pages/Statements/Statements";
 import UserDetail from "../../../pages/UserManagement/UserDetail"
 import AddUser from "../../../pages/UserManagement/AddUser";
+import EditStockGoods from "../../../pages/Stock/StockGoods/EditStockGoods";
 
 const routes = [
     {
@@ -33,6 +34,11 @@ const routes = [
         path: "/StockGoods",
         exact: true,
         element: <StockGoods />,
+    },
+    {
+        path: "/EditStockGoods",
+        exact: true,
+        element: <EditStockGoods />,
     },
     {
         path: "/Invoice",
