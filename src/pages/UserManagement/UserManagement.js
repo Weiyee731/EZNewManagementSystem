@@ -16,6 +16,7 @@ import Typography from '@mui/material/Typography';
 import Backdrop from '@mui/material/Backdrop';
 import { getWindowDimensions } from "../../tools/Helpers";
 import SearchBar from "../../components/SearchBar/SearchBar"
+import AlertDialog from "../../components/modal/Modal";
 
 const style = {
     position: 'absolute',
@@ -80,7 +81,12 @@ class UserManagement extends Component {
         this.state = {
             AddModalOpen: false,
             UserListing: [],
-            UserListingfiltered:[]
+            UserListingfiltered: [],
+            name: "",
+            code: "",
+            email: "",
+            contact: "",
+            address: ""
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
@@ -131,7 +137,7 @@ class UserManagement extends Component {
     renderTableActionButton = () => {
         return (
             <div className="d-flex">
-                <Tooltip sx={{ marginLeft: 5 }} title="Add New Items">
+                <Tooltip sx={{ marginLeft: 5 }} title="Add new user">
                     <IconButton onClick={(event) => { this.onAddButtonClick() }}>
                         <AddIcon />
                     </IconButton>
@@ -149,7 +155,7 @@ class UserManagement extends Component {
     }
 
     onAddButtonClick = () => {
-        this.setState({ AddModalOpen: true });
+        this.setState({ AddModalOpen: !this.state.AddModalOpen });
     }
 
     onDeleteButtonClick = (items) => {
@@ -157,17 +163,58 @@ class UserManagement extends Component {
 
     }
 
+    onTextFieldOnChange = (e) => {
+        switch (e.target.id) {
+            case "name":
+                this.setState({
+                    name: e.target.value
+                })
+                break;
+
+            case "code":
+                this.setState({
+                    code: e.target.value
+                })
+                break;
+
+            case "email":
+                this.setState({
+                    email: e.target.value
+                })
+                break;
+
+            case "contact":
+                this.setState({
+                    contact: e.target.value
+                })
+                break;
+
+            case "address":
+                this.setState({
+                    address: e.target.value
+                })
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    onSubmitNewUser = () => {
+        console.log(this.state)
+    }
+
     render() {
 
         const onChange = (e) => {
-            const FilterArr = this.state.UserListing.filter((searchedItem) =>searchedItem.UserCode.toLowerCase().includes(e.target.value))
+            const FilterArr = this.state.UserListing.filter((searchedItem) => searchedItem.UserCode.toLowerCase().includes(e.target.value))
             this.setState({ UserListingfiltered: FilterArr });
         }
 
         return (
             <>
                 <div className="w-100 container-fluid">
-                    <SearchBar  onChange={onChange}  />
+                    <SearchBar onChange={onChange} />
                     <TableComponents
                         // table settings 
                         tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}  // optional, it can pass as string or as children elements
@@ -196,81 +243,76 @@ class UserManagement extends Component {
                     />
                 </div>
                 <div>
-                    <Modal
-                        open={this.state.AddModalOpen}
-                        onClose={this.handleClose}
-                        aria-labelledby="modal-modal-title"
-                        aria-describedby="modal-modal-description"
-                        closeAfterTransition
-                        BackdropComponent={Backdrop}
-                        BackdropProps={{ timeout: 500 }}>
-                        <Box sx={style} component="main" maxWidth="xs">
-                            <Typography component="h1" variant="h5">Sign up</Typography>
-                            <Box component="form" noValidate sx={{ mt: 3 }}>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            autoComplete="given-name"
-                                            name="Full Name"
-                                            required
-                                            fullWidth
-                                            id="Fullname"
-                                            label="Full Name"
-                                            autoFocus
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            id="UserCode"
-                                            label="User Code"
-                                            name="UserCode"
-                                            autoComplete="family-name"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            id="email"
-                                            label="Email Address"
-                                            name="email"
-                                            autoComplete="email"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            name="Contact"
-                                            label="Contact"
-                                            id="contact"
-                                            autoComplete="contact"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            name="Address"
-                                            label="Address"
-                                            id="address"
-                                            autoComplete="address"
-                                        />
-                                    </Grid>
+                    <AlertDialog
+                        open={this.state.AddModalOpen}              // required, pass the boolean whether modal is open or close
+                        handleToggleDialog={this.onAddButtonClick}  // required, pass the toggle function of modal
+                        handleConfirmFunc={this.onSubmitNewUser}   // required, pass the confirm function 
+                        showAction={true}                           // required, to show the footer of modal display
+                        title={"Add new user"}                      // required, title of the modal
+                        buttonTitle={"Add"}                         // required, title of button
+                        singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
+                    >
+                        <Box component="form" noValidate sx={{ mt: 3 }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        autoComplete="given-name"
+                                        name="Full Name"
+                                        required
+                                        fullWidth
+                                        id="name"
+                                        label="Full Name"
+                                        autoFocus
+                                        onChange={this.onTextFieldOnChange}
+                                    />
                                 </Grid>
-                                <Button
-                                    type="submit"
-                                    fullWidth
-                                    variant="contained"
-                                    sx={{ mt: 3, mb: 2 }}
-                                >
-                                    Add New User
-                                </Button>
-                            </Box>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="code"
+                                        label="User Code"
+                                        name="UserCode"
+                                        autoComplete="family-name"
+                                        onChange={this.onTextFieldOnChange}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="email"
+                                        label="Email Address"
+                                        name="email"
+                                        autoComplete="email"
+                                        onChange={this.onTextFieldOnChange}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        name="Contact"
+                                        label="Contact"
+                                        id="contact"
+                                        autoComplete="contact"
+                                        onChange={this.onTextFieldOnChange}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        name="Address"
+                                        label="Address"
+                                        id="address"
+                                        autoComplete="address"
+                                        onChange={this.onTextFieldOnChange}
+                                    />
+                                </Grid>
+                            </Grid>
                         </Box>
-                    </Modal>
+                    </AlertDialog>
                 </div>
             </>
         )

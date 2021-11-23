@@ -5,6 +5,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function AlertDialog(props) {
   return (
@@ -14,20 +16,50 @@ export default function AlertDialog(props) {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">
+      <DialogTitle
+        id="alert-dialog-title"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
         {props.title}
+        <IconButton onClick={() => props.handleToggleDialog()}>
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
       <DialogContent>
-        <DialogContentText id="alert-dialog-description">
-          {props.message}
-        </DialogContentText>
+        {props.message ?
+          <DialogContentText id="alert-dialog-description">
+            {props.message}
+          </DialogContentText>
+          :
+          <>
+            {props.children}
+          </>
+        }
       </DialogContent>
-      <DialogActions>
-        <Button onClick={() => props.handleToggleDialog()}>No</Button>
-        <Button onClick={() => props.handleConfirmFunc()} variant='contained'>
-          Yes
-        </Button>
-      </DialogActions>
+      {props.showAction &&
+        <DialogActions>
+          {props.singleButton ?
+            <Button
+              onClick={() => props.handleConfirmFunc()}
+              variant='contained'
+              fullWidth
+            >
+              {props.buttonTitle}
+            </Button>
+            :
+            <>
+              <Button onClick={() => props.handleToggleDialog()}>No</Button>
+              <Button onClick={() => props.handleConfirmFunc()} variant='contained'>
+                {props.buttonTitle}
+              </Button>
+            </>
+          }
+        </DialogActions>
+      }
     </Dialog>
   );
 }
@@ -36,9 +68,9 @@ export function ModalPopOut(props) {
   console.log(props)
   return (
     <Dialog
-      fullScreen={props.fullScreen?props.fullScreen:false}    //fullscreen modal
-      hideBackdrop={props.hideBackdrop?props.hideBackdrop:false}   //hide back
-      BackDropProps={props.BackDropProps?props.BackDropProps:false}
+      fullScreen={props.fullScreen ? props.fullScreen : false}    //fullscreen modal
+      hideBackdrop={props.hideBackdrop ? props.hideBackdrop : false}   //hide back
+      BackDropProps={props.BackDropProps ? props.BackDropProps : false}
       // onBackdropClick={this.onClose= 'open'}
       open={props.open}
       onClose={() => props.handleToggleDialog()}

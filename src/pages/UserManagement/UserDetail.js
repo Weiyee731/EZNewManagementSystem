@@ -221,9 +221,9 @@ class UserDetail extends Component {
               <Typography variant="h5" component="div">
                 Edit Profile
               </Typography>
-              <CardActions>
+              {/* <CardActions>
                 <Button size="small">Learn More</Button>
-              </CardActions>
+              </CardActions> */}
             </div>
             <div className="row">
               <div className="col-lg-6 col-md-6 col-sm-12">
@@ -279,8 +279,7 @@ class UserDetail extends Component {
           </CardContent>
 
         </Card>
-        <div className="">
-
+        <div className="mt-4">
           <TableComponents
             tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}
             tableTopRight={this.renderTableActionButton}
