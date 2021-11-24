@@ -24,7 +24,9 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import AddIcon from '@mui/icons-material/Add';
-// import SearchBar from "../SearchBar/SearchBar"
+import SearchBar from "../SearchBar/SearchBar"
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 import { isObjectUndefinedOrNull, isArrayNotEmpty, isStringNullOrEmpty } from "../../tools/Helpers"
 
 function descendingComparator(a, b, orderBy) {
@@ -63,8 +65,8 @@ function EnhancedTableHead(props) {
     return (
         <TableHead >
             <TableRow>
-                {
-                    renderCheckbox === true &&
+                {/* {
+                    renderCheckbox === true && */}
                     <TableCell padding="checkbox" sx={{ bgcolor: 'rgb(200, 200, 200)' }} >
                         <Checkbox
                             color={checkboxColor}
@@ -74,7 +76,7 @@ function EnhancedTableHead(props) {
                             inputProps={{ 'aria-label': 'select all desserts', }}
                         />
                     </TableCell>
-                }
+                {/* } */}
                 {
                     isArrayNotEmpty(tableHeaders) && tableHeaders.map((headCell) => (
                         <TableCell
@@ -268,6 +270,28 @@ export default function TableComponents(props) {
     const emptyRowColSpan = renderCheckbox ? tableHeaders.length + 1 : tableHeaders.length
     return (
         <Box sx={{ width: '100%' }}>
+            <div
+                style={{
+                    textAlign: 'right'
+                }}
+            >
+                <FormControlLabel
+                    style={{
+                        marginBottom: '0.5rem',
+                    }}
+                    control={
+                        <Switch
+                            checked={renderCheckbox}
+                            onChange={() => {
+                                setRenderCheckbox(!renderCheckbox)
+                                setOnRowSelect(!onRowSelect)
+                                setSelected([])
+                            }}
+                        />
+                    }
+                    label="Select"
+                />
+            </div>
             <Paper sx={{ width: '100%', mb: 2 }}>
                 {
                     <EnhancedTableToolbar
@@ -312,8 +336,8 @@ export default function TableComponents(props) {
                                             key={'row_' + index}
                                             selected={isItemSelected}
                                         >
-                                            {
-                                                renderCheckbox &&
+                                            {/* {
+                                                renderCheckbox && */}
                                                 <TableCell padding="checkbox">
                                                     <Checkbox
                                                         color={checkboxColor}
@@ -322,7 +346,7 @@ export default function TableComponents(props) {
                                                         onClick={(event) => handleSelectItem(event, row[objectKey])}
                                                     />
                                                 </TableCell>
-                                            }
+                                            {/* } */}
                                             {!isObjectUndefinedOrNull(props.tableRows.renderTableRows) && props.tableRows.renderTableRows(row, index)}
                                         </TableRow>
                                     );

@@ -177,7 +177,7 @@ class UserManagement extends Component {
     }
 
     onDeleteButtonClick = (items) => {
-        console.log('delete button')
+        console.log('delete button', items)
     }
 
     onTextFieldOnChange = (e) => {
