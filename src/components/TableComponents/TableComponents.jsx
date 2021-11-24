@@ -65,8 +65,8 @@ function EnhancedTableHead(props) {
     return (
         <TableHead >
             <TableRow>
-                {/* {
-                    renderCheckbox === true && */}
+                {
+                    renderCheckbox === true &&
                     <TableCell padding="checkbox" sx={{ bgcolor: 'rgb(200, 200, 200)' }} >
                         <Checkbox
                             color={checkboxColor}
@@ -76,7 +76,7 @@ function EnhancedTableHead(props) {
                             inputProps={{ 'aria-label': 'select all desserts', }}
                         />
                     </TableCell>
-                {/* } */}
+                }
                 {
                     isArrayNotEmpty(tableHeaders) && tableHeaders.map((headCell) => (
                         <TableCell
@@ -336,8 +336,8 @@ export default function TableComponents(props) {
                                             key={'row_' + index}
                                             selected={isItemSelected}
                                         >
-                                            {/* {
-                                                renderCheckbox && */}
+                                            {
+                                                renderCheckbox &&
                                                 <TableCell padding="checkbox">
                                                     <Checkbox
                                                         color={checkboxColor}
@@ -346,7 +346,7 @@ export default function TableComponents(props) {
                                                         onClick={(event) => handleSelectItem(event, row[objectKey])}
                                                     />
                                                 </TableCell>
-                                            {/* } */}
+                                            }
                                             {!isObjectUndefinedOrNull(props.tableRows.renderTableRows) && props.tableRows.renderTableRows(row, index)}
                                         </TableRow>
                                     );
