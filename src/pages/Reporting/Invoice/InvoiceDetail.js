@@ -37,83 +37,41 @@ function mapDispatchToProps(dispatch) {
 
 const headCells = [
   {
-    id: 'TrackingNo',
+    id: 'index',
     align: 'left',
     disablePadding: false,
-    label: 'Tracking No. ',
+    label: 'item',
   },
   {
-    id: 'Weight',
+    id: 'TrackingNumber',
     align: 'left',
     disablePadding: false,
-    label: 'Weight (KG)',
+    label: 'Description',
   },
   {
-    id: 'Depth',
+    id: 'ProductQuantity',
     align: 'left',
     disablePadding: false,
-    label: 'Depth',
-  },
-  {
-    id: 'Width',
-    align: 'left',
-    disablePadding: false,
-    label: 'Width',
-  },
-  {
-    id: 'Height',
-    align: 'left',
-    disablePadding: false,
-    label: 'Height',
+    label: 'Qty',
   },
   {
     id: 'Dimension',
     align: 'left',
     disablePadding: false,
-    label: 'Dimension',
+    label: 'M³',
   },
   {
-    id: 'Item',
+    id: 'ProductPrice',
     align: 'left',
     disablePadding: false,
-    label: 'Item',
+    label: 'Price',
   },
   {
-    id: 'Member',
+    id: 'Total',
     align: 'left',
     disablePadding: false,
-    label: 'Member',
-  },
-  {
-    id: 'Division',
-    align: 'left',
-    disablePadding: false,
-    label: 'Division',
-  },
-  {
-    id: 'Stockdate',
-    align: 'left',
-    disablePadding: false,
-    label: 'Stock Date',
-  },
-  {
-    id: 'packagingDate',
-    align: 'left',
-    disablePadding: false,
-    label: 'Packaging Date',
-  },
-  {
-    id: 'ContainerNo',
-    align: 'left',
-    disablePadding: false,
-    label: 'Container',
-  },
-  {
-    id: 'Remarks',
-    align: 'left',
-    disablePadding: false,
-    label: 'Remarks',
-  },
+    label: 'Total',
+  }
 ];
 
 const companyTitle = {
@@ -237,20 +195,13 @@ class InvoicerDetail extends Component {
           scope="row"
           sx={{ fontSize: fontsize }}
         >
-          {data.TrackingNumber}
+          {index}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep.toFixed(2)}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth.toFixed(2)}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight.toFixed(2)}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.TrackingNumber}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductQuantity}</TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight).toFixed(2)}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.PackagingDate}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ContainerName}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Remark}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductPrice}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductPrice * data.ProductQuantity)}</TableCell>
       </>
     )
   }
@@ -357,7 +308,7 @@ class InvoicerDetail extends Component {
         </Card>
         <div className="">
           <TableComponents
-            tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}
+            tableTopLeft={""}
             tableTopRight={this.renderTableActionButton}
             tableOptions={{
               dense: false,
@@ -366,7 +317,6 @@ class InvoicerDetail extends Component {
               stickyTableHeader: true,
               stickyTableHeight: 300,
             }}
-            paginationOptions={[20, 50, 100, { label: 'All', value: -1 }]}
             tableHeaders={headCells}
             tableRows={{
               renderTableRows: this.renderTableRows,
@@ -376,8 +326,6 @@ class InvoicerDetail extends Component {
             }}
             selectedIndexKey={"pid"}
             Data={this.state.TransactionDetail}
-            onTableRowClick={this.onTableRowClick}
-
           />
         </div>
         <div style={tncDiv}>
@@ -385,13 +333,17 @@ class InvoicerDetail extends Component {
           <br />
           <div>
             <p>
-              1. Customer will be billed after indicating acceptance of this
-              quote.
+              1. All payment should be make payable to
+              <br/>
+              EZ TAO BAO ENTERPRISE 17.10
+              <br/>
+              25301009073
+              <br/>
+              HONG LEONG BANK
             </p>
             <p>
-              2. Payment will be due prior to delivery of service and goods.
+              2. Payment must be cleared within 3 days after the billing date
             </p>
-            <p>To accept this Quotation ,sign here and return :</p>
           </div>
         </div>
       </div>
