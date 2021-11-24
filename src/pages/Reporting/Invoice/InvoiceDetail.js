@@ -21,6 +21,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import FormControl from '@mui/material/FormControl';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import TableComponents from "../../../components/TableComponents/TableComponents"
+import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
 
 function mapStateToProps(state) {
   return {
@@ -36,54 +37,118 @@ function mapDispatchToProps(dispatch) {
 
 const headCells = [
   {
-    id: 'OrderDate',
+    id: 'TrackingNo',
     align: 'left',
     disablePadding: false,
-    label: 'Invoice Date',
+    label: 'Tracking No. ',
   },
   {
-    id: 'TransactionName',
+    id: 'Weight',
     align: 'left',
     disablePadding: false,
-    label: 'Invoice No.',
+    label: 'Weight (KG)',
   },
   {
-    id: 'UserCode',
+    id: 'Depth',
     align: 'left',
     disablePadding: false,
-    label: 'Code',
+    label: 'Depth',
   },
   {
-    id: 'AreaCode',
-    align: 'center',
+    id: 'Width',
+    align: 'left',
     disablePadding: false,
-    label: 'Area',
+    label: 'Width',
   },
   {
-    id: 'Fullname',
-    align: 'center',
+    id: 'Height',
+    align: 'left',
     disablePadding: false,
-    label: 'Name',
+    label: 'Height',
   },
   {
-    id: 'OrderTotalAmount',
-    align: 'center',
+    id: 'Dimension',
+    align: 'left',
     disablePadding: false,
-    label: 'Total Amount',
+    label: 'Dimension',
   },
   {
-    id: 'OrderPaidAmount',
-    align: 'center',
+    id: 'Item',
+    align: 'left',
     disablePadding: false,
-    label: 'Paid',
+    label: 'Item',
   },
   {
-    id: 'OrderStatus',
-    align: 'center',
+    id: 'Member',
+    align: 'left',
     disablePadding: false,
-    label: 'Status',
+    label: 'Member',
+  },
+  {
+    id: 'Division',
+    align: 'left',
+    disablePadding: false,
+    label: 'Division',
+  },
+  {
+    id: 'Stockdate',
+    align: 'left',
+    disablePadding: false,
+    label: 'Stock Date',
+  },
+  {
+    id: 'packagingDate',
+    align: 'left',
+    disablePadding: false,
+    label: 'Packaging Date',
+  },
+  {
+    id: 'ContainerNo',
+    align: 'left',
+    disablePadding: false,
+    label: 'Container',
+  },
+  {
+    id: 'Remarks',
+    align: 'left',
+    disablePadding: false,
+    label: 'Remarks',
   },
 ];
+
+const companyTitle = {
+  fontWeight: "bolder",
+  fontSize: "32px",
+  textAlign: "center"
+};
+
+const companyDetailTitle = {
+  fontWeight: "bold",
+  fontSize: "20px",
+  float: "center",
+  textAlign: "center"
+};
+
+const companyDetail = {
+  fontSize: "18px",
+  fontWeight: "bold",
+};
+
+const quotation = {
+  float: "right",
+  fontSize: "20px",
+  fontWeight: "bold",
+};
+
+const tncTitle = {
+  fontSize: "16px",
+  color: "#0070C0",
+};
+
+const tncDiv = {
+  margin: "1%",
+};
+
 
 class InvoicerDetail extends Component {
   constructor(props) {
@@ -93,6 +158,7 @@ class InvoicerDetail extends Component {
       TransactionID: this.props.match.params.transactionid,
       OrderDate: "",
       TransactionName: "",
+      Fullname: "",
       Email: "",
       Contact: "",
       Address: "",
@@ -111,7 +177,9 @@ class InvoicerDetail extends Component {
           Transaction: this.props.transaction,
           OrderDate: this.props.transaction[0].OrderDate,
           TransactionName: this.props.transaction[0].TransactionName,
-          Email: this.props.transaction[0].UserEmailAddress,
+          Fullname: this.props.transaction[0].Fullname,
+          UserCode: this.props.transaction[0].UserCode,
+          AreaCode: this.props.transaction[0].AreaCode,
           Contact: this.props.transaction[0].UserContactNo,
           Address: this.props.transaction[0].UserAddress,
           OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
@@ -130,7 +198,9 @@ class InvoicerDetail extends Component {
           Transaction: this.props.transaction,
           OrderDate: this.props.transaction[0].OrderDate,
           TransactionName: this.props.transaction[0].TransactionName,
-          Email: this.props.transaction[0].UserEmailAddress,
+          Fullname: this.props.transaction[0].Fullname,
+          UserCode: this.props.transaction[0].UserCode,
+          AreaCode: this.props.transaction[0].AreaCode,
           Contact: this.props.transaction[0].UserContactNo,
           Address: this.props.transaction[0].UserAddress,
           OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
@@ -144,7 +214,9 @@ class InvoicerDetail extends Component {
           Transaction: prevProps.transaction,
           OrderDate: prevProps.transaction[0].OrderDate,
           TransactionName: prevProps.transaction[0].TransactionName,
-          Email: prevProps.transaction[0].UserEmailAddress,
+          Fullname: prevProps.transaction[0].Fullname,
+          UserCode: prevProps.transaction[0].UserCode,
+          AreaCode: prevProps.transaction[0].AreaCode,
           Contact: prevProps.transaction[0].UserContactNo,
           Address: prevProps.transaction[0].UserAddress,
           OrderTotalAmount: prevProps.transaction[0].OrderTotalAmount,
@@ -156,16 +228,29 @@ class InvoicerDetail extends Component {
   }
 
   renderTableRows = (data, index) => {
+    const fontsize = '9pt'
     return (
       <>
-        <TableCell component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{data.OrderDate}</TableCell>
-        <TableCell>{data.TransactionName}</TableCell>
-        <TableCell>{data.UserCode}</TableCell>
-        <TableCell>{data.AreaCode}</TableCell>
-        <TableCell>{data.Fullname}</TableCell>
-        <TableCell align="center"><Box color={data.OrderColor}>{data.OrderTotalAmount}</Box></TableCell>
-        <TableCell align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
-        <TableCell align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
+        <TableCell
+          component="th"
+          id={`table-checkbox-${index}`}
+          scope="row"
+          sx={{ fontSize: fontsize }}
+        >
+          {data.TrackingNumber}
+        </TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep.toFixed(2)}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth.toFixed(2)}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight.toFixed(2)}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight).toFixed(2)}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.PackagingDate}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ContainerName}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Remark}</TableCell>
       </>
     )
   }
@@ -195,7 +280,6 @@ class InvoicerDetail extends Component {
   }
 
   render() {
-    console.log(this.props.transaction)
     return (
       <div>
         <Card>
@@ -209,150 +293,69 @@ class InvoicerDetail extends Component {
               >
                 <ArrowBackIcon />
               </IconButton>
-              <div className="row">
-                <Typography variant="h5" component="div">
-                  {this.state.TransactionName}
-                </Typography>
-              </div>
+
             </div>
             <div className="row">
-                <Typography variant="h7" component="div">
-                  {this.state.OrderDate}
-                </Typography>
-              </div>
-            <div className="row">
-              <div className="col-lg-6 col-md-6 col-sm-12">
-                <TextField
-                  className="w-100 my-3"
-                  disabled
-                  value={this.state.FullName}
-                  id="fullname"
-                  label="Full Name"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle />
-                      </InputAdornment>
-                    ),
-                  }}
-                  variant="standard"
-                  defaultValue={this.state.Contact}
-                />
-              </div>
-              <div className="col-lg-6 col-md-6 col-sm-12">
-                <TextField
-                  className="w-100 my-3"
-                  disabled
-                  value={this.state.UserCode}
-                  id="usercode"
-                  label="User Code"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle />
-                      </InputAdornment>
-                    ),
-                  }}
-                  variant="standard"
-                  defaultValue={this.state.Contact}
-                />
-              </div>
-              <div className="col-lg-6 col-md-6 col-sm-12">
-                <TextField
-                  className="w-100 my-3"
-                  disabled
-                  value={this.state.Email}
-                  id="email"
-                  label="email"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle />
-                      </InputAdornment>
-                    ),
-                  }}
-                  variant="standard"
-                  defaultValue={this.state.Contact}
-                />
-              </div>
-              <div className="col-lg-6 col-md-6 col-sm-12">
-                <TextField
-                  className="w-100 my-3"
-                  disabled
-                  value={this.state.Contact}
-                  id="contact"
-                  label="Contact No."
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle />
-                      </InputAdornment>
-                    ),
-                  }}
-                  variant="standard"
-                  defaultValue={this.state.Contact}
-                />
-              </div>
-            </div>
-            <TextField
-              className="w-100 my-3"
-              disabled
-              value={this.state.Address}
-              id="address"
-              label="Address"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <AccountCircle />
-                  </InputAdornment>
-                ),
-              }}
-              variant="standard"
-              defaultValue={this.state.Address}
-            />
-            <div className="row">
-              <div className="col-lg-6 col-md-6 col-sm-12">
-                <TextField
-                  className="w-100 my-3"
-                  disabled
-                  value={this.state.OrderTotalAmount}
-                  id="OrderTotal"
-                  label="Total Payable"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle />
-                      </InputAdornment>
-                    ),
-                  }}
-                  variant="standard"
-                  defaultValue={this.state.Contact}
-                />
-              </div>
-              <div className="col-lg-6 col-md-6 col-sm-12">
-                <TextField
-                  className="w-100 my-3"
-                  disabled
-                  value={this.state.OrderPaidAmount}
-                  id="usercode"
-                  label="Paid"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle />
-                      </InputAdornment>
-                    ),
-                  }}
-                  variant="standard"
-                  defaultValue={this.state.Contact}
-                />
+              <div
+                style={{ width: "100%", padding: "3%" }}
+                className="Post"
+                ref={(el) => (this.componentRef = el)}
+              >
+                <div style={{ padding: "1%" }}>
+                  <div>
+                    <div style={{ float: "left" }}>
+                      <img src="" width="200px" />
+                    </div>
+                    <div style={companyTitle}>
+                      EZ TRANSIT AND LOGISTICS SDN BHD
+                    </div>
+                    <div style={companyDetailTitle}>
+                      NO.2, LORONG A, TAMAN BDC
+                    </div>
+                    <div style={companyDetailTitle}>
+                      JALAN STUTONG 93350 KUCHING, SARAWAK
+                    </div>
+                    <div style={companyDetailTitle}>
+                      EL: 019 - 883 6783 / 012 - 895 7769
+                    </div>
+                    <div
+                      style={{
+                        width: "100%",
+                        borderTop: "none",
+                        borderRight: "none",
+                        borderLeft: "none",
+                        borderImage: "initial",
+                        borderBottom: "1pt solid rgb(0, 112, 192)",
+                        padding: "0 5px",
+                        height: "20px",
+                        verticalAlign: "top",
+                      }}
+                    />
+                  </div>
+                  <div style={companyDetailTitle}>
+                    INVOICE:
+                  </div>
+                  <div className="row" style={companyDetail}>
+                    <span className="col-8">{this.state.UserCode}-{this.state.AreaCode}{this.state.Fullname}</span>
+                    <span className="col-1">No</span>
+                    <span className="col-3">: {this.state.TransactionName}</span>
+                  </div>
+                  <div className="row" style={companyDetail}>
+                    <span className="col-8">{this.state.Address}</span>
+                    <span className="col-1">Terms</span>
+                    <span className="col-3">: C.O.D</span>
+                  </div>
+                  <div className="row" style={companyDetail} >
+                    <span className="col-8">Tel : {this.state.Contact}</span>
+                    <span className="col-1">Date</span>
+                    <span className="col-3">: {this.state.OrderDate}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
-
         </Card>
         <div className="">
-
           <TableComponents
             tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}
             tableTopRight={this.renderTableActionButton}
@@ -372,10 +375,24 @@ class InvoicerDetail extends Component {
               onRowClickSelect: false
             }}
             selectedIndexKey={"pid"}
-            Data={this.state.Transaction}
+            Data={this.state.TransactionDetail}
             onTableRowClick={this.onTableRowClick}
 
           />
+        </div>
+        <div style={tncDiv}>
+          <div style={tncTitle}>Terms and Conditions</div>
+          <br />
+          <div>
+            <p>
+              1. Customer will be billed after indicating acceptance of this
+              quote.
+            </p>
+            <p>
+              2. Payment will be due prior to delivery of service and goods.
+            </p>
+            <p>To accept this Quotation ,sign here and return :</p>
+          </div>
         </div>
       </div>
     )
