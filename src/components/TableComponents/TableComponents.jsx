@@ -67,15 +67,15 @@ function EnhancedTableHead(props) {
             <TableRow>
                 {/* {
                     renderCheckbox === true && */}
-                    <TableCell padding="checkbox" sx={{ bgcolor: 'rgb(200, 200, 200)' }} >
-                        <Checkbox
-                            color={checkboxColor}
-                            indeterminate={numSelected > 0 && numSelected < rowCount}
-                            checked={rowCount > 0 && numSelected === rowCount}
-                            onChange={onSelectAllClick}
-                            inputProps={{ 'aria-label': 'select all desserts', }}
-                        />
-                    </TableCell>
+                <TableCell padding="checkbox" sx={{ bgcolor: 'rgb(200, 200, 200)' }} >
+                    <Checkbox
+                        color={checkboxColor}
+                        indeterminate={numSelected > 0 && numSelected < rowCount}
+                        checked={rowCount > 0 && numSelected === rowCount}
+                        onChange={onSelectAllClick}
+                        inputProps={{ 'aria-label': 'select all desserts', }}
+                    />
+                </TableCell>
                 {/* } */}
                 {
                     isArrayNotEmpty(tableHeaders) && tableHeaders.map((headCell) => (
@@ -235,6 +235,8 @@ export default function TableComponents(props) {
     };
 
     const handleSelectItem = (event, key) => {
+        event.stopPropagation();
+
         const selectedIndex = selected.indexOf(key);
         let newSelected = [];
         if (selectedIndex === -1) {
@@ -256,9 +258,9 @@ export default function TableComponents(props) {
         if (!onRowSelect) {
             if (typeof props.onTableRowClick !== "undefined")
                 props.onTableRowClick(event, row)
-        }
-        else
+        } else {
             handleSelectItem(event, row[objectKey])
+        }
     };
     const handleChangePage = (event, newPage) => { setPage(newPage); };
     const handleChangeRowsPerPage = (event) => { setRowsPerPage(parseInt(event.target.value, 10)); setPage(0); };
@@ -275,7 +277,7 @@ export default function TableComponents(props) {
                     textAlign: 'right'
                 }}
             >
-                <FormControlLabel
+                {/* <FormControlLabel
                     style={{
                         marginBottom: '0.5rem',
                     }}
@@ -290,7 +292,7 @@ export default function TableComponents(props) {
                         />
                     }
                     label="Select"
-                />
+                /> */}
             </div>
             <Paper sx={{ width: '100%', mb: 2 }}>
                 {
@@ -338,14 +340,14 @@ export default function TableComponents(props) {
                                         >
                                             {/* {
                                                 renderCheckbox && */}
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox
-                                                        color={checkboxColor}
-                                                        checked={isItemSelected}
-                                                        inputProps={{ 'aria-labelledby': labelId, }}
-                                                        onClick={(event) => handleSelectItem(event, row[objectKey])}
-                                                    />
-                                                </TableCell>
+                                            <TableCell padding="checkbox">
+                                                <Checkbox
+                                                    color={checkboxColor}
+                                                    checked={isItemSelected}
+                                                    inputProps={{ 'aria-labelledby': labelId, }}
+                                                    onClick={(event) => handleSelectItem(event, row[objectKey])}
+                                                />
+                                            </TableCell>
                                             {/* } */}
                                             {!isObjectUndefinedOrNull(props.tableRows.renderTableRows) && props.tableRows.renderTableRows(row, index)}
                                         </TableRow>
