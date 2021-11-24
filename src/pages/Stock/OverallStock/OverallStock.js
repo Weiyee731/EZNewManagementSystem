@@ -223,10 +223,10 @@ class OverallStock extends Component {
                     {data.TrackingNumber}
                 </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep.toFixed(2)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth.toFixed(2)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight.toFixed(2)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight).toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep*100).toFixed(1)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionWidth*100).toFixed(1)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionHeight*100).toFixed(1)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight).toFixed(3)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>

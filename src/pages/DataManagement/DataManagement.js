@@ -4,13 +4,15 @@ import { GitAction } from "../../store/action/gitAction";
 import { browserHistory } from "react-router";
 import Dropzone from "../../components/Dropzone/Dropzone"
 import * as XLSX from 'xlsx';
-import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension } from "../../tools/Helpers";
+import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty, convertDateTimeToString } from "../../tools/Helpers";
 import TableComponents from "../../components/TableComponents/TableComponents";
 import TableCell from '@mui/material/TableCell';
 import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
 import Button from '@mui/material/Button';
 import PublishIcon from '@mui/icons-material/Publish';
+import ReportIcon from '@mui/icons-material/Report';
 
 function mapStateToProps(state) {
     return {
@@ -95,7 +97,7 @@ class DataManagement extends Component {
                         if (d[d.length - 1] == '"')
                             d = d.substring(d.length - 2, 1);
                     }
-                    if (headers[j]) 
+                    if (headers[j])
                         obj[headers[j]] = d;
                 }
 
@@ -112,17 +114,77 @@ class DataManagement extends Component {
             selector: c,
         }));
 
+        if (rows.length > 0) {
+            rows.map(row => {
+                row["isInvalid"] = (isStringNullOrEmpty(row["Tracking No"]) || isStringNullOrEmpty(row["Additional Cost"].trim) || isStringNullOrEmpty(row["Division"]))    //here
+            })
+        }
         this.setState({ DataHeaders: columns.filter(x => x.name !== ""), DataRows: rows.filter(x => x[columns[0].name] !== ""), loadingData: false })
     }
 
     publishData() {
         const { DataHeaders, DataRows } = this.state
-        console.log(DataRows)
+        if (isArrayNotEmpty(DataRows)) {
+            let Courier = ""
+            let TrackingNo = ""
+            let Weight = ""
+            let Depth = ""
+            let Width = ""
+            let Height = ""
+            let Item = ""
+            let Qty = ""
+            let Member = ""
+            let StockDate = ""
+            let PackagingDate = ""
+            let AdditionalCost = ""
+            let Remarks = ""
+
+            for (let index = 0; index < DataRows.length; index++) {
+                Courier += (isStringNullOrEmpty(DataRows[index]["Courier"])) ? "-" : DataRows[index]["Courier"].trim();
+                TrackingNo += (isStringNullOrEmpty(DataRows[index]["Tracking No"])) ? "-" : DataRows[index]["Tracking No"].trim();
+                Weight += (isStringNullOrEmpty(DataRows[index]["Weight"])) ? "-" : DataRows[index]["Weight"].trim();
+                Depth += (isStringNullOrEmpty(DataRows[index]["Depth"])) ? "-" : DataRows[index]["Depth"].trim();
+                Height += (isStringNullOrEmpty(DataRows[index]["Height"])) ? "-" : DataRows[index]["Height"].trim();
+                Item += (isStringNullOrEmpty(DataRows[index]["Item"])) ? "-" : DataRows[index]["Item"].trim();
+                Qty += (isStringNullOrEmpty(DataRows[index]["Qty"])) ? "-" : DataRows[index]["Qty"].trim();
+                Member += (isStringNullOrEmpty(DataRows[index]["Member"])) ? "-" : DataRows[index]["Member"].trim();
+                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : DataRows[index]["Packaging Date"].trim();
+                AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "-" : DataRows[index]["Additional Cost"].trim();
+                Remarks += (isStringNullOrEmpty(DataRows[index]["Remarks"])) ? "-" : DataRows[index]["Remarks"];
+
+                if (index !== DataRows.length - 1) {
+                    Courier += ",";
+                    TrackingNo += ",";
+                    Weight += ",";
+                    Depth += ",";
+                    Height += ",";
+                    Item += ",";
+                    Qty += ",";
+                    Member += ",";
+                    PackagingDate += ",";
+                    AdditionalCost += ",";
+                    Remarks += ",";
+                }
+            }
+
+            console.log(Courier)
+            console.log(TrackingNo)
+            console.log(Weight)
+            console.log(Depth)
+            console.log(Height)
+            console.log(Item)
+            console.log(Qty)
+            console.log(Member)
+            console.log(PackagingDate)
+            console.log(AdditionalCost)
+            console.log(Remarks)
+        }
     }
 
     renderTableHeaders = () => {
         const { DataHeaders } = this.state
         let headers = []
+        // eslint-disable-next-line array-callback-return
         DataHeaders.filter(x => x.name !== "").map((el, index) => {
             let obj = {
                 id: el.name,
@@ -132,7 +194,6 @@ class DataManagement extends Component {
             }
             headers.push(obj)
         })
-
         return headers
     }
 
@@ -143,7 +204,7 @@ class DataManagement extends Component {
             <>
                 {
                     DataHeaders.filter(x => x.name !== "").map((el, index) => {
-                        return (<TableCell align="left" sx={{ fontSize: fontsize }}>{data[el.name].toString()}</TableCell>)
+                        return (<TableCell key={"tc_" + index} align="left" sx={{ fontSize: fontsize, bgcolor: (data.isInvalid === true) ? '#FFD700' : "#ffffff" }}>{data[el.name].toString()}</TableCell>)
                     })
                 }
             </>
@@ -153,7 +214,7 @@ class DataManagement extends Component {
     render() {
         const { DataHeaders, DataRows, loadingData } = this.state
         const isDataExtracted = DataHeaders.length > 0 || DataRows.length > 0
-
+        const invalidRowCount = DataRows.filter(x => x.isInvalid === true).length
         return (
             <div>
                 <div className="container">
@@ -192,12 +253,21 @@ class DataManagement extends Component {
                     <div>
                         <TableComponents
                             tableTopRight={
-                                <Button onClick={() => this.publishData()} variant="contained" endIcon={<PublishIcon />}> Upload  </Button>
+                                <div className="d-flex">
+                                    {
+                                        invalidRowCount > 0 &&
+                                        <IconButton size="medium" variant="contained" color="error">
+                                            <ReportIcon />
+                                        </IconButton>
+
+                                    }
+                                    <Button onClick={() => this.publishData()} variant="contained" endIcon={<PublishIcon />} disabled={(invalidRowCount > 0)}> Upload  </Button>
+                                </div>
                             }
                             tableOptions={{
                                 dense: true,
                                 tableOrderBy: 'asc',
-                                sortingIndex: isArrayNotEmpty(DataHeaders) ? DataHeaders[0].name : "",
+                                sortingIndex: "Error",
                                 stickyTableHeader: true,
                                 stickyTableHeight: (getWindowDimensions().screenHeight * 0.6),
                             }}
@@ -212,7 +282,6 @@ class DataManagement extends Component {
                             selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].name : ""}
                             Data={DataRows}
                         />
-
                     </div>
                 }
             </div>
