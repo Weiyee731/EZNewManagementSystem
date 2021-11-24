@@ -12,6 +12,9 @@ import Input from '@mui/material/Input';
 import InputAdornment from '@mui/material/InputAdornment';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import SearchBar from "../../../components/SearchBar/SearchBar"
 import TableComponents from "../../../components/TableComponents/TableComponents";
@@ -22,12 +25,14 @@ import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUnde
 function mapStateToProps(state) {
     return {
         stocks: state.counterReducer["stocks"],
+        userAreaCode: state.counterReducer["userAreaCode"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         CallFetchAllStock: (propsData) => dispatch(GitAction.CallFetchAllStock(propsData)),
+        CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
     };
 }
 
@@ -123,7 +128,7 @@ const INITIAL_STATE = {
         MemberNumber: "",
         MemberNumberVerified: null,
 
-        Division: "",
+        Division: "1",
 
         Depth: "",
         DepthVerified: null,
@@ -137,11 +142,7 @@ const INITIAL_STATE = {
         Weight: "",
         WeightVerified: null,
 
-        AdditionalCost: "",
-        AdditionalCostVerified: null,
-
-        Remarks: "",
-        RemarksVerified: null,
+        AdditionalCost: []
     }
 }
 
@@ -151,11 +152,18 @@ class OverallStock extends Component {
         this.state = INITIAL_STATE
 
         this.props.CallFetchAllStock({ USERID: 1 })
+        this.props.CallUserAreaCode(
+
+        )
         this.changeTab = this.changeTab.bind(this)
         this.onAddButtonClick = this.onAddButtonClick.bind(this)
         this.handleRemarkModal = this.handleRemarkModal.bind(this)
         this.handleUpdateRemark = this.handleUpdateRemark.bind(this)
         this.handleFormInput = this.handleFormInput.bind(this)
+        this.handleAdditionalCostInputs = this.handleAdditionalCostInputs.bind(this)
+        this.RenderAdditionalCost = this.RenderAdditionalCost.bind(this)
+        this.handleRemoveAdditionalCosts = this.handleRemoveAdditionalCosts.bind(this)
+        this.removeAllAdditionalCost = this.removeAllAdditionalCost.bind(this)
     }
 
     componentDidMount() {
@@ -168,7 +176,6 @@ class OverallStock extends Component {
             this.setState({
                 filteredList: (isStringNullOrEmpty(stocks.ReturnVal) && stocks.ReturnVal == 0) ? [] : stocks
             })
-
         }
     }
 
@@ -246,10 +253,7 @@ class OverallStock extends Component {
         tempFormValue.HeightVerified = !isStringNullOrEmpty(row.ProductDimensionHeight) && !isNaN(row.ProductDimensionHeight)
         tempFormValue.Weight = row.ProductWeight;
         tempFormValue.WeightVerified = !isStringNullOrEmpty(row.ProductWeight) && !isNaN(row.ProductWeight)
-        tempFormValue.AdditionalCost = isStringNullOrEmpty(row.AdditionalCost) ? "" : row.AdditionalCost;
-        tempFormValue.AdditionalCostVerified = isStringNullOrEmpty(row.AdditionalCost) || !isNaN(row.AdditionalCost)
-        tempFormValue.Remarks = isStringNullOrEmpty(row.Remark) ? "" : row.Remark;
-        tempFormValue.RemarksVerified = true;
+        tempFormValue.Division = Number(row.UserAreaID)
 
         this.setState({
             openRemarkModal: true,
@@ -324,23 +328,81 @@ class OverallStock extends Component {
                 this.setState({ formValue: tempForm })
                 break;
 
-            case "AdditionalCost":
-                tempForm.AdditionalCost = value
-                tempForm.AdditionalCostVerified = isStringNullOrEmpty(value) || !isNaN(value)
-                this.setState({ formValue: tempForm })
-                break;
-
-            case "Remarks":
-                tempForm.Remarks = value
-                tempForm.RemarksVerified = true
-                this.setState({ formValue: tempForm })
-                break;
-
             default:
                 break;
         }
     }
 
+    handleAdditionalCostInputs = (e, index) => {
+        let validated;
+        const { value, name } = e.target
+        let tempFormValue = this.state.formValue
+        let additionalCostItems = tempFormValue.AdditionalCost
+
+        switch (name) {
+            case "AdditionalChargedRemark":
+                const chargedAmount = additionalCostItems[index].chargedAmount
+                validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(chargedAmount)) && !isNaN(chargedAmount) && (Number(value) > 0)
+                additionalCostItems[index].chargedRemark = value
+                additionalCostItems[index].validated = validated
+                tempFormValue.AdditionalCost = additionalCostItems
+
+                this.setState({ formValue: tempFormValue })
+                break;
+
+            case "AdditionalChargedAmount":
+                const chargedRemark = additionalCostItems[index].chargedRemark
+                validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(chargedRemark)) && !isNaN(e.target.value) && (Number(value) > 0)
+                additionalCostItems[index].chargedAmount = value
+                additionalCostItems[index].validated = validated
+                tempFormValue.AdditionalCost = additionalCostItems
+
+                this.setState({ formValue: tempFormValue })
+                break;
+
+            default:
+        }
+    }
+
+    RenderAdditionalCost = () => {
+        const { formValue } = this.state
+        let tempFormValue = formValue
+        let additionalCostItems = (!isObjectUndefinedOrNull(tempFormValue.AdditionalCost)) ? formValue.AdditionalCost : []
+        let obj = {
+            chargedRemark: "",
+            chargedAmount: "",
+            validated: null
+        }
+
+        if (additionalCostItems.length > 0) {
+            if (additionalCostItems[additionalCostItems.length - 1].validated)
+                additionalCostItems.push(obj)
+        }
+        else
+            additionalCostItems.push(obj)
+
+        tempFormValue.AdditionalCost = additionalCostItems
+        this.setState({ formValue: tempFormValue })
+    }
+
+    handleRemoveAdditionalCosts(index) {
+        const { formValue } = this.state
+        let tempFormValue = formValue
+        let additionalCostItems = (!isObjectUndefinedOrNull(tempFormValue.AdditionalCost)) ? tempFormValue.AdditionalCost : []
+
+        if (additionalCostItems.length > 0) {
+            additionalCostItems.splice(index, 1)
+            console.log(tempFormValue)
+            this.setState({ formValue: tempFormValue })
+        }
+
+    }
+
+    removeAllAdditionalCost() {
+        let tempFormValue = this.state.formValue
+        tempFormValue.AdditionalCost = []
+        this.setState({ formValue: tempFormValue })
+    }
 
     render() {
         const ToggleTabs = [
@@ -412,9 +474,11 @@ class OverallStock extends Component {
                                         onChange={this.handleFormInput}
                                         label="Division"
                                     >
-                                        <MenuItem value={"DU"} >DU</MenuItem>
-                                        <MenuItem value={"KU"} >KU</MenuItem>
-                                        <MenuItem value={"SU"} >SKU</MenuItem>
+                                        {
+                                            isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
+                                                return <MenuItem value={el.UserAreaID} >{el.AreaName + " - " + el.AreaCode}</MenuItem>
+                                            })
+                                        }
                                     </Select>
                                 </FormControl>
                             </div>
@@ -481,26 +545,60 @@ class OverallStock extends Component {
                                 </FormControl>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-6 col-sm-3">
-                                <FormControl variant="standard" size="small" fullWidth>
-                                    <InputLabel htmlFor="AdditionalCost">Additional Cost</InputLabel>
-                                    <Input
-                                        variant="standard"
-                                        size="small"
-                                        name="AdditionalCost"
-                                        value={formValue.AdditionalCost}
-                                        onChange={this.handleFormInput}
-                                        startAdornment={<InputAdornment position="start">RM</InputAdornment>}
-                                        error={!formValue.AdditionalCostVerified}
-                                    />
-                                    {!formValue.AdditionalCostVerified && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
-                                </FormControl>
+                        <div className="my-1 row">
+                            <div className="col-12">
+                                <Button className="my-1 w-100" color="success" variant="contained" size="small" onClick={() => { this.RenderAdditionalCost() }}>Add Additional Costs</Button>
                             </div>
-                            <div className="col-6 col-sm-9">
-                                <TextField variant="standard" size="small" fullWidth label="Remarks" name="Remarks" value={formValue.Remarks} onChange={this.handleFormInput} multiline maxRows={3} />
-                            </div>
+
                         </div>
+                        {
+                            isArrayNotEmpty(formValue.AdditionalCost) && formValue.AdditionalCost.map((el, idx) => {
+                                return (
+                                    <div className="row">
+                                        <div className="col-6 col-sm-8">
+                                            <TextField
+                                                variant="standard"
+                                                size="small"
+                                                fullWidth
+                                                label={"Add. Chg. " + (idx + 1)}
+                                                name="AdditionalChargedRemark"
+                                                value={el.chargedRemark}
+                                                onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
+                                                error={!el.validated}
+                                            />
+                                            {!el.validated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
+                                        </div>
+                                        <div className="col-4 col-sm-3">
+                                            <FormControl variant="standard" size="small" fullWidth>
+                                                <InputLabel htmlFor="AdditionalChargedAmount"></InputLabel>
+                                                <Input
+                                                    variant="standard"
+                                                    size="small"
+                                                    name="AdditionalChargedAmount"
+                                                    value={el.chargedAmount}
+                                                    onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
+                                                    startAdornment={<InputAdornment position="start">RM</InputAdornment>}
+                                                    error={!el.validated}
+                                                />
+                                                {!el.validated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
+
+                                            </FormControl>
+                                        </div>
+                                        <div className="col-2 col-sm-1 d-flex">
+                                            <IconButton className='m-auto' color="primary" size="small" aria-label="remove-additional-cost" component="span" onClick={() => this.handleRemoveAdditionalCosts(idx)}>
+                                                <DeleteIcon size="inherit" />
+                                            </IconButton>
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
+                        {
+                            isArrayNotEmpty(formValue.AdditionalCost) &&
+                            <div className="mt-3 col-12">
+                                <Button className="my-1 w-100" color="error" variant="contained" size="small" onClick={() => { this.removeAllAdditionalCost() }} startIcon={<DeleteIcon />}>Clear Additional Costs</Button>
+                            </div>
+                        }
                     </div>
                 </AlertDialog>
             </div>
