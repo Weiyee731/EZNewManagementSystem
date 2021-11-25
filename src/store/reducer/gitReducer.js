@@ -6,6 +6,7 @@ const INITIAL_STATE = {
   user: [],
   userProfile: [],
   registrationReturn: [],
+  userAreaCode: [],
   sidebars: [],
   stocks: [],
   stockReturn: [],
@@ -47,7 +48,6 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, { registrationReturn: [] });
 
     case GitAction.GetUserProfile:
-
       return Object.assign({}, state, { loading: true });
     case GitAction.GotUserProfile:
       return Object.assign({}, state, {
@@ -66,6 +66,14 @@ export function counterReducer(state = INITIAL_STATE, action) {
       });
     case GitAction.ResetUserProfileByID:
       return Object.assign({}, state, { userProfile: [] });
+
+    case GitAction.GetUserAreaCode:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.GotUserAreaCode:
+      return Object.assign({}, state, {
+        loading: false,
+        userAreaCode: action.payload
+      });
 
     ///////////////////////////////////////////////////  sidebar configuration ///////////////////////////////////////////////////
 

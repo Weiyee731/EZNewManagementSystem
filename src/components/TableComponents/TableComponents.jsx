@@ -25,6 +25,8 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import AddIcon from '@mui/icons-material/Add';
 import SearchBar from "../SearchBar/SearchBar"
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 import { isObjectUndefinedOrNull, isArrayNotEmpty, isStringNullOrEmpty } from "../../tools/Helpers"
 
 function descendingComparator(a, b, orderBy) {
@@ -42,7 +44,7 @@ function getComparator(order, orderBy) {
 // This method is created for cross-browser compatibility, if you don't
 // need to support IE11, you can use Array.prototype.sort() directly
 function stableSort(array, comparator) {
-    if(isArrayNotEmpty(array)){
+    if (isArrayNotEmpty(array)) {
         const stabilizedThis = array.map((el, index) => [el, index]);
         stabilizedThis.sort((a, b) => {
             const order = comparator(a[0], b[0]);
@@ -190,7 +192,6 @@ TableComponents.propTypes = {
 };
 
 export default function TableComponents(props) {
-
     const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
 
@@ -234,6 +235,8 @@ export default function TableComponents(props) {
     };
 
     const handleSelectItem = (event, key) => {
+        event.stopPropagation();
+
         const selectedIndex = selected.indexOf(key);
         let newSelected = [];
         if (selectedIndex === -1) {
@@ -251,7 +254,14 @@ export default function TableComponents(props) {
         setSelected(newSelected);
     }
 
-    const handleRowClick = (event, row) => { (onRowSelect) ? handleSelectItem(event, row[objectKey]) : props.onTableRowClick(event, row) };
+    const handleRowClick = (event, row) => {
+        if (!onRowSelect) {
+            if (typeof props.onTableRowClick !== "undefined")
+                props.onTableRowClick(event, row)
+        } else {
+            handleSelectItem(event, row[objectKey])
+        }
+    };
     const handleChangePage = (event, newPage) => { setPage(newPage); };
     const handleChangeRowsPerPage = (event) => { setRowsPerPage(parseInt(event.target.value, 10)); setPage(0); };
     const isSelected = (name) => selected.indexOf(name) !== -1;
@@ -262,6 +272,28 @@ export default function TableComponents(props) {
     const emptyRowColSpan = renderCheckbox ? tableHeaders.length + 1 : tableHeaders.length
     return (
         <Box sx={{ width: '100%' }}>
+            <div
+                style={{
+                    textAlign: 'right'
+                }}
+            >
+                {/* <FormControlLabel
+                    style={{
+                        marginBottom: '0.5rem',
+                    }}
+                    control={
+                        <Switch
+                            checked={renderCheckbox}
+                            onChange={() => {
+                                setRenderCheckbox(!renderCheckbox)
+                                setOnRowSelect(!onRowSelect)
+                                setSelected([])
+                            }}
+                        />
+                    }
+                    label="Select"
+                /> */}
+            </div>
             <Paper sx={{ width: '100%', mb: 2 }}>
                 {
                     <EnhancedTableToolbar
@@ -303,7 +335,7 @@ export default function TableComponents(props) {
                                             onClick={(event) => handleRowClick(event, row)}
                                             aria-checked={isItemSelected}
                                             tabIndex={-1}
-                                            key={row[objectKey]}
+                                            key={'row_' + index}
                                             selected={isItemSelected}
                                         >
                                             {
@@ -404,8 +436,6 @@ function TablePaginationActions(props) {
         </Box>
     );
 }
-
-
 
 /***************************************
  * Example:

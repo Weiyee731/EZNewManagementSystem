@@ -146,7 +146,7 @@ const INITIAL_STATE = {
     }
 }
 
-class OverallStock extends Component {
+class CreateInvoice extends Component {
     constructor(props) {
         super(props);
         this.state = INITIAL_STATE
@@ -223,10 +223,10 @@ class OverallStock extends Component {
                     {data.TrackingNumber}
                 </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep*100).toFixed(1)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionWidth*100).toFixed(1)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionHeight*100).toFixed(1)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight).toFixed(3)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight).toFixed(2)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>
@@ -418,7 +418,7 @@ class OverallStock extends Component {
             <div className="container-fluid">
                 <SearchBar />
                 <hr />
-                <ToggleTabsComponent Tabs={ToggleTabs} size="small" onChange={this.changeTab} />
+                {/* <ToggleTabsComponent Tabs={ToggleTabs} size="small" onChange={this.changeTab} /> */}
                 <TableComponents
                     // table settings 
                     tableOptions={{
@@ -432,7 +432,7 @@ class OverallStock extends Component {
                     tableHeaders={headCells}        //required
                     tableRows={{
                         renderTableRows: this.renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
-                        checkbox: false,                          // optional, by default is true
+                        checkbox: true,                          // optional, by default is true
                         checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
                         onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                     }}
@@ -606,4 +606,4 @@ class OverallStock extends Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(OverallStock);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateInvoice);

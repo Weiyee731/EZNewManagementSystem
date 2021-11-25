@@ -4,7 +4,15 @@ import { GitAction } from "../../store/action/gitAction";
 import { browserHistory } from "react-router";
 import Dropzone from "../../components/Dropzone/Dropzone"
 import * as XLSX from 'xlsx';
-import { isArrayNotEmpty, getFileExtension, getFileTypeByExtension } from "../../tools/Helpers";
+import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty, convertDateTimeToString } from "../../tools/Helpers";
+import TableComponents from "../../components/TableComponents/TableComponents";
+import TableCell from '@mui/material/TableCell';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import LinearProgress from '@mui/material/LinearProgress';
+import Button from '@mui/material/Button';
+import PublishIcon from '@mui/icons-material/Publish';
+import ReportIcon from '@mui/icons-material/Report';
 
 function mapStateToProps(state) {
     return {
@@ -20,8 +28,9 @@ function mapDispatchToProps(dispatch) {
 
 
 const INITIAL_STATE = {
-    columns: [],
-    data: [],
+    DataHeaders: [],
+    DataRows: [],
+    loadingData: false,
 }
 
 class DataManagement extends Component {
@@ -30,6 +39,10 @@ class DataManagement extends Component {
         this.state = INITIAL_STATE
 
         this.uploadHandler = this.uploadHandler.bind(this)
+        this.publishData = this.publishData.bind(this)
+        this.renderTableHeaders = this.renderTableHeaders.bind(this)
+        this.renderTableRows = this.renderTableRows.bind(this)
+        this.onRemoveAttachment = this.onRemoveAttachment.bind(this)
     }
 
     componentDidMount() {
@@ -45,6 +58,7 @@ class DataManagement extends Component {
             const fileExt = getFileExtension(excelFile.name)
 
             if (getFileTypeByExtension(fileExt) === 'excel') {
+                this.setState({ loadingData: true })
                 const reader = new FileReader();
                 reader.onload = (evt) => {
                     /* Parse data */
@@ -62,14 +76,18 @@ class DataManagement extends Component {
         }
     }
 
+    onRemoveAttachment(item) {
+        this.setState({ DataHeaders: [], DataRows: [] })
+    }
+
     processData(dataString) {
         const dataStringLines = dataString.split(/\r\n|\n/);
         const headers = dataStringLines[0].split(/,(?![^"]*"(?:(?:[^"]*"){2})*[^"]*$)/);
 
-        const list = [];
+        const rows = [];
         for (let i = 1; i < dataStringLines.length; i++) {
             const row = dataStringLines[i].split(/,(?![^"]*"(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (headers && row.length == headers.length) {
+            if (headers && row.length === headers.length) {
                 const obj = {};
                 for (let j = 0; j < headers.length; j++) {
                     let d = row[j];
@@ -79,14 +97,13 @@ class DataManagement extends Component {
                         if (d[d.length - 1] == '"')
                             d = d.substring(d.length - 2, 1);
                     }
-                    if (headers[j]) {
+                    if (headers[j])
                         obj[headers[j]] = d;
-                    }
                 }
 
                 // remove the blank rows
                 if (Object.values(obj).filter(x => x).length > 0) {
-                    list.push(obj);
+                    rows.push(obj);
                 }
             }
         }
@@ -97,28 +114,176 @@ class DataManagement extends Component {
             selector: c,
         }));
 
-        console.log(columns)
-        console.log(list)
+        if (rows.length > 0) {
+            rows.map(row => {
+                row["isInvalid"] = (isStringNullOrEmpty(row["Tracking No"]) || isStringNullOrEmpty(row["Additional Cost"].trim) || isStringNullOrEmpty(row["Division"]))    //here
+            })
+        }
+        this.setState({ DataHeaders: columns.filter(x => x.name !== ""), DataRows: rows.filter(x => x[columns[0].name] !== ""), loadingData: false })
+    }
 
-        this.setState({ columns: columns, data: list })
+    publishData() {
+        const { DataHeaders, DataRows } = this.state
+        if (isArrayNotEmpty(DataRows)) {
+            let Courier = ""
+            let TrackingNo = ""
+            let Weight = ""
+            let Depth = ""
+            let Width = ""
+            let Height = ""
+            let Item = ""
+            let Qty = ""
+            let Member = ""
+            let StockDate = ""
+            let PackagingDate = ""
+            let AdditionalCost = ""
+            let Remarks = ""
+
+            for (let index = 0; index < DataRows.length; index++) {
+                Courier += (isStringNullOrEmpty(DataRows[index]["Courier"])) ? "-" : DataRows[index]["Courier"].trim();
+                TrackingNo += (isStringNullOrEmpty(DataRows[index]["Tracking No"])) ? "-" : DataRows[index]["Tracking No"].trim();
+                Weight += (isStringNullOrEmpty(DataRows[index]["Weight"])) ? "-" : DataRows[index]["Weight"].trim();
+                Depth += (isStringNullOrEmpty(DataRows[index]["Depth"])) ? "-" : DataRows[index]["Depth"].trim();
+                Height += (isStringNullOrEmpty(DataRows[index]["Height"])) ? "-" : DataRows[index]["Height"].trim();
+                Item += (isStringNullOrEmpty(DataRows[index]["Item"])) ? "-" : DataRows[index]["Item"].trim();
+                Qty += (isStringNullOrEmpty(DataRows[index]["Qty"])) ? "-" : DataRows[index]["Qty"].trim();
+                Member += (isStringNullOrEmpty(DataRows[index]["Member"])) ? "-" : DataRows[index]["Member"].trim();
+                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : DataRows[index]["Packaging Date"].trim();
+                AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "-" : DataRows[index]["Additional Cost"].trim();
+                Remarks += (isStringNullOrEmpty(DataRows[index]["Remarks"])) ? "-" : DataRows[index]["Remarks"];
+
+                if (index !== DataRows.length - 1) {
+                    Courier += ",";
+                    TrackingNo += ",";
+                    Weight += ",";
+                    Depth += ",";
+                    Height += ",";
+                    Item += ",";
+                    Qty += ",";
+                    Member += ",";
+                    PackagingDate += ",";
+                    AdditionalCost += ",";
+                    Remarks += ",";
+                }
+            }
+
+            console.log(Courier)
+            console.log(TrackingNo)
+            console.log(Weight)
+            console.log(Depth)
+            console.log(Height)
+            console.log(Item)
+            console.log(Qty)
+            console.log(Member)
+            console.log(PackagingDate)
+            console.log(AdditionalCost)
+            console.log(Remarks)
+        }
+    }
+
+    renderTableHeaders = () => {
+        const { DataHeaders } = this.state
+        let headers = []
+        // eslint-disable-next-line array-callback-return
+        DataHeaders.filter(x => x.name !== "").map((el, index) => {
+            let obj = {
+                id: el.name,
+                align: 'left',
+                disablePadding: false,
+                label: el.name,
+            }
+            headers.push(obj)
+        })
+        return headers
+    }
+
+    renderTableRows = (data, index) => {
+        const fontsize = '9pt'
+        const { DataHeaders } = this.state
+        return (
+            <>
+                {
+                    DataHeaders.filter(x => x.name !== "").map((el, index) => {
+                        return (<TableCell key={"tc_" + index} align="left" sx={{ fontSize: fontsize, bgcolor: (data.isInvalid === true) ? '#FFD700' : "#ffffff" }}>{data[el.name].toString()}</TableCell>)
+                    })
+                }
+            </>
+        )
     }
 
     render() {
+        const { DataHeaders, DataRows, loadingData } = this.state
+        const isDataExtracted = DataHeaders.length > 0 || DataRows.length > 0
+        const invalidRowCount = DataRows.filter(x => x.isInvalid === true).length
         return (
             <div>
-                <Dropzone
-                    placeholder={{
-                        text: "Drag and Drop Excel here, or click to select file",
-                        fontSize: '16px'
-                    }}
-                    acceptedFormats={".xls, .xlsx, .csv"}
-                    styles={{
-                        height: '10vh'
-                    }}
-                    onChange={this.uploadHandler}
-                    maxFiles={1}
-                />
+                <div className="container">
+                    <Dropzone
+                        placeholder={{
+                            text: "Drag and Drop Excel here, or click to select file",
+                            fontSize: '16px'
+                        }}
+                        acceptedFormats={".xls, .xlsx, .csv"}
+                        styles={{ height: isDataExtracted ? '10vh' : loadingData ? '70vh' : '90vh' }}
+                        onChange={this.uploadHandler}
+                        onRemoveAttachment={this.onRemoveAttachment}
+                        maxFiles={1}
+                        imageStyles={{
+                            display: 'inline-flex',
+                            borderRadius: 2,
+                            border: '1px solid #eaeaea',
+                            marginBottom: 4,
+                            marginRight: 4,
+                            width: 60,
+                            height: 60,
+                            padding: 2,
+                            boxSizing: 'border-box'
+                        }}
+                    />
+                    {
+                        loadingData &&
+                        <Box sx={{ width: '100%' }}>
+                            <div><i>Loading data, please wait...</i></div>
+                            <LinearProgress sx={{ height: 15 }} />
+                        </Box>
+                    }
+                </div>
+                {
+                    isDataExtracted &&
+                    <div>
+                        <TableComponents
+                            tableTopRight={
+                                <div className="d-flex">
+                                    {
+                                        invalidRowCount > 0 &&
+                                        <IconButton size="medium" variant="contained" color="error">
+                                            <ReportIcon />
+                                        </IconButton>
 
+                                    }
+                                    <Button onClick={() => this.publishData()} variant="contained" endIcon={<PublishIcon />} disabled={(invalidRowCount > 0)}> Upload  </Button>
+                                </div>
+                            }
+                            tableOptions={{
+                                dense: true,
+                                tableOrderBy: 'asc',
+                                sortingIndex: "Error",
+                                stickyTableHeader: true,
+                                stickyTableHeight: (getWindowDimensions().screenHeight * 0.6),
+                            }}
+                            paginationOptions={[50, 100, 250, { label: 'All', value: -1 }]}
+                            tableHeaders={this.renderTableHeaders()}
+                            tableRows={{
+                                renderTableRows: this.renderTableRows,
+                                checkbox: false,
+                                checkboxColor: "primary",
+                                onRowClickSelect: false
+                            }}
+                            selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].name : ""}
+                            Data={DataRows}
+                        />
+                    </div>
+                }
             </div>
         )
     }

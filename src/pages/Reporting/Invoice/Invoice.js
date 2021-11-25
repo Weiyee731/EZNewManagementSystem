@@ -155,7 +155,7 @@ class Invoice extends Component {
     }
 
     onTableRowClick = (event, row) => {
-        this.props.history.push(`/InvoiceDetail/${row.UserID}`)
+        this.props.history.push(`/InvoiceDetail/${row.TransactionID}`)
     }
 
     handleClose = () => {

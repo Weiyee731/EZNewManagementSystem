@@ -7,10 +7,13 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { isStringNullOrEmpty } from '../../tools/Helpers';
 
 export default function AlertDialog(props) {
   return (
     <Dialog
+      fullWidth={typeof props.fullWidth === "undefined" ? true : props.fullWidth}
+      maxWidth={isStringNullOrEmpty(props.maxWidth) ? "lg" : props.maxWidth}
       open={props.open}
       onClose={() => props.handleToggleDialog()}
       aria-labelledby="alert-dialog-title"
@@ -25,7 +28,7 @@ export default function AlertDialog(props) {
         }}
       >
         {props.title}
-        <IconButton onClick={() => props.handleToggleDialog()}>
+        <IconButton sx={{ marginLeft: 'auto' }} onClick={() => props.handleToggleDialog()}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -65,7 +68,6 @@ export default function AlertDialog(props) {
 }
 
 export function ModalPopOut(props) {
-  // console.log(props)
   return (
     <Dialog
       fullScreen={props.fullScreen ? props.fullScreen : false}    //fullscreen modal

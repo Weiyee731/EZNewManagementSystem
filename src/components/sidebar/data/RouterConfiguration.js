@@ -5,6 +5,7 @@ import StockGoods from "../../../pages/Stock/StockGoods/StockGoods";
 import CreditNote from '../../../pages/Reporting/CreditNote/CreditNote';
 import DeliveryOrder from "../../../pages/Reporting/DeliveryOrder/DeliveryOrder";
 import Invoice from "../../../pages/Reporting/Invoice/Invoice";
+import CreateInvoice from "../../../pages/Reporting/Invoice/CreateInvoice";
 import InvoiceDetail from "../../../pages/Reporting/Invoice/InvoiceDetail";
 import DataManagement from "../../../pages/DataManagement/DataManagement";
 import AllPayments from "../../../pages/Payments/AllPayments/AllPayments";
@@ -44,6 +45,11 @@ const routes = [
         path: "/Invoice",
         exact: true,
         element: <Invoice />,
+    },
+    {
+        path: "/CreateInvoice",
+        exact: true,
+        element: <CreateInvoice />,
     },
     {
         path: "/InvoiceDetail/:transactionid",

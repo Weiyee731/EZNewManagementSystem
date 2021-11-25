@@ -15,7 +15,14 @@ import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
+import Input from '@mui/material/Input';
+import InputLabel from '@mui/material/InputLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import FormControl from '@mui/material/FormControl';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 import TableComponents from "../../../components/TableComponents/TableComponents"
+import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
+
 function mapStateToProps(state) {
   return {
     transaction: state.counterReducer["transaction"],
@@ -30,152 +37,171 @@ function mapDispatchToProps(dispatch) {
 
 const headCells = [
   {
-    id: 'OrderDate',
+    id: 'index',
     align: 'left',
     disablePadding: false,
-    label: 'Invoice Date',
+    label: 'item',
   },
   {
-    id: 'TransactionName',
+    id: 'TrackingNumber',
     align: 'left',
     disablePadding: false,
-    label: 'Invoice No.',
+    label: 'Description',
   },
   {
-    id: 'UserCode',
+    id: 'ProductQuantity',
     align: 'left',
     disablePadding: false,
-    label: 'Code',
+    label: 'Qty',
   },
   {
-    id: 'AreaCode',
-    align: 'center',
+    id: 'Dimension',
+    align: 'left',
     disablePadding: false,
-    label: 'Area',
+    label: 'M³',
   },
   {
-    id: 'Fullname',
-    align: 'center',
+    id: 'ProductPrice',
+    align: 'left',
     disablePadding: false,
-    label: 'Name',
+    label: 'Price',
   },
   {
-    id: 'OrderTotalAmount',
-    align: 'center',
+    id: 'Total',
+    align: 'left',
     disablePadding: false,
-    label: 'Total Amount',
-  },
-  {
-    id: 'OrderPaidAmount',
-    align: 'center',
-    disablePadding: false,
-    label: 'Paid',
-  },
-  {
-    id: 'OrderStatus',
-    align: 'center',
-    disablePadding: false,
-    label: 'Status',
-  },
+    label: 'Total',
+  }
 ];
+
+const companyTitle = {
+  fontWeight: "bolder",
+  fontSize: "32px",
+  textAlign: "center"
+};
+
+const companyDetailTitle = {
+  fontWeight: "bold",
+  fontSize: "20px",
+  float: "center",
+  textAlign: "center"
+};
+
+const companyDetail = {
+  fontSize: "18px",
+  fontWeight: "bold",
+};
+
+const quotation = {
+  float: "right",
+  fontSize: "20px",
+  fontWeight: "bold",
+};
+
+const tncTitle = {
+  fontSize: "16px",
+  color: "#0070C0",
+};
+
+const tncDiv = {
+  margin: "1%",
+};
+
 
 class InvoicerDetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      UserProfile: [],
-      UserID: this.props.match.params.userid,
-      FullName: "",
-      UserCode: "",
+      Transaction: [],
+      TransactionID: this.props.match.params.transactionid,
+      OrderDate: "",
+      TransactionName: "",
+      Fullname: "",
       Email: "",
       Contact: "",
       Address: "",
-      Transaction:[]
+      OrderTotalAmount: "",
+      OrderPaidAmount: "",
+      TransactionDetail: []
     }
-    this.handleInputChange = this.handleInputChange.bind(this)
-    this.props.CallUserProfileByID(this.state)
+    this.props.CallFetchAllTransactionByID(this.state)
   }
 
   componentDidMount() {
-    if (this.props.transaction.length !== this.state.UserProfile.length) {
+    if (this.props.transaction.length !== this.state.Transaction.length) {
       if (this.props.transaction !== undefined && this.props.transaction[0] !== undefined) {
         console.log(this.props.transaction)
         this.setState({
-          UserProfile: this.props.transaction,
-          FullName: this.props.transaction[0].Fullname,
+          Transaction: this.props.transaction,
+          OrderDate: this.props.transaction[0].OrderDate,
+          TransactionName: this.props.transaction[0].TransactionName,
+          Fullname: this.props.transaction[0].Fullname,
           UserCode: this.props.transaction[0].UserCode,
-          Email: this.props.transaction[0].UserEmailAddress,
+          AreaCode: this.props.transaction[0].AreaCode,
           Contact: this.props.transaction[0].UserContactNo,
           Address: this.props.transaction[0].UserAddress,
-          Transaction: JSON.parse(this.props.transaction[0].Transaction),
+          OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
+          OrderPaidAmount: this.props.transaction[0].OrderPaidAmount,
+          TransactionDetail: JSON.parse(this.props.transaction[0].TransactionDetail),
         });
       }
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
+    console.log(this.props.transaction)
     if (prevProps.transaction.length !== this.props.transaction.length) {
       if (this.props.transaction !== undefined && this.props.transaction[0] !== undefined) {
         this.setState({
-          UserProfile: this.props.transaction,
-          FullName: this.props.transaction[0].Fullname,
+          Transaction: this.props.transaction,
+          OrderDate: this.props.transaction[0].OrderDate,
+          TransactionName: this.props.transaction[0].TransactionName,
+          Fullname: this.props.transaction[0].Fullname,
           UserCode: this.props.transaction[0].UserCode,
-          Email: this.props.transaction[0].UserEmailAddress,
+          AreaCode: this.props.transaction[0].AreaCode,
           Contact: this.props.transaction[0].UserContactNo,
           Address: this.props.transaction[0].UserAddress,
-          Transaction: JSON.parse(this.props.transaction[0].Transaction),
+          OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
+          OrderPaidAmount: this.props.transaction[0].OrderPaidAmount,
+          TransactionDetail: this.props.transaction[0].TransactionDetail !== "null" ? JSON.parse(this.props.transaction[0].TransactionDetail) : [],
         });
       }
     } else {
-      if (prevProps.transaction.length !== this.state.UserProfile.length) {
+      if (prevProps.transaction.length !== this.state.Transaction.length) {
         this.setState({
-          UserProfile: prevProps.transaction,
-          FullName: prevProps.transaction[0].Fullname,
+          Transaction: prevProps.transaction,
+          OrderDate: prevProps.transaction[0].OrderDate,
+          TransactionName: prevProps.transaction[0].TransactionName,
+          Fullname: prevProps.transaction[0].Fullname,
           UserCode: prevProps.transaction[0].UserCode,
-          Email: prevProps.transaction[0].UserEmailAddress,
+          AreaCode: prevProps.transaction[0].AreaCode,
           Contact: prevProps.transaction[0].UserContactNo,
           Address: prevProps.transaction[0].UserAddress,
-          Transaction: JSON.parse(prevProps.transaction[0].Transaction),
+          OrderTotalAmount: prevProps.transaction[0].OrderTotalAmount,
+          OrderPaidAmount: prevProps.transaction[0].OrderPaidAmount,
+          TransactionDetail: JSON.parse(prevProps.transaction[0].TransactionDetail),
         });
       }
-    }
-  }
-
-  handleInputChange = (e) => {
-    const elementId = e.target.id
-    switch (elementId) {
-      case "fullname":
-        this.setState({ FullName: e.target.value.trim() })
-        break;
-
-      case "usercode":
-        this.setState({ UserCode: e.target.value })
-        break;
-      case "email":
-        this.setState({ Email: e.target.value })
-        break;
-      case "contact":
-        this.setState({ Contact: e.target.value })
-        break;
-      case "address":
-        this.setState({ Address: e.target.value })
-        break;
-      default:
-        break;
     }
   }
 
   renderTableRows = (data, index) => {
+    const fontsize = '9pt'
     return (
       <>
-        <TableCell component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{data.OrderDate}</TableCell>
-        <TableCell>{data.TransactionName}</TableCell>
-        <TableCell>{data.UserCode}</TableCell>
-        <TableCell>{data.AreaCode}</TableCell>
-        <TableCell>{data.Fullname}</TableCell>
-        <TableCell align="center"><Box color={data.OrderColor}>{data.OrderTotalAmount}</Box></TableCell>
-        <TableCell align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
-        <TableCell align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
+        <TableCell
+          component="th"
+          id={`table-checkbox-${index}`}
+          scope="row"
+          sx={{ fontSize: fontsize }}
+        >
+          {index}
+        </TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.TrackingNumber}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductQuantity}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight).toFixed(2)}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductPrice}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductPrice * data.ProductQuantity)}</TableCell>
       </>
     )
   }
@@ -218,80 +244,79 @@ class InvoicerDetail extends Component {
               >
                 <ArrowBackIcon />
               </IconButton>
-              <Typography variant="h5" component="div">
-                Edit Profile
-              </Typography>
-              <CardActions>
-                <Button size="small">Learn More</Button>
-              </CardActions>
+
             </div>
             <div className="row">
-              <div className="col-lg-6 col-md-6 col-sm-12">
-                <TextField
-                  className="w-100 my-3"
-                  required
-                  value={this.state.FullName}
-                  onChange={(e) => this.handleInputChange(e)}
-                  id="fullname"
-                  label="Full Name"
-                  defaultValue={this.state.FullName}
-                />
-              </div>
-              <div className="col-lg-6 col-md-6 col-sm-12">
-                <TextField
-                  className="w-100 my-3"
-                  required
-                  value={this.state.UserCode}
-                  onChange={(e) => this.handleInputChange(e)}
-                  id="usercode"
-                  label="User Code"
-                  defaultValue={this.state.UserCode}
-                />
+              <div
+                style={{ width: "100%", padding: "3%" }}
+                className="Post"
+                ref={(el) => (this.componentRef = el)}
+              >
+                <div style={{ padding: "1%" }}>
+                  <div>
+                    <div style={{ float: "left" }}>
+                      <img src="" width="200px" />
+                    </div>
+                    <div style={companyTitle}>
+                      EZ TRANSIT AND LOGISTICS SDN BHD
+                    </div>
+                    <div style={companyDetailTitle}>
+                      NO.2, LORONG A, TAMAN BDC
+                    </div>
+                    <div style={companyDetailTitle}>
+                      JALAN STUTONG 93350 KUCHING, SARAWAK
+                    </div>
+                    <div style={companyDetailTitle}>
+                      EL: 019 - 883 6783 / 012 - 895 7769
+                    </div>
+                    <div
+                      style={{
+                        width: "100%",
+                        borderTop: "none",
+                        borderRight: "none",
+                        borderLeft: "none",
+                        borderImage: "initial",
+                        borderBottom: "1pt solid rgb(0, 112, 192)",
+                        padding: "0 5px",
+                        height: "20px",
+                        verticalAlign: "top",
+                      }}
+                    />
+                  </div>
+                  <div style={companyDetailTitle}>
+                    INVOICE:
+                  </div>
+                  <div className="row" style={companyDetail}>
+                    <span className="col-8">{this.state.UserCode}-{this.state.AreaCode}{this.state.Fullname}</span>
+                    <span className="col-1">No</span>
+                    <span className="col-3">: {this.state.TransactionName}</span>
+                  </div>
+                  <div className="row" style={companyDetail}>
+                    <span className="col-8">{this.state.Address}</span>
+                    <span className="col-1">Terms</span>
+                    <span className="col-3">: C.O.D</span>
+                  </div>
+                  <div className="row" style={companyDetail} >
+                    <span className="col-8">Tel : {this.state.Contact}</span>
+                    <span className="col-1">Date</span>
+                    <span className="col-3">: {this.state.OrderDate}</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <TextField
-              className="w-100 my-3"
-              required
-              value={this.state.Email}
-              onChange={(e) => this.handleInputChange(e)}
-              id="email"
-              label="Email Address"
-              defaultValue={this.state.Email}
-            />
-            <TextField
-              className="w-100 my-3"
-              required
-              value={this.state.Contact}
-              onChange={(e) => this.handleInputChange(e)}
-              id="contact"
-              label="Contact No."
-              defaultValue={this.state.Contact}
-            />
-            <TextField
-              className="w-100 my-3"
-              required
-              value={this.state.Address}
-              onChange={(e) => this.handleInputChange(e)}
-              id="address"
-              label="Address"
-              defaultValue={this.state.Address}
-            />
           </CardContent>
-
         </Card>
         <div className="">
-
           <TableComponents
-            tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}
+            tableTopLeft={""}
             tableTopRight={this.renderTableActionButton}
             tableOptions={{
               dense: false,
               tableOrderBy: 'asc',
               sortingIndex: "fat",
               stickyTableHeader: true,
-              stickyTableHeight: 300, 
+              stickyTableHeight: 300,
             }}
-            paginationOptions={[20, 50, 100, { label: 'All', value: -1 }]}
             tableHeaders={headCells}
             tableRows={{
               renderTableRows: this.renderTableRows,
@@ -300,10 +325,26 @@ class InvoicerDetail extends Component {
               onRowClickSelect: false
             }}
             selectedIndexKey={"pid"}
-            Data={this.state.Transaction}
-            onTableRowClick={this.onTableRowClick}
-            
+            Data={this.state.TransactionDetail}
           />
+        </div>
+        <div style={tncDiv}>
+          <div style={tncTitle}>Terms and Conditions</div>
+          <br />
+          <div>
+            <p>
+              1. All payment should be make payable to
+              <br/>
+              EZ TAO BAO ENTERPRISE 17.10
+              <br/>
+              25301009073
+              <br/>
+              HONG LEONG BANK
+            </p>
+            <p>
+              2. Payment must be cleared within 3 days after the billing date
+            </p>
+          </div>
         </div>
       </div>
     )
