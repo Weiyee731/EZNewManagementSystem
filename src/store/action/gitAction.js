@@ -113,7 +113,36 @@ export class GitAction {
     };
   }
 
+  
+  static UpdateInventoryStockStatus = "UPDATE-INVENTORY-STOCK-STATUS";
+  static UpdatedInventoryStockStatus = "UPDATED-INVENTORY-STOCK-STATUS";
+  static ResetStockStatusReturn = "RESET-STOCK-STATUS_RETURN";
+  static CallUpdateStockStatus(propsData) {
+    return {
+      type: GitAction.UpdateInventoryStockStatus,
+      payload: propsData
+    };
+  }
+  static CallResetStockStatusReturn() {
+    return {
+      type: GitAction.ResetStockStatusReturn,
+    };
+  }
 
+  static ViewContainer = "VIEW-CONTAINER";
+  static ViewedContainer = "VIEWED-CONTAINER";
+  static ResetViewedContainer = "RESET-VIEWED-CONTAINER";
+  static CallViewContainer(propsData) {
+    return {
+      type: GitAction.ViewContainer,
+      payload: propsData
+    };
+  }
+  static CallResetViewedContainerReturn() {
+    return {
+      type: GitAction.ResetViewedContainer,
+    };
+  }
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
   static InsertNewTransaction = "INSERT_NEW_TRANSACTION";
   static NewTransactionInserted = "NEW_TRANSACTION_INSERTED";
