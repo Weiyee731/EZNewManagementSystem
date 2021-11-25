@@ -321,7 +321,7 @@ export class GitEpic {
       // )
       try {
         const response = await fetch(url +
-          "Transaction_ViewTransaction"
+          "Transaction_ViewTransaction?TrackingStatusID=" + payload.TrackingStatusID
         );
 
         let json = await response.json();
@@ -391,6 +391,37 @@ export class GitEpic {
       }
     });
 
+    Transaction_UpdateTransactionStatus = action$ =>
+    action$.ofType(GitAction.UpdateTransaction).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Transaction_UpdateTransactionStatus?" +
+        "TRANSACTIONID=" + payload.TransactionID +
+        "&TRANSPORTATIONTYPE=" + payload.TransportationType +
+        "&DELIVERYFEE=" + payload.DeliveryFee
+      )
+      try {
+        const response = await fetch(url +
+          "Transaction_UpdateTransactionStatus?" +
+          "TRANSACTIONID=" + payload.TransactionID +
+          "&TRANSPORTATIONTYPE=" + payload.TransportationType +
+          "&DELIVERYFEE=" + payload.DeliveryFee
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UpdatedTransaction,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Transaction_InsertTransaction")
+        return {
+          type: GitAction.UpdatedTransaction,
+          payload: [],
+        };
+      }
+    });
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
 
 }
