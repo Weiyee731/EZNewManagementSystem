@@ -7,20 +7,23 @@ import Stack from '@mui/material/Stack';
 
 export default function ResponsiveDatePickers(props) {
   const [value, setValue] = React.useState(new Date());
-
+  const formats = {
+    normalDate: "d/MM/yyyy",
+    keyboardDate: "d/MM/yyyy",
+  };
+// console.log(props.value)
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <LocalizationProvider dateFormats={formats} dateAdapter={AdapterDateFns}>
       <Stack spacing={3}>
         <DatePicker
           disableFuture
           label={props.title}
           openTo="year"
           views={['year', 'month', 'day']}
-          value={value}
-          onChange={(newValue) => {
-            setValue(newValue);
-          }}
-          renderInput={(params) => <TextField {...params} />}
+          value={props.value}
+          readOnly={props.readOnly?props.readOnly:false}
+          onChange={(e) => props.onChange(e)}  
+          renderInput={(params) => <TextField {...params} variant="standard" />}
         />
       </Stack>
     </LocalizationProvider>

@@ -72,7 +72,7 @@ export function ModalPopOut(props) {
     <Dialog
       fullScreen={props.fullScreen ? props.fullScreen : false}    //fullscreen modal
       hideBackdrop={props.hideBackdrop ? props.hideBackdrop : false}   //hide back
-      BackDropProps={props.BackDropProps ? props.BackDropProps : false}
+      // BackDropProps={props.BackDropProps ? props.BackDropProps : false}
       // onBackdropClick={this.onClose= 'open'}
       open={props.open}
       onClose={() => props.handleToggleDialog()}

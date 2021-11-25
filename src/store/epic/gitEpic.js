@@ -251,10 +251,10 @@ export class GitEpic {
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
   Inventory_ViewStockList = action$ =>
     action$.ofType(GitAction.FetchStocks).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Inventory_ViewStockList?" +
-        "TRACKINGSTATUSID=" + payload.USERID
-      )
+      // console.log(url +
+      //   "Inventory_ViewStockList?" +
+      //   "TRACKINGSTATUSID=" + payload.USERID
+      // )
       try {
         const response = await fetch(url +
           "Inventory_ViewStockList?" +
@@ -305,6 +305,63 @@ export class GitEpic {
         toast.error("Error Code: Inventory_InsertStock")
         return {
           type: GitAction.NewStockInserted,
+          payload: [],
+        };
+      }
+    });
+
+    // Inventory_UpdateStockStatus(string STOCKID, string CONTAINERNAME, string CONTAINERDATE)
+    Inventory_UpdateStockStatus = action$ =>
+    action$.ofType(GitAction.UpdateInventoryStockStatus).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Inventory_UpdateStockStatus?" +
+        "STOCKID=" + payload.STOCKID +
+        "&CONTAINERNAME=" + payload.CONTAINERNAME +
+        "&CONTAINERDATE=" + payload.CONTAINERDATE )
+      try {
+        const response = await fetch(url +
+          "Inventory_UpdateStockStatus?" +
+          "STOCKID=" + payload.STOCKID +
+          "&CONTAINERNAME=" + payload.CONTAINERNAME +
+          "&CONTAINERDATE=" + payload.CONTAINERDATE 
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UpdatedInventoryStockStatus,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_InsertStock")
+        return {
+          type: GitAction.UpdatedInventoryStockStatus,
+          payload: [],
+        };
+      }
+    });
+
+    Container_ViewContainer = action$ =>
+    action$.ofType(GitAction.ViewContainer).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Container_ViewContainer")
+      try {
+        const response = await fetch(url +
+          "Container_ViewContainer"
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.ViewedContainer,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_InsertStock")
+        return {
+          type: GitAction.ViewedContainer,
           payload: [],
         };
       }

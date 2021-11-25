@@ -18,6 +18,7 @@ const SearchBox = (props) => {
             placeholder={isStringNullOrEmpty(props.placeholder) ? "Type to search" : props.placeholder}
             helperText={isStringNullOrEmpty(props.helperText) ? "" : props.helperText}
             onChange={(e) => props.onChange(e)}
+            autoFocus={props.autoFocus?props.autoFocus:false}
             size="small"
             margin="dense"
             variant="outlined"

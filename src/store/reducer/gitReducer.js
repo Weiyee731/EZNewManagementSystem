@@ -10,6 +10,8 @@ const INITIAL_STATE = {
   sidebars: [],
   stocks: [],
   stockReturn: [],
+  stockApproval: [],
+  AllContainer: [],
   transactions: [],
   transaction: [],
   transactionReturn: [],
@@ -107,6 +109,26 @@ export function counterReducer(state = INITIAL_STATE, action) {
       });
     case GitAction.ResetStockReturn:
       return Object.assign({}, state, { stockReturn: [] });
+
+    case GitAction.UpdateInventoryStockStatus:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.UpdateDInventoryStockStatus:
+      return Object.assign({}, state, {
+        loading: false,
+        stockApproval: action.payload
+      });
+    case GitAction.ResetStockStatusReturn:
+      return Object.assign({}, state, { stockApproval: [] });
+
+    case GitAction.ViewContainer:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.ViewedContainer:
+      return Object.assign({}, state, {
+        loading: false,
+        AllContainer: action.payload
+      });
+    case GitAction.ResetViewedContainer:
+      return Object.assign({}, state, { AllContainer: [] });
 
     /////////////////////////////////////////////////// Transaction Management ///////////////////////////////////////////////////
 
