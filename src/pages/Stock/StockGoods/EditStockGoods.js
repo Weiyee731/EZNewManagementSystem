@@ -70,6 +70,10 @@ class EditStockGoods extends Component {
             this.props.parentCallback({ "AreaCode": event.target.value });
             event.preventDefault();
         }
+        if (statement === "Item") {
+            this.props.parentCallback({ "Item": event.target.value });
+            event.preventDefault();
+        }
         if (statement === "AdditionalCharges") {
             this.props.parentCallback({ "AdditionalCharges": event.target.value });
             event.preventDefault();
