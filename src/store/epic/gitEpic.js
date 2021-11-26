@@ -310,20 +310,20 @@ export class GitEpic {
       }
     });
 
-    // Inventory_UpdateStockStatus(string STOCKID, string CONTAINERNAME, string CONTAINERDATE)
-    Inventory_UpdateStockStatus = action$ =>
+  // Inventory_UpdateStockStatus(string STOCKID, string CONTAINERNAME, string CONTAINERDATE)
+  Inventory_UpdateStockStatus = action$ =>
     action$.ofType(GitAction.UpdateInventoryStockStatus).switchMap(async ({ payload }) => {
       console.log(url +
         "Inventory_UpdateStockStatus?" +
         "STOCKID=" + payload.STOCKID +
         "&CONTAINERNAME=" + payload.CONTAINERNAME +
-        "&CONTAINERDATE=" + payload.CONTAINERDATE )
+        "&CONTAINERDATE=" + payload.CONTAINERDATE)
       try {
         const response = await fetch(url +
           "Inventory_UpdateStockStatus?" +
           "STOCKID=" + payload.STOCKID +
           "&CONTAINERNAME=" + payload.CONTAINERNAME +
-          "&CONTAINERDATE=" + payload.CONTAINERDATE 
+          "&CONTAINERDATE=" + payload.CONTAINERDATE
         );
 
         let json = await response.json();
@@ -342,7 +342,7 @@ export class GitEpic {
       }
     });
 
-    Container_ViewContainer = action$ =>
+  Container_ViewContainer = action$ =>
     action$.ofType(GitAction.ViewContainer).switchMap(async ({ payload }) => {
       console.log(url +
         "Container_ViewContainer")
@@ -420,14 +420,14 @@ export class GitEpic {
 
   Transaction_InsertTransaction = action$ =>
     action$.ofType(GitAction.InsertNewTransaction).switchMap(async ({ payload }) => {
-      console.log(url + 
+      console.log(url +
         "Transaction_InsertTransaction?" +
-          "USERID=" + payload.USERID +
-          "&CALCULATIONTYPE=" + payload.TYPE +
-          "&ORDERTOTALMOUNT=" + payload.ORDERTOTALMOUNT +
-          "&ORDERPAIDMOUNT=" + payload.ORDERPAIDMOUNT +
-          "&STOCKID=" + payload.STOCKID +
-          "&PRODUCTPRICE=" + payload.PRODUCTPRICE
+        "USERID=" + payload.USERID +
+        "&CALCULATIONTYPE=" + payload.TYPE +
+        "&ORDERTOTALMOUNT=" + payload.ORDERTOTALMOUNT +
+        "&ORDERPAIDMOUNT=" + payload.ORDERPAIDMOUNT +
+        "&STOCKID=" + payload.STOCKID +
+        "&PRODUCTPRICE=" + payload.PRODUCTPRICE
       )
       try {
         const response = await fetch(url +
@@ -456,9 +456,7 @@ export class GitEpic {
       }
     });
 
-<<<<<<< HEAD
-=======
-    Transaction_UpdateTransactionStatus = action$ =>
+  Transaction_UpdateTransactionStatus = action$ =>
     action$.ofType(GitAction.UpdateTransaction).switchMap(async ({ payload }) => {
       console.log(url +
         "Transaction_UpdateTransactionStatus?" +
@@ -491,6 +489,5 @@ export class GitEpic {
     });
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
 
->>>>>>> b5da24db9533be67fdde0fd54c0d5d0751dd6f54
 }
 export let gitEpic = new GitEpic();
