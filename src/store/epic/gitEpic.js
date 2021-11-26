@@ -346,7 +346,7 @@ export class GitEpic {
     action$.ofType(GitAction.UpdateStockDetailByPost).switchMap(async ({ payload }) => {
 
       return fetch(
-        "https://tourism.denoo.my/EzLogistic/api/EzLogistic/" + "Inventory_UpdateStockDetailByPost"
+        url + "Inventory_UpdateStockDetailByPost"
         , {
           method: 'POST',
           headers: {

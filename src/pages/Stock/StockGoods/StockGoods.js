@@ -408,7 +408,7 @@ class StockGoods extends Component {
         if (childData.ProductDimensionWidth !== null && childData.ProductDimensionWidth !== undefined) {
             this.setState({ ProductDimensionWidth: childData.ProductDimensionWidth })
         }
-        if (childData.ProductDimensionWidth !== null && childData.ProductDimensionHeight !== undefined) {
+        if (childData.ProductDimensionHeight !== null && childData.ProductDimensionHeight !== undefined) {
             this.setState({ ProductDimensionWidth: childData.ProductDimensionHeight })
         }
         if (childData.ProductDimensionDeep !== null && childData.ProductDimensionDeep !== undefined) {
