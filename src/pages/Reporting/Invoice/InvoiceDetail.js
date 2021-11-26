@@ -148,6 +148,7 @@ class InvoicerDetail extends Component {
       OrderDate: "",
       TransactionName: "",
       TransportationType: 1,
+      TransportationBool: false,
       Fullname: "",
       Email: "",
       Contact: "",
@@ -161,6 +162,8 @@ class InvoicerDetail extends Component {
       TransactionDetail: []
     }
     this.handleInputChange = this.handleInputChange.bind(this)
+    this.handleChange = this.handleChange.bind(this)
+
     this.onClickConfirmInvoice = this.onClickConfirmInvoice.bind(this)
     this.props.CallFetchAllTransactionByID(this.state)
   }
@@ -229,7 +232,7 @@ class InvoicerDetail extends Component {
       <>
         <TableCell
           component="th"
-          id={`table-checkbox-${index}`}
+          id={`table-checkbox-${(index+1)}`}
           scope="row"
           sx={{ fontSize: fontsize }}
         >
@@ -295,6 +298,14 @@ class InvoicerDetail extends Component {
         break;
     }
   }
+
+  handleChange = (e) => {
+    if (e.target.checked) {
+      this.setState({ TransportationType: 2, TransportationBool: e.target.checked })
+    } else {
+      this.setState({ TransportationType: 1, TransportationBool: e.target.checked })
+    }
+  };
 
   render() {
     return (
@@ -453,50 +464,64 @@ class InvoicerDetail extends Component {
                 BackdropProps={{ timeout: 500 }}
               >
                 <Box sx={style} component="main" maxWidth="xs">
-                  <Typography component="h1" variant="h5" style={{textAlign:"center"}}>Additional Charges</Typography>
+                  <Typography component="h1" variant="h4" style={{ textAlign: "center" }}>Additional Charges</Typography>
                   <Box component="form" noValidate sx={{ mt: 3 }}>
                     <div className="row">
-                      <p style={{textAlign:"center"}}>
+                      <h4 style={{ textAlign: "center" }}>
                         Before Print, please select the delivery method
-                      </p>
-                      <div className="row">
-                        <div className="col-2">Self Pick</div>
-                        <Switch className="col-2" defaultChecked />
-                        <div className="col-2">Delivery</div>
-                        <div className="col-6"></div>
+                      </h4>
+                      <div className="row" style={{ textAlign: "center", margin: "auto" }}>
+                        <div style={{ display: "inline", width: "100%" }}>
+                          <Grid component="label" container alignItems="center" spacing={1} style={{ width: "100%", display: "inline" }}>
+                            <div>
+                              <Grid item style={{ display: "inline-grid" }}>Self Pick Up</Grid>
+                              <Grid item style={{ display: "inline-grid" }}>
+                                <Switch
+                                  checked={this.state.TransportationBool}
+                                  onChange={(e) => { this.handleChange(e) }}
+                                  value="checkedA"
+                                />
+                              </Grid>
+                              <Grid item style={{ display: "inline-grid" }}>Delivery</Grid>
+                            </div>
+                          </Grid>
+                        </div>
                       </div>
+                      {this.state.TransportationBool && (
+                        <div className="row">
+                          <div className="col-5 col-sm-7">
+                            <TextField
+                              variant="standard"
+                              size="small"
+                              fullWidth
+                              id="remark"
+                              label={"Remark "}
+                              name="AdditionalChargedRemark"
+                              value={this.state.Remark}
+                              onChange={(e) => { this.handleInputChange(e) }}
+                              error={false}
+                            />
+                            {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
+                          </div>
+                          <div className="col-4 col-sm-3">
+                            <FormControl variant="standard" size="small" fullWidth>
+                              <InputLabel htmlFor="AdditionalChargedAmount"></InputLabel>
+                              <Input
+                                variant="standard"
+                                size="small"
+                                name="AdditionalChargedAmount"
+                                value={this.state.DeliveryFee}
+                                id="deliveryfee"
+                                onChange={(e) => { this.handleInputChange(e) }}
+                                startAdornment={<InputAdornment position="start">RM</InputAdornment>}
+                                error={false}
+                              />
+                              {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
 
-                      <div className="col-6 col-sm-8">
-                        <TextField
-                          variant="standard"
-                          size="small"
-                          fullWidth
-                          id="remark"
-                          label={"Remark "}
-                          name="AdditionalChargedRemark"
-                          value={this.state.Remark}
-                          onChange={(e) => { this.handleInputChange(e) }}
-                          error={false}
-                        />
-                        {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
-                      </div>
-                      <div className="col-4 col-sm-3">
-                        <FormControl variant="standard" size="small" fullWidth>
-                          <InputLabel htmlFor="AdditionalChargedAmount"></InputLabel>
-                          <Input
-                            variant="standard"
-                            size="small"
-                            name="AdditionalChargedAmount"
-                            value={this.state.DeliveryFee}
-                            id="deliveryfee"
-                            onChange={(e) => { this.handleInputChange(e) }}
-                            startAdornment={<InputAdornment position="start">RM</InputAdornment>}
-                            error={false}
-                          />
-                          {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
-
-                        </FormControl>
-                      </div>
+                            </FormControl>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <Button
                       type="submit"
@@ -523,13 +548,13 @@ class InvoicerDetail extends Component {
                 BackdropProps={{ timeout: 500 }}
               ><Box sx={style} component="main" maxWidth="xs">
                   <Typography component="h1" variant="h5">Printing Invoice</Typography>
-                  <Box component="form" noValidate sx={{ mt: 3 }}>
-                    <div className="row">
-                      <p>
+                  <Box component="form" noValidate sx={{ mt: 3 }} style={{ textAlign: "center", margin: "auto" }}>
+                    <div className="row" style={{ width: "100%", display: "inline" }}>
+                      <h4>
                         Please select deliver option
-                      </p>
+                      </h4>
                     </div>
-                    <ReactToPrint
+                    <ReactToPrint style={{ width: "100%", display: "inline" }}
                       trigger={(e) => {
                         return (<Button variant="contained">Print The Invoice</Button>);
                       }}

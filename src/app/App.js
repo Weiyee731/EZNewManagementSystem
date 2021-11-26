@@ -5,7 +5,7 @@ import './App.scss';
 import './App_modified.css';
 
 const App = () => (
-  <Router>
+  <Router basename={"/Ez"}>
     <Layout />
   </Router>
 );
