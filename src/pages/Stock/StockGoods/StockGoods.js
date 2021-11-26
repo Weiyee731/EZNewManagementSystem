@@ -239,7 +239,7 @@ class StockGoods extends Component {
         this.props.CallFetchAllStock({ USERID: "1" });
         if (this.props.stocks.length !== this.state.stockListing.length) {
             if (this.props.stocks !== undefined && this.props.stocks[0] !== undefined && this.props.ReturnVal !== "0") {
-                this.setState({ stockListing: this.props.stocks, stockFiltered: this.props.stocks });
+                this.setState({ stockListing: this.props.stocks, stockFiltered: this.props.stocks});
             } else { console.log(("no")) }
         } else { console.log(("no")) }
     }
@@ -263,8 +263,12 @@ class StockGoods extends Component {
             //         this.setState({ stockFiltered: prevProps.stocks });
             //     }
         }
-        if (prevState.selectedRows.length !== this.state.selectedRows) {
-            if (this.state.selectedRows !== undefined && this.state.selectedRows[0] !== undefined) {
+        if (prevState.selectedRows !== this.state.selectedRows) {
+            console.log("1")
+            console.log(this.state.selectedRows)
+            console.log(this.state.selectedRows[0])
+            if (this.state.selectedRows !== undefined ) {
+                console.log("2")
                 this.setState({
                     TrackingNumber: this.state.selectedRows.TrackingNumber,
                     UserCode: this.state.selectedRows.UserCode,
