@@ -171,6 +171,16 @@ export class GitAction {
       payload: propsData
     };
   }
+
+  static UpdateTransaction = "UPDATE_TRANSACTION";
+  static UpdatedTransaction = "TRANSACTION_UPDATEED";
+  static CallUpdateTransaction(propsData) {
+    return {
+      type: GitAction.UpdateTransaction,
+      payload: propsData
+    };
+  }
+
   static CallResetTransaction() {
     return {
       type: GitAction.ResetTransactionReturn,

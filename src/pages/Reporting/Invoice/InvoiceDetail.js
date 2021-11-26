@@ -15,13 +15,20 @@ import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import Input from '@mui/material/Input';
-import InputLabel from '@mui/material/InputLabel';
-import InputAdornment from '@mui/material/InputAdornment';
-import FormControl from '@mui/material/FormControl';
-import AccountCircle from '@mui/icons-material/AccountCircle';
+import Grid from '@mui/material/Grid';
+import Backdrop from '@mui/material/Backdrop';
 import TableComponents from "../../../components/TableComponents/TableComponents"
 import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
+import PrintIcon from '@mui/icons-material/Print';
+import FormHelperText from '@mui/material/FormHelperText';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import Input from '@mui/material/Input';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import ReactToPrint, { useReactToPrint } from "react-to-print";
 
 function mapStateToProps(state) {
   return {
@@ -32,8 +39,22 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     CallFetchAllTransactionByID: (data) => dispatch(GitAction.CallFetchAllTransactionByID(data)),
+    CallUpdateTransaction: (data) => dispatch(GitAction.CallUpdateTransaction(data)),
   };
 }
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '65%',
+  height: '30%',
+  bgcolor: 'background.paper',
+  border: '0px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 const headCells = [
   {
@@ -76,19 +97,19 @@ const headCells = [
 
 const companyTitle = {
   fontWeight: "bolder",
-  fontSize: "32px",
+  fontSize: "25px",
   textAlign: "center"
 };
 
 const companyDetailTitle = {
   fontWeight: "bold",
-  fontSize: "20px",
+  fontSize: "16px",
   float: "center",
   textAlign: "center"
 };
 
 const companyDetail = {
-  fontSize: "18px",
+  fontSize: "14px",
   fontWeight: "bold",
 };
 
@@ -105,8 +126,18 @@ const tncTitle = {
 
 const tncDiv = {
   margin: "1%",
+  fontWeight: "bold",
+  fontSize: "14px",
 };
 
+function printPDF() {
+  return (
+    <ReactToPrint
+      content={() => this.componentRef}
+      documentTitle="post.pdf"
+    ></ReactToPrint>
+  );
+}
 
 class InvoicerDetail extends Component {
   constructor(props) {
@@ -116,14 +147,24 @@ class InvoicerDetail extends Component {
       TransactionID: this.props.match.params.transactionid,
       OrderDate: "",
       TransactionName: "",
+      TransportationType: 1,
+      TransportationBool: false,
       Fullname: "",
       Email: "",
       Contact: "",
       Address: "",
       OrderTotalAmount: "",
       OrderPaidAmount: "",
+      AddModalOpen: false,
+      AddModalOpen2: false,
+      DeliveryFee: 0.00,
+      Remark: "",
       TransactionDetail: []
     }
+    this.handleInputChange = this.handleInputChange.bind(this)
+    this.handleChange = this.handleChange.bind(this)
+
+    this.onClickConfirmInvoice = this.onClickConfirmInvoice.bind(this)
     this.props.CallFetchAllTransactionByID(this.state)
   }
 
@@ -191,7 +232,7 @@ class InvoicerDetail extends Component {
       <>
         <TableCell
           component="th"
-          id={`table-checkbox-${index}`}
+          id={`table-checkbox-${(index+1)}`}
           scope="row"
           sx={{ fontSize: fontsize }}
         >
@@ -213,12 +254,18 @@ class InvoicerDetail extends Component {
     )
   }
 
+
+
   onTableRowClick = (event, row) => {
     this.props.history.push(`/UserDetail/${row.UserID}/${row.UserCode}`)
   }
 
   handleClose = () => {
     this.setState({ AddModalOpen: false });
+  }
+
+  handleClose2 = () => {
+    this.setState({ AddModalOpen2: false });
   }
 
   onAddButtonClick = () => {
@@ -230,125 +277,297 @@ class InvoicerDetail extends Component {
 
   }
 
+  onClickConfirmInvoice = (items) => {
+    this.props.CallUpdateTransaction(this.state);
+    this.state.TransactionDetail.push({ TrackingNumber: "Delivery Fee", ProductQuantity: 1, ProductDimensionDeep: "", ProductDimensionWidth: "", ProductDimensionHeight: "", ProductPrice: this.state.DeliveryFee })
+    this.setState({ AddModalOpen: false, AddModalOpen2: true });
+  }
+
+  handleInputChange = (e) => {
+    const elementId = e.target.id
+    switch (elementId) {
+      case "remark":
+        this.setState({ Remark: e.target.value.trim() })
+        break;
+
+      case "deliveryfee":
+        this.setState({ DeliveryFee: e.target.value })
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  handleChange = (e) => {
+    if (e.target.checked) {
+      this.setState({ TransportationType: 2, TransportationBool: e.target.checked })
+    } else {
+      this.setState({ TransportationType: 1, TransportationBool: e.target.checked })
+    }
+  };
+
   render() {
     return (
       <div>
         <Card>
           <CardContent>
-            <div className="d-flex align-items-center">
-              <IconButton
-                color="primary"
-                aria-label="back"
-                component="span"
-                onClick={() => this.props.history.goBack()}
-              >
-                <ArrowBackIcon />
-              </IconButton>
-
+            <div className="d-flex align-items-center row">
+              <div className="col-1">
+                <IconButton
+                  color="primary"
+                  aria-label="back"
+                  component="span"
+                  onClick={() => this.props.history.goBack()}>
+                  <ArrowBackIcon />
+                </IconButton>
+              </div>
+              <div className="col-9"></div>
+              <div className="col-1" style={{ textAlign: "end" }}>
+                <IconButton
+                  color="primary"
+                  aria-label="back"
+                  component="span"
+                  onClick={this.onAddButtonClick}>
+                  <PrintIcon />
+                </IconButton>
+              </div>
             </div>
-            <div className="row">
-              <div
-                style={{ width: "100%", padding: "3%" }}
-                className="Post"
-                ref={(el) => (this.componentRef = el)}
-              >
-                <div style={{ padding: "1%" }}>
+            <div style={{ width: "100%", padding: "3%" }}
+              className="Post"
+              ref={(el) => (this.componentRef = el)}>
+              <div className="row">
+                <div>
                   <div>
-                    <div style={{ float: "left" }}>
-                      <img src="" width="200px" />
-                    </div>
-                    <div style={companyTitle}>
-                      EZ TRANSIT AND LOGISTICS SDN BHD
+                    <div>
+                      <div style={companyTitle}>
+                        EZ TRANSIT AND LOGISTICS SDN BHD
+                      </div>
+                      <div style={companyDetailTitle}>
+                        NO.2, LORONG A, TAMAN BDC
+                      </div>
+                      <div style={companyDetailTitle}>
+                        JALAN STUTONG 93350 KUCHING, SARAWAK
+                      </div>
+                      <div style={companyDetailTitle}>
+                        EL: 019 - 883 6783 / 012 - 895 7769
+                      </div>
+                      <div
+                        style={{
+                          width: "100%",
+                          borderTop: "none",
+                          borderRight: "none",
+                          borderLeft: "none",
+                          borderImage: "initial",
+                          borderBottom: "1pt solid rgb(0, 112, 192)",
+                          padding: "0 5px",
+                          height: "20px",
+                          verticalAlign: "top",
+                        }}
+                      />
                     </div>
                     <div style={companyDetailTitle}>
-                      NO.2, LORONG A, TAMAN BDC
+                      INVOICE:
                     </div>
-                    <div style={companyDetailTitle}>
-                      JALAN STUTONG 93350 KUCHING, SARAWAK
+                    <div className="row" style={companyDetail}>
+                      <span className="col-6">{this.state.UserCode}-{this.state.AreaCode}{this.state.Fullname}</span>
+                      <span className="col-1"></span>
+                      <span className="col-1">No</span>
+                      <span className="col-4">: {this.state.TransactionName}</span>
                     </div>
-                    <div style={companyDetailTitle}>
-                      EL: 019 - 883 6783 / 012 - 895 7769
+                    <div className="row" style={companyDetail}>
+                      <span className="col-6">{this.state.Address}</span>
+                      <span className="col-1"></span>
+                      <span className="col-1">Terms</span>
+                      <span className="col-4">: C.O.D</span>
                     </div>
-                    <div
-                      style={{
-                        width: "100%",
-                        borderTop: "none",
-                        borderRight: "none",
-                        borderLeft: "none",
-                        borderImage: "initial",
-                        borderBottom: "1pt solid rgb(0, 112, 192)",
-                        padding: "0 5px",
-                        height: "20px",
-                        verticalAlign: "top",
-                      }}
-                    />
-                  </div>
-                  <div style={companyDetailTitle}>
-                    INVOICE:
-                  </div>
-                  <div className="row" style={companyDetail}>
-                    <span className="col-8">{this.state.UserCode}-{this.state.AreaCode}{this.state.Fullname}</span>
-                    <span className="col-1">No</span>
-                    <span className="col-3">: {this.state.TransactionName}</span>
-                  </div>
-                  <div className="row" style={companyDetail}>
-                    <span className="col-8">{this.state.Address}</span>
-                    <span className="col-1">Terms</span>
-                    <span className="col-3">: C.O.D</span>
-                  </div>
-                  <div className="row" style={companyDetail} >
-                    <span className="col-8">Tel : {this.state.Contact}</span>
-                    <span className="col-1">Date</span>
-                    <span className="col-3">: {this.state.OrderDate}</span>
+                    <div className="row" style={companyDetail} >
+                      <span className="col-6">Tel : {this.state.Contact}</span>
+                      <span className="col-1"></span>
+                      <span className="col-1">Date</span>
+                      <span className="col-4">: {this.state.OrderDate}</span>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              <TableComponents
+                tableTopLeft={""}
+                tableTopRight={this.renderTableActionButton}
+                tableOptions={{
+                  dense: false,
+                  tableOrderBy: 'asc',
+                  sortingIndex: "fat",
+                  stickyTableHeader: true,
+                  stickyTableHeight: 300,
+                }}
+                tableHeaders={headCells}
+                tableRows={{
+                  renderTableRows: this.renderTableRows,
+                  checkbox: false,
+                  checkboxColor: "primary",
+                  onRowClickSelect: false
+                }}
+                selectedIndexKey={"pid"}
+                Data={this.state.TransactionDetail}
+              />
+              <div className="row">
+                <div style={tncDiv} className="col-7">
+                  <div style={tncTitle}>Terms and Conditions</div>
+                  <br />
+                  <div>
+                    <p>
+                      1. All payment should be make payable to
+                      <br />
+                      EZ TAO BAO ENTERPRISE
+                      <br />
+                      25301009073
+                      <br />
+                      HONG LEONG BANK
+                    </p>
+                    <p>
+                      2. Payment must be cleared within 3 days after the billing date
+                    </p>
+                  </div>
+                </div>
+                <div style={tncDiv} className="col-4">
+                  <div>
+                    <p>
+                      Sub Total :
+                      <br />
+                      Total     : {this.state.OrderTotalAmount}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div style={tncDiv} className="col-7">
+                  __________________________________
+                  <p>EZ TRANSIT AND LOGISTICS SDN BHD</p>
+                </div>
+                <div style={tncDiv} className="col-4">
+                  __________________________________
+                  <p>Name  : </p>
+                  <p>IC NO : </p>
+                  <p>DATE  : </p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <Modal
+                open={this.state.AddModalOpen}
+                onClose={this.handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{ timeout: 500 }}
+              >
+                <Box sx={style} component="main" maxWidth="xs">
+                  <Typography component="h1" variant="h4" style={{ textAlign: "center" }}>Additional Charges</Typography>
+                  <Box component="form" noValidate sx={{ mt: 3 }}>
+                    <div className="row">
+                      <h4 style={{ textAlign: "center" }}>
+                        Before Print, please select the delivery method
+                      </h4>
+                      <div className="row" style={{ textAlign: "center", margin: "auto" }}>
+                        <div style={{ display: "inline", width: "100%" }}>
+                          <Grid component="label" container alignItems="center" spacing={1} style={{ width: "100%", display: "inline" }}>
+                            <div>
+                              <Grid item style={{ display: "inline-grid" }}>Self Pick Up</Grid>
+                              <Grid item style={{ display: "inline-grid" }}>
+                                <Switch
+                                  checked={this.state.TransportationBool}
+                                  onChange={(e) => { this.handleChange(e) }}
+                                  value="checkedA"
+                                />
+                              </Grid>
+                              <Grid item style={{ display: "inline-grid" }}>Delivery</Grid>
+                            </div>
+                          </Grid>
+                        </div>
+                      </div>
+                      {this.state.TransportationBool && (
+                        <div className="row">
+                          <div className="col-5 col-sm-7">
+                            <TextField
+                              variant="standard"
+                              size="small"
+                              fullWidth
+                              id="remark"
+                              label={"Remark "}
+                              name="AdditionalChargedRemark"
+                              value={this.state.Remark}
+                              onChange={(e) => { this.handleInputChange(e) }}
+                              error={false}
+                            />
+                            {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
+                          </div>
+                          <div className="col-4 col-sm-3">
+                            <FormControl variant="standard" size="small" fullWidth>
+                              <InputLabel htmlFor="AdditionalChargedAmount"></InputLabel>
+                              <Input
+                                variant="standard"
+                                size="small"
+                                name="AdditionalChargedAmount"
+                                value={this.state.DeliveryFee}
+                                id="deliveryfee"
+                                onChange={(e) => { this.handleInputChange(e) }}
+                                startAdornment={<InputAdornment position="start">RM</InputAdornment>}
+                                error={false}
+                              />
+                              {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
+
+                            </FormControl>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <Button
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      sx={{ mt: 3, mb: 2 }}
+                      onClick={(e1) => this.onClickConfirmInvoice(e1)}
+                    >Add Additional Charge
+                    </Button>
+
+                  </Box>
+                </Box>
+              </Modal>
+
+            </div>
+            <div>
+              <Modal
+                open={this.state.AddModalOpen2}
+                onClose={this.handleClose2}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{ timeout: 500 }}
+              ><Box sx={style} component="main" maxWidth="xs">
+                  <Typography component="h1" variant="h5">Printing Invoice</Typography>
+                  <Box component="form" noValidate sx={{ mt: 3 }} style={{ textAlign: "center", margin: "auto" }}>
+                    <div className="row" style={{ width: "100%", display: "inline" }}>
+                      <h4>
+                        Please select deliver option
+                      </h4>
+                    </div>
+                    <ReactToPrint style={{ width: "100%", display: "inline" }}
+                      trigger={(e) => {
+                        return (<Button variant="contained">Print The Invoice</Button>);
+                      }}
+                      content={() => this.componentRef}
+                    />
+                  </Box>
+                </Box>
+              </Modal>
             </div>
           </CardContent>
         </Card>
-        <div className="">
-          <TableComponents
-            tableTopLeft={""}
-            tableTopRight={this.renderTableActionButton}
-            tableOptions={{
-              dense: false,
-              tableOrderBy: 'asc',
-              sortingIndex: "fat",
-              stickyTableHeader: true,
-              stickyTableHeight: 300,
-            }}
-            tableHeaders={headCells}
-            tableRows={{
-              renderTableRows: this.renderTableRows,
-              checkbox: false,
-              checkboxColor: "primary",
-              onRowClickSelect: false
-            }}
-            selectedIndexKey={"pid"}
-            Data={this.state.TransactionDetail}
-          />
-        </div>
-        <div style={tncDiv}>
-          <div style={tncTitle}>Terms and Conditions</div>
-          <br />
-          <div>
-            <p>
-              1. All payment should be make payable to
-              <br/>
-              EZ TAO BAO ENTERPRISE 17.10
-              <br/>
-              25301009073
-              <br/>
-              HONG LEONG BANK
-            </p>
-            <p>
-              2. Payment must be cleared within 3 days after the billing date
-            </p>
-          </div>
-        </div>
-      </div>
+      </div >
     )
   }
 }
-
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(InvoicerDetail));

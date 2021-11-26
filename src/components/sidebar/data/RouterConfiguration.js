@@ -11,6 +11,7 @@ import DataManagement from "../../../pages/DataManagement/DataManagement";
 import AllPayments from "../../../pages/Payments/AllPayments/AllPayments";
 import BalanceSettlement from "../../../pages/Payments/BalanceSettlement/BalanceSettlement";
 import Statements from "../../../pages/Statements/Statements";
+import TransactionHistory from "../../../pages/Statements/TransactionHistory";
 import UserDetail from "../../../pages/UserManagement/UserDetail"
 import AddUser from "../../../pages/UserManagement/AddUser";
 import EditStockGoods from "../../../pages/Stock/StockGoods/EditStockGoods";
@@ -85,6 +86,11 @@ const routes = [
         path: "/Statements",
         exact: true,
         element: <Statements />,
+    },
+    {
+        path: "/TransactionHistory",
+        exact: true,
+        element: <TransactionHistory />,
     },
     {
         path: "/UserDetail/:userid/:usercode",

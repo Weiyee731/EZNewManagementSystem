@@ -310,38 +310,38 @@ export class GitEpic {
       }
     });
 
-  // Inventory_UpdateStockStatus(string STOCKID, string CONTAINERNAME, string CONTAINERDATE)
-  // Inventory_UpdateStockStatus = action$ =>
-  // action$.ofType(GitAction.UpdateInventoryStockStatus).switchMap(async ({ payload }) => {
-  //   console.log(url +
-  //     "Inventory_UpdateStockStatus?" +
-  //     "STOCKID=" + payload.STOCKID +
-  //     "&CONTAINERNAME=" + payload.CONTAINERNAME +
-  //     "&CONTAINERDATE=" + payload.CONTAINERDATE )
-  //   try {
-  //     const response = await fetch(url +
-  //       "Inventory_UpdateStockStatus?" +
-  //       "STOCKID=" + payload.STOCKID +
-  //       "&CONTAINERNAME=" + payload.CONTAINERNAME +
-  //       "&CONTAINERDATE=" + payload.CONTAINERDATE 
-  //     );
 
-  //     let json = await response.json();
-  //     json = JSON.parse(json)
-  //     return {
-  //       type: GitAction.UpdatedInventoryStockStatus,
-  //       payload: json,
-  //     };
-  //   }
-  //   catch (error) {
-  //     toast.error("Error Code: Inventory_InsertStock")
-  //     return {
-  //       type: GitAction.UpdatedInventoryStockStatus,
-  //       payload: [],
-  //     };
-  //   }
-  // });
+//   Inventory_UpdateStockStatus = action$ =>
+//   action$.ofType(GitAction.UpdateInventoryStockStatus).switchMap(async ({ payload }) => {
+//     console.log(url +
+//       "Inventory_UpdateStockStatus?" +
+//       "STOCKID=" + payload.STOCKID +
+//       "&CONTAINERNAME=" + payload.CONTAINERNAME +
+//       "&CONTAINERDATE=" + payload.CONTAINERDATE)
+//     try {
+//       const response = await fetch(url +
+//         "Inventory_UpdateStockStatus?" +
+//         "STOCKID=" + payload.STOCKID +
+//         "&CONTAINERNAME=" + payload.CONTAINERNAME +
+//         "&CONTAINERDATE=" + payload.CONTAINERDATE
+//       );
 
+//       let json = await response.json();
+//       json = JSON.parse(json)
+//       return {
+//         type: GitAction.UpdatedInventoryStockStatus,
+//         payload: json,
+//       };
+//     }
+//     catch (error) {
+//       toast.error("Error Code: Inventory_InsertStock")
+//       return {
+//         type: GitAction.UpdatedInventoryStockStatus,
+//         payload: [],
+//       };
+//     }
+// >>>>>>> 37db0b75379f395e9b923fa20c436716dbc39c28
+//   });
   Inventory_UpdateStockDetailByPost = action$ =>
     action$.ofType(GitAction.UpdateStockDetailByPost).switchMap(async ({ payload }) => {
 
@@ -425,7 +425,7 @@ export class GitEpic {
       // )
       try {
         const response = await fetch(url +
-          "Transaction_ViewTransaction"
+          "Transaction_ViewTransaction?TrackingStatusID=" + payload.TrackingStatusID
         );
 
         let json = await response.json();
@@ -467,16 +467,24 @@ export class GitEpic {
 
   Transaction_InsertTransaction = action$ =>
     action$.ofType(GitAction.InsertNewTransaction).switchMap(async ({ payload }) => {
-      // console.log(url + 
-      //   double_click_and_paste_url_here
-      // )
+      console.log(url +
+        "Transaction_InsertTransaction?" +
+        "USERID=" + payload.USERID +
+        "&CALCULATIONTYPE=" + payload.TYPE +
+        "&ORDERTOTALMOUNT=" + payload.ORDERTOTALMOUNT +
+        "&ORDERPAIDMOUNT=" + payload.ORDERPAIDMOUNT +
+        "&STOCKID=" + payload.STOCKID +
+        "&PRODUCTPRICE=" + payload.PRODUCTPRICE
+      )
       try {
         const response = await fetch(url +
           "Transaction_InsertTransaction?" +
           "USERID=" + payload.USERID +
+          "&CALCULATIONTYPE=" + payload.TYPE +
           "&ORDERTOTALMOUNT=" + payload.ORDERTOTALMOUNT +
           "&ORDERPAIDMOUNT=" + payload.ORDERPAIDMOUNT +
-          "&STOCKID=" + payload.STOCKID
+          "&STOCKID=" + payload.STOCKID +
+          "&PRODUCTPRICE=" + payload.PRODUCTPRICE
         );
 
         let json = await response.json();
@@ -495,6 +503,37 @@ export class GitEpic {
       }
     });
 
+  Transaction_UpdateTransactionStatus = action$ =>
+    action$.ofType(GitAction.UpdateTransaction).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Transaction_UpdateTransactionStatus?" +
+        "TRANSACTIONID=" + payload.TransactionID +
+        "&TRANSPORTATIONTYPE=" + payload.TransportationType +
+        "&DELIVERYFEE=" + payload.DeliveryFee
+      )
+      try {
+        const response = await fetch(url +
+          "Transaction_UpdateTransactionStatus?" +
+          "TRANSACTIONID=" + payload.TransactionID +
+          "&TRANSPORTATIONTYPE=" + payload.TransportationType +
+          "&DELIVERYFEE=" + payload.DeliveryFee
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UpdatedTransaction,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Transaction_InsertTransaction")
+        return {
+          type: GitAction.UpdatedTransaction,
+          payload: [],
+        };
+      }
+    });
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
 
 }
