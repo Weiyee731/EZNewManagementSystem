@@ -20,7 +20,7 @@ import EditStockGoods from "./EditStockGoods";
 import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents";
 import MenuItem from '@mui/material/MenuItem';
 import Autocomplete from '@mui/material/Autocomplete';
-
+import { isStringNullOrEmpty } from "../../../tools/Helpers"
 function mapStateToProps(state) {
     return {
         stocks: state.counterReducer["stocks"],
@@ -144,7 +144,7 @@ const INITIAL_STATE = {
     // datevalue
     options: [],
     childData: [],
-    TrackingNumber: "",
+    // TrackingNumber: "",
     openAddModal: false,
 
     container: "",
@@ -156,9 +156,9 @@ const INITIAL_STATE = {
     ProductDimensionDeep: "",
     ProductWeight: "",
     AreaCode: "",
-    Item: "",
-    AdditionalCharges: "",
-    Remark: "",
+    Item: "null",
+    AdditionalCharges: "0",
+    Remark: "no",
 }
 
 
@@ -239,7 +239,7 @@ class StockGoods extends Component {
         this.props.CallFetchAllStock({ USERID: "1" });
         if (this.props.stocks.length !== this.state.stockListing.length) {
             if (this.props.stocks !== undefined && this.props.stocks[0] !== undefined && this.props.ReturnVal !== "0") {
-                this.setState({ stockListing: this.props.stocks, stockFiltered: this.props.stocks});
+                this.setState({ stockListing: this.props.stocks, stockFiltered: this.props.stocks });
             } else { console.log(("no")) }
         } else { console.log(("no")) }
     }
@@ -267,7 +267,7 @@ class StockGoods extends Component {
             console.log("1")
             console.log(this.state.selectedRows)
             console.log(this.state.selectedRows[0])
-            if (this.state.selectedRows !== undefined ) {
+            if (this.state.selectedRows !== undefined) {
                 console.log("2")
                 this.setState({
                     TrackingNumber: this.state.selectedRows.TrackingNumber,
@@ -276,9 +276,9 @@ class StockGoods extends Component {
                     ProductDimensionHeight: this.state.selectedRows.ProductDimensionHeight,
                     ProductDimensionDeep: this.state.selectedRows.ProductDimensionDeep,
                     AreaCode: this.state.selectedRows.AreaCode,
-                    Item: this.state.selectedRows.Item,
-                    AdditionalCharges: this.state.selectedRows.AdditionalCharges,
-                    Remark: this.state.selectedRows.Remark,
+                    Item: isStringNullOrEmpty(this.state.selectedRows.Item) ? "no item" : this.state.selectedRows.Item,
+                    AdditionalCharges: isStringNullOrEmpty(this.state.selectedRows.AdditionalCharges) ? "0" : this.state.selectedRows.AdditionalCharges,
+                    Remark: isStringNullOrEmpty(this.state.selectedRows.Remark) ? "no remark" : this.state.selectedRows.Remark,
                     ProductWeight: this.state.selectedRows.ProductWeight,
                 })
             }
@@ -372,13 +372,14 @@ class StockGoods extends Component {
     }
 
     onSearchChange = (e, type) => {
-
+        console.log(e.target.value)
+        console.log(this.state.stockListing)
         if (e.target.value !== ""
             //  &&
             // this.state.stockListing[0].ReturnVal !== undefined &&
             // this.state.stockListing[0].ReturnVal !== "0"
         ) {
-            const FilterArr = this.state.stockListing.filter((searchedItem) => searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()) || searchedItem.UserCode.includes(e.target.value.toLowerCase()) || searchedItem.AreaCode.toLowerCase().includes(e.target.value.toLowerCase()) || searchedItem.AreaName.toLowerCase().includes(e.target.value.toLowerCase()))
+            const FilterArr = this.state.stockListing.filter((searchedItem) => searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()) || searchedItem.UserCode.includes(e.target.value.toLowerCase()) || searchedItem.AreaCode.toLowerCase().includes(e.target.value.toLowerCase()) )
             this.setState({ stockFiltered: FilterArr })
             if (FilterArr.length === 1 && FilterArr[0].TrackingNumber === e.target.value) {
                 this.setState({ selectedRows: FilterArr[0], openEditModal: !this.state.openEditModal });
@@ -401,7 +402,7 @@ class StockGoods extends Component {
     // }
 
     handleCallback = (childData) => {
-        this.setState({childData:childData})
+        this.setState({ childData: childData })
         if (childData.TrackingNumber !== null && childData.TrackingNumber !== undefined) {
             this.setState({ TrackingNumber: childData.TrackingNumber })
         }
@@ -460,7 +461,7 @@ class StockGoods extends Component {
 
                         </div>
                         <div className="col-sm-6 col-12">
-                        {console.log(this.props.AllContainer)}
+                            {console.log(this.props.AllContainer)}
                             {console.log(options)}
                             <Autocomplete
                                 options={options}
