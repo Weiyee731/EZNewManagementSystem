@@ -29,6 +29,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import ReactToPrint, { useReactToPrint } from "react-to-print";
+import TableRow from '@mui/material/TableRow';
 
 function mapStateToProps(state) {
   return {
@@ -148,6 +149,7 @@ class InvoicerDetail extends Component {
       OrderDate: "",
       TransactionName: "",
       TransportationType: 1,
+      TransportationBool: false,
       Fullname: "",
       Email: "",
       Contact: "",
@@ -156,11 +158,14 @@ class InvoicerDetail extends Component {
       OrderPaidAmount: "",
       AddModalOpen: false,
       AddModalOpen2: false,
+      DeliveryFeeInd: false,
       DeliveryFee: 0.00,
       Remark: "",
       TransactionDetail: []
     }
     this.handleInputChange = this.handleInputChange.bind(this)
+    this.handleChange = this.handleChange.bind(this)
+
     this.onClickConfirmInvoice = this.onClickConfirmInvoice.bind(this)
     this.props.CallFetchAllTransactionByID(this.state)
   }
@@ -178,8 +183,8 @@ class InvoicerDetail extends Component {
           AreaCode: this.props.transaction[0].AreaCode,
           Contact: this.props.transaction[0].UserContactNo,
           Address: this.props.transaction[0].UserAddress,
-          OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
-          OrderPaidAmount: this.props.transaction[0].OrderPaidAmount,
+          OrderTotalAmount: this.props.transaction[0].OrderSubTotalAmount,
+          OrderPaidAmount: this.props.transaction[0].OrderSubPaidAmount,
           TransactionDetail: JSON.parse(this.props.transaction[0].TransactionDetail),
         });
       }
@@ -199,8 +204,8 @@ class InvoicerDetail extends Component {
           AreaCode: this.props.transaction[0].AreaCode,
           Contact: this.props.transaction[0].UserContactNo,
           Address: this.props.transaction[0].UserAddress,
-          OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
-          OrderPaidAmount: this.props.transaction[0].OrderPaidAmount,
+          OrderTotalAmount: this.props.transaction[0].OrderSubTotalAmount,
+          OrderPaidAmount: this.props.transaction[0].OrderSubPaidAmount,
           TransactionDetail: this.props.transaction[0].TransactionDetail !== "null" ? JSON.parse(this.props.transaction[0].TransactionDetail) : [],
         });
       }
@@ -215,9 +220,9 @@ class InvoicerDetail extends Component {
           AreaCode: prevProps.transaction[0].AreaCode,
           Contact: prevProps.transaction[0].UserContactNo,
           Address: prevProps.transaction[0].UserAddress,
-          OrderTotalAmount: prevProps.transaction[0].OrderTotalAmount,
-          OrderPaidAmount: prevProps.transaction[0].OrderPaidAmount,
-          TransactionDetail: JSON.parse(prevProps.transaction[0].TransactionDetail),
+          OrderTotalAmount: prevProps.transaction[0].OrderSubTotalAmount,
+          OrderPaidAmount: prevProps.transaction[0].OrderSubPaidAmount,
+          TransactionDetail: JSON.parse(prevProps.transaction[0].TransactionDetail)
         });
       }
     }
@@ -229,17 +234,27 @@ class InvoicerDetail extends Component {
       <>
         <TableCell
           component="th"
-          id={`table-checkbox-${index}`}
+          id={`table-checkbox-${(index + 1)}`}
           scope="row"
           sx={{ fontSize: fontsize }}
         >
-          {index}
+          {(index + 1)}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.TrackingNumber}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.TrackingNumber}
+          {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
+            return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px" }}>{additionalCharges.Description}</TableCell></TableRow>
+          })}</TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductQuantity}</TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight).toFixed(2)}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductPrice}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductPrice * data.ProductQuantity)}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductPrice}
+          {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
+            return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{additionalCharges.ProductPrice}</TableCell></TableRow>
+          })}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductPrice * data.ProductQuantity)}
+          {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
+            return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{(additionalCharges.ProductPrice * additionalCharges.ProductQuantity)}</TableCell></TableRow>
+          })}
+        </TableCell>
       </>
     )
   }
@@ -275,9 +290,19 @@ class InvoicerDetail extends Component {
   }
 
   onClickConfirmInvoice = (items) => {
+    var isDeliveryExist = false
     this.props.CallUpdateTransaction(this.state);
-    this.state.TransactionDetail.push({ TrackingNumber: "Delivery Fee", ProductQuantity: 1, ProductDimensionDeep: "", ProductDimensionWidth: "", ProductDimensionHeight: "", ProductPrice: this.state.DeliveryFee })
+    this.state.TransactionDetail.map((search)=>{
+      if(search.Description === "Delivery Fee"){
+        search.ProductPrice = this.state.DeliveryFee
+        isDeliveryExist = true
+      }
+    })
+
     this.setState({ AddModalOpen: false, AddModalOpen2: true });
+    if (!isDeliveryExist) {
+      this.state.TransactionDetail.push({ TrackingNumber: "Delivery Fee", ProductQuantity: 1, ProductDimensionDeep: "", ProductDimensionWidth: "", ProductDimensionHeight: "", ProductPrice: this.state.DeliveryFee })
+    }
   }
 
   handleInputChange = (e) => {
@@ -295,6 +320,14 @@ class InvoicerDetail extends Component {
         break;
     }
   }
+
+  handleChange = (e) => {
+    if (e.target.checked) {
+      this.setState({ TransportationType: 2, TransportationBool: e.target.checked })
+    } else {
+      this.setState({ TransportationType: 1, TransportationBool: e.target.checked })
+    }
+  };
 
   render() {
     return (
@@ -380,15 +413,16 @@ class InvoicerDetail extends Component {
                 </div>
               </div>
 
-              <TableComponents
-                tableTopLeft={""}
-                tableTopRight={this.renderTableActionButton}
+              <TableComponents style={{ boxShadow: "0px" }}
+                // tableTopLeft={""}
+                // tableTopRight={this.renderTableActionButton}
+                elevation={"0"}
                 tableOptions={{
                   dense: false,
                   tableOrderBy: 'asc',
                   sortingIndex: "fat",
-                  stickyTableHeader: true,
-                  stickyTableHeight: 300,
+                  stickyTableHeader: false,
+                  stickyTableHeight: 100,
                 }}
                 tableHeaders={headCells}
                 tableRows={{
@@ -422,9 +456,9 @@ class InvoicerDetail extends Component {
                 <div style={tncDiv} className="col-4">
                   <div>
                     <p>
-                      Sub Total :
+                      Sub Total : {this.state.OrderTotalAmount}
                       <br />
-                      Total     : {this.state.OrderTotalAmount}
+                      Total     : {(parseFloat(this.state.OrderTotalAmount) + parseFloat(this.state.DeliveryFee))}
                     </p>
                   </div>
                 </div>
@@ -453,50 +487,64 @@ class InvoicerDetail extends Component {
                 BackdropProps={{ timeout: 500 }}
               >
                 <Box sx={style} component="main" maxWidth="xs">
-                  <Typography component="h1" variant="h5" style={{textAlign:"center"}}>Additional Charges</Typography>
+                  <Typography component="h1" variant="h4" style={{ textAlign: "center" }}>Additional Charges</Typography>
                   <Box component="form" noValidate sx={{ mt: 3 }}>
                     <div className="row">
-                      <p style={{textAlign:"center"}}>
+                      <h4 style={{ textAlign: "center" }}>
                         Before Print, please select the delivery method
-                      </p>
-                      <div className="row">
-                        <div className="col-2">Self Pick</div>
-                        <Switch className="col-2" defaultChecked />
-                        <div className="col-2">Delivery</div>
-                        <div className="col-6"></div>
+                      </h4>
+                      <div className="row" style={{ textAlign: "center", margin: "auto" }}>
+                        <div style={{ display: "inline", width: "100%" }}>
+                          <Grid component="label" container alignItems="center" spacing={1} style={{ width: "100%", display: "inline" }}>
+                            <div>
+                              <Grid item style={{ display: "inline-grid" }}>Self Pick Up</Grid>
+                              <Grid item style={{ display: "inline-grid" }}>
+                                <Switch
+                                  checked={this.state.TransportationBool}
+                                  onChange={(e) => { this.handleChange(e) }}
+                                  value="checkedA"
+                                />
+                              </Grid>
+                              <Grid item style={{ display: "inline-grid" }}>Delivery</Grid>
+                            </div>
+                          </Grid>
+                        </div>
                       </div>
+                      {this.state.TransportationBool && (
+                        <div className="row">
+                          <div className="col-5 col-sm-7">
+                            <TextField
+                              variant="standard"
+                              size="small"
+                              fullWidth
+                              id="remark"
+                              label={"Remark "}
+                              name="AdditionalChargedRemark"
+                              value={this.state.Remark}
+                              onChange={(e) => { this.handleInputChange(e) }}
+                              error={false}
+                            />
+                            {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
+                          </div>
+                          <div className="col-4 col-sm-3">
+                            <FormControl variant="standard" size="small" fullWidth>
+                              <InputLabel htmlFor="AdditionalChargedAmount"></InputLabel>
+                              <Input
+                                variant="standard"
+                                size="small"
+                                name="AdditionalChargedAmount"
+                                value={this.state.DeliveryFee}
+                                id="deliveryfee"
+                                onChange={(e) => { this.handleInputChange(e) }}
+                                startAdornment={<InputAdornment position="start">RM</InputAdornment>}
+                                error={false}
+                              />
+                              {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
 
-                      <div className="col-6 col-sm-8">
-                        <TextField
-                          variant="standard"
-                          size="small"
-                          fullWidth
-                          id="remark"
-                          label={"Remark "}
-                          name="AdditionalChargedRemark"
-                          value={this.state.Remark}
-                          onChange={(e) => { this.handleInputChange(e) }}
-                          error={false}
-                        />
-                        {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
-                      </div>
-                      <div className="col-4 col-sm-3">
-                        <FormControl variant="standard" size="small" fullWidth>
-                          <InputLabel htmlFor="AdditionalChargedAmount"></InputLabel>
-                          <Input
-                            variant="standard"
-                            size="small"
-                            name="AdditionalChargedAmount"
-                            value={this.state.DeliveryFee}
-                            id="deliveryfee"
-                            onChange={(e) => { this.handleInputChange(e) }}
-                            startAdornment={<InputAdornment position="start">RM</InputAdornment>}
-                            error={false}
-                          />
-                          {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
-
-                        </FormControl>
-                      </div>
+                            </FormControl>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <Button
                       type="submit"
@@ -523,13 +571,13 @@ class InvoicerDetail extends Component {
                 BackdropProps={{ timeout: 500 }}
               ><Box sx={style} component="main" maxWidth="xs">
                   <Typography component="h1" variant="h5">Printing Invoice</Typography>
-                  <Box component="form" noValidate sx={{ mt: 3 }}>
-                    <div className="row">
-                      <p>
+                  <Box component="form" noValidate sx={{ mt: 3 }} style={{ textAlign: "center", margin: "auto" }}>
+                    <div className="row" style={{ width: "100%", display: "inline" }}>
+                      <h4>
                         Please select deliver option
-                      </p>
+                      </h4>
                     </div>
-                    <ReactToPrint
+                    <ReactToPrint style={{ width: "100%", display: "inline" }}
                       trigger={(e) => {
                         return (<Button variant="contained">Print The Invoice</Button>);
                       }}

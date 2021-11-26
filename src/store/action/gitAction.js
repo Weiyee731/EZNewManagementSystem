@@ -122,7 +122,7 @@ export class GitAction {
   static ResetStockStatusReturn = "RESET-STOCK-STATUS_RETURN";
   static CallUpdateStockStatus(propsData) {
     return {
-      type: GitAction.UpdateInventoryStockStatus,
+      type: GitAction.CallUpdateStockStatus,
       payload: propsData
     };
   }
@@ -132,6 +132,21 @@ export class GitAction {
     };
   }
 
+  static UpdateStockDetailByPost = "UPDATE-STOCKDETAIL-BY-POST";
+  static UpdatedStockDetailByPost = "UPDATED-STOCKDETAIL-BY-POST";
+  static ResetUpdatedStockDetailByPost = "RESET-UPDATED-STOCKDETAIL-BY-POST";
+  static CallUpdateStockDetailByPost(propsData) {
+    return {
+      type: GitAction.UpdateStockDetailByPost,
+      payload: propsData
+    };
+  }
+  static CallResetUpdatedStockDetailByPost() {
+    return {
+      type: GitAction.ResetUpdatedStockDetailByPost,
+    };
+  }
+  
   static ViewContainer = "VIEW-CONTAINER";
   static ViewedContainer = "VIEWED-CONTAINER";
   static ResetViewedContainer = "RESET-VIEWED-CONTAINER";

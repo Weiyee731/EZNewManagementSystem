@@ -14,6 +14,7 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Backdrop from '@mui/material/Backdrop';
+import DeleteIcon from '@mui/icons-material/Delete';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
@@ -266,7 +267,7 @@ class UserManagement extends Component {
                         tableHeaders={headCells}        //required
                         tableRows={{
                             renderTableRows: this.renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
-                            checkbox: false,                          // optional, by default is true
+                            checkbox: true,                          // optional, by default is true
                             checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
                             onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                         }}
@@ -275,6 +276,7 @@ class UserManagement extends Component {
                         onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                         onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                         onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items
+                        actionIcon={<DeleteIcon />}
                     />
                 </div>
                 <div>

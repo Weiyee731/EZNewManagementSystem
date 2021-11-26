@@ -11,7 +11,6 @@ import Tooltip from '@mui/material/Tooltip';
 import TableComponents from "../../../components/TableComponents/TableComponents"
 import TableCell from '@mui/material/TableCell';
 import { ModalPopOut } from "../../../components/modal/Modal";
-import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import ResponsiveDatePickers from '../../../components/datePicker/datePicker';
 import CheckIcon from '@mui/icons-material/Check';
@@ -21,7 +20,7 @@ import EditStockGoods from "./EditStockGoods";
 import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents";
 import MenuItem from '@mui/material/MenuItem';
 import Autocomplete from '@mui/material/Autocomplete';
-
+import { isStringNullOrEmpty } from "../../../tools/Helpers"
 function mapStateToProps(state) {
     return {
         stocks: state.counterReducer["stocks"],
@@ -35,6 +34,7 @@ function mapDispatchToProps(dispatch) {
         CallFetchAllStock: (props) => dispatch(GitAction.CallFetchAllStock(props)),
         CallUpdateStockStatus: (props) => dispatch(GitAction.CallUpdateStockStatus(props)),
         CallViewContainer: (props) => dispatch(GitAction.CallViewContainer(props)),
+        CallUpdateStockDetailByPost: (props) => dispatch(GitAction.CallUpdateStockDetailByPost(props)),
     };
 }
 
@@ -139,11 +139,26 @@ const INITIAL_STATE = {
     selectedRows: [],
     stockListing: [],
     stockFiltered: [],
-    container: "",
-    date: new Date(),
+
     newcontainer: "",
     // datevalue
+    options: [],
+    childData: [],
+    // TrackingNumber: "",
     openAddModal: false,
+
+    container: "",
+    date: new Date(),
+    TrackingNumber: "",
+    UserCode: "",
+    ProductDimensionWidth: "",
+    ProductDimensionHeight: "",
+    ProductDimensionDeep: "",
+    ProductWeight: "",
+    AreaCode: "",
+    Item: "null",
+    AdditionalCharges: "0",
+    Remark: "no",
 }
 
 
@@ -182,7 +197,11 @@ function renderTableRows(data, index) {
 }
 
 function onTableRowClick(event, row) {
-    this.setState({ openEditModal: true, selectedRows: row });
+    console.log(row)
+    this.setState({
+        openEditModal: true,
+        selectedRows: row,
+    });
     // return <Link to={{ pathname: `/EditStockGoods`, props: row }}></Link>
 
 }
@@ -204,7 +223,7 @@ class StockGoods extends Component {
         onAddButtonClick = onAddButtonClick.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.changeTab = this.changeTab.bind(this);
-        this.onSearchTrackingNumchange = this.onSearchTrackingNumchange.bind(this);
+        // this.onSearchTrackingNumchange = this.onSearchTrackingNumchange.bind(this);
         this.onContainerChange = this.onContainerChange.bind(this);
         this.onSearchChange = this.onSearchChange.bind(this);
         this.onDateChange = this.onDateChange.bind(this);
@@ -212,16 +231,27 @@ class StockGoods extends Component {
 
     componentDidMount() {
         // this.props.CallFetchAllStock({USERID:JSON.parse(localStorage.getItem("loginUser"))[0].UserID});
-        this.props.CallViewContainer();
+        this.props.CallViewContainer();  //view container
+        if (this.state.options !== this.props.AllContainer) {
+            this.setState({ options: this.props.AllContainer })
+        } //set container return to the state: option
+
         this.props.CallFetchAllStock({ USERID: "1" });
         if (this.props.stocks.length !== this.state.stockListing.length) {
-            if (this.props.stocks !== undefined && this.props.stocks[0] !== undefined) {
+            if (this.props.stocks !== undefined && this.props.stocks[0] !== undefined && this.props.ReturnVal !== "0") {
                 this.setState({ stockListing: this.props.stocks, stockFiltered: this.props.stocks });
             } else { console.log(("no")) }
         } else { console.log(("no")) }
     }
 
     componentDidUpdate(prevProps, prevState) {
+
+        if (prevProps.AllContainer.length !== this.props.AllContainer.length) {
+            if (this.props.AllContainer !== undefined && this.props.AllContainer[0] !== undefined) {
+                this.setState({ options: this.props.AllContainer });
+                console.log("1", this.state.options)
+            } else { console.log("match wo") }
+        }
         if (prevProps.stocks.length !== this.props.stocks.length) {
             // console.log(this.props.stocks !== undefined && this.props.stocks[0] !== undefined)
             if (this.props.stocks !== undefined && this.props.stocks[0] !== undefined) {
@@ -232,6 +262,26 @@ class StockGoods extends Component {
             //     if (prevProps.stocks.length !== this.state.stockFiltered.length) {
             //         this.setState({ stockFiltered: prevProps.stocks });
             //     }
+        }
+        if (prevState.selectedRows !== this.state.selectedRows) {
+            console.log("1")
+            console.log(this.state.selectedRows)
+            console.log(this.state.selectedRows[0])
+            if (this.state.selectedRows !== undefined) {
+                console.log("2")
+                this.setState({
+                    TrackingNumber: this.state.selectedRows.TrackingNumber,
+                    UserCode: this.state.selectedRows.UserCode,
+                    ProductDimensionWidth: this.state.selectedRows.ProductDimensionWidth,
+                    ProductDimensionHeight: this.state.selectedRows.ProductDimensionHeight,
+                    ProductDimensionDeep: this.state.selectedRows.ProductDimensionDeep,
+                    AreaCode: this.state.selectedRows.AreaCode,
+                    Item: isStringNullOrEmpty(this.state.selectedRows.Item) ? "no item" : this.state.selectedRows.Item,
+                    AdditionalCharges: isStringNullOrEmpty(this.state.selectedRows.AdditionalCharges) ? "0" : this.state.selectedRows.AdditionalCharges,
+                    Remark: isStringNullOrEmpty(this.state.selectedRows.Remark) ? "no remark" : this.state.selectedRows.Remark,
+                    ProductWeight: this.state.selectedRows.ProductWeight,
+                })
+            }
         }
     }
 
@@ -244,7 +294,24 @@ class StockGoods extends Component {
             case "openEditModal":
 
                 this.setState({ openEditModal: !this.state.openEditModal });
-                this.props.CallUpdateStockStatus({ STOCKID: this.state.selectedRows.StockID, CONTAINERNAME: this.state.container, CONTAINERDATE: this.state.date })
+                console.log(this.state.selectedRows)
+                // this.props.CallUpdateStockStatus({ STOCKID: this.state.selectedRows.StockID, CONTAINERNAME: this.state.container, CONTAINERDATE: this.state.date })
+                this.props.CallUpdateStockDetailByPost({
+                    STOCKID: this.state.selectedRows.StockID,
+                    TRACKINGNUMBER: this.state.TrackingNumber,
+                    PRODUCTWEIGHT: this.state.ProductWeight,
+                    PRODUCTHEIGHT: this.state.ProductDimensionHeight,
+                    PRODUCTWIDTH: this.state.ProductDimensionWidth,
+                    PRODUCTDEEP: this.state.ProductDimensionDeep,
+                    AREACODE: this.state.AreaCode,
+                    USERCODE: this.state.UserCode,
+                    ITEM: this.state.Item,
+                    TRACKINGSTATUSID: 1,
+                    CONTAINERNAME: this.state.container,
+                    CONTAINERDATE: this.state.date,
+                    REMARK: this.state.Remark,
+                    EXTRACHARGE: this.state.AdditionalCharges
+                })
                 break;
 
             case "openAddModal":
@@ -260,7 +327,6 @@ class StockGoods extends Component {
         switch (key) {
             case "All":
                 console.log("all")
-                // const FilterArr1 = this.props.stocks.filter((searchedItem) => searchedItem.TrackingStatusID !== null)
                 this.setState({ stockFiltered: this.props.stocks ? this.props.stocks : "" });
                 break;
 
@@ -306,34 +372,69 @@ class StockGoods extends Component {
     }
 
     onSearchChange = (e, type) => {
-        console.log(this.state.stockListing[0].ReturnVal)
-        if (e.target.value !== "" &&
+        console.log(e.target.value)
+        console.log(this.state.stockListing)
+        if (e.target.value !== ""
+            //  &&
             // this.state.stockListing[0].ReturnVal !== undefined &&
-            this.state.stockListing[0].ReturnVal !== "0") {
-            const FilterArr = this.state.stockListing.filter((searchedItem) => searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()) || searchedItem.UserCode.includes(e.target.value.toLowerCase()) || searchedItem.AreaCode.toLowerCase().includes(e.target.value.toLowerCase()) || searchedItem.AreaName.toLowerCase().includes(e.target.value.toLowerCase()))
-            this.setState({ stockFiltered: FilterArr });
-            console.log(FilterArr)
-            if (FilterArr.length === 1) {
-                this.setState({ selectedRows: FilterArr });
-                if (this.state.selectedRows === FilterArr) {
-                    this.setState({ openEditModal: !this.state.openEditModal })
-                }
+            // this.state.stockListing[0].ReturnVal !== "0"
+        ) {
+            const FilterArr = this.state.stockListing.filter((searchedItem) => searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()) || searchedItem.UserCode.includes(e.target.value.toLowerCase()) || searchedItem.AreaCode.toLowerCase().includes(e.target.value.toLowerCase()) )
+            this.setState({ stockFiltered: FilterArr })
+            if (FilterArr.length === 1 && FilterArr[0].TrackingNumber === e.target.value) {
+                this.setState({ selectedRows: FilterArr[0], openEditModal: !this.state.openEditModal });
             }
         } else {
             this.setState({ stockFiltered: this.props.stocks });
         }
     }
 
-    onSearchTrackingNumchange = (e, type) => {
-        const FilterArr = this.state.stockListing.filter((searchedItem) => searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()))
-        if (e.target.value !== "") {
-            this.state.stockFiltered.filter((searchedItem) => console.log(searchedItem.TrackingNumber.toLowerCase().includes(e.target.value)))
-            this.setState({ stockFiltered: FilterArr });
-            if (this.state.stockFiltered.length === 1) {
-                this.setState({ selectedRows: this.state.stockFiltered, openEditModal: !this.state.openEditModal })
-            }
+    // onSearchTrackingNumchange = (e, type) => {
+    //     const FilterArr = this.state.stockListing.filter((searchedItem) => searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()))
+    //     if (e.target.value !== "") {
+    //         // this.state.stockFiltered.filter((searchedItem) => console.log(searchedItem.TrackingNumber.toLowerCase().includes(e.target.value)))
+    //         this.setState({ stockFiltered: FilterArr });
+    //         if (this.state.stockFiltered.length === 1) {
+    //             this.setState({ selectedRows: this.state.stockFiltered, openEditModal: !this.state.openEditModal })
+    //         }
+    //     }
+    //     else { this.setState({ stockFiltered: this.props.stocks }); }
+    // }
+
+    handleCallback = (childData) => {
+        this.setState({ childData: childData })
+        if (childData.TrackingNumber !== null && childData.TrackingNumber !== undefined) {
+            this.setState({ TrackingNumber: childData.TrackingNumber })
         }
-        else { this.setState({ stockFiltered: this.props.stocks }); }
+        if (childData.UserCode !== null && childData.UserCode !== undefined) {
+            console.log("hi22", childData.UserCode)
+            this.setState({ UserCode: childData.UserCode })
+        }
+        if (childData.ProductDimensionWidth !== null && childData.ProductDimensionWidth !== undefined) {
+            this.setState({ ProductDimensionWidth: childData.ProductDimensionWidth })
+        }
+        if (childData.ProductDimensionHeight !== null && childData.ProductDimensionHeight !== undefined) {
+            this.setState({ ProductDimensionWidth: childData.ProductDimensionHeight })
+        }
+        if (childData.ProductDimensionDeep !== null && childData.ProductDimensionDeep !== undefined) {
+            this.setState({ ProductDimensionDeep: childData.ProductDimensionDeep })
+        }
+        if (childData.ProductWeight !== null && childData.ProductWeight !== undefined) {
+            this.setState({ ProductWeight: childData.ProductWeight })
+        }
+        if (childData.Item !== null && childData.Item !== undefined) {
+            this.setState({ Item: childData.Item })
+        }
+        if (childData.AreaCode !== null && childData.AreaCode !== undefined) {
+            this.setState({ AreaCode: childData.AreaCode })
+        }
+        if (childData.AdditionalCharges !== null && childData.AdditionalCharges !== undefined) {
+            this.setState({ AdditionalCharges: childData.AdditionalCharges })
+        }
+        if (childData.Remark !== null && childData.Remark !== undefined) {
+            this.setState({ Remark: childData.Remark })
+        }
+
     }
 
     render() {
@@ -342,10 +443,8 @@ class StockGoods extends Component {
             { children: "Unchecked", key: "Unchecked" },
             { children: "Checked", key: "Checked" }
         ]
-        console.log(this.state.stockApproval)
-        const { open, openEditModal, openAddModal } = this.state
-        // const { AllContainer } = this.props
-        const options = this.props.AllContainer
+        console.log(this.state.childData)
+        const { open, openEditModal, openAddModal, options } = this.state
         return (
             <div className="container-fluid">
                 <ModalPopOut
@@ -357,64 +456,42 @@ class StockGoods extends Component {
                     title={"Please select the container number and date desired"}
                     message={<div className="row ">
                         <div className="col-sm-6 col-12">
-                            <Box
-                                component="form"
-                                sx={{
-                                    '& > :not(style)': { mt: 1, mb: 1 },
-                                }}
-                                noValidate
-                                autoComplete="off"
-                            >
-                                <ResponsiveDatePickers title="Date" value={this.state.datevalue ? this.state.datevalue : ""} onChange={(e) => this.onDateChange(e)} />
-                            </Box>
+
+                            <ResponsiveDatePickers title="Date" value={this.state.datevalue ? this.state.datevalue : ""} onChange={(e) => this.onDateChange(e)} />
+
                         </div>
                         <div className="col-sm-6 col-12">
-                            <Box
-                                component="form"
-                                sx={{
-                                    '& > :not(style)': { mt: 1, mb: 1 },
+                            {console.log(this.props.AllContainer)}
+                            {console.log(options)}
+                            <Autocomplete
+                                options={options}
+                                noOptionsText="Enter to create a new option"
+                                getOptionLabel={(option) => option.ReturnMsg}
+                                onInputChange={(e, newValue) => {
+                                    this.setState({ container: newValue });
                                 }}
-                                noValidate
-                                autoComplete="off"
-
-                            >
-                                {/* <Autocomplete
-                                    options={options}
-                                    noOptionsText="Enter to create a new option"
-                                    getOptionLabel={(option) => option.ReturnMsg}
-                                    onInputChange={(e, newValue) => {
-                                        this.setState({container:newValue});
-                                    }}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label="Select"
-                                            variant="standard"
-                                            onKeyDown={(e) => {
-                                                if (
-                                                    e.key === "Enter" &&
-                                                    options.findIndex((o) => o.CONTAINERNAME === this.state.container) === -1
-                                                ) {
-                                                    this.options.push(this.state.container)
-                                                    // this.setState((o)=>o.concat({title:this.state.container}))
-                                                }
-                                            }}
-                                        />
-                                    )}
-                                /> */}
-                                <TextField id="outlined-basic" autoFocus fullWidth label="Container Number" select onChange={(e) => this.onContainerChange(e)} variant="standard" >
-                                    {options.map((option) => (
-                                        <MenuItem key={option.ReturnVal} value={option.ReturnVal}>
-                                            {option.ReturnMsg}
-                                        </MenuItem>
-                                    ))}</TextField>
-                                    
-                            </Box>
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Select"
+                                        variant="standard"
+                                        onKeyDown={(e) => {
+                                            console.log(e.target.value)
+                                            if (
+                                                e.key === "Enter"
+                                                && options.ReturnVal !== 0
+                                                // &&
+                                                // options.findIndex((o) => o.CONTAINERNAME === this.state.options) === -1
+                                            ) {
+                                                this.state.options.push({ ReturnVal: this.state.date, ReturnMsg: e.target.value })
+                                            } else console.log("hi")
+                                        }}
+                                    />
+                                )}
+                            />
                         </div>
-
                     </div>}
                 />
-
                 {openEditModal &&
                     <ModalPopOut
                         open={openEditModal}
@@ -422,9 +499,10 @@ class StockGoods extends Component {
                         handleToggleDialog={() => this.handleCancel("form")}
                         handleConfirmFunc={() => this.handleSearchfilter("openEditModal")}
                         message={
-                            <EditStockGoods data={this.state.selectedRows} />
+                            <EditStockGoods data={this.state.selectedRows} parentCallback={this.handleCallback} />
                         }
-                    />
+                    > {console.log("22", this.state.selectedRows)}</ModalPopOut>
+
                 }
                 {openAddModal &&
                     <ModalPopOut
@@ -441,20 +519,12 @@ class StockGoods extends Component {
                     <div className="row" onClick={() => this.setState({ open: !this.state.open })}>
 
                         <div className="col-6 mt-2 mb-md-2">
-                            <ResponsiveDatePickers title="Date" value={this.state.datevalue ? this.state.datevalue : ""} readOnly onChange={(e) => this.onDateChange(e)} />
+                            <ResponsiveDatePickers title="Date" value={this.state.datevalue ? this.state.datevalue : ""} disabled readOnly onChange={(e) => this.onDateChange(e)} />
                         </div>
                         <div className="col-6 mt-2">
-                            {/* <SearchBar autoFocus placeholder={"Search Tracking number"} onChange={(e) => this.onSearchTrackingNumchange(e)} /> */}
-                            <Box
-                                component="form"
-                                sx={{
-                                    '& > :not(style)': { mb: 1 },
-                                }}
-                                noValidate
-                                autoComplete="off"
-                            >
-                                <TextField id="outlined-basic" value={this.state.container ? this.state.container : ""} fullWidth label="Container Number" onChange={(e) => this.onContainerChange(e)} variant="standard" />
-                            </Box>
+
+                            <TextField id="outlined-basic" value={this.state.container ? this.state.container : ""} fullWidth label="Container Number" variant="standard" />
+
                         </div>
                     </div>
 
@@ -493,7 +563,6 @@ class StockGoods extends Component {
                             onDeleteButtonClick={onDeleteButtonClick}
                         />
                     </div>
-
                 </div>
             </div>
         )
