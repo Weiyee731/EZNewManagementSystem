@@ -15,17 +15,20 @@ import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
-
 import SearchBar from "../../../components/SearchBar/SearchBar"
 import TableComponents from "../../../components/TableComponents/TableComponents";
 import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents";
+import Stack from '@mui/material/Stack';
 import AlertDialog from "../../../components/modal/Modal";
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import ProformaList from "./ProformaList";
 import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
 
 function mapStateToProps(state) {
     return {
         stocks: state.counterReducer["stocks"],
         userAreaCode: state.counterReducer["userAreaCode"],
+        transactionReturn: state.counterReducer["transactionReturn"],
     };
 }
 
@@ -120,6 +123,12 @@ const headCells = [
 const INITIAL_STATE = {
     filteredList: null,
     openRemarkModal: false,
+    openProformaModal: false,
+    openDeliveryModal: false,
+    selectedItems: [],
+    selectedProductPrice: [],
+    selectedUserID: null,
+    selectedDeliveryType: null,
 
     formValue: {
         TrackingNumber: "",
@@ -151,7 +160,7 @@ class CreateInvoice extends Component {
         super(props);
         this.state = INITIAL_STATE
 
-        this.props.CallFetchAllStock({ USERID: 1 })
+        this.props.CallFetchAllStock({ USERID: 2 })
         this.props.CallUserAreaCode(
 
         )
@@ -170,9 +179,8 @@ class CreateInvoice extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.state.filteredList === null && isArrayNotEmpty(this.props.stocks)) {
-            const { stocks } = this.props
-            console.log(stocks)
+        const { stocks } = this.props
+        if (this.state.filteredList === null && isArrayNotEmpty(stocks)) {
             this.setState({
                 filteredList: (isStringNullOrEmpty(stocks.ReturnVal) && stocks.ReturnVal == 0) ? [] : stocks
             })
@@ -222,10 +230,10 @@ class CreateInvoice extends Component {
                 >
                     {data.TrackingNumber}
                 </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep.toFixed(2)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth.toFixed(2)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight ? data.ProductWeight.toFixed(2) : ""}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep ? data.ProductDimensionDeep.toFixed(2) : ""}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth ? data.ProductDimensionWidth.toFixed(2) : ""}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight ? data.ProductDimensionHeight.toFixed(2) : ""}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight).toFixed(2)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
@@ -266,8 +274,37 @@ class CreateInvoice extends Component {
     }
 
     onDeleteButtonClick = (items) => {
+        let arr = []
         console.log('delete button')
         console.log(items)
+        items.map((item) => {
+            arr.push(item.UserID === item.UserID)
+        })
+        if (arr.indexOf(false) !== 1) {
+            this.setState({
+                selectedItems: items,
+                selectedUserID: items[0].UserID
+            })
+            this.handleDeliveryModal()
+        }
+    }
+
+    handleProformaModal = (i) => {
+        this.setState({
+            openProformaModal: !this.state.openProformaModal,
+            selectedDeliveryType: i
+        })
+    }
+
+    handleSelectDeliveryType = (i) => {
+        this.handleDeliveryModal()
+        this.handleProformaModal(i)
+    }
+
+    handleDeliveryModal = () => {
+        this.setState({
+            openDeliveryModal: !this.state.openDeliveryModal
+        })
     }
 
     handleRemarkModal = () => {
@@ -278,6 +315,18 @@ class CreateInvoice extends Component {
         const { formValue } = this.state
         console.log('update remark')
         console.log(formValue)
+    }
+
+    handleCreateProforma = (item) => {
+        console.log(item)
+        console.log(this.state)
+    }
+
+    handleProductPrice = (item) => {
+        console.log(item)
+        // this.setState({
+        //     selectedProductPrice: item
+        // })
     }
 
     handleFormInput = (e) => {
@@ -412,7 +461,7 @@ class CreateInvoice extends Component {
             { children: "Collected", key: "Collected" },
         ]
 
-        const { filteredList, formValue } = this.state
+        const { filteredList, formValue, selectedItems, selectedDeliveryType, openDeliveryModal, openProformaModal, openRemarkModal } = this.state
 
         return (
             <div className="container-fluid">
@@ -421,6 +470,7 @@ class CreateInvoice extends Component {
                 {/* <ToggleTabsComponent Tabs={ToggleTabs} size="small" onChange={this.changeTab} /> */}
                 <TableComponents
                     // table settings 
+                    tableTopLeft={<h3 style={{ fontWeight: 700 }}>Proforma Invoice</h3>}
                     tableOptions={{
                         dense: true,                // optional, default is false
                         tableOrderBy: 'asc',        // optional, default is asc
@@ -441,14 +491,16 @@ class CreateInvoice extends Component {
                     onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                     onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                     onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items
+                    actionIcon={<DriveFileRenameOutlineIcon />}
+                    extraInfo={true}
                 />
 
                 <AlertDialog
-                    open={this.state.openRemarkModal}              // required, pass the boolean whether modal is open or close
+                    open={openRemarkModal}              // required, pass the boolean whether modal is open or close
                     handleToggleDialog={this.handleRemarkModal}  // required, pass the toggle function of modal
                     handleConfirmFunc={this.handleUpdateRemark}    // required, pass the confirm function 
                     showAction={true}                           // required, to show the footer of modal display
-                    title={""}                                  // required, title of the modal
+                    title={formValue.TrackingNumber}                                  // required, title of the modal
                     buttonTitle={"Update"}                         // required, title of button
                     singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
                     maxWidth={"md"}
@@ -600,6 +652,70 @@ class CreateInvoice extends Component {
                             </div>
                         }
                     </div>
+                </AlertDialog>
+
+                <AlertDialog
+                    open={openDeliveryModal}              // required, pass the boolean whether modal is open or close
+                    handleToggleDialog={this.handleDeliveryModal}  // required, pass the toggle function of modal
+                    handleConfirmFunc={this.handleUpdateRemark}    // required, pass the confirm function 
+                    showAction={false}                           // required, to show the footer of modal display
+                    title={"Delivery Type"}                                  // required, title of the modal
+                    buttonTitle={"Select"}                         // required, title of button
+                    singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
+                    maxWidth={"xs"}
+                >
+                    <Stack
+                        spacing={2}
+                        direction="row"
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignContent: 'center'
+                        }}
+                    >
+                        <Button
+                            variant="text"
+                            onClick={() => this.handleSelectDeliveryType(1)}
+                        >
+                            Self Pickup
+                        </Button>
+                        <Button
+                            variant="contained"
+                            onClick={() => this.handleSelectDeliveryType(2)}
+                        >
+                            Consolidate
+                        </Button>
+                        <Button
+                            variant="text"
+                            onClick={() => this.handleSelectDeliveryType(3)}
+                        >
+                            Small Item
+                        </Button>
+                        <Button
+                            variant="contained"
+                            onClick={() => this.handleSelectDeliveryType(4)}
+                        >
+                            Large Item
+                        </Button>
+                    </Stack>
+                </AlertDialog>
+
+                <AlertDialog
+                    open={openProformaModal}              // required, pass the boolean whether modal is open or close
+                    handleToggleDialog={this.handleProformaModal}  // required, pass the toggle function of modal
+                    handleConfirmFunc={this.handleCreateProforma}    // required, pass the confirm function 
+                    showAction={false}                           // required, to show the footer of modal display
+                    title={"Create proforma invoice"}                                  // required, title of the modal
+                    buttonTitle={"Create"}                         // required, title of button
+                    singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
+                    maxWidth={"md"}
+                >
+                    <ProformaList
+                        selected={selectedDeliveryType}
+                        items={selectedItems}
+                        handleCreateProforma={this.handleCreateProforma}
+                        handleProductPrice={this.handleProductPrice}
+                    />
                 </AlertDialog>
             </div>
         )

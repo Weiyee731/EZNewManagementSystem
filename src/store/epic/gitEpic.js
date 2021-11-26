@@ -363,16 +363,24 @@ export class GitEpic {
 
   Transaction_InsertTransaction = action$ =>
     action$.ofType(GitAction.InsertNewTransaction).switchMap(async ({ payload }) => {
-      // console.log(url + 
-      //   double_click_and_paste_url_here
-      // )
+      console.log(url + 
+        "Transaction_InsertTransaction?" +
+          "USERID=" + payload.USERID +
+          "&CALCULATIONTYPE=" + payload.TYPE +
+          "&ORDERTOTALMOUNT=" + payload.ORDERTOTALMOUNT +
+          "&ORDERPAIDMOUNT=" + payload.ORDERPAIDMOUNT +
+          "&STOCKID=" + payload.STOCKID +
+          "&PRODUCTPRICE=" + payload.PRODUCTPRICE
+      )
       try {
         const response = await fetch(url +
           "Transaction_InsertTransaction?" +
           "USERID=" + payload.USERID +
+          "&CALCULATIONTYPE=" + payload.TYPE +
           "&ORDERTOTALMOUNT=" + payload.ORDERTOTALMOUNT +
           "&ORDERPAIDMOUNT=" + payload.ORDERPAIDMOUNT +
-          "&STOCKID=" + payload.STOCKID
+          "&STOCKID=" + payload.STOCKID +
+          "&PRODUCTPRICE=" + payload.PRODUCTPRICE
         );
 
         let json = await response.json();
@@ -390,8 +398,6 @@ export class GitEpic {
         };
       }
     });
-
-  ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
 
 }
 export let gitEpic = new GitEpic();

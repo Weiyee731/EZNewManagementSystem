@@ -16,9 +16,13 @@ import AddIcon from '@mui/icons-material/Add';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TableComponents from "../../components/TableComponents/TableComponents"
+import LoadingButton from '@mui/lab/LoadingButton';
+import SaveIcon from '@mui/icons-material/Save';
+
 function mapStateToProps(state) {
   return {
     userProfile: state.counterReducer["userProfile"],
+    loading: state.counterReducer["loading"],
   };
 }
 
@@ -90,7 +94,7 @@ class UserDetail extends Component {
       Email: "",
       Contact: "",
       Address: "",
-      Transaction:[]
+      Transaction: []
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.props.CallUserProfileByID(this.state)
@@ -221,9 +225,29 @@ class UserDetail extends Component {
               <Typography variant="h5" component="div">
                 Edit Profile
               </Typography>
-              {/* <CardActions>
-                <Button size="small">Learn More</Button>
-              </CardActions> */}
+              <div
+                style={{
+                  textAlign: 'end',
+                  flex: 1
+                }}
+              >
+                {/* <Button
+                  onClick={() => console.log("save")}
+                  variant="contained"
+                  color="primary"
+                >
+                  Save
+                </Button> */}
+                <LoadingButton
+                  loading={this.props.loading}
+                  loadingPosition="start"
+                  startIcon={<SaveIcon />}
+                  variant="contained"
+                  onClick={() => console.log("save")}
+                >
+                  Save
+                </LoadingButton>
+              </div>
             </div>
             <div className="row">
               <div className="col-lg-6 col-md-6 col-sm-12">
@@ -281,14 +305,14 @@ class UserDetail extends Component {
         </Card>
         <div className="mt-4">
           <TableComponents
-            tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}
+            tableTopLeft={<h3 style={{ fontWeight: 700 }}>Invoice</h3>}
             tableTopRight={this.renderTableActionButton}
             tableOptions={{
               dense: false,
               tableOrderBy: 'asc',
               sortingIndex: "fat",
               stickyTableHeader: true,
-              stickyTableHeight: 300, 
+              stickyTableHeight: 300,
             }}
             paginationOptions={[20, 50, 100, { label: 'All', value: -1 }]}
             tableHeaders={headCells}
@@ -301,7 +325,7 @@ class UserDetail extends Component {
             selectedIndexKey={"pid"}
             Data={this.state.Transaction}
             onTableRowClick={this.onTableRowClick}
-            
+
           />
         </div>
       </div>
