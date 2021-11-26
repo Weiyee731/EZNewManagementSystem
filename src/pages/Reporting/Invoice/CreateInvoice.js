@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { GitAction } from "../../../store/action/gitAction";
-import { browserHistory } from "react-router";
-
+import { withRouter } from 'react-router'
 import TableCell from '@mui/material/TableCell';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
@@ -129,6 +128,8 @@ const INITIAL_STATE = {
     selectedProductPrice: [],
     selectedUserID: null,
     selectedDeliveryType: null,
+    totalVolumeSelected: null,
+    totalWeightSelected: null,
 
     formValue: {
         TrackingNumber: "",
@@ -161,10 +162,7 @@ class CreateInvoice extends Component {
         this.state = INITIAL_STATE
 
         this.props.CallFetchAllStock({ USERID: 2 })
-        this.props.CallUserAreaCode(
-
-        )
-        this.changeTab = this.changeTab.bind(this)
+        this.props.CallUserAreaCode()
         this.onAddButtonClick = this.onAddButtonClick.bind(this)
         this.handleRemarkModal = this.handleRemarkModal.bind(this)
         this.handleUpdateRemark = this.handleUpdateRemark.bind(this)
@@ -182,39 +180,8 @@ class CreateInvoice extends Component {
         const { stocks } = this.props
         if (this.state.filteredList === null && isArrayNotEmpty(stocks)) {
             this.setState({
-                filteredList: (isStringNullOrEmpty(stocks.ReturnVal) && stocks.ReturnVal == 0) ? [] : stocks
+                filteredList: stocks[0].ReturnVal == '0' ? [] : stocks
             })
-        }
-    }
-
-    changeTab = (key) => {
-        switch (key) {
-            case "All":
-                this.setState({
-                    filteredList: this.props.stocks
-                })
-                break;
-
-            case "Unchecked":
-                this.setState({
-                    filteredList: this.props.stocks.filter(x => x.TrackingStatus === "Pending")
-                })
-                break;
-
-            case "Checked":
-                this.setState({
-                    filteredList: this.props.stocks.filter(x => x.TrackingStatus === "Completed")
-                })
-                break;
-
-            case "Collected":
-                this.setState({
-                    filteredList: this.props.stocks.filter(x => x.TrackingStatus === "Pending")
-                })
-                break;
-
-            default:
-                break;
         }
     }
 
@@ -278,27 +245,40 @@ class CreateInvoice extends Component {
         console.log('delete button')
         console.log(items)
         items.map((item) => {
-            arr.push(item.UserID === item.UserID)
+            console.log(item.UserID)
+            arr.push(item.UserID)
         })
-        if (arr.indexOf(false) !== 1) {
+        console.log(items[0].UserID)
+        console.log((arr.filter((el) => el === items[0].UserID)).length === arr.length)
+        if ((arr.filter((el) => el === items[0].UserID)).length === arr.length) {
             this.setState({
                 selectedItems: items,
                 selectedUserID: items[0].UserID
             })
             this.handleDeliveryModal()
+        } else {
+            alert("Please select the tracking records with the same user")
         }
     }
-
-    handleProformaModal = (i) => {
-        this.setState({
-            openProformaModal: !this.state.openProformaModal,
-            selectedDeliveryType: i
-        })
-    }
-
+    
     handleSelectDeliveryType = (i) => {
+        const { selectedItems, selectedUserID } = this.state
+
+        let mCube = 0
+        let weight = 0
+        this.state.selectedItems.map((item) => {
+            weight = weight + item.ProductWeight
+            mCube = mCube + ((item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight) / 1000000)
+        })
         this.handleDeliveryModal()
-        this.handleProformaModal(i)
+        this.props.history.push({
+            pathname: '/ProformaList',
+            selectedType: i,
+            state: selectedItems,
+            userId: selectedUserID,
+            totalVolume: mCube,
+            totalWeight: weight
+        })
     }
 
     handleDeliveryModal = () => {
@@ -317,10 +297,6 @@ class CreateInvoice extends Component {
         console.log(formValue)
     }
 
-    handleCreateProforma = (item) => {
-        console.log(item)
-        console.log(this.state)
-    }
 
     handleProductPrice = (item) => {
         console.log(item)
@@ -454,15 +430,8 @@ class CreateInvoice extends Component {
     }
 
     render() {
-        const ToggleTabs = [
-            { children: "All", key: "All" },
-            { children: "Unchecked", key: "Unchecked" },
-            { children: "Checked", key: "Checked" },
-            { children: "Collected", key: "Collected" },
-        ]
-
-        const { filteredList, formValue, selectedItems, selectedDeliveryType, openDeliveryModal, openProformaModal, openRemarkModal } = this.state
-
+        const { filteredList, formValue, openDeliveryModal, openRemarkModal } = this.state
+        console.log(filteredList)
         return (
             <div className="container-fluid">
                 <SearchBar />
@@ -699,27 +668,9 @@ class CreateInvoice extends Component {
                         </Button>
                     </Stack>
                 </AlertDialog>
-
-                <AlertDialog
-                    open={openProformaModal}              // required, pass the boolean whether modal is open or close
-                    handleToggleDialog={this.handleProformaModal}  // required, pass the toggle function of modal
-                    handleConfirmFunc={this.handleCreateProforma}    // required, pass the confirm function 
-                    showAction={false}                           // required, to show the footer of modal display
-                    title={"Create proforma invoice"}                                  // required, title of the modal
-                    buttonTitle={"Create"}                         // required, title of button
-                    singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
-                    maxWidth={"md"}
-                >
-                    <ProformaList
-                        selected={selectedDeliveryType}
-                        items={selectedItems}
-                        handleCreateProforma={this.handleCreateProforma}
-                        handleProductPrice={this.handleProductPrice}
-                    />
-                </AlertDialog>
             </div>
         )
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateInvoice);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CreateInvoice));

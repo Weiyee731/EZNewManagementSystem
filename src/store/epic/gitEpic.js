@@ -17,6 +17,7 @@ import { ServerConfiguration } from "../serverConf";
 //   1. testing server url    //
 //   2. live server url       // 
 const url = ServerConfiguration.testingServerUrl;
+const postUrl = ServerConfiguration.postUrl;
 export class GitEpic {
   ///////////////////////////////////////////////////  user account credentials ///////////////////////////////////////////////////
 
@@ -251,10 +252,10 @@ export class GitEpic {
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
   Inventory_ViewStockList = action$ =>
     action$.ofType(GitAction.FetchStocks).switchMap(async ({ payload }) => {
-      // console.log(url +
-      //   "Inventory_ViewStockList?" +
-      //   "TRACKINGSTATUSID=" + payload.USERID
-      // )
+      console.log(url +
+        "Inventory_ViewStockList?" +
+        "TRACKINGSTATUSID=" + payload.USERID
+      )
       try {
         const response = await fetch(url +
           "Inventory_ViewStockList?" +
@@ -346,7 +347,7 @@ export class GitEpic {
     action$.ofType(GitAction.UpdateStockDetailByPost).switchMap(async ({ payload }) => {
 
       return fetch(
-        "https://tourism.denoo.my/EzLogistic/api/EzLogistic/" + "Inventory_UpdateStockDetailByPost"
+        postUrl + "Inventory_UpdateStockDetailByPost"
         , {
           method: 'POST',
           headers: {

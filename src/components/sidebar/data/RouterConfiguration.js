@@ -15,6 +15,7 @@ import TransactionHistory from "../../../pages/Statements/TransactionHistory";
 import UserDetail from "../../../pages/UserManagement/UserDetail"
 import AddUser from "../../../pages/UserManagement/AddUser";
 import EditStockGoods from "../../../pages/Stock/StockGoods/EditStockGoods";
+import ProformaList from "../../../pages/Reporting/Invoice/ProformaList";
 
 const routes = [
     {
@@ -102,7 +103,11 @@ const routes = [
         exact: true,
         element: <AddUser />,
     },
-
+    {
+        path: "/ProformaList",
+        exact: true,
+        element: <ProformaList />,
+    },
 ]
 
 export default routes

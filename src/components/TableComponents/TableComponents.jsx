@@ -126,10 +126,13 @@ const EnhancedTableToolbar = (props) => {
     const numSelected = selectedRows.length
     let mCube = 0
     let weight = 0
-    selectedRows.map((item) => {
-        weight = weight + item.ProductWeight
-        mCube = mCube + ((item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight) / 1000000)
-    })
+
+    if (extraInfo) {
+        selectedRows.map((item) => {
+            weight = weight + item.ProductWeight
+            mCube = mCube + ((item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight) / 1000000)
+        })
+    }
 
     return (
         <Toolbar
