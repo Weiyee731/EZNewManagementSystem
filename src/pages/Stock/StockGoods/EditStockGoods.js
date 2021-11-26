@@ -41,10 +41,47 @@ class EditStockGoods extends Component {
 
     }
 
+    onTrigger = (event, statement) => {
+        if (statement === "TrackingNumber") {
+            this.props.parentCallback({ "TrackingNumber": event.target.value });
+            event.preventDefault();
+        }
+        if (statement === "UserCode") {
+            this.props.parentCallback({ "UserCode": event.target.value });
+            event.preventDefault();
+        }
+        if (statement === "ProductDimensionWidth") {
+            this.props.parentCallback({ "ProductDimensionWidth": event.target.value });
+            event.preventDefault();
+        }
+        if (statement === "ProductDimensionHeight") {
+            this.props.parentCallback({ "ProductDimensionHeight": event.target.value });
+            event.preventDefault();
+        }
+        if (statement === "ProductDimensionDeep") {
+            this.props.parentCallback({ "ProductDimensionDeep": event.target.value });
+            event.preventDefault();
+        }
+        if (statement === "ProductWeight") {
+            this.props.parentCallback({ "ProductWeight": event.target.value });
+            event.preventDefault();
+        }
+        if (statement === "AreaCode") {
+            this.props.parentCallback({ "AreaCode": event.target.value });
+            event.preventDefault();
+        }
+        if (statement === "AdditionalCharges") {
+            this.props.parentCallback({ "AdditionalCharges": event.target.value });
+            event.preventDefault();
+        }
+        if (statement === "Remark") {
+            this.props.parentCallback({ "Remark": event.target.value });
+            event.preventDefault();
+        }
+    }
+
     render() {
         const Data = this.props.data ? this.props.data : [];
-        console.log(this.props.data)
-        console.log(Data)
         return (
             <div>
                 <Card>
@@ -65,6 +102,7 @@ class EditStockGoods extends Component {
                         <div className="row">
                             <div className="col-lg-6 col-md-6 col-sm-12">
                                 <TextField
+                                    onChange={(e) => this.onTrigger(e, "TrackingNumber")}
                                     className="w-100 my-3"
                                     required
                                     id="outlined-required"
@@ -74,6 +112,7 @@ class EditStockGoods extends Component {
                             </div>
                             <div className="col-lg-6 col-md-6 col-sm-12">
                                 <TextField
+                                    onChange={(e) => this.onTrigger(e, "UserCode")}
                                     className="w-100 my-3"
                                     required
                                     id="outlined-required"
@@ -85,6 +124,7 @@ class EditStockGoods extends Component {
                         <div className="row">
                             <div className="col-lg-4 col-md-4 col-sm-6">
                                 <TextField
+                                    onChange={(e) => this.onTrigger(e, "ProductDimensionWidth")}
                                     className="w-100 my-3"
                                     required
                                     id="outlined-required"
@@ -94,6 +134,7 @@ class EditStockGoods extends Component {
                             </div>
                             <div className="col-lg-4 col-md-4 col-sm-6">
                                 <TextField
+                                    onChange={(e) => this.onTrigger(e, "ProductDimensionHeight")}
                                     className="w-100 my-3"
                                     required
                                     id="outlined-required"
@@ -103,6 +144,7 @@ class EditStockGoods extends Component {
                             </div>
                             <div className="col-lg-4 col-md-4 col-sm-6">
                                 <TextField
+                                    onChange={(e) => this.onTrigger(e, "ProductDimensionDeep")}
                                     className="w-100 my-3"
                                     required
                                     id="outlined-required"
@@ -112,6 +154,7 @@ class EditStockGoods extends Component {
                             </div>
                             <div className="col-lg-12 col-md-12 col-sm-6">
                                 <TextField
+                                    onChange={(e) => this.onTrigger(e, "ProductWeight")}
                                     className="w-100 my-3"
                                     required
                                     id="outlined-required"
@@ -120,8 +163,40 @@ class EditStockGoods extends Component {
                                 />
                             </div>
                         </div>
-
+                        <div className="row">
+                            <div className="col-lg-12 col-md-12 col-sm-6">
+                                <TextField
+                                    onChange={(e) => this.onTrigger(e, "AreaCode")}
+                                    className="w-100 my-3"
+                                    required
+                                    id="outlined-required"
+                                    label="Area Code"
+                                    defaultValue={Data.AreaCode}
+                                />
+                            </div>
+                            <div className="col-lg-12 col-md-12 col-sm-6">
+                                <TextField
+                                    onChange={(e) => this.onTrigger(e, "Item")}
+                                    className="w-100 my-3"
+                                    required
+                                    id="outlined-required"
+                                    label="Items"
+                                    defaultValue={Data.Item}
+                                />
+                            </div>
+                            <div className="col-lg-12 col-md-12 col-sm-6">
+                                <TextField
+                                    onChange={(e) => this.onTrigger(e, "AdditionalCharges")}
+                                    className="w-100 my-3"
+                                    required
+                                    id="outlined-required"
+                                    label="Extra Charge(RM)"
+                                    defaultValue={Data.AdditionalCharges}
+                                />
+                            </div>
+                        </div>
                         <TextField
+                            onChange={(e) => this.onTrigger(e, "Remark")}
                             className="w-100 my-3"
                             // required
                             multiline

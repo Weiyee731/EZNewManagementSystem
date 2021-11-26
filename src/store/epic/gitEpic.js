@@ -310,39 +310,86 @@ export class GitEpic {
       }
     });
 
-    // Inventory_UpdateStockStatus(string STOCKID, string CONTAINERNAME, string CONTAINERDATE)
-    Inventory_UpdateStockStatus = action$ =>
-    action$.ofType(GitAction.UpdateInventoryStockStatus).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Inventory_UpdateStockStatus?" +
-        "STOCKID=" + payload.STOCKID +
-        "&CONTAINERNAME=" + payload.CONTAINERNAME +
-        "&CONTAINERDATE=" + payload.CONTAINERDATE )
-      try {
-        const response = await fetch(url +
-          "Inventory_UpdateStockStatus?" +
-          "STOCKID=" + payload.STOCKID +
-          "&CONTAINERNAME=" + payload.CONTAINERNAME +
-          "&CONTAINERDATE=" + payload.CONTAINERDATE 
-        );
+  // Inventory_UpdateStockStatus(string STOCKID, string CONTAINERNAME, string CONTAINERDATE)
+  // Inventory_UpdateStockStatus = action$ =>
+  // action$.ofType(GitAction.UpdateInventoryStockStatus).switchMap(async ({ payload }) => {
+  //   console.log(url +
+  //     "Inventory_UpdateStockStatus?" +
+  //     "STOCKID=" + payload.STOCKID +
+  //     "&CONTAINERNAME=" + payload.CONTAINERNAME +
+  //     "&CONTAINERDATE=" + payload.CONTAINERDATE )
+  //   try {
+  //     const response = await fetch(url +
+  //       "Inventory_UpdateStockStatus?" +
+  //       "STOCKID=" + payload.STOCKID +
+  //       "&CONTAINERNAME=" + payload.CONTAINERNAME +
+  //       "&CONTAINERDATE=" + payload.CONTAINERDATE 
+  //     );
 
-        let json = await response.json();
-        json = JSON.parse(json)
-        return {
-          type: GitAction.UpdatedInventoryStockStatus,
-          payload: json,
-        };
-      }
-      catch (error) {
-        toast.error("Error Code: Inventory_InsertStock")
-        return {
-          type: GitAction.UpdatedInventoryStockStatus,
-          payload: [],
-        };
-      }
+  //     let json = await response.json();
+  //     json = JSON.parse(json)
+  //     return {
+  //       type: GitAction.UpdatedInventoryStockStatus,
+  //       payload: json,
+  //     };
+  //   }
+  //   catch (error) {
+  //     toast.error("Error Code: Inventory_InsertStock")
+  //     return {
+  //       type: GitAction.UpdatedInventoryStockStatus,
+  //       payload: [],
+  //     };
+  //   }
+  // });
+
+  Inventory_UpdateStockDetailByPost = action$ =>
+    action$.ofType(GitAction.UpdateStockDetailByPost).switchMap(async ({ payload }) => {
+
+      return fetch(
+        "https://tourism.denoo.my/EzLogistic/api/EzLogistic/" + "Inventory_UpdateStockDetailByPost"
+        , {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            STOCKID: payload.STOCKID,
+            USERCODE: payload.USERCODE,
+            TRACKINGNUMBER: payload.TRACKINGNUMBER,
+            PRODUCTWEIGHT: payload.PRODUCTWEIGHT,
+            PRODUCTHEIGHT: payload.PRODUCTHEIGHT,
+
+            PRODUCTDEEP: payload.PRODUCTDEEP,
+            AREACODE: payload.AREACODE,
+            ITEM: payload.ITEM,
+            TRACKINGSTATUSID: payload.TRACKINGSTATUSID,
+            CONTAINERNAME: payload.CONTAINERNAME,
+
+            CONTAINERDATE: payload.CONTAINERDATE,
+            REMARK: payload.REMARK,
+            EXTRACHARGE: payload.EXTRACHARGE
+          })
+        }
+      )
+        .then(response => response.json())
+        .then(json => {
+          console.log("json", json)
+          if (json !== "fail") {
+            json = json;
+            toast.success("Successfully update stock. Fetching the latest data..", { autoClose: 3000 })
+          } else {
+            json = [];
+          }
+          return {
+            type: GitAction.UpdatedStockDetailByPost,
+            payload: json,
+          };
+        })
+        .catch(error => toast.error("Error code: 8003"));
     });
 
-    Container_ViewContainer = action$ =>
+  Container_ViewContainer = action$ =>
     action$.ofType(GitAction.ViewContainer).switchMap(async ({ payload }) => {
       console.log(url +
         "Container_ViewContainer")
