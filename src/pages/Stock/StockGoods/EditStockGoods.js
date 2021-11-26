@@ -109,6 +109,7 @@ class EditStockGoods extends Component {
                                     onChange={(e) => this.onTrigger(e, "TrackingNumber")}
                                     className="w-100 my-3"
                                     required
+                                    variant="standard"
                                     id="outlined-required"
                                     label="Trading Number"
                                     defaultValue={Data.TrackingNumber}
@@ -119,6 +120,7 @@ class EditStockGoods extends Component {
                                     onChange={(e) => this.onTrigger(e, "UserCode")}
                                     className="w-100 my-3"
                                     required
+                                    variant="standard"
                                     id="outlined-required"
                                     label="Member Number"
                                     defaultValue={Data.UserCode}
@@ -131,6 +133,7 @@ class EditStockGoods extends Component {
                                     onChange={(e) => this.onTrigger(e, "ProductDimensionWidth")}
                                     className="w-100 my-3"
                                     required
+                                    variant="standard"
                                     id="outlined-required"
                                     label="Width (m)"
                                     defaultValue={Data.ProductDimensionWidth}
@@ -141,6 +144,7 @@ class EditStockGoods extends Component {
                                     onChange={(e) => this.onTrigger(e, "ProductDimensionHeight")}
                                     className="w-100 my-3"
                                     required
+                                    variant="standard"
                                     id="outlined-required"
                                     label="Height (m)"
                                     defaultValue={Data.ProductDimensionHeight}
@@ -151,6 +155,7 @@ class EditStockGoods extends Component {
                                     onChange={(e) => this.onTrigger(e, "ProductDimensionDeep")}
                                     className="w-100 my-3"
                                     required
+                                    variant="standard"
                                     id="outlined-required"
                                     label="Depth (m)"
                                     defaultValue={Data.ProductDimensionDeep}
@@ -161,6 +166,7 @@ class EditStockGoods extends Component {
                                     onChange={(e) => this.onTrigger(e, "ProductWeight")}
                                     className="w-100 my-3"
                                     required
+                                    variant="standard"
                                     id="outlined-required"
                                     label="Weight (kg)"
                                     defaultValue={Data.ProductWeight}
@@ -173,6 +179,7 @@ class EditStockGoods extends Component {
                                     onChange={(e) => this.onTrigger(e, "AreaCode")}
                                     className="w-100 my-3"
                                     required
+                                    variant="standard"
                                     id="outlined-required"
                                     label="Area Code"
                                     defaultValue={Data.AreaCode}
@@ -183,6 +190,7 @@ class EditStockGoods extends Component {
                                     onChange={(e) => this.onTrigger(e, "Item")}
                                     className="w-100 my-3"
                                     required
+                                    variant="standard"
                                     id="outlined-required"
                                     label="Items"
                                     defaultValue={Data.Item}
@@ -193,6 +201,7 @@ class EditStockGoods extends Component {
                                     onChange={(e) => this.onTrigger(e, "AdditionalCharges")}
                                     className="w-100 my-3"
                                     required
+                                    variant="standard"
                                     id="outlined-required"
                                     label="Extra Charge(RM)"
                                     defaultValue={Data.AdditionalCharges}
@@ -205,6 +214,7 @@ class EditStockGoods extends Component {
                             // required
                             multiline
                             rows={4}
+                            variant="standard"
                             id="outlined-required"
                             label="Remark"
                             defaultValue={Data.Remark}

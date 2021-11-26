@@ -457,7 +457,7 @@ class StockGoods extends Component {
                         </div>
                         <div className="col-sm-6 col-12">
                         {console.log(this.props.AllContainer)}
-                            {/* {console.log(options)} */}
+                            {console.log(options)}
                             <Autocomplete
                                 options={options}
                                 noOptionsText="Enter to create a new option"
