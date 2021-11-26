@@ -122,8 +122,14 @@ EnhancedTableHead.propTypes = {
 };
 
 const EnhancedTableToolbar = (props) => {
-    const { selectedRows, tableTopLeft, OnActionButtonClick, OnDeleteButtonClick, tableTopRight } = props;
+    const { selectedRows, tableTopLeft, OnActionButtonClick, OnDeleteButtonClick, tableTopRight, actionIcon, extraInfo } = props;
     const numSelected = selectedRows.length
+    let mCube = 0
+    let weight = 0
+    selectedRows.map((item) => {
+        weight = weight + item.ProductWeight
+        mCube = mCube + ((item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight) / 1000000)
+    })
 
     return (
         <Toolbar
@@ -144,7 +150,7 @@ const EnhancedTableToolbar = (props) => {
                         variant="subtitle1"
                         component="div"
                     >
-                        {numSelected} selected
+                        {numSelected} selected {extraInfo && ` | ${mCube.toFixed(3)} m3 | ${weight} kg`}
                     </Typography>
                 ) : (
                     <Typography
@@ -158,19 +164,15 @@ const EnhancedTableToolbar = (props) => {
             }
             {
                 numSelected > 0 ? (
-                    <Tooltip title="Delete">
-                        <IconButton onClick={() => { OnDeleteButtonClick(selectedRows) }} >
-                            <DeleteIcon />
-                        </IconButton>
-                    </Tooltip>
+                    <IconButton onClick={() => { OnDeleteButtonClick(selectedRows) }} >
+                        {actionIcon}
+                    </IconButton>
                 ) : (
                     tableTopRight === null ?
                         typeof OnActionButtonClick === "function" &&
-                        <Tooltip title="Add New Items">
-                            <IconButton onClick={(event) => { OnActionButtonClick(selectedRows) }}>
-                                <AddIcon />
-                            </IconButton>
-                        </Tooltip>
+                        <IconButton onClick={() => { OnActionButtonClick(selectedRows) }}>
+                            <AddIcon />
+                        </IconButton>
                         : tableTopRight
                 )
             }
@@ -184,7 +186,7 @@ EnhancedTableToolbar.propTypes = {
 
 TableComponents.propTypes = {
     tableOptions: PropTypes.object.isRequired,
-    paginationOptions: PropTypes.array.isRequired,
+    paginationOptions: PropTypes.array,
     tableHeaders: PropTypes.array.isRequired,
     tableRows: PropTypes.object.isRequired,
     Data: PropTypes.array.isRequired,
@@ -227,11 +229,12 @@ export default function TableComponents(props) {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelecteds = rows.map((n) => n[objectKey]);
+            const newSelecteds = rows.map((n) => n);
             setSelected(newSelecteds);
             return;
+        } else {
+            setSelected([]);
         }
-        setSelected([]);
     };
 
     const handleSelectItem = (event, key) => {
@@ -259,7 +262,7 @@ export default function TableComponents(props) {
             if (typeof props.onTableRowClick !== "undefined")
                 props.onTableRowClick(event, row)
         } else {
-            handleSelectItem(event, row[objectKey])
+            handleSelectItem(event, row)
         }
     };
     const handleChangePage = (event, newPage) => { setPage(newPage); };
@@ -302,6 +305,8 @@ export default function TableComponents(props) {
                         tableTopRight={tableTopRight}
                         OnActionButtonClick={props.onActionButtonClick}
                         OnDeleteButtonClick={props.onDeleteButtonClick}
+                        actionIcon={props.actionIcon}
+                        extraInfo={props.extraInfo}
                     />
                 }
 
@@ -326,7 +331,7 @@ export default function TableComponents(props) {
                         <TableBody>
                             {
                                 isArrayNotEmpty(TableData) && TableData.map((row, index) => {
-                                    const isItemSelected = isSelected(row[objectKey]);
+                                    const isItemSelected = isSelected(row);
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
                                     return (
@@ -345,7 +350,7 @@ export default function TableComponents(props) {
                                                         color={checkboxColor}
                                                         checked={isItemSelected}
                                                         inputProps={{ 'aria-labelledby': labelId, }}
-                                                        onClick={(event) => handleSelectItem(event, row[objectKey])}
+                                                        onClick={(event) => handleSelectItem(event, row)}
                                                     />
                                                 </TableCell>
                                             }
