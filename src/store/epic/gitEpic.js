@@ -251,10 +251,10 @@ export class GitEpic {
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
   Inventory_ViewStockList = action$ =>
     action$.ofType(GitAction.FetchStocks).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Inventory_ViewStockList?" +
-        "TRACKINGSTATUSID=" + payload.USERID
-      )
+      // console.log(url +
+      //   "Inventory_ViewStockList?" +
+      //   "TRACKINGSTATUSID=" + payload.USERID
+      // )
       try {
         const response = await fetch(url +
           "Inventory_ViewStockList?" +
@@ -309,6 +309,63 @@ export class GitEpic {
         };
       }
     });
+
+    // Inventory_UpdateStockStatus(string STOCKID, string CONTAINERNAME, string CONTAINERDATE)
+    Inventory_UpdateStockStatus = action$ =>
+    action$.ofType(GitAction.UpdateInventoryStockStatus).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Inventory_UpdateStockStatus?" +
+        "STOCKID=" + payload.STOCKID +
+        "&CONTAINERNAME=" + payload.CONTAINERNAME +
+        "&CONTAINERDATE=" + payload.CONTAINERDATE )
+      try {
+        const response = await fetch(url +
+          "Inventory_UpdateStockStatus?" +
+          "STOCKID=" + payload.STOCKID +
+          "&CONTAINERNAME=" + payload.CONTAINERNAME +
+          "&CONTAINERDATE=" + payload.CONTAINERDATE 
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UpdatedInventoryStockStatus,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_InsertStock")
+        return {
+          type: GitAction.UpdatedInventoryStockStatus,
+          payload: [],
+        };
+      }
+    });
+
+    Container_ViewContainer = action$ =>
+    action$.ofType(GitAction.ViewContainer).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Container_ViewContainer")
+      try {
+        const response = await fetch(url +
+          "Container_ViewContainer"
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.ViewedContainer,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_InsertStock")
+        return {
+          type: GitAction.ViewedContainer,
+          payload: [],
+        };
+      }
+    });
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
 
 
@@ -321,7 +378,7 @@ export class GitEpic {
       // )
       try {
         const response = await fetch(url +
-          "Transaction_ViewTransaction"
+          "Transaction_ViewTransaction?TrackingStatusID=" + payload.TrackingStatusID
         );
 
         let json = await response.json();
@@ -399,5 +456,41 @@ export class GitEpic {
       }
     });
 
+<<<<<<< HEAD
+=======
+    Transaction_UpdateTransactionStatus = action$ =>
+    action$.ofType(GitAction.UpdateTransaction).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Transaction_UpdateTransactionStatus?" +
+        "TRANSACTIONID=" + payload.TransactionID +
+        "&TRANSPORTATIONTYPE=" + payload.TransportationType +
+        "&DELIVERYFEE=" + payload.DeliveryFee
+      )
+      try {
+        const response = await fetch(url +
+          "Transaction_UpdateTransactionStatus?" +
+          "TRANSACTIONID=" + payload.TransactionID +
+          "&TRANSPORTATIONTYPE=" + payload.TransportationType +
+          "&DELIVERYFEE=" + payload.DeliveryFee
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UpdatedTransaction,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Transaction_InsertTransaction")
+        return {
+          type: GitAction.UpdatedTransaction,
+          payload: [],
+        };
+      }
+    });
+  ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
+
+>>>>>>> b5da24db9533be67fdde0fd54c0d5d0751dd6f54
 }
 export let gitEpic = new GitEpic();

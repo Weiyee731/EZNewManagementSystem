@@ -19,16 +19,22 @@ import '../../../scss/stock.scss';
 import { Link } from 'react-router-dom';
 import EditStockGoods from "./EditStockGoods";
 import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents";
+import MenuItem from '@mui/material/MenuItem';
+import Autocomplete from '@mui/material/Autocomplete';
 
 function mapStateToProps(state) {
     return {
         stocks: state.counterReducer["stocks"],
+        stockApproval: state.counterReducer["stockApproval"],
+        AllContainer: state.counterReducer["AllContainer"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         CallFetchAllStock: (props) => dispatch(GitAction.CallFetchAllStock(props)),
+        CallUpdateStockStatus: (props) => dispatch(GitAction.CallUpdateStockStatus(props)),
+        CallViewContainer: (props) => dispatch(GitAction.CallViewContainer(props)),
     };
 }
 
@@ -73,7 +79,7 @@ const headCells = [
         id: 'Dimension',
         numeric: true,
         disablePadding: false,
-        label: 'Dimension (m)',
+        label: 'Dimension (m^3)',
     },
     {
         id: 'Category_Name',
@@ -122,51 +128,27 @@ const headCells = [
         numeric: true,
         disablePadding: false,
         label: 'Approve',
-        className: "sticky "
+        className: "sticky"
     },
 ];
 
 const INITIAL_STATE = {
     open: true,
     key: "All",
-    openModal: false,
-    selectedRows: []
+    openEditModal: false,
+    selectedRows: [],
+    stockListing: [],
+    stockFiltered: [],
+    container: "",
+    date: new Date(),
+    newcontainer: "",
+    // datevalue
+    openAddModal: false,
 }
 
-// function createData(Courier,
-//     Tracking_No,
-//     Weight,
-//     Depth,
-//     Width,
-//     Height,
-//     Dimension,
-//     Category_Name,
-//     Quantity,
-//     Member_No,
-//     Division,
-//     Charged_remark,
-//     Stock_Date,
-//     Packaging_Date, Approve) {
-//     return {
-//         Courier,
-//         Tracking_No,
-//         Weight,
-//         Depth,
-//         Width,
-//         Height,
-//         Dimension,
-//         Category_Name,
-//         Quantity,
-//         Member_No,
-//         Division,
-//         Charged_remark,
-//         Stock_Date,
-//         Packaging_Date,
-//         Approve
-//     };
-// }
 
 function renderTableRows(data, index) {
+    var dimension = data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight;
     return (
         <>
             <TableCell
@@ -182,15 +164,14 @@ function renderTableRows(data, index) {
             <TableCell>{data.ProductDimensionDeep}</TableCell>
             <TableCell>{data.ProductDimensionWidth}</TableCell>
             <TableCell>{data.ProductDimensionHeight}</TableCell>
-            {/* <TableCell>{data.Dimension}</TableCell> */}
-            <TableCell>{data.ProductDimensionDeep}x{data.ProductDimensionWidth}x{data.ProductDimensionHeight}</TableCell>
+            <TableCell>{dimension}</TableCell>
             <TableCell>{data.Category_Name}</TableCell>
             <TableCell>{data.Quantity}</TableCell>
             <TableCell>{data.UserCode}</TableCell>
-            <TableCell>{data.UserAreaID}</TableCell>
-            <TableCell>{data.Charged_remark}</TableCell>
-            <TableCell>{data.Stock_Date}</TableCell>
-            <TableCell>{data.Packaging_Date}</TableCell>
+            <TableCell>{data.AreaCode}</TableCell>
+            <TableCell>{data.Remark}</TableCell>
+            <TableCell>{data.StockDate}</TableCell>
+            <TableCell>{data.PackagingDate}</TableCell>
             <TableCell className="sticky" key={data.Tracking_No}>
                 <Tooltip title="Approve">
                     <IconButton style={{ backgroundColor: "#f2f2f3 " }}><CheckIcon /></IconButton>
@@ -201,13 +182,14 @@ function renderTableRows(data, index) {
 }
 
 function onTableRowClick(event, row) {
-    this.setState({ openModal: true, selectedRows: row });
-    return <Link to={{ pathname: `/EditStockGoods`, props: row }}></Link>
+    this.setState({ openEditModal: true, selectedRows: row });
+    // return <Link to={{ pathname: `/EditStockGoods`, props: row }}></Link>
 
 }
 
 function onAddButtonClick() {
     console.log('add button')
+    this.setState({ openAddModal: true })
 }
 
 function onDeleteButtonClick(items) {
@@ -219,50 +201,80 @@ class StockGoods extends Component {
         super(props);
         this.state = INITIAL_STATE
         onTableRowClick = onTableRowClick.bind(this);
+        onAddButtonClick = onAddButtonClick.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
-        this.changeTab = this.changeTab.bind(this)
-        onAddButtonClick = onAddButtonClick.bind(this)
+        this.changeTab = this.changeTab.bind(this);
+        this.onSearchTrackingNumchange = this.onSearchTrackingNumchange.bind(this);
+        this.onContainerChange = this.onContainerChange.bind(this);
+        this.onSearchChange = this.onSearchChange.bind(this);
+        this.onDateChange = this.onDateChange.bind(this);
     }
 
     componentDidMount() {
-        // this.props.CallFetchAllStock(localStorage.getItem("loginUser").UserID);
+        // this.props.CallFetchAllStock({USERID:JSON.parse(localStorage.getItem("loginUser"))[0].UserID});
+        this.props.CallViewContainer();
         this.props.CallFetchAllStock({ USERID: "1" });
-        //check all value in local storage
-        //     var values = [],
-        //     keys = Object.keys(localStorage),
-        //     i = keys.length;
-
-        // while ( i-- ) {
-        //     values.push( localStorage.getItem(keys[i]) );
-        // }
-        // console.log(values)
+        if (this.props.stocks.length !== this.state.stockListing.length) {
+            if (this.props.stocks !== undefined && this.props.stocks[0] !== undefined) {
+                this.setState({ stockListing: this.props.stocks, stockFiltered: this.props.stocks });
+            } else { console.log(("no")) }
+        } else { console.log(("no")) }
     }
 
     componentDidUpdate(prevProps, prevState) {
-
+        if (prevProps.stocks.length !== this.props.stocks.length) {
+            // console.log(this.props.stocks !== undefined && this.props.stocks[0] !== undefined)
+            if (this.props.stocks !== undefined && this.props.stocks[0] !== undefined) {
+                this.setState({ stockListing: this.props.stocks });
+            } else { console.log("match") }
+        }
+        else {
+            //     if (prevProps.stocks.length !== this.state.stockFiltered.length) {
+            //         this.setState({ stockFiltered: prevProps.stocks });
+            //     }
+        }
     }
 
-    handleSearchfilter = () => {
-        console.log(this.state.selectedRows)
-        this.setState({ open: !this.state.open })
+    handleSearchfilter = (filter) => {
+        switch (filter) {
+            case "open":
+                this.setState({ open: !this.state.open });
+                break;
+
+            case "openEditModal":
+
+                this.setState({ openEditModal: !this.state.openEditModal });
+                this.props.CallUpdateStockStatus({ STOCKID: this.state.selectedRows.StockID, CONTAINERNAME: this.state.container, CONTAINERDATE: this.state.date })
+                break;
+
+            case "openAddModal":
+                this.setState({ openAddModal: !this.state.openAddModal });
+                break;
+
+            default:
+                break;
+        }
     }
 
     changeTab = (key) => {
-        console.log(key)
         switch (key) {
             case "All":
                 console.log("all")
-                // this.props.stocks.map((stock, index) => { if (stock.TrackingStatusID === 1) { return stock } else { } })
+                // const FilterArr1 = this.props.stocks.filter((searchedItem) => searchedItem.TrackingStatusID !== null)
+                this.setState({ stockFiltered: this.props.stocks ? this.props.stocks : "" });
                 break;
 
             case "Unchecked":
-                console.log("Unchecked")
-                this.props.stocks.map((stock, index) => { if (stock.TrackingStatusID === 0) { console.log(stock);return stock } else { } })
+
+                const FilterArr = this.props.stocks.filter((searchedItem) => searchedItem.TrackingStatusID === 1)
+                this.setState({ stockFiltered: FilterArr });
+                console.log(this.state.stockFiltered)
                 break;
 
             case "Checked":
                 console.log("Checked")
-                this.props.stocks.map((stock, index) => { if (stock.TrackingStatusID === 1) { console.log(stock); return stock } else { } })
+                const FilterArr2 = this.props.stocks.filter((searchedItem) => searchedItem.TrackingStatusID === 2)
+                this.setState({ stockFiltered: FilterArr2 });
                 break;
 
             default:
@@ -271,10 +283,57 @@ class StockGoods extends Component {
     }
 
     handleCancel = (condition) => {
-        console.log(this.props)
         if (condition !== "filter") {
-            this.setState({ openModal: !this.state.openModal })
+            this.setState({ openEditModal: !this.state.openEditModal })
         } else this.setState({ open: !this.state.open })
+    }
+
+    onContainerChange = (e, type) => {
+        if (e.target.value !== "") { console.log("container", e.target.value); this.setState({ stockFiltered: this.props.stocks, container: e.target.value }); }
+        else {
+            this.setState({ stockFiltered: this.props.stocks, container: e.target.value })
+        }
+    }
+
+    onDateChange = (e, type) => {
+        if (e !== "") {
+            console.log("date", new Date(e).toLocaleDateString('en-GB'));
+            console.log(this.state.date)
+            this.setState({ date: new Date(e).toLocaleDateString('en-GB'), datevalue: e })
+        }
+        else {
+        }
+    }
+
+    onSearchChange = (e, type) => {
+        console.log(this.state.stockListing[0].ReturnVal)
+        if (e.target.value !== "" &&
+            // this.state.stockListing[0].ReturnVal !== undefined &&
+            this.state.stockListing[0].ReturnVal !== "0") {
+            const FilterArr = this.state.stockListing.filter((searchedItem) => searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()) || searchedItem.UserCode.includes(e.target.value.toLowerCase()) || searchedItem.AreaCode.toLowerCase().includes(e.target.value.toLowerCase()) || searchedItem.AreaName.toLowerCase().includes(e.target.value.toLowerCase()))
+            this.setState({ stockFiltered: FilterArr });
+            console.log(FilterArr)
+            if (FilterArr.length === 1) {
+                this.setState({ selectedRows: FilterArr });
+                if (this.state.selectedRows === FilterArr) {
+                    this.setState({ openEditModal: !this.state.openEditModal })
+                }
+            }
+        } else {
+            this.setState({ stockFiltered: this.props.stocks });
+        }
+    }
+
+    onSearchTrackingNumchange = (e, type) => {
+        const FilterArr = this.state.stockListing.filter((searchedItem) => searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()))
+        if (e.target.value !== "") {
+            this.state.stockFiltered.filter((searchedItem) => console.log(searchedItem.TrackingNumber.toLowerCase().includes(e.target.value)))
+            this.setState({ stockFiltered: FilterArr });
+            if (this.state.stockFiltered.length === 1) {
+                this.setState({ selectedRows: this.state.stockFiltered, openEditModal: !this.state.openEditModal })
+            }
+        }
+        else { this.setState({ stockFiltered: this.props.stocks }); }
     }
 
     render() {
@@ -283,8 +342,10 @@ class StockGoods extends Component {
             { children: "Unchecked", key: "Unchecked" },
             { children: "Checked", key: "Checked" }
         ]
-
-        const { open, openModal } = this.state
+        console.log(this.state.stockApproval)
+        const { open, openEditModal, openAddModal } = this.state
+        // const { AllContainer } = this.props
+        const options = this.props.AllContainer
         return (
             <div className="container-fluid">
                 <ModalPopOut
@@ -292,8 +353,8 @@ class StockGoods extends Component {
                     classes='true'
                     onBackdropClick={() => console.log('backdrop')}
                     handleToggleDialog={() => this.handleCancel("filter")}
-                    handleConfirmFunc={this.handleSearchfilter}
-                    title={"Please key in the container number and date"}
+                    handleConfirmFunc={() => this.handleSearchfilter("open")}
+                    title={"Please select the container number and date desired"}
                     message={<div className="row ">
                         <div className="col-sm-6 col-12">
                             <Box
@@ -304,7 +365,7 @@ class StockGoods extends Component {
                                 noValidate
                                 autoComplete="off"
                             >
-                                <TextField id="outlined-basic" fullWidth label="Container Number" variant="outlined" />
+                                <ResponsiveDatePickers title="Date" value={this.state.datevalue ? this.state.datevalue : ""} onChange={(e) => this.onDateChange(e)} />
                             </Box>
                         </div>
                         <div className="col-sm-6 col-12">
@@ -315,35 +376,91 @@ class StockGoods extends Component {
                                 }}
                                 noValidate
                                 autoComplete="off"
+
                             >
-                                <ResponsiveDatePickers title="Date" />
+                                {/* <Autocomplete
+                                    options={options}
+                                    noOptionsText="Enter to create a new option"
+                                    getOptionLabel={(option) => option.ReturnMsg}
+                                    onInputChange={(e, newValue) => {
+                                        this.setState({container:newValue});
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Select"
+                                            variant="standard"
+                                            onKeyDown={(e) => {
+                                                if (
+                                                    e.key === "Enter" &&
+                                                    options.findIndex((o) => o.CONTAINERNAME === this.state.container) === -1
+                                                ) {
+                                                    this.options.push(this.state.container)
+                                                    // this.setState((o)=>o.concat({title:this.state.container}))
+                                                }
+                                            }}
+                                        />
+                                    )}
+                                /> */}
+                                <TextField id="outlined-basic" autoFocus fullWidth label="Container Number" select onChange={(e) => this.onContainerChange(e)} variant="standard" >
+                                    {options.map((option) => (
+                                        <MenuItem key={option.ReturnVal} value={option.ReturnVal}>
+                                            {option.ReturnMsg}
+                                        </MenuItem>
+                                    ))}</TextField>
+                                    
                             </Box>
                         </div>
+
                     </div>}
                 />
 
-                {openModal &&
+                {openEditModal &&
                     <ModalPopOut
-                        open={openModal}
+                        open={openEditModal}
                         onBackdropClick={() => console.log('backdrop')}
                         handleToggleDialog={() => this.handleCancel("form")}
-                        handleConfirmFunc={this.handleSearchfilter}
+                        handleConfirmFunc={() => this.handleSearchfilter("openEditModal")}
                         message={
                             <EditStockGoods data={this.state.selectedRows} />
                         }
                     />
                 }
+                {openAddModal &&
+                    <ModalPopOut
+                        open={openAddModal}
+                        onBackdropClick={() => console.log('backdrop')}
+                        handleToggleDialog={() => this.handleCancel("form")}
+                        handleConfirmFunc={() => this.handleSearchfilter("openAddModal")}
+                        message={
+                            <EditStockGoods />
+                        }
+                    />
+                }
                 <div>
-                    <div className="row">
+                    <div className="row" onClick={() => this.setState({ open: !this.state.open })}>
 
-                        <div className="col-6 mt-2 mb-md-2">  <ResponsiveDatePickers title="Date" /></div>
-                        <div className="col-6 mt-2">  <SearchBar placeholder={"Search container number"} /></div>
-                        
+                        <div className="col-6 mt-2 mb-md-2">
+                            <ResponsiveDatePickers title="Date" value={this.state.datevalue ? this.state.datevalue : ""} readOnly onChange={(e) => this.onDateChange(e)} />
+                        </div>
+                        <div className="col-6 mt-2">
+                            {/* <SearchBar autoFocus placeholder={"Search Tracking number"} onChange={(e) => this.onSearchTrackingNumchange(e)} /> */}
+                            <Box
+                                component="form"
+                                sx={{
+                                    '& > :not(style)': { mb: 1 },
+                                }}
+                                noValidate
+                                autoComplete="off"
+                            >
+                                <TextField id="outlined-basic" value={this.state.container ? this.state.container : ""} fullWidth label="Container Number" onChange={(e) => this.onContainerChange(e)} variant="standard" />
+                            </Box>
+                        </div>
                     </div>
 
                     <div className='w-100'>
-                        <ToggleTabsComponent Tabs={ToggleTabs} onChange={() => this.changeTab()} size="small" />
-                            <SearchBar placeholder={"Search anything"} />
+                        <ToggleTabsComponent Tabs={ToggleTabs} onChange={(e) => this.changeTab(e)} size="small" />
+                        <SearchBar placeholder={"Search anything"} autoFocus={true} onChange={(e) => this.onSearchChange(e)} />
                         <TableComponents
                             tableTopLeft={<h3 style={{ fontWeight: 700 }}>Stocks</h3>}
                             tableTopRight={this.renderTableActionButton}
@@ -369,8 +486,8 @@ class StockGoods extends Component {
                                 checkboxColor: "primary",
                                 onRowClickSelect: false
                             }}
-                            selectedIndexKey={"pid"}
-                            Data={this.props.stocks}
+                            selectedIndexKey={"StockID"}
+                            Data={this.state.stockFiltered ? this.state.stockFiltered : []}
                             onTableRowClick={onTableRowClick}
                             onActionButtonClick={onAddButtonClick}
                             onDeleteButtonClick={onDeleteButtonClick}

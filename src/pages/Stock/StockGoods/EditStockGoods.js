@@ -43,6 +43,8 @@ class EditStockGoods extends Component {
 
     render() {
         const Data = this.props.data ? this.props.data : [];
+        console.log(this.props.data)
+        console.log(Data)
         return (
             <div>
                 <Card>
@@ -67,7 +69,7 @@ class EditStockGoods extends Component {
                                     required
                                     id="outlined-required"
                                     label="Trading Number"
-                                    defaultValue={Data.Tracking_No}
+                                    defaultValue={Data.TrackingNumber}
                                 />
                             </div>
                             <div className="col-lg-6 col-md-6 col-sm-12">
@@ -76,7 +78,7 @@ class EditStockGoods extends Component {
                                     required
                                     id="outlined-required"
                                     label="Member Number"
-                                    defaultValue={Data.Member_No}
+                                    defaultValue={Data.UserCode}
                                 />
                             </div>
                         </div>
@@ -87,7 +89,7 @@ class EditStockGoods extends Component {
                                     required
                                     id="outlined-required"
                                     label="Width (m)"
-                                    defaultValue={Data.Width}
+                                    defaultValue={Data.ProductDimensionWidth}
                                 />
                             </div>
                             <div className="col-lg-4 col-md-4 col-sm-6">
@@ -96,7 +98,7 @@ class EditStockGoods extends Component {
                                     required
                                     id="outlined-required"
                                     label="Height (m)"
-                                    defaultValue={Data.Height}
+                                    defaultValue={Data.ProductDimensionHeight}
                                 />
                             </div>
                             <div className="col-lg-4 col-md-4 col-sm-6">
@@ -105,7 +107,7 @@ class EditStockGoods extends Component {
                                     required
                                     id="outlined-required"
                                     label="Depth (m)"
-                                    defaultValue={Data.Depth}
+                                    defaultValue={Data.ProductDimensionDeep}
                                 />
                             </div>
                             <div className="col-lg-12 col-md-12 col-sm-6">
@@ -114,7 +116,7 @@ class EditStockGoods extends Component {
                                     required
                                     id="outlined-required"
                                     label="Weight (kg)"
-                                    defaultValue={Data.Weight}
+                                    defaultValue={Data.ProductWeight}
                                 />
                             </div>
                         </div>
@@ -126,12 +128,12 @@ class EditStockGoods extends Component {
                             rows={4}
                             id="outlined-required"
                             label="Remark"
-                            defaultValue={Data.Charged_remark}
+                            defaultValue={Data.Remark}
                         />
-                        <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                        <Typography sx={{ mb: 1.5 }} component="div" color="text.secondary">
                             Reminder
                         </Typography>
-                        <Typography variant="body2">
+                        <Typography variant="body2" component="div">
                             Please fill in all the required information
                             <br />
                             {/* {'-'} */}

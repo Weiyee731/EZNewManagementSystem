@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { GitAction } from "../../../store/action/gitAction";
+import { GitAction } from "../../store/action/gitAction";
 import { withRouter } from 'react-router'
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
@@ -9,12 +9,12 @@ import AddIcon from '@mui/icons-material/Add';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import TableComponents from "../../../components/TableComponents/TableComponents"
+import TableComponents from "../../components/TableComponents/TableComponents"
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Backdrop from '@mui/material/Backdrop';
-import SearchBar from "../../../components/SearchBar/SearchBar"
+import SearchBar from "../../components/SearchBar/SearchBar"
 
 function mapStateToProps(state) {
     return {
@@ -91,14 +91,14 @@ const headCells = [
       label: 'Status',
     },
   ];
-class Invoice extends Component {
+class TransactionHistory extends Component {
     constructor(props) {
         super(props);
         this.state = {
             AddModalOpen: false,
             TransactionListing: [],
             TransactionListingFiltered: [],
-            TrackingStatusID: 3
+            TrackingStatusID:4
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
@@ -293,4 +293,4 @@ class Invoice extends Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Invoice));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(TransactionHistory));
