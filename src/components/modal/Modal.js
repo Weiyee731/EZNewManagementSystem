@@ -83,9 +83,9 @@ export function ModalPopOut(props) {
         {props.title}
       </DialogTitle>
       <DialogContent>
-        <DialogContentText id="alert-dialog-description">
+        {/* <DialogContentText id="alert-dialog-description"> */}
           {props.message}
-        </DialogContentText>
+        {/* </DialogContentText> */}
       </DialogContent>
       <DialogActions>
         <Button onClick={() => props.handleToggleDialog()}>Cancel</Button>
