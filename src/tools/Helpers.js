@@ -69,6 +69,7 @@ export const convertArrayToStringWithSpecialCharacter = (list, sc) => {
         return text;
     }
 }
+export const extractNumberFromStrings = (text) => {  return (typeof text === "string") ? Number("5g".replace(/[^0-9\.]+/g,"")) : 0 }
 
 // image utilities functions
 export const getImageOrientationType = (imageWidth, imageHeight) => {

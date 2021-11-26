@@ -4,7 +4,7 @@ import { GitAction } from "../../store/action/gitAction";
 import { browserHistory } from "react-router";
 import Dropzone from "../../components/Dropzone/Dropzone"
 import * as XLSX from 'xlsx';
-import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty, convertDateTimeToString } from "../../tools/Helpers";
+import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty, convertDateTimeToString, extractNumberFromStrings } from "../../tools/Helpers";
 import TableComponents from "../../components/TableComponents/TableComponents";
 import TableCell from '@mui/material/TableCell';
 import Box from '@mui/material/Box';
@@ -116,7 +116,7 @@ class DataManagement extends Component {
 
         if (rows.length > 0) {
             rows.map(row => {
-                row["isInvalid"] = (isStringNullOrEmpty(row["Tracking No"]) || isStringNullOrEmpty(row["Additional Cost"].trim) || isStringNullOrEmpty(row["Division"]))    //here
+                row["isInvalid"] = (isStringNullOrEmpty(row["Tracking No"]) || isStringNullOrEmpty(row["Member"]) || isStringNullOrEmpty(row["Division"]))
             })
         }
         this.setState({ DataHeaders: columns.filter(x => x.name !== ""), DataRows: rows.filter(x => x[columns[0].name] !== ""), loadingData: false })
@@ -142,13 +142,15 @@ class DataManagement extends Component {
             for (let index = 0; index < DataRows.length; index++) {
                 Courier += (isStringNullOrEmpty(DataRows[index]["Courier"])) ? "-" : DataRows[index]["Courier"].trim();
                 TrackingNo += (isStringNullOrEmpty(DataRows[index]["Tracking No"])) ? "-" : DataRows[index]["Tracking No"].trim();
-                Weight += (isStringNullOrEmpty(DataRows[index]["Weight"])) ? "-" : DataRows[index]["Weight"].trim();
-                Depth += (isStringNullOrEmpty(DataRows[index]["Depth"])) ? "-" : DataRows[index]["Depth"].trim();
-                Height += (isStringNullOrEmpty(DataRows[index]["Height"])) ? "-" : DataRows[index]["Height"].trim();
+                Weight += (isStringNullOrEmpty(DataRows[index]["Weight"])) ? "0" : DataRows[index]["Weight"];
+                Depth += (isStringNullOrEmpty(DataRows[index]["Depth"])) ? "0" : DataRows[index]["Depth"];
+                Height += (isStringNullOrEmpty(DataRows[index]["Height"])) ? "0" : DataRows[index]["Height"];
+                Width += (isStringNullOrEmpty(DataRows[index]["Width"])) ? "0" : DataRows[index]["Width"];
                 Item += (isStringNullOrEmpty(DataRows[index]["Item"])) ? "-" : DataRows[index]["Item"].trim();
                 Qty += (isStringNullOrEmpty(DataRows[index]["Qty"])) ? "-" : DataRows[index]["Qty"].trim();
                 Member += (isStringNullOrEmpty(DataRows[index]["Member"])) ? "-" : DataRows[index]["Member"].trim();
-                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : DataRows[index]["Packaging Date"].trim();
+                StockDate += (isStringNullOrEmpty(DataRows[index]["Stock Date"])) ? "-" : convertDateTimeToString(DataRows[index]["Stock Date"].trim())
+                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : convertDateTimeToString(DataRows[index]["Packaging Date"].trim())
                 AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "-" : DataRows[index]["Additional Cost"].trim();
                 Remarks += (isStringNullOrEmpty(DataRows[index]["Remarks"])) ? "-" : DataRows[index]["Remarks"];
 
@@ -157,10 +159,12 @@ class DataManagement extends Component {
                     TrackingNo += ",";
                     Weight += ",";
                     Depth += ",";
+                    Width += ",";
                     Height += ",";
                     Item += ",";
                     Qty += ",";
                     Member += ",";
+                    StockDate += ",";
                     PackagingDate += ",";
                     AdditionalCost += ",";
                     Remarks += ",";
@@ -170,14 +174,17 @@ class DataManagement extends Component {
             console.log(Courier)
             console.log(TrackingNo)
             console.log(Weight)
+            console.log(Width)
             console.log(Depth)
             console.log(Height)
             console.log(Item)
             console.log(Qty)
             console.log(Member)
+            console.log(StockDate)
             console.log(PackagingDate)
             console.log(AdditionalCost)
             console.log(Remarks)
+
         }
     }
 
