@@ -20,7 +20,7 @@ import EditStockGoods from "./EditStockGoods";
 import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents";
 import MenuItem from '@mui/material/MenuItem';
 import Autocomplete from '@mui/material/Autocomplete';
-
+import { isStringNullOrEmpty } from "../../../tools/Helpers"
 function mapStateToProps(state) {
     return {
         stocks: state.counterReducer["stocks"],
@@ -139,14 +139,26 @@ const INITIAL_STATE = {
     selectedRows: [],
     stockListing: [],
     stockFiltered: [],
-    container: "",
-    date: new Date(),
+
     newcontainer: "",
     // datevalue
     options: [],
     childData: [],
-    TrackingNumber: "",
+    // TrackingNumber: "",
     openAddModal: false,
+
+    container: "",
+    date: new Date(),
+    TrackingNumber: "",
+    UserCode: "",
+    ProductDimensionWidth: "",
+    ProductDimensionHeight: "",
+    ProductDimensionDeep: "",
+    ProductWeight: "",
+    AreaCode: "",
+    Item: "null",
+    AdditionalCharges: "0",
+    Remark: "no",
 }
 
 
@@ -186,7 +198,10 @@ function renderTableRows(data, index) {
 
 function onTableRowClick(event, row) {
     console.log(row)
-    this.setState({ openEditModal: true, selectedRows: row });
+    this.setState({
+        openEditModal: true,
+        selectedRows: row,
+    });
     // return <Link to={{ pathname: `/EditStockGoods`, props: row }}></Link>
 
 }
@@ -208,7 +223,7 @@ class StockGoods extends Component {
         onAddButtonClick = onAddButtonClick.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.changeTab = this.changeTab.bind(this);
-        this.onSearchTrackingNumchange = this.onSearchTrackingNumchange.bind(this);
+        // this.onSearchTrackingNumchange = this.onSearchTrackingNumchange.bind(this);
         this.onContainerChange = this.onContainerChange.bind(this);
         this.onSearchChange = this.onSearchChange.bind(this);
         this.onDateChange = this.onDateChange.bind(this);
@@ -230,7 +245,7 @@ class StockGoods extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-       
+
         if (prevProps.AllContainer.length !== this.props.AllContainer.length) {
             if (this.props.AllContainer !== undefined && this.props.AllContainer[0] !== undefined) {
                 this.setState({ options: this.props.AllContainer });
@@ -248,6 +263,26 @@ class StockGoods extends Component {
             //         this.setState({ stockFiltered: prevProps.stocks });
             //     }
         }
+        if (prevState.selectedRows !== this.state.selectedRows) {
+            console.log("1")
+            console.log(this.state.selectedRows)
+            console.log(this.state.selectedRows[0])
+            if (this.state.selectedRows !== undefined) {
+                console.log("2")
+                this.setState({
+                    TrackingNumber: this.state.selectedRows.TrackingNumber,
+                    UserCode: this.state.selectedRows.UserCode,
+                    ProductDimensionWidth: this.state.selectedRows.ProductDimensionWidth,
+                    ProductDimensionHeight: this.state.selectedRows.ProductDimensionHeight,
+                    ProductDimensionDeep: this.state.selectedRows.ProductDimensionDeep,
+                    AreaCode: this.state.selectedRows.AreaCode,
+                    Item: isStringNullOrEmpty(this.state.selectedRows.Item) ? "no item" : this.state.selectedRows.Item,
+                    AdditionalCharges: isStringNullOrEmpty(this.state.selectedRows.AdditionalCharges) ? "0" : this.state.selectedRows.AdditionalCharges,
+                    Remark: isStringNullOrEmpty(this.state.selectedRows.Remark) ? "no remark" : this.state.selectedRows.Remark,
+                    ProductWeight: this.state.selectedRows.ProductWeight,
+                })
+            }
+        }
     }
 
     handleSearchfilter = (filter) => {
@@ -263,19 +298,19 @@ class StockGoods extends Component {
                 // this.props.CallUpdateStockStatus({ STOCKID: this.state.selectedRows.StockID, CONTAINERNAME: this.state.container, CONTAINERDATE: this.state.date })
                 this.props.CallUpdateStockDetailByPost({
                     STOCKID: this.state.selectedRows.StockID,
-                    TRACKINGNUMBER: this.state.selectedRows.TRACKINGNUMBER,
-                    PRODUCTWEIGHT: this.state.selectedRows.PRODUCTWEIGHT,
-                    PRODUCTHEIGHT: this.state.selectedRows.PRODUCTHEIGHT,
-                    PRODUCTWIDTH: this.state.selectedRows.PRODUCTWIDTH,
-                    PRODUCTDEEP: this.state.selectedRows.PRODUCTDEEP,
-                    AREACODE: this.state.selectedRows.AREACODE,
-                    ITEM: this.state.selectedRows.USERCODE,
-                    ITEM: this.state.selectedRows.USERCODE,
-                    TRACKINGSTATUSID: this.state.selectedRows.TRACKINGSTATUSID,
+                    TRACKINGNUMBER: this.state.TrackingNumber,
+                    PRODUCTWEIGHT: this.state.ProductWeight,
+                    PRODUCTHEIGHT: this.state.ProductDimensionHeight,
+                    PRODUCTWIDTH: this.state.ProductDimensionWidth,
+                    PRODUCTDEEP: this.state.ProductDimensionDeep,
+                    AREACODE: this.state.AreaCode,
+                    USERCODE: this.state.UserCode,
+                    ITEM: this.state.Item,
+                    TRACKINGSTATUSID: 1,
                     CONTAINERNAME: this.state.container,
                     CONTAINERDATE: this.state.date,
-                    REMARK: this.state.selectedRows.REMARK,
-                    EXTRACHARGE: this.state.selectedRows.EXTRACHARGE
+                    REMARK: this.state.Remark,
+                    EXTRACHARGE: this.state.AdditionalCharges
                 })
                 break;
 
@@ -337,62 +372,69 @@ class StockGoods extends Component {
     }
 
     onSearchChange = (e, type) => {
-        if (e.target.value !== "" &&
+        console.log(e.target.value)
+        console.log(this.state.stockListing)
+        if (e.target.value !== ""
+            //  &&
             // this.state.stockListing[0].ReturnVal !== undefined &&
-            this.state.stockListing[0].ReturnVal !== "0") {
-            const FilterArr = this.state.stockListing.filter((searchedItem) => searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()) || searchedItem.UserCode.includes(e.target.value.toLowerCase()) || searchedItem.AreaCode.toLowerCase().includes(e.target.value.toLowerCase()) || searchedItem.AreaName.toLowerCase().includes(e.target.value.toLowerCase()))
-           
-            console.log(FilterArr)
-            console.log(this.state.stockFiltered)
-            if (FilterArr.length === 1) {
-                this.setState({ stockFiltered:FilterArr[0], selectedRows: FilterArr[0], openEditModal: !this.state.openEditModal });
-                // if (this.state.selectedRows.length !== 0) { this.setState({ openEditModal: !this.state.openEditModal, selectedRows: FilterArr }) }
+            // this.state.stockListing[0].ReturnVal !== "0"
+        ) {
+            const FilterArr = this.state.stockListing.filter((searchedItem) => searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()) || searchedItem.UserCode.includes(e.target.value.toLowerCase()) || searchedItem.AreaCode.toLowerCase().includes(e.target.value.toLowerCase()) )
+            this.setState({ stockFiltered: FilterArr })
+            if (FilterArr.length === 1 && FilterArr[0].TrackingNumber === e.target.value) {
+                this.setState({ selectedRows: FilterArr[0], openEditModal: !this.state.openEditModal });
             }
         } else {
             this.setState({ stockFiltered: this.props.stocks });
         }
     }
 
-    onSearchTrackingNumchange = (e, type) => {
-        const FilterArr = this.state.stockListing.filter((searchedItem) => searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()))
-        if (e.target.value !== "") {
-            this.state.stockFiltered.filter((searchedItem) => console.log(searchedItem.TrackingNumber.toLowerCase().includes(e.target.value)))
-            this.setState({ stockFiltered: FilterArr });
-            if (this.state.stockFiltered.length === 1) {
-                this.setState({ selectedRows: this.state.stockFiltered, openEditModal: !this.state.openEditModal })
-            }
-        }
-        else { this.setState({ stockFiltered: this.props.stocks }); }
-    }
+    // onSearchTrackingNumchange = (e, type) => {
+    //     const FilterArr = this.state.stockListing.filter((searchedItem) => searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()))
+    //     if (e.target.value !== "") {
+    //         // this.state.stockFiltered.filter((searchedItem) => console.log(searchedItem.TrackingNumber.toLowerCase().includes(e.target.value)))
+    //         this.setState({ stockFiltered: FilterArr });
+    //         if (this.state.stockFiltered.length === 1) {
+    //             this.setState({ selectedRows: this.state.stockFiltered, openEditModal: !this.state.openEditModal })
+    //         }
+    //     }
+    //     else { this.setState({ stockFiltered: this.props.stocks }); }
+    // }
 
-    handleCallback = (childData) =>{
-        console.log(childData)
-        if (childData === "TrackingNumber") {
-            this.setState({childData: childData})
+    handleCallback = (childData) => {
+        this.setState({ childData: childData })
+        if (childData.TrackingNumber !== null && childData.TrackingNumber !== undefined) {
+            this.setState({ TrackingNumber: childData.TrackingNumber })
         }
-        if (childData === "UserCode") {
+        if (childData.UserCode !== null && childData.UserCode !== undefined) {
+            console.log("hi22", childData.UserCode)
+            this.setState({ UserCode: childData.UserCode })
         }
-        if (childData === "ProductDimensionWidth") {
+        if (childData.ProductDimensionWidth !== null && childData.ProductDimensionWidth !== undefined) {
+            this.setState({ ProductDimensionWidth: childData.ProductDimensionWidth })
         }
-        if (childData === "ProductDimensionHeight") {
-           
+        if (childData.ProductDimensionHeight !== null && childData.ProductDimensionHeight !== undefined) {
+            this.setState({ ProductDimensionWidth: childData.ProductDimensionHeight })
         }
-        if (childData === "ProductDimensionDeep") {
-           
+        if (childData.ProductDimensionDeep !== null && childData.ProductDimensionDeep !== undefined) {
+            this.setState({ ProductDimensionDeep: childData.ProductDimensionDeep })
         }
-        if (childData === "ProductWeight") {
-            
+        if (childData.ProductWeight !== null && childData.ProductWeight !== undefined) {
+            this.setState({ ProductWeight: childData.ProductWeight })
         }
-        if (childData === "AreaCode") {
-            
+        if (childData.Item !== null && childData.Item !== undefined) {
+            this.setState({ Item: childData.Item })
         }
-        if (childData === "AdditionalCharges") {
-           
+        if (childData.AreaCode !== null && childData.AreaCode !== undefined) {
+            this.setState({ AreaCode: childData.AreaCode })
         }
-        if (childData === "Remark") {
-           
+        if (childData.AdditionalCharges !== null && childData.AdditionalCharges !== undefined) {
+            this.setState({ AdditionalCharges: childData.AdditionalCharges })
         }
-      
+        if (childData.Remark !== null && childData.Remark !== undefined) {
+            this.setState({ Remark: childData.Remark })
+        }
+
     }
 
     render() {
@@ -401,7 +443,7 @@ class StockGoods extends Component {
             { children: "Unchecked", key: "Unchecked" },
             { children: "Checked", key: "Checked" }
         ]
-        console.log(this.state.stockFiltered)
+        console.log(this.state.childData)
         const { open, openEditModal, openAddModal, options } = this.state
         return (
             <div className="container-fluid">
@@ -419,6 +461,8 @@ class StockGoods extends Component {
 
                         </div>
                         <div className="col-sm-6 col-12">
+                            {console.log(this.props.AllContainer)}
+                            {console.log(options)}
                             <Autocomplete
                                 options={options}
                                 noOptionsText="Enter to create a new option"
@@ -440,7 +484,6 @@ class StockGoods extends Component {
                                                 // options.findIndex((o) => o.CONTAINERNAME === this.state.options) === -1
                                             ) {
                                                 this.state.options.push({ ReturnVal: this.state.date, ReturnMsg: e.target.value })
-                                                // this.setState((o)=>o.concat({title:this.state.container}))
                                             } else console.log("hi")
                                         }}
                                     />
@@ -456,10 +499,10 @@ class StockGoods extends Component {
                         handleToggleDialog={() => this.handleCancel("form")}
                         handleConfirmFunc={() => this.handleSearchfilter("openEditModal")}
                         message={
-                            <EditStockGoods data={this.state.selectedRows} parentCallback = {this.handleCallback}/>
+                            <EditStockGoods data={this.state.selectedRows} parentCallback={this.handleCallback} />
                         }
-                    > { console.log("22",this.state.selectedRows)}</ModalPopOut>
-                    
+                    > {console.log("22", this.state.selectedRows)}</ModalPopOut>
+
                 }
                 {openAddModal &&
                     <ModalPopOut

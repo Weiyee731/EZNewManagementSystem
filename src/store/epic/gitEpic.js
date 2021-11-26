@@ -360,7 +360,7 @@ export class GitEpic {
             TRACKINGNUMBER: payload.TRACKINGNUMBER,
             PRODUCTWEIGHT: payload.PRODUCTWEIGHT,
             PRODUCTHEIGHT: payload.PRODUCTHEIGHT,
-
+            PRODUCTWIDTH: payload.PRODUCTWIDTH,
             PRODUCTDEEP: payload.PRODUCTDEEP,
             AREACODE: payload.AREACODE,
             ITEM: payload.ITEM,
