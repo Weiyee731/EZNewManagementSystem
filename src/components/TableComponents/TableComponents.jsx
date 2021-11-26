@@ -196,7 +196,7 @@ TableComponents.propTypes = {
 export default function TableComponents(props) {
     const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
-
+    const [elevation, setElevation] = React.useState((isStringNullOrEmpty(props.elevation) ? 1 : props.elevation));
     // render from props
     // table settings
     const [stickyTableHeader, setTableHeaderSticky] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.stickyTableHeader === null ? true : props.tableOptions.stickyTableHeader);
@@ -273,31 +273,10 @@ export default function TableComponents(props) {
     const TableData = (rowsPerPage !== -1) ? stableSort(rows, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : stableSort(rows, getComparator(order, orderBy))
     const checkboxColor = !isObjectUndefinedOrNull(props.tableRows.checkboxColor) ? props.tableRows.checkboxColor : "primary"
     const emptyRowColSpan = renderCheckbox ? tableHeaders.length + 1 : tableHeaders.length
+
     return (
         <Box sx={{ width: '100%' }}>
-            <div
-                style={{
-                    textAlign: 'right'
-                }}
-            >
-                {/* <FormControlLabel
-                    style={{
-                        marginBottom: '0.5rem',
-                    }}
-                    control={
-                        <Switch
-                            checked={renderCheckbox}
-                            onChange={() => {
-                                setRenderCheckbox(!renderCheckbox)
-                                setOnRowSelect(!onRowSelect)
-                                setSelected([])
-                            }}
-                        />
-                    }
-                    label="Select"
-                /> */}
-            </div>
-            <Paper sx={{ width: '100%', mb: 2 }}>
+            <Paper sx={{ width: '100%', mb: 2 }} elevation={elevation} >
                 {
                     <EnhancedTableToolbar
                         selectedRows={selected}
