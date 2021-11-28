@@ -220,9 +220,19 @@ export default function TableComponents(props) {
     const [renderCheckbox, setRenderCheckbox] = React.useState(!isObjectUndefinedOrNull(props.tableRows.checkbox) ? props.tableRows.checkbox : true);
     const [onRowSelect, setOnRowSelect] = React.useState(!isObjectUndefinedOrNull(props.tableRows.onRowClickSelect) ? props.tableRows.onRowClickSelect : false);
 
+    // useEffect(() => {
+    // }, [props.Data]);
+
     useEffect(() => {
+        setTableHeaders(props.tableHeaders)
         setRows(props.Data)
-    }, [props.Data]);
+        setTableTopRight(props.tableTopRight)
+        setObjectKey(props.selectedIndexKey)
+    }, [props]);
+
+    // useEffect(() => {
+    //     setRows(props)
+    // }, [props]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';

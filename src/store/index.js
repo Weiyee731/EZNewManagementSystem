@@ -20,6 +20,7 @@ const rootEpic = combineEpics(
   gitEpic.Transaction_UpdateTransactionStatus,
   gitEpic.Transaction_ViewTransaction,
   gitEpic.Transaction_ViewTransactionByID,
+  gitEpic.Inventory_InsertStockByPost,
 );
 
 const rootReducer = combineReducers({ counterReducer });

@@ -3,5 +3,5 @@ export const ServerConfiguration = {
     LiveServerUrl: "http://localhost/TourismManagementAPI/TourismApi/api/TourismApi/",
     mediaUrl: "http://localhost/TourismManagementAPI/TourismApi/api/TourismApi/",
     filesUrl: "http://localhost/TourismManagementAPI/TourismApi/api/TourismApi/",
-    postUrl: "https://tourism.denoo.my/EzLogistic/api/EzLogistic/"
+    postUrl: "http://tourism.denoo.my/EzLogistic/api/EzLogistic/"
 }
