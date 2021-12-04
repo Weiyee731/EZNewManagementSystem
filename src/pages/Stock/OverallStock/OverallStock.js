@@ -150,6 +150,7 @@ const INITIAL_STATE = {
 
     searchKeywords: "",
     searchCategory: "All",
+    searchArea: "All",
     searchBeginDate: "",
     searchEndDate: "",
 }
@@ -160,9 +161,8 @@ class OverallStock extends Component {
         this.state = INITIAL_STATE
 
         this.props.CallFetchAllStock({ USERID: 1 })
-        // this.props.CallUserAreaCode(
-
-        // )
+        this.props.CallUserAreaCode()
+        
         this.changeTab = this.changeTab.bind(this)
         this.onAddButtonClick = this.onAddButtonClick.bind(this)
         this.handleRemarkModal = this.handleRemarkModal.bind(this)
@@ -175,7 +175,7 @@ class OverallStock extends Component {
         this.onSearch = this.onSearch.bind(this)
         this.handleSearchInput = this.handleSearchInput.bind(this)
         this.handleSearchCategory = this.handleSearchCategory.bind(this)
-        this.ontest = this.ontest.bind(this)
+        this.handleSearchArea = this.handleSearchArea.bind(this)
     }
 
     componentDidMount() {
@@ -428,17 +428,8 @@ class OverallStock extends Component {
         this.setState({ searchCategory: e.target.value })
     }
 
-    ontest() {
-        const formData = new FormData();
-        const url = "https://pengundi.spr.gov.my/"
-        const config = { headers: { 'content-type': 'multipart/form-data' } }
-        formData.append('ic', '951214086123');
-
-        axios.post(url, formData, config).then((res) => {
-            console.log(res)
-        }).catch(error => {
-            console.log(error)
-        })
+    handleSearchArea(e) {
+        this.setState({ searchArea: e.target.value })
     }
 
     render() {
@@ -449,11 +440,10 @@ class OverallStock extends Component {
             { children: "Collected", key: "Collected" },
         ]
 
-        const { filteredList, formValue, searchCategory } = this.state
+        const { filteredList, formValue, searchCategory, searchArea } = this.state
 
         return (
             <div className="container-fluid">
-                <button type="button" onClick={() => this.ontest()}>Test</button>
                 <div className="row d-flex">
                     <div className="col-md-2 col-12 m-auto">
                         <div className="w-100 d-flex filter-dropdown">
@@ -476,7 +466,29 @@ class OverallStock extends Component {
                             </Select>
                         </div>
                     </div>
-                    <div className="col-md-10 col-12 m-auto">
+                    <div className="col-md-2 col-12 m-auto">
+                        <div className="w-100 d-flex filter-dropdown">
+                            <label className="w-25">Area:</label>
+                            <Select
+                                labelId="search-filter-area"
+                                id="search-filter-area"
+                                value={searchArea}
+                                label="Area"
+                                onChange={this.handleSearchArea}
+                                size="small"
+                                className="w-75"
+                                placeholder="filter by"
+                            >
+                                <MenuItem key="all_area" value="All">All</MenuItem>
+                                {
+                                    isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
+                                        return <MenuItem key={el.AreaCode} value={el.UserAreaID}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
+                                    })
+                                }
+                            </Select>
+                        </div>
+                    </div>
+                    <div className="col-md-8 col-8 m-auto">
                         <SearchBar id="" placeholder="Enter Member No, Tracking No or Container No to search" buttonOnClick={() => this.onSearch()} onChange={this.handleSearchInput} />
                     </div>
                 </div>
