@@ -114,6 +114,12 @@ const headCells = [
         label: 'Container',
     },
     {
+        id: 'AdditionalCharges',
+        align: 'left',
+        disablePadding: false,
+        label: 'Additional Charges',
+    },
+    {
         id: 'Remarks',
         align: 'left',
         disablePadding: false,
@@ -185,7 +191,7 @@ class OverallStock extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (this.state.filteredList === null && isArrayNotEmpty(this.props.stocks)) {
             const { stocks } = this.props
-            console.log(stocks)
+            // console.log(stocks)
             this.setState({
                 filteredList: (isStringNullOrEmpty(stocks.ReturnVal) && stocks.ReturnVal == 0) ? [] : stocks
             })
@@ -225,6 +231,18 @@ class OverallStock extends Component {
 
     renderTableRows = (data, index) => {
         const fontsize = '9pt'
+        const renderAdditionalCost = (charges) => {
+            let renderStrings = ""
+            try {
+                charges = JSON.parse(charges)
+                charges.length > 0 && charges.map(el => { renderStrings = renderStrings + el.Charges + ": " + el.Value + "; " })
+                return renderStrings
+            }
+            catch (e) {
+                return renderStrings
+            }
+        }
+
         return (
             <>
                 <TableCell
@@ -246,6 +264,7 @@ class OverallStock extends Component {
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.PackagingDate}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ContainerName}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{!isStringNullOrEmpty(data.AdditionalCharges) && renderAdditionalCost(data.AdditionalCharges)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Remark}</TableCell>
             </>
         )
@@ -267,6 +286,13 @@ class OverallStock extends Component {
         tempFormValue.Weight = row.ProductWeight;
         tempFormValue.WeightVerified = !isStringNullOrEmpty(row.ProductWeight) && !isNaN(row.ProductWeight)
         tempFormValue.Division = Number(row.UserAreaID)
+
+        let additionalCharges = row.AdditionalCharges
+        try { additionalCharges = JSON.parse(additionalCharges) } catch (e) { console.log(e); additionalCharges = [] }
+        tempFormValue.AdditionalCost = isObjectUndefinedOrNull(additionalCharges) ? [] : additionalCharges
+        tempFormValue.AdditionalCost.length > 0 && tempFormValue.AdditionalCost.map((el, idx) => {
+            el.validated = !(isStringNullOrEmpty(el.Charges)) && !(isStringNullOrEmpty(el.Value)) && !isNaN(el.Value) && (Number(el.Value) > 0)
+        })
 
         this.setState({
             openRemarkModal: true,
@@ -354,9 +380,9 @@ class OverallStock extends Component {
 
         switch (name) {
             case "AdditionalChargedRemark":
-                const chargedAmount = additionalCostItems[index].chargedAmount
+                const chargedAmount = additionalCostItems[index].Value
                 validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(chargedAmount)) && !isNaN(chargedAmount) && (Number(value) > 0)
-                additionalCostItems[index].chargedRemark = value
+                additionalCostItems[index].Charges = value
                 additionalCostItems[index].validated = validated
                 tempFormValue.AdditionalCost = additionalCostItems
 
@@ -364,9 +390,9 @@ class OverallStock extends Component {
                 break;
 
             case "AdditionalChargedAmount":
-                const chargedRemark = additionalCostItems[index].chargedRemark
+                const chargedRemark = additionalCostItems[index].Charges
                 validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(chargedRemark)) && !isNaN(e.target.value) && (Number(value) > 0)
-                additionalCostItems[index].chargedAmount = value
+                additionalCostItems[index].Value = value
                 additionalCostItems[index].validated = validated
                 tempFormValue.AdditionalCost = additionalCostItems
 
@@ -382,8 +408,8 @@ class OverallStock extends Component {
         let tempFormValue = formValue
         let additionalCostItems = (!isObjectUndefinedOrNull(tempFormValue.AdditionalCost)) ? formValue.AdditionalCost : []
         let obj = {
-            chargedRemark: "",
-            chargedAmount: "",
+            Charges: "",
+            Value: "",
             validated: null
         }
 
@@ -646,12 +672,11 @@ class OverallStock extends Component {
                             <div className="col-12">
                                 <Button className="my-1 w-100" color="success" variant="contained" size="small" onClick={() => { this.RenderAdditionalCost() }}>Add Additional Costs</Button>
                             </div>
-
                         </div>
                         {
                             isArrayNotEmpty(formValue.AdditionalCost) && formValue.AdditionalCost.map((el, idx) => {
                                 return (
-                                    <div className="row">
+                                    <div key={idx} className="row">
                                         <div className="col-6 col-sm-8">
                                             <TextField
                                                 variant="standard"
@@ -659,7 +684,7 @@ class OverallStock extends Component {
                                                 fullWidth
                                                 label={"Add. Chg. " + (idx + 1)}
                                                 name="AdditionalChargedRemark"
-                                                value={el.chargedRemark}
+                                                value={el.Charges}
                                                 onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
                                                 error={!el.validated}
                                             />
@@ -672,7 +697,7 @@ class OverallStock extends Component {
                                                     variant="standard"
                                                     size="small"
                                                     name="AdditionalChargedAmount"
-                                                    value={el.chargedAmount}
+                                                    value={el.Value}
                                                     onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
                                                     startAdornment={<InputAdornment position="start">RM</InputAdornment>}
                                                     error={!el.validated}
