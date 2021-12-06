@@ -4,6 +4,7 @@ import Layout from '../components/sidebar/Layout';
 import './App.scss';
 import './App_modified.css';
 
+
 const App = () => (
   <Router basename={"/Ez"}>
     <Layout />

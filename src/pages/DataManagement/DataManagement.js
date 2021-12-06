@@ -4,7 +4,7 @@ import { GitAction } from "../../store/action/gitAction";
 import { browserHistory } from "react-router";
 import Dropzone from "../../components/Dropzone/Dropzone"
 import * as XLSX from 'xlsx';
-import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty, convertDateTimeToString } from "../../tools/Helpers";
+import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty, convertDateTimeToString, extractNumberFromStrings } from "../../tools/Helpers";
 import TableComponents from "../../components/TableComponents/TableComponents";
 import TableCell from '@mui/material/TableCell';
 import Box from '@mui/material/Box';
@@ -13,24 +13,29 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Button from '@mui/material/Button';
 import PublishIcon from '@mui/icons-material/Publish';
 import ReportIcon from '@mui/icons-material/Report';
+import { toast } from 'react-toastify';
+import { ModalPopOut } from "../../components/modal/Modal";
 
 function mapStateToProps(state) {
     return {
-        foods: state.counterReducer["foods"],
+        stockApproval: state.counterReducer["stockApproval"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        CallTesting: () => dispatch(GitAction.CallTesting()),
+        CallInsertStockByPost: propsData => dispatch(GitAction.CallInsertStockByPost(propsData)),
+        CallResetUpdatedStockDetailByPost: () => dispatch(GitAction.CallResetUpdatedStockDetailByPost()),
     };
 }
-
 
 const INITIAL_STATE = {
     DataHeaders: [],
     DataRows: [],
     loadingData: false,
+    isSubmit: false,
+    errorReportData: [],
+    openErrorReport: false,
 }
 
 class DataManagement extends Component {
@@ -43,13 +48,17 @@ class DataManagement extends Component {
         this.renderTableHeaders = this.renderTableHeaders.bind(this)
         this.renderTableRows = this.renderTableRows.bind(this)
         this.onRemoveAttachment = this.onRemoveAttachment.bind(this)
+        this.onViewErrorReport = this.onViewErrorReport.bind(this)
     }
 
     componentDidMount() {
     }
 
     componentDidUpdate(prevProps, prevState) {
-
+        if (isArrayNotEmpty(this.props.stockApproval)) {
+            console.log("Yes")
+            this.props.CallResetUpdatedStockDetailByPost()
+        }
     }
 
     uploadHandler = (files) => {
@@ -80,10 +89,13 @@ class DataManagement extends Component {
         this.setState({ DataHeaders: [], DataRows: [] })
     }
 
+    onViewErrorReport() {
+        this.setState({ errorReportData: this.state.DataRows.filter(x => x.isInvalid === true), openErrorReport: !this.state.openErrorReport })
+    }
+
     processData(dataString) {
         const dataStringLines = dataString.split(/\r\n|\n/);
         const headers = dataStringLines[0].split(/,(?![^"]*"(?:(?:[^"]*"){2})*[^"]*$)/);
-
         const rows = [];
         for (let i = 1; i < dataStringLines.length; i++) {
             const row = dataStringLines[i].split(/,(?![^"]*"(?:(?:[^"]*"){2})*[^"]*$)/);
@@ -116,14 +128,14 @@ class DataManagement extends Component {
 
         if (rows.length > 0) {
             rows.map(row => {
-                row["isInvalid"] = (isStringNullOrEmpty(row["Tracking No"]) || isStringNullOrEmpty(row["Additional Cost"].trim) || isStringNullOrEmpty(row["Division"]))    //here
+                row["isInvalid"] = (isStringNullOrEmpty(row["Tracking No"]) || isStringNullOrEmpty(row["Member"]) || isStringNullOrEmpty(row["Division"]))
             })
         }
         this.setState({ DataHeaders: columns.filter(x => x.name !== ""), DataRows: rows.filter(x => x[columns[0].name] !== ""), loadingData: false })
     }
 
     publishData() {
-        const { DataHeaders, DataRows } = this.state
+        const { DataRows } = this.state
         if (isArrayNotEmpty(DataRows)) {
             let Courier = ""
             let TrackingNo = ""
@@ -132,8 +144,8 @@ class DataManagement extends Component {
             let Width = ""
             let Height = ""
             let Item = ""
-            let Qty = ""
             let Member = ""
+            let Division = ""
             let StockDate = ""
             let PackagingDate = ""
             let AdditionalCost = ""
@@ -142,13 +154,15 @@ class DataManagement extends Component {
             for (let index = 0; index < DataRows.length; index++) {
                 Courier += (isStringNullOrEmpty(DataRows[index]["Courier"])) ? "-" : DataRows[index]["Courier"].trim();
                 TrackingNo += (isStringNullOrEmpty(DataRows[index]["Tracking No"])) ? "-" : DataRows[index]["Tracking No"].trim();
-                Weight += (isStringNullOrEmpty(DataRows[index]["Weight"])) ? "-" : DataRows[index]["Weight"].trim();
-                Depth += (isStringNullOrEmpty(DataRows[index]["Depth"])) ? "-" : DataRows[index]["Depth"].trim();
-                Height += (isStringNullOrEmpty(DataRows[index]["Height"])) ? "-" : DataRows[index]["Height"].trim();
+                Weight += (isStringNullOrEmpty(DataRows[index]["Weight"])) ? "0" : DataRows[index]["Weight"];
+                Depth += (isStringNullOrEmpty(DataRows[index]["Depth"])) ? "0" : DataRows[index]["Depth"];
+                Height += (isStringNullOrEmpty(DataRows[index]["Height"])) ? "0" : DataRows[index]["Height"];
+                Width += (isStringNullOrEmpty(DataRows[index]["Width"])) ? "0" : DataRows[index]["Width"];
                 Item += (isStringNullOrEmpty(DataRows[index]["Item"])) ? "-" : DataRows[index]["Item"].trim();
-                Qty += (isStringNullOrEmpty(DataRows[index]["Qty"])) ? "-" : DataRows[index]["Qty"].trim();
                 Member += (isStringNullOrEmpty(DataRows[index]["Member"])) ? "-" : DataRows[index]["Member"].trim();
-                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : DataRows[index]["Packaging Date"].trim();
+                Division += (isStringNullOrEmpty(DataRows[index]["Division"])) ? "-" : DataRows[index]["Division"].trim();
+                StockDate += (isStringNullOrEmpty(DataRows[index]["Stock Date"])) ? "-" : convertDateTimeToString(DataRows[index]["Stock Date"].trim())
+                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : convertDateTimeToString(DataRows[index]["Packaging Date"].trim())
                 AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "-" : DataRows[index]["Additional Cost"].trim();
                 Remarks += (isStringNullOrEmpty(DataRows[index]["Remarks"])) ? "-" : DataRows[index]["Remarks"];
 
@@ -157,27 +171,37 @@ class DataManagement extends Component {
                     TrackingNo += ",";
                     Weight += ",";
                     Depth += ",";
+                    Width += ",";
                     Height += ",";
                     Item += ",";
-                    Qty += ",";
                     Member += ",";
+                    Division += ",";
+                    StockDate += ",";
                     PackagingDate += ",";
                     AdditionalCost += ",";
                     Remarks += ",";
                 }
             }
 
-            console.log(Courier)
-            console.log(TrackingNo)
-            console.log(Weight)
-            console.log(Depth)
-            console.log(Height)
-            console.log(Item)
-            console.log(Qty)
-            console.log(Member)
-            console.log(PackagingDate)
-            console.log(AdditionalCost)
-            console.log(Remarks)
+            let object = {
+                USERCODE: Member,
+                TRACKINGNUMBER: TrackingNo,
+                PRODUCTWEIGHT: Weight,
+                PRODUCTHEIGHT: Height,
+                PRODUCTWIDTH: Width,
+                PRODUCTDEEP: Depth,
+                AREACODE: Division,
+                ITEM: Item,
+                STOCKDATE: StockDate,
+                PACKAGINGDATE: PackagingDate,
+                REMARK: Remarks,
+                EXTRACHARGE: AdditionalCost,
+            }
+
+            toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
+            this.setState({ isSubmit: true })
+
+            this.props.CallInsertStockByPost(object)
         }
     }
 
@@ -204,7 +228,7 @@ class DataManagement extends Component {
             <>
                 {
                     DataHeaders.filter(x => x.name !== "").map((el, index) => {
-                        return (<TableCell key={"tc_" + index} align="left" sx={{ fontSize: fontsize, bgcolor: (data.isInvalid === true) ? '#FFD700' : "#ffffff" }}>{data[el.name].toString()}</TableCell>)
+                        return (<TableCell key={"tc_" + index} align="left" sx={{ fontSize: fontsize, bgcolor: (data.isInvalid === true) ? '#FFD700' : "#ffffff" }}>{data[el.name]}</TableCell>)
                     })
                 }
             </>
@@ -212,7 +236,7 @@ class DataManagement extends Component {
     }
 
     render() {
-        const { DataHeaders, DataRows, loadingData } = this.state
+        const { DataHeaders, DataRows, loadingData, isSubmit } = this.state
         const isDataExtracted = DataHeaders.length > 0 || DataRows.length > 0
         const invalidRowCount = DataRows.filter(x => x.isInvalid === true).length
         return (
@@ -256,12 +280,18 @@ class DataManagement extends Component {
                                 <div className="d-flex">
                                     {
                                         invalidRowCount > 0 &&
-                                        <IconButton size="medium" variant="contained" color="error">
+                                        <IconButton size="medium" variant="contained" color="error" onClick={() => this.onViewErrorReport()}>
                                             <ReportIcon />
                                         </IconButton>
-
                                     }
-                                    <Button onClick={() => this.publishData()} variant="contained" endIcon={<PublishIcon />} disabled={(invalidRowCount > 0)}> Upload  </Button>
+                                    <Button
+                                        onClick={() => this.publishData()}
+                                        variant="contained"
+                                        endIcon={<PublishIcon />}
+                                        disabled={(invalidRowCount > 0 || isSubmit === true)}
+                                    >
+                                        Upload
+                                    </Button>
                                 </div>
                             }
                             tableOptions={{
@@ -284,6 +314,27 @@ class DataManagement extends Component {
                         />
                     </div>
                 }
+                <ModalPopOut fullScreen={true} open={this.state.openErrorReport} handleToggleDialog={() => this.onViewErrorReport()} title="Error Report" showAction={false}>
+                    <TableComponents
+                        tableOptions={{
+                            dense: true,
+                            tableOrderBy: 'asc',
+                            sortingIndex: "Error",
+                            stickyTableHeader: true,
+                            stickyTableHeight: (getWindowDimensions().screenHeight * 0.6),
+                        }}
+                        paginationOptions={[50, 100, 250, { label: 'All', value: -1 }]}
+                        tableHeaders={this.renderTableHeaders()}
+                        tableRows={{
+                            renderTableRows: this.renderTableRows,
+                            checkbox: false,
+                            checkboxColor: "primary",
+                            onRowClickSelect: false
+                        }}
+                        selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].name : ""}
+                        Data={this.state.errorReportData}
+                    />
+                </ModalPopOut>
             </div>
         )
     }

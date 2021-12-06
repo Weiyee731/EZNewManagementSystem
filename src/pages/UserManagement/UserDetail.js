@@ -301,7 +301,6 @@ class UserDetail extends Component {
               defaultValue={this.state.Address}
             />
           </CardContent>
-
         </Card>
         <div className="mt-4">
           <TableComponents

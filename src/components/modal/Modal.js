@@ -5,9 +5,17 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { isStringNullOrEmpty } from '../../tools/Helpers';
+import Slide from '@mui/material/Slide';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default function AlertDialog(props) {
   return (
@@ -68,6 +76,7 @@ export default function AlertDialog(props) {
 }
 
 export function ModalPopOut(props) {
+  console.log(props.fullScreen)
   return (
     <Dialog
       fullScreen={props.fullScreen ? props.fullScreen : false}    //fullscreen modal
@@ -79,12 +88,31 @@ export function ModalPopOut(props) {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
+      {
+        props.fullScreen &&
+        <AppBar sx={{ position: 'relative', bgcolor: (!isStringNullOrEmpty(props.fullScreenHeaderbgColor) ? props.fullScreenHeaderbgColor : "#252525") }}>
+          <Toolbar>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+              {props.title}
+            </Typography>
+            <IconButton
+              edge="end"
+              color="inherit"
+              onClick={() => { props.handleToggleDialog() }}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+      }
+
       <DialogTitle id="alert-dialog-title">
         {props.title}
       </DialogTitle>
       <DialogContent>
         {/* <DialogContentText id="alert-dialog-description"> */}
-          {props.message}
+        {typeof props.children !== "undefined" ? props.children : props.message}
         {/* </DialogContentText> */}
       </DialogContent>
       <DialogActions>
@@ -96,4 +124,3 @@ export function ModalPopOut(props) {
     </Dialog>
   );
 }
-

@@ -126,10 +126,13 @@ const EnhancedTableToolbar = (props) => {
     const numSelected = selectedRows.length
     let mCube = 0
     let weight = 0
-    selectedRows.map((item) => {
-        weight = weight + item.ProductWeight
-        mCube = mCube + ((item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight) / 1000000)
-    })
+
+    if (extraInfo) {
+        selectedRows.map((item) => {
+            weight = weight + item.ProductWeight
+            mCube = mCube + ((item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight) / 1000000)
+        })
+    }
 
     return (
         <Toolbar
@@ -217,9 +220,19 @@ export default function TableComponents(props) {
     const [renderCheckbox, setRenderCheckbox] = React.useState(!isObjectUndefinedOrNull(props.tableRows.checkbox) ? props.tableRows.checkbox : true);
     const [onRowSelect, setOnRowSelect] = React.useState(!isObjectUndefinedOrNull(props.tableRows.onRowClickSelect) ? props.tableRows.onRowClickSelect : false);
 
+    // useEffect(() => {
+    // }, [props.Data]);
+
     useEffect(() => {
+        setTableHeaders(props.tableHeaders)
         setRows(props.Data)
-    }, [props.Data]);
+        setTableTopRight(props.tableTopRight)
+        setObjectKey(props.selectedIndexKey)
+    }, [props]);
+
+    // useEffect(() => {
+    //     setRows(props)
+    // }, [props]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';

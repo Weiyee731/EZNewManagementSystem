@@ -1,0 +1,49 @@
+.filter-dropdown label {
+    font-size  : 11pt;
+    /* margin  :  auto; */
+    font-weight: 600;
+}
+
+.filter-dropdown .MuiInputBase-root {
+    border-radius: 15px;
+    padding      : 0;
+    font-size    : 10.5pt;
+    border       : 1px solid rgba(33, 33, 33, 0.6);
+}
+
+.filter-dropdown input {
+    border   : none;
+    font-size: 10.5pt;
+    padding  : 0.5em;
+}
+
+.filter-dropdown fieldset {
+    border: none;
+}
+
+.stock-date-range-picker .MuiInputBase-root {
+    border-radius: 15px;
+    padding      : 0;
+    font-size    : 10.5pt;
+    border       : 1px solid rgba(33, 33, 33, 0.6);
+}
+
+.stock-date-range-picker input {
+    border   : none;
+    font-size: 10.5pt;
+    padding  : 0.5em;
+}
+
+.stock-date-range-picker fieldset {
+    border: none;
+}
+
+.stock-date-range-picker div:first-child {
+    width: 100%;
+}
+
+.stock-date-range-picker .start-date-picker label,
+.stock-date-range-picker .end-date-picker label{
+    font-size: 10.5pt;
+    padding: -6px;
+}

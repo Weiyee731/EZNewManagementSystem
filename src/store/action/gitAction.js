@@ -161,6 +161,21 @@ export class GitAction {
       type: GitAction.ResetViewedContainer,
     };
   }
+  
+  static InsertStockByPost = "INSERT-STOCK-BY-POST";
+  static StockInsertedByPost = "STOCK-INSERTED-BY-POST";
+  static ResetInsertedStockReturn = "RESET-INSERTED-STOCK-RETURN";
+  static CallInsertStockByPost(propsData) {
+    return {
+      type: GitAction.InsertStockByPost,
+      payload: propsData
+    };
+  }
+  static CallResetInsertedStockReturnValue() {
+    return {
+      type: GitAction.ResetInsertedStockReturn,
+    };
+  }
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
   static InsertNewTransaction = "INSERT_NEW_TRANSACTION";
   static NewTransactionInserted = "NEW_TRANSACTION_INSERTED";

@@ -17,6 +17,7 @@ import { ServerConfiguration } from "../serverConf";
 //   1. testing server url    //
 //   2. live server url       // 
 const url = ServerConfiguration.testingServerUrl;
+const postUrl = ServerConfiguration.postUrl;
 export class GitEpic {
   ///////////////////////////////////////////////////  user account credentials ///////////////////////////////////////////////////
 
@@ -251,10 +252,10 @@ export class GitEpic {
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
   Inventory_ViewStockList = action$ =>
     action$.ofType(GitAction.FetchStocks).switchMap(async ({ payload }) => {
-      // console.log(url +
-      //   "Inventory_ViewStockList?" +
-      //   "TRACKINGSTATUSID=" + payload.USERID
-      // )
+      console.log(url +
+        "Inventory_ViewStockList?" +
+        "TRACKINGSTATUSID=" + payload.USERID
+      )
       try {
         const response = await fetch(url +
           "Inventory_ViewStockList?" +
@@ -311,42 +312,42 @@ export class GitEpic {
     });
 
 
-//   Inventory_UpdateStockStatus = action$ =>
-//   action$.ofType(GitAction.UpdateInventoryStockStatus).switchMap(async ({ payload }) => {
-//     console.log(url +
-//       "Inventory_UpdateStockStatus?" +
-//       "STOCKID=" + payload.STOCKID +
-//       "&CONTAINERNAME=" + payload.CONTAINERNAME +
-//       "&CONTAINERDATE=" + payload.CONTAINERDATE)
-//     try {
-//       const response = await fetch(url +
-//         "Inventory_UpdateStockStatus?" +
-//         "STOCKID=" + payload.STOCKID +
-//         "&CONTAINERNAME=" + payload.CONTAINERNAME +
-//         "&CONTAINERDATE=" + payload.CONTAINERDATE
-//       );
+  //   Inventory_UpdateStockStatus = action$ =>
+  //   action$.ofType(GitAction.UpdateInventoryStockStatus).switchMap(async ({ payload }) => {
+  //     console.log(url +
+  //       "Inventory_UpdateStockStatus?" +
+  //       "STOCKID=" + payload.STOCKID +
+  //       "&CONTAINERNAME=" + payload.CONTAINERNAME +
+  //       "&CONTAINERDATE=" + payload.CONTAINERDATE)
+  //     try {
+  //       const response = await fetch(url +
+  //         "Inventory_UpdateStockStatus?" +
+  //         "STOCKID=" + payload.STOCKID +
+  //         "&CONTAINERNAME=" + payload.CONTAINERNAME +
+  //         "&CONTAINERDATE=" + payload.CONTAINERDATE
+  //       );
 
-//       let json = await response.json();
-//       json = JSON.parse(json)
-//       return {
-//         type: GitAction.UpdatedInventoryStockStatus,
-//         payload: json,
-//       };
-//     }
-//     catch (error) {
-//       toast.error("Error Code: Inventory_InsertStock")
-//       return {
-//         type: GitAction.UpdatedInventoryStockStatus,
-//         payload: [],
-//       };
-//     }
-// >>>>>>> 37db0b75379f395e9b923fa20c436716dbc39c28
-//   });
+  //       let json = await response.json();
+  //       json = JSON.parse(json)
+  //       return {
+  //         type: GitAction.UpdatedInventoryStockStatus,
+  //         payload: json,
+  //       };
+  //     }
+  //     catch (error) {
+  //       toast.error("Error Code: Inventory_InsertStock")
+  //       return {
+  //         type: GitAction.UpdatedInventoryStockStatus,
+  //         payload: [],
+  //       };
+  //     }
+  // >>>>>>> 37db0b75379f395e9b923fa20c436716dbc39c28
+  //   });
   Inventory_UpdateStockDetailByPost = action$ =>
     action$.ofType(GitAction.UpdateStockDetailByPost).switchMap(async ({ payload }) => {
 
       return fetch(
-        url + "Inventory_UpdateStockDetailByPost"
+        postUrl + "Inventory_UpdateStockDetailByPost"
         , {
           method: 'POST',
           headers: {
@@ -413,6 +414,51 @@ export class GitEpic {
         };
       }
     });
+
+    Inventory_InsertStockByPost = action$ =>
+      action$.ofType(GitAction.InsertStockByPost).switchMap(async ({ payload }) => {
+
+      return fetch(
+        postUrl + "Inventory_InsertStockByPost"
+        , {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            USERCODE: payload.USERCODE,
+            TRACKINGNUMBER: payload.TRACKINGNUMBER,
+            PRODUCTWEIGHT: payload.PRODUCTWEIGHT,
+            PRODUCTHEIGHT: payload.PRODUCTHEIGHT,
+            PRODUCTWIDTH: payload.PRODUCTWIDTH,
+            PRODUCTDEEP: payload.PRODUCTDEEP,
+            AREACODE: payload.AREACODE,
+            ITEM: payload.ITEM,
+            STOCKDATE: payload.STOCKDATE,
+            PACKAGINGDATE: payload.PACKAGINGDATE,
+            REMARK: payload.REMARK,
+            EXTRACHARGE: payload.EXTRACHARGE
+          })
+        }
+      )
+        .then(response => response.json())
+        .then(json => {
+          console.log("json", json)
+          if (json !== "fail") {
+            json = json;
+            toast.success("Successfully update stock. Fetching the latest data..", { autoClose: 3000 })
+          } else {
+            json = [];
+          }
+          return {
+            type: GitAction.StockInsertedByPost,
+            payload: json,
+          };
+        })
+        .catch(error => toast.error("Error code: 8003"));
+    });
+
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
 
 
