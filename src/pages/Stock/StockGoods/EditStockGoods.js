@@ -10,16 +10,27 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import IconButton from '@mui/material/IconButton';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import FormHelperText from '@mui/material/FormHelperText';
+import Input from '@mui/material/Input';
+import InputAdornment from '@mui/material/InputAdornment';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
 
 function mapStateToProps(state) {
     return {
         foods: state.counterReducer["foods"],
+        userAreaCode: state.counterReducer["userAreaCode"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         CallTesting: () => dispatch(GitAction.CallTesting()),
+        CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
     };
 }
 
@@ -31,6 +42,13 @@ class EditStockGoods extends Component {
     constructor(props) {
         super(props);
         this.state = INITIAL_STATE
+
+        this.props.CallUserAreaCode();
+
+        this.handleAdditionalCostInputs = this.handleAdditionalCostInputs.bind(this)
+        this.RenderAdditionalCost = this.RenderAdditionalCost.bind(this)
+        this.handleRemoveAdditionalCosts = this.handleRemoveAdditionalCosts.bind(this)
+        this.removeAllAdditionalCost = this.removeAllAdditionalCost.bind(this)
     }
 
     componentDidMount() {
@@ -66,8 +84,8 @@ class EditStockGoods extends Component {
             this.props.parentCallback({ "ProductWeight": event.target.value });
             event.preventDefault();
         }
-        if (statement === "AreaCode") {
-            this.props.parentCallback({ "AreaCode": event.target.value });
+        if (statement === "UserAreaID") {
+            this.props.parentCallback({ "UserAreaID": event.target.value });
             event.preventDefault();
         }
         if (statement === "Item") {
@@ -84,154 +102,269 @@ class EditStockGoods extends Component {
         }
     }
 
+
+    //     <div className="col-lg-6 col-md-6 col-sm-12">
+    //     <TextField
+    //         onChange={(e) => this.onTrigger(e, "TrackingNumber")}
+    //         className="w-100 my-3"
+    //         required
+    //         variant="standard"
+    //         id="outlined-required"
+    //         label="Trading Number"
+    //         defaultValue={formValue.TrackingNumber}
+    //     />
+    // </div>
+    handleAdditionalCostInputs = (e, index) => {
+        let validated;
+        const { value, name } = e.target
+        let tempFormValue = this.state.formValue
+        let additionalCostItems = tempFormValue.AdditionalCost
+
+        switch (name) {
+            case "AdditionalChargedRemark":
+                const chargedAmount = additionalCostItems[index].chargedAmount
+                validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(chargedAmount)) && !isNaN(chargedAmount) && (Number(value) > 0)
+                additionalCostItems[index].chargedRemark = value
+                additionalCostItems[index].validated = validated
+                tempFormValue.AdditionalCost = additionalCostItems
+
+                this.setState({ formValue: tempFormValue })
+                break;
+
+            case "AdditionalChargedAmount":
+                const chargedRemark = additionalCostItems[index].chargedRemark
+                validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(chargedRemark)) && !isNaN(e.target.value) && (Number(value) > 0)
+                additionalCostItems[index].chargedAmount = value
+                additionalCostItems[index].validated = validated
+                tempFormValue.AdditionalCost = additionalCostItems
+
+                this.setState({ formValue: tempFormValue })
+                break;
+
+            default:
+        }
+    }
+
+    RenderAdditionalCost = () => {
+        const { formValue } = this.state
+        let tempFormValue = formValue
+        let additionalCostItems = (!isObjectUndefinedOrNull(tempFormValue.AdditionalCost)) ? formValue.AdditionalCost : []
+        let obj = {
+            chargedRemark: "",
+            chargedAmount: "",
+            validated: null
+        }
+
+        if (additionalCostItems.length > 0) {
+            if (additionalCostItems[additionalCostItems.length - 1].validated)
+                additionalCostItems.push(obj)
+        }
+        else
+            additionalCostItems.push(obj)
+
+        tempFormValue.AdditionalCost = additionalCostItems
+        this.setState({ formValue: tempFormValue })
+    }
+
+    handleRemoveAdditionalCosts(index) {
+        const { formValue } = this.state
+        let tempFormValue = formValue
+        let additionalCostItems = (!isObjectUndefinedOrNull(tempFormValue.AdditionalCost)) ? tempFormValue.AdditionalCost : []
+
+        if (additionalCostItems.length > 0) {
+            additionalCostItems.splice(index, 1)
+            console.log(tempFormValue)
+            this.setState({ formValue: tempFormValue })
+        }
+
+    }
+
+    removeAllAdditionalCost() {
+        let tempFormValue = this.state.formValue
+        tempFormValue.AdditionalCost = []
+        this.setState({ formValue: tempFormValue })
+    }
+
+
     render() {
-        const Data = this.props.data ? this.props.data : [];
+        const formValue = this.props.data ? this.props.data : [];
+        var validation = {
+            TrackingNumberVerified: false,
+            MemberNumberVerified: false,
+            DepthVerified: false,
+            WidthVerified: false,
+            HeightVerified: false,
+            WeightVerified: false,
+
+        }
+        console.log(formValue.UserAreaID)
         return (
             <div>
-                <Card>
-                    <CardContent>
-                        <div className="d-flex align-items-center">
-                            <IconButton
-                                color="primary"
-                                aria-label="back"
-                                component="span"
-                                onClick={() => this.props.history.goBack()}
-                            >
-                                <ArrowBackIcon />
-                            </IconButton>
-                            <Typography variant="h5" component="div">
-                                Order Details
-                            </Typography>
+
+                <div className="d-flex align-items-center">
+                    <IconButton
+                        color="primary"
+                        aria-label="back"
+                        component="span"
+                        onClick={() => this.props.history.goBack()}
+                    >
+                        <ArrowBackIcon />
+                    </IconButton>
+                    <Typography variant="h5" component="div">
+                        Order Details
+                    </Typography>
+                </div>
+
+                <div className="py-md-3 py-1">
+                    <div className="row">
+                        <div className="col-12 col-md-4">
+                            <TextField variant="standard" size="small" fullWidth label="Tracking Number" name="TrackingNumber" value={formValue.TrackingNumber}  onChange={(e) => this.onTrigger(e, "TrackingNumber")} error={!validation.TrackingNumberVerified} />
+                            {!formValue.TrackingNumberVerified && <FormHelperText sx={{ color: 'red' }} id="TrackingNumber-error-text">Invalid</FormHelperText>}
                         </div>
-                        <div className="row">
-                            <div className="col-lg-6 col-md-6 col-sm-12">
-                                <TextField
-                                    onChange={(e) => this.onTrigger(e, "TrackingNumber")}
-                                    className="w-100 my-3"
-                                    required
-                                    variant="standard"
-                                    id="outlined-required"
-                                    label="Trading Number"
-                                    defaultValue={Data.TrackingNumber}
-                                />
-                            </div>
-                            <div className="col-lg-6 col-md-6 col-sm-12">
-                                <TextField
-                                    onChange={(e) => this.onTrigger(e, "UserCode")}
-                                    className="w-100 my-3"
-                                    required
-                                    variant="standard"
-                                    id="outlined-required"
-                                    label="Member Number"
-                                    defaultValue={Data.UserCode}
-                                />
-                            </div>
+                        <div className="col-12 col-md-4">
+                            <TextField variant="standard" size="small" fullWidth label="Member Number" name="MemberNumber" value={formValue.UserCode}  onChange={(e) => this.onTrigger(e, "UserCode")} error={!validation.MemberNumberVerified} />
+                            {!formValue.MemberNumberVerified && <FormHelperText sx={{ color: 'red' }} id="MemberNumber-error-text">Invalid</FormHelperText>}
                         </div>
-                        <div className="row">
-                            <div className="col-lg-4 col-md-4 col-sm-6">
-                                <TextField
-                                    onChange={(e) => this.onTrigger(e, "ProductDimensionWidth")}
-                                    className="w-100 my-3"
-                                    required
+                        <div className="col-12 col-md-4">
+                            <FormControl variant="standard" size="small" fullWidth>
+                                <InputLabel id="Division-label">Division</InputLabel>
+                                <Select
+                                    labelId="Division"
+                                    id="Division"
+                                    name="Division"
+                                    defaultValue={formValue.UserAreaID}
+                                    onChange={(e) => this.onTrigger(e, "UserAreaID")}
+                                    label="Division"
+                                >
+                                    {/* {console.log()} */}
+                                    {
+                                        isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
+                                            return <MenuItem value={el.UserAreaID} key={idx}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
+
+                                        })
+                                    }
+                                </Select>
+                            </FormControl>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-4 col-sm-3">
+                            <FormControl variant="standard" size="small" fullWidth>
+                                <InputLabel htmlFor="Depth">Depth</InputLabel>
+                                <Input
                                     variant="standard"
-                                    id="outlined-required"
-                                    label="Width (m)"
-                                    defaultValue={Data.ProductDimensionWidth}
-                                />
-                            </div>
-                            <div className="col-lg-4 col-md-4 col-sm-6">
-                                <TextField
-                                    onChange={(e) => this.onTrigger(e, "ProductDimensionHeight")}
-                                    className="w-100 my-3"
-                                    required
-                                    variant="standard"
-                                    id="outlined-required"
-                                    label="Height (m)"
-                                    defaultValue={Data.ProductDimensionHeight}
-                                />
-                            </div>
-                            <div className="col-lg-4 col-md-4 col-sm-6">
-                                <TextField
+                                    size="small"
+                                    name="Depth"
+                                    value={formValue.ProductDimensionDeep}
                                     onChange={(e) => this.onTrigger(e, "ProductDimensionDeep")}
-                                    className="w-100 my-3"
-                                    required
-                                    variant="standard"
-                                    id="outlined-required"
-                                    label="Depth (m)"
-                                    defaultValue={Data.ProductDimensionDeep}
+                                    endAdornment={<InputAdornment position="start">m</InputAdornment>}
+                                    error={!validation.DepthVerified}
                                 />
-                            </div>
-                            <div className="col-lg-12 col-md-12 col-sm-6">
-                                <TextField
+                                {!validation.DepthVerified && <FormHelperText sx={{ color: 'red' }} id="Depth-error-text">Invalid</FormHelperText>}
+                            </FormControl>
+                        </div>
+                        <div className="col-4 col-sm-3">
+                            <FormControl variant="standard" size="small" fullWidth>
+                                <InputLabel htmlFor="Width">Width</InputLabel>
+                                <Input
+                                    variant="standard"
+                                    size="small"
+                                    name="Width"
+                                    value={formValue.ProductDimensionWidth}
+                                    onChange={(e) => this.onTrigger(e, "ProductDimensionWidth")}
+                                    endAdornment={<InputAdornment position="start">m</InputAdornment>}
+                                    error={!validation.WidthVerified}
+                                />
+                                {!validation.WidthVerified && <FormHelperText sx={{ color: 'red' }} id="Width-error-text">Invalid</FormHelperText>}
+                            </FormControl>
+                        </div>
+                        <div className="col-4 col-sm-3">
+                            <FormControl variant="standard" size="small" fullWidth>
+                                <InputLabel htmlFor="Height">Height</InputLabel>
+                                <Input
+                                    variant="standard"
+                                    size="small"
+                                    name="Height"
+                                    value={formValue.ProductDimensionHeight}
+                                    onChange={(e) => this.onTrigger(e, "ProductDimensionHeight")}
+                                    endAdornment={<InputAdornment position="start">m</InputAdornment>}
+                                    error={!validation.HeightVerified}
+                                />
+                                {!validation.HeightVerified && <FormHelperText sx={{ color: 'red' }} id="Height-error-text">Invalid</FormHelperText>}
+                            </FormControl>
+                        </div>
+                        <div className="col-12 col-sm-3">
+                            <FormControl variant="standard" size="small" fullWidth>
+                                <InputLabel htmlFor="Weight">Weight</InputLabel>
+                                <Input
+                                    variant="standard"
+                                    size="small"
+                                    name="Weight"
+                                    value={formValue.ProductWeight}
                                     onChange={(e) => this.onTrigger(e, "ProductWeight")}
-                                    className="w-100 my-3"
-                                    required
-                                    variant="standard"
-                                    id="outlined-required"
-                                    label="Weight (kg)"
-                                    defaultValue={Data.ProductWeight}
+                                    endAdornment={<InputAdornment position="start">KG</InputAdornment>}
+                                    error={!validation.WeightVerified}
                                 />
-                            </div>
+                                {!validation.WeightVerified && <FormHelperText sx={{ color: 'red' }} id="Weight-error-text">Invalid</FormHelperText>}
+                            </FormControl>
                         </div>
-                        <div className="row">
-                            <div className="col-lg-12 col-md-12 col-sm-6">
-                                <TextField
-                                    onChange={(e) => this.onTrigger(e, "AreaCode")}
-                                    className="w-100 my-3"
-                                    required
-                                    variant="standard"
-                                    id="outlined-required"
-                                    label="Area Code"
-                                    defaultValue={Data.AreaCode}
-                                />
-                            </div>
-                            <div className="col-lg-12 col-md-12 col-sm-6">
-                                <TextField
-                                    onChange={(e) => this.onTrigger(e, "Item")}
-                                    className="w-100 my-3"
-                                    required
-                                    variant="standard"
-                                    id="outlined-required"
-                                    label="Items"
-                                    defaultValue={Data.Item}
-                                />
-                            </div>
-                            <div className="col-lg-12 col-md-12 col-sm-6">
-                                <TextField
-                                    onChange={(e) => this.onTrigger(e, "AdditionalCharges")}
-                                    className="w-100 my-3"
-                                    required
-                                    variant="standard"
-                                    id="outlined-required"
-                                    label="Extra Charge(RM)"
-                                    defaultValue={Data.AdditionalCharges}
-                                />
-                            </div>
+                    </div>
+                    <div className="my-1 row">
+                        <div className="col-12">
+                            <Button className="my-1 w-100" color="success" variant="contained" size="small" onClick={() => { this.RenderAdditionalCost() }}>Add Additional Costs</Button>
                         </div>
-                        <TextField
-                            onChange={(e) => this.onTrigger(e, "Remark")}
-                            className="w-100 my-3"
-                            // required
-                            multiline
-                            rows={4}
-                            variant="standard"
-                            id="outlined-required"
-                            label="Remark"
-                            defaultValue={Data.Remark}
-                        />
-                        <Typography sx={{ mb: 1.5 }} component="div" color="text.secondary">
-                            Reminder
-                        </Typography>
-                        <Typography variant="body2" component="div">
-                            Please fill in all the required information
-                            <br />
-                            {/* {'-'} */}
-                        </Typography>
-                    </CardContent>
-                    <CardActions>
-                        {/* <Button size="small">Learn More</Button> */}
-                    </CardActions>
-                </Card>
+
+                    </div>
+                    {
+                        isArrayNotEmpty(formValue.AdditionalCost) && formValue.AdditionalCost.map((el, idx) => {
+                            return (
+                                <div className="row">
+                                    <div className="col-6 col-sm-8">
+                                        <TextField
+                                            variant="standard"
+                                            size="small"
+                                            fullWidth
+                                            label={"Add. Chg. " + (idx + 1)}
+                                            name="AdditionalChargedRemark"
+                                            value={el.Remark}
+                                            onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
+                                            error={!el.validated}
+                                        />
+                                        {console.log(el)}
+                                        {!el.validated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
+                                    </div>
+                                    <div className="col-4 col-sm-3">
+                                        <FormControl variant="standard" size="small" fullWidth>
+                                            <InputLabel htmlFor="AdditionalChargedAmount"></InputLabel>
+                                            <Input
+                                                variant="standard"
+                                                size="small"
+                                                name="AdditionalChargedAmount"
+                                                value={el.chargedAmount}
+                                                onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
+                                                startAdornment={<InputAdornment position="start">RM</InputAdornment>}
+                                                error={!el.validated}
+                                            />
+                                            {!el.validated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
+
+                                        </FormControl>
+                                    </div>
+                                    <div className="col-2 col-sm-1 d-flex">
+                                        <IconButton className='m-auto' color="primary" size="small" aria-label="remove-additional-cost" component="span" onClick={() => this.handleRemoveAdditionalCosts(idx)}>
+                                            <DeleteIcon size="inherit" />
+                                        </IconButton>
+                                    </div>
+                                </div>
+                            )
+                        })
+                    }
+                    {
+                        isArrayNotEmpty(formValue.AdditionalCost) &&
+                        <div className="mt-3 col-12">
+                            <Button className="my-1 w-100" color="error" variant="contained" size="small" onClick={() => { this.removeAllAdditionalCost() }} startIcon={<DeleteIcon />}>Clear Additional Costs</Button>
+                        </div>
+                    }
+                </div>
             </div>
         )
     }
