@@ -311,7 +311,6 @@ export class GitEpic {
       }
     });
 
-
   //   Inventory_UpdateStockStatus = action$ =>
   //   action$.ofType(GitAction.UpdateInventoryStockStatus).switchMap(async ({ payload }) => {
   //     console.log(url +
@@ -343,6 +342,7 @@ export class GitEpic {
   //     }
   // >>>>>>> 37db0b75379f395e9b923fa20c436716dbc39c28
   //   });
+
   Inventory_UpdateStockDetailByPost = action$ =>
     action$.ofType(GitAction.UpdateStockDetailByPost).switchMap(async ({ payload }) => {
 
