@@ -513,15 +513,6 @@ export class GitEpic {
 
   Transaction_InsertTransaction = action$ =>
     action$.ofType(GitAction.InsertNewTransaction).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Transaction_InsertTransaction?" +
-        "USERID=" + payload.USERID +
-        "&CALCULATIONTYPE=" + payload.TYPE +
-        "&ORDERTOTALMOUNT=" + payload.ORDERTOTALMOUNT +
-        "&ORDERPAIDMOUNT=" + payload.ORDERPAIDMOUNT +
-        "&STOCKID=" + payload.STOCKID +
-        "&PRODUCTPRICE=" + payload.PRODUCTPRICE
-      )
       try {
         const response = await fetch(url +
           "Transaction_InsertTransaction?" +
@@ -573,7 +564,7 @@ export class GitEpic {
         };
       }
       catch (error) {
-        toast.error("Error Code: Transaction_InsertTransaction")
+        toast.error("Error Code: Transaction_UpdateTransactionStatus")
         return {
           type: GitAction.UpdatedTransaction,
           payload: [],
