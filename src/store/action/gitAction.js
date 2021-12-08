@@ -185,7 +185,15 @@ export class GitAction {
     };
   }
 
-
+  static GetFilteredInventory = "GET-FILTERED-INVENTORY";
+  static GotFilteredInventory = "GOT-FILTERED-INVENTORY";
+  static CallFilterInventory(propsData) {
+    return {
+      type: GitAction.GetFilteredInventory,
+      payload: propsData
+    };
+  }
+ 
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
   static InsertNewTransaction = "INSERT_NEW_TRANSACTION";
   static NewTransactionInserted = "NEW_TRANSACTION_INSERTED";

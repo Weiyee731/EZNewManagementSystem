@@ -15,6 +15,7 @@ import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CircularProgress from '@mui/material/CircularProgress';
 import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
 import SearchBar from "../../../components/SearchBar/SearchBar"
 import TableComponents from "../../../components/TableComponents/TableComponents";
@@ -23,6 +24,7 @@ import AlertDialog from "../../../components/modal/Modal";
 import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
 import ResponsiveDatePickers from '../../../components/datePicker/datePicker';
 import axios from "axios";
+import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
 
 import "./OverallStock.css";
 
@@ -37,6 +39,7 @@ function mapDispatchToProps(dispatch) {
     return {
         CallFetchAllStock: (propsData) => dispatch(GitAction.CallFetchAllStock(propsData)),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
+        CallFilterInventory: (propsData) => dispatch(GitAction.CallFilterInventory(propsData)),
     };
 }
 
@@ -159,8 +162,8 @@ const INITIAL_STATE = {
     searchKeywords: "",
     searchCategory: "All",
     searchArea: "All",
-    searchBeginDate: "",
-    searchEndDate: "",
+    searchDates: [],
+    isOnSearch: false,
 }
 
 class OverallStock extends Component {
@@ -168,7 +171,7 @@ class OverallStock extends Component {
         super(props);
         this.state = INITIAL_STATE
 
-        this.props.CallFetchAllStock({ USERID: 1 })
+        // this.props.CallFetchAllStock({ USERID: 1 })
         this.props.CallUserAreaCode()
 
         this.changeTab = this.changeTab.bind(this)
@@ -184,6 +187,7 @@ class OverallStock extends Component {
         this.handleSearchInput = this.handleSearchInput.bind(this)
         this.handleSearchCategory = this.handleSearchCategory.bind(this)
         this.handleSearchArea = this.handleSearchArea.bind(this)
+        this.onDateChange = this.onDateChange.bind(this)
     }
 
     componentDidMount() {
@@ -192,10 +196,13 @@ class OverallStock extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (this.state.filteredList === null && isArrayNotEmpty(this.props.stocks)) {
             const { stocks } = this.props
-            // console.log(stocks)
+            
             this.setState({
-                filteredList: (isStringNullOrEmpty(stocks.ReturnVal) && stocks.ReturnVal == 0) ? [] : stocks
+                filteredList: (isStringNullOrEmpty(stocks.ReturnVal) && stocks.ReturnVal == 0) ? [] : stocks,
+                isOnSearch: false
             })
+
+            toast.dismiss();
         }
     }
 
@@ -254,7 +261,7 @@ class OverallStock extends Component {
                 >
                     {data.TrackingNumber}
                 </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * 100).toFixed(1)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionWidth * 100).toFixed(1)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionHeight * 100).toFixed(1)}</TableCell>
@@ -324,13 +331,13 @@ class OverallStock extends Component {
         const { formValue } = this.state
 
         let extraChangesValue = "";
-        
+
         if (formValue.AdditionalCost.length > 0) {
             for (var i = 0; i < formValue.AdditionalCost.length; i++) {
                 extraChangesValue += formValue.AdditionalCost[i].Charges + ":" + formValue.AdditionalCost[i].Value + ";"
             }
         }
-        else{
+        else {
             extraChangesValue = "-"
         }
 
@@ -478,7 +485,46 @@ class OverallStock extends Component {
     }
 
     onSearch() {
-        console.log('search')
+        const { filteredList, searchKeywords, searchCategory, searchArea, searchDates, isOnSearch } = this.state
+        const { stocks } = this.props
+
+        let date_range = (typeof searchDates === "string" && !Array.isArray(searchDates)) ? JSON.parse(searchDates) : searchDates
+
+        // CallFilterInventory
+        if (searchArea === "All" && searchCategory === "All" && isStringNullOrEmpty(searchKeywords) && !isArrayNotEmpty(date_range)) {
+            this.props.CallFetchAllStock({ USERID: 1 })
+            toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark"})
+            this.setState({ isOnSearch: true })
+        }
+        else {
+            let tempList = stocks
+
+            let filteringKeywords = {
+                FILTERCOLUMN: "",
+                FILTERKEYWORD: ""
+            }
+            console.log(filteringKeywords)
+            // this.props.CallFilterInventory(filteringKeywords)
+
+            console.log(searchKeywords)
+            console.log(searchCategory)
+            console.log(searchArea)
+            console.log(date_range)
+
+            if (!isStringNullOrEmpty(searchKeywords)) {
+                if (searchCategory !== "All" || searchArea !== "All") {
+                    console.log(tempList)
+                    // filteredList.filter()
+                }
+                else{
+
+                }
+            }
+
+            if (isArrayNotEmpty(stocks)) {
+
+            }
+        }
     }
 
     handleSearchInput(e) {
@@ -491,6 +537,10 @@ class OverallStock extends Component {
 
     handleSearchArea(e) {
         this.setState({ searchArea: e.target.value })
+    }
+
+    onDateChange(e) {
+        this.setState({ searchDates: e })
     }
 
     render() {
@@ -568,7 +618,7 @@ class OverallStock extends Component {
                     </div>
                     <div className="col-md-4 col-12 mb-2 d-flex">
                         <div className="w-100 mt-auto">
-                            <SearchBar id="" placeholder="Enter Member No, Tracking No or Container No to search" buttonOnClick={() => this.onSearch()} onChange={this.handleSearchInput} className="searchbar-input mt-auto"/>
+                            <SearchBar id="" placeholder="Enter Member No, Tracking No or Container No to search" buttonOnClick={() => this.onSearch()} onChange={this.handleSearchInput} className="searchbar-input mt-auto" disableButton={this.state.isOnSearch} />
                         </div>
                     </div>
                 </div>

@@ -252,10 +252,7 @@ export class GitEpic {
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
   Inventory_ViewStockList = action$ =>
     action$.ofType(GitAction.FetchStocks).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Inventory_ViewStockList?" +
-        "TRACKINGSTATUSID=" + payload.USERID
-      )
+    
       try {
         const response = await fetch(url +
           "Inventory_ViewStockList?" +
@@ -495,6 +492,36 @@ export class GitEpic {
           };
         })
         .catch(error => toast.error("Error code: 8003"));
+    });
+
+  Inventory_GetFilteredStockList = action$ =>
+    action$.ofType(GitAction.GetFilteredInventory).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Inventory_ViewStockListByFilter?" +
+        "FILTERCOLUMN=" + payload.FILTERCOLUMN +
+        "FILTERKEYWORD=" + payload.FILTERKEYWORD
+      )
+      try {
+        const response = await fetch(url +
+          "Inventory_ViewStockListByFilter?" +
+          "FILTERCOLUMN=" + payload.FILTERCOLUMN +
+          "FILTERKEYWORD=" + payload.FILTERKEYWORD
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.GotFilteredInventory,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_GetFilteredStockList")
+        return {
+          type: GitAction.GotFilteredInventory,
+          payload: [],
+        };
+      }
     });
 
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////

@@ -97,6 +97,13 @@ export function counterReducer(state = INITIAL_STATE, action) {
         loading: false,
         stocks: action.payload
       });
+    case GitAction.GetFilteredInventory:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.GotFilteredInventory:
+      return Object.assign({}, state, {
+        loading: false,
+        stocks: action.payload
+      });
     case GitAction.ResetStocksList:
       return Object.assign({}, state, { stocks: [] });
 
