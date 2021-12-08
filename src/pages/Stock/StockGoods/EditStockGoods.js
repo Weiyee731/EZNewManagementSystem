@@ -38,6 +38,14 @@ const INITIAL_STATE = {
 
 }
 
+var validation = {
+    TrackingNumberVerified: null,
+    MemberNumberVerified: null,
+    DepthVerified: null,
+    WidthVerified: null,
+    HeightVerified: null,
+    WeightVerified: null,
+}
 class EditStockGoods extends Component {
     constructor(props) {
         super(props);
@@ -60,60 +68,57 @@ class EditStockGoods extends Component {
     }
 
     onTrigger = (event, statement) => {
+        const value = event.target.value
+
         if (statement === "TrackingNumber") {
-            this.props.parentCallback({ "TrackingNumber": event.target.value });
+            validation.TrackingNumberVerified = !isStringNullOrEmpty(value)
+            this.props.parentCallback({ "TrackingNumber": value });
             event.preventDefault();
         }
         if (statement === "UserCode") {
-            this.props.parentCallback({ "UserCode": event.target.value });
+            validation.MemberNumberVerified = !isStringNullOrEmpty(value)
+            console.log(validation.MemberNumberVerified)
+            this.props.parentCallback({ "UserCode": value });
             event.preventDefault();
         }
         if (statement === "ProductDimensionWidth") {
-            this.props.parentCallback({ "ProductDimensionWidth": event.target.value });
+            validation.WidthVerified = !isStringNullOrEmpty(value) && !isNaN(value)
+            this.props.parentCallback({ "ProductDimensionWidth": value });
             event.preventDefault();
         }
         if (statement === "ProductDimensionHeight") {
-            this.props.parentCallback({ "ProductDimensionHeight": event.target.value });
+            validation.HeightVerified = !isStringNullOrEmpty(value) && !isNaN(value)
+            this.props.parentCallback({ "ProductDimensionHeight": value });
             event.preventDefault();
         }
         if (statement === "ProductDimensionDeep") {
-            this.props.parentCallback({ "ProductDimensionDeep": event.target.value });
+            validation.DepthVerified = !isStringNullOrEmpty(value) && !isNaN(value)
+            this.props.parentCallback({ "ProductDimensionDeep": value });
             event.preventDefault();
         }
         if (statement === "ProductWeight") {
-            this.props.parentCallback({ "ProductWeight": event.target.value });
+            validation.WeightVerified = !isStringNullOrEmpty(value) && !isNaN(value)
+            this.props.parentCallback({ "ProductWeight": value });
             event.preventDefault();
         }
         if (statement === "UserAreaID") {
-            this.props.parentCallback({ "UserAreaID": event.target.value });
+            this.props.parentCallback({ "UserAreaID": value });
             event.preventDefault();
         }
         if (statement === "Item") {
-            this.props.parentCallback({ "Item": event.target.value });
+            this.props.parentCallback({ "Item": value });
             event.preventDefault();
         }
         if (statement === "AdditionalCharges") {
-            this.props.parentCallback({ "AdditionalCharges": event.target.value });
+            this.props.parentCallback({ "AdditionalCharges": value });
             event.preventDefault();
         }
         if (statement === "Remark") {
-            this.props.parentCallback({ "Remark": event.target.value });
+            this.props.parentCallback({ "Remark": value });
             event.preventDefault();
         }
     }
 
-
-    //     <div className="col-lg-6 col-md-6 col-sm-12">
-    //     <TextField
-    //         onChange={(e) => this.onTrigger(e, "TrackingNumber")}
-    //         className="w-100 my-3"
-    //         required
-    //         variant="standard"
-    //         id="outlined-required"
-    //         label="Trading Number"
-    //         defaultValue={formValue.TrackingNumber}
-    //     />
-    // </div>
     handleAdditionalCostInputs = (e, index) => {
         let validated;
         const { value, name } = e.target
@@ -146,9 +151,9 @@ class EditStockGoods extends Component {
     }
 
     RenderAdditionalCost = () => {
-        const { formValue } = this.state
-        let tempFormValue = formValue
-        let additionalCostItems = (!isObjectUndefinedOrNull(tempFormValue.AdditionalCost)) ? formValue.AdditionalCost : []
+        // const { formValue } = this.state
+        let tempFormValue = validation;
+        let additionalCostItems = (!isObjectUndefinedOrNull(tempFormValue.AdditionalCost)) ? validation.AdditionalCost : []
         let obj = {
             chargedRemark: "",
             chargedAmount: "",
@@ -163,67 +168,44 @@ class EditStockGoods extends Component {
             additionalCostItems.push(obj)
 
         tempFormValue.AdditionalCost = additionalCostItems
-        this.setState({ formValue: tempFormValue })
+        validation = tempFormValue;
+        // this.setState({ formValue: tempFormValue })
     }
 
     handleRemoveAdditionalCosts(index) {
-        const { formValue } = this.state
-        let tempFormValue = formValue
+        // const { formValue } = this.state
+        let tempFormValue = validation
         let additionalCostItems = (!isObjectUndefinedOrNull(tempFormValue.AdditionalCost)) ? tempFormValue.AdditionalCost : []
 
         if (additionalCostItems.length > 0) {
             additionalCostItems.splice(index, 1)
             console.log(tempFormValue)
-            this.setState({ formValue: tempFormValue })
+            validation = tempFormValue;
         }
 
     }
 
     removeAllAdditionalCost() {
-        let tempFormValue = this.state.formValue
+        let tempFormValue = validation
         tempFormValue.AdditionalCost = []
-        this.setState({ formValue: tempFormValue })
+        validation = tempFormValue;
     }
-
 
     render() {
         const formValue = this.props.data ? this.props.data : [];
-        var validation = {
-            TrackingNumberVerified: false,
-            MemberNumberVerified: false,
-            DepthVerified: false,
-            WidthVerified: false,
-            HeightVerified: false,
-            WeightVerified: false,
 
-        }
-        console.log(formValue.UserAreaID)
         return (
             <div>
-
-                <div className="d-flex align-items-center">
-                    <IconButton
-                        color="primary"
-                        aria-label="back"
-                        component="span"
-                        onClick={() => this.props.history.goBack()}
-                    >
-                        <ArrowBackIcon />
-                    </IconButton>
-                    <Typography variant="h5" component="div">
-                        Order Details
-                    </Typography>
-                </div>
-
                 <div className="py-md-3 py-1">
                     <div className="row">
                         <div className="col-12 col-md-4">
-                            <TextField variant="standard" size="small" fullWidth label="Tracking Number" name="TrackingNumber" value={formValue.TrackingNumber}  onChange={(e) => this.onTrigger(e, "TrackingNumber")} error={!validation.TrackingNumberVerified} />
-                            {!formValue.TrackingNumberVerified && <FormHelperText sx={{ color: 'red' }} id="TrackingNumber-error-text">Invalid</FormHelperText>}
+                            <TextField variant="standard" size="small" fullWidth label="Tracking Number" name="TrackingNumber" defaultValue={formValue.TrackingNumber} onChange={(e) => this.onTrigger(e, "TrackingNumber")} error={!validation.TrackingNumberVerified} />
+                            {!validation.TrackingNumberVerified && <FormHelperText sx={{ color: 'red' }} id="TrackingNumber-error-text">Invalid</FormHelperText>}
                         </div>
                         <div className="col-12 col-md-4">
-                            <TextField variant="standard" size="small" fullWidth label="Member Number" name="MemberNumber" value={formValue.UserCode}  onChange={(e) => this.onTrigger(e, "UserCode")} error={!validation.MemberNumberVerified} />
-                            {!formValue.MemberNumberVerified && <FormHelperText sx={{ color: 'red' }} id="MemberNumber-error-text">Invalid</FormHelperText>}
+                            <TextField variant="standard" size="small" fullWidth label="Member Number" name="MemberNumber" defaultValue={formValue.UserCode} onChange={(e) => this.onTrigger(e, "UserCode")} error={!validation.MemberNumberVerified} />
+                            {console.log("member", validation.MemberNumberVerified)}
+                            {!validation.MemberNumberVerified && <FormHelperText sx={{ color: 'red' }} id="MemberNumber-error-text">Invalid</FormHelperText>}
                         </div>
                         <div className="col-12 col-md-4">
                             <FormControl variant="standard" size="small" fullWidth>
@@ -236,11 +218,10 @@ class EditStockGoods extends Component {
                                     onChange={(e) => this.onTrigger(e, "UserAreaID")}
                                     label="Division"
                                 >
-                                    {/* {console.log()} */}
+                                    {console.log("UserAreaID", formValue.UserAreaID)}
                                     {
                                         isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
                                             return <MenuItem value={el.UserAreaID} key={idx}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
-
                                         })
                                     }
                                 </Select>
@@ -255,7 +236,7 @@ class EditStockGoods extends Component {
                                     variant="standard"
                                     size="small"
                                     name="Depth"
-                                    value={formValue.ProductDimensionDeep}
+                                    defaultValue={formValue.ProductDimensionDeep}
                                     onChange={(e) => this.onTrigger(e, "ProductDimensionDeep")}
                                     endAdornment={<InputAdornment position="start">m</InputAdornment>}
                                     error={!validation.DepthVerified}
@@ -270,7 +251,7 @@ class EditStockGoods extends Component {
                                     variant="standard"
                                     size="small"
                                     name="Width"
-                                    value={formValue.ProductDimensionWidth}
+                                    defaultValue={formValue.ProductDimensionWidth}
                                     onChange={(e) => this.onTrigger(e, "ProductDimensionWidth")}
                                     endAdornment={<InputAdornment position="start">m</InputAdornment>}
                                     error={!validation.WidthVerified}
@@ -285,7 +266,7 @@ class EditStockGoods extends Component {
                                     variant="standard"
                                     size="small"
                                     name="Height"
-                                    value={formValue.ProductDimensionHeight}
+                                    defaultValue={formValue.ProductDimensionHeight}
                                     onChange={(e) => this.onTrigger(e, "ProductDimensionHeight")}
                                     endAdornment={<InputAdornment position="start">m</InputAdornment>}
                                     error={!validation.HeightVerified}
@@ -300,7 +281,7 @@ class EditStockGoods extends Component {
                                     variant="standard"
                                     size="small"
                                     name="Weight"
-                                    value={formValue.ProductWeight}
+                                    defaultValue={formValue.ProductWeight}
                                     onChange={(e) => this.onTrigger(e, "ProductWeight")}
                                     endAdornment={<InputAdornment position="start">KG</InputAdornment>}
                                     error={!validation.WeightVerified}
@@ -326,11 +307,10 @@ class EditStockGoods extends Component {
                                             fullWidth
                                             label={"Add. Chg. " + (idx + 1)}
                                             name="AdditionalChargedRemark"
-                                            value={el.Remark}
+                                            defaultValue={el.Remark}
                                             onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
                                             error={!el.validated}
                                         />
-                                        {console.log(el)}
                                         {!el.validated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
                                     </div>
                                     <div className="col-4 col-sm-3">
@@ -340,7 +320,7 @@ class EditStockGoods extends Component {
                                                 variant="standard"
                                                 size="small"
                                                 name="AdditionalChargedAmount"
-                                                value={el.chargedAmount}
+                                                defaultValue={el.chargedAmount}
                                                 onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
                                                 startAdornment={<InputAdornment position="start">RM</InputAdornment>}
                                                 error={!el.validated}

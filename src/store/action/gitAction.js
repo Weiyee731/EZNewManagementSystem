@@ -122,7 +122,7 @@ export class GitAction {
   static ResetStockStatusReturn = "RESET-STOCK-STATUS_RETURN";
   static CallUpdateStockStatus(propsData) {
     return {
-      type: GitAction.CallUpdateStockStatus,
+      type: GitAction.UpdateInventoryStockStatus,
       payload: propsData
     };
   }

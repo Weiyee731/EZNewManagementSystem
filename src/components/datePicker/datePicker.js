@@ -32,7 +32,7 @@ export default function ResponsiveDatePickers(props) {
                   className={(isObjectUndefinedOrNull(startPickerPropsOptions) && isStringNullOrEmpty(startPickerPropsOptions.className)) ? "" : startPickerPropsOptions.className}
                   variant={(isObjectUndefinedOrNull(startPickerPropsOptions) && isStringNullOrEmpty(startPickerPropsOptions.variant)) ? "standard" : startPickerPropsOptions.varinat}
                 />
-                <Box sx={{ mx: 2 }}> to </Box>
+                <Box sx={{ mx: 1 }}> to </Box>
                 <TextField
                   {...endProps}
                   className={(isObjectUndefinedOrNull(endPickerPropsOptions) && isObjectUndefinedOrNull(endPickerPropsOptions.className)) ? {} : endPickerPropsOptions.className}

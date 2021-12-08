@@ -506,71 +506,69 @@ class OverallStock extends Component {
         return (
             <div className="container-fluid">
                 <div className="row">
-                    <div className="col-md-4 col-12">
-                        <div className="col-md-12 col-12">
-                            <div className="filter-dropdown row">
-                                <div className="col-md-6 col-12">
-                                    <div className="d-inline-block w-100">
-                                        <label className="">Filter By:</label>
-                                        <Select
-                                            labelId="search-filter-category"
-                                            id="search-filter-category"
-                                            value={searchCategory}
-                                            label="Search By"
-                                            onChange={this.handleSearchCategory}
-                                            size="small"
-                                            IconComponent={FilterListOutlinedIcon}
-                                            className="w-100"
-                                            // style={{width: '40%', marginRight: 10}}
-                                            placeholder="filter by"
-                                        >
-                                            <MenuItem key="search_all" value="All">All</MenuItem>
-                                            <MenuItem key="search_tracking" value="Tracking">Tracking Number</MenuItem>
-                                            <MenuItem key="search_member" value={"Member"}>Member</MenuItem>
-                                            <MenuItem key="search_container" value={"Container"}>Container</MenuItem>
-                                        </Select>
-                                    </div>
+                    <div className="col-md-4 col-12 mb-2">
+                        <div className="filter-dropdown row">
+                            <div className="col-md-6 col-12">
+                                <div className="d-inline-block w-100">
+                                    <label className="">Filter By:</label>
+                                    <Select
+                                        labelId="search-filter-category"
+                                        id="search-filter-category"
+                                        value={searchCategory}
+                                        label="Search By"
+                                        onChange={this.handleSearchCategory}
+                                        size="small"
+                                        IconComponent={FilterListOutlinedIcon}
+                                        className="w-100"
+                                        // style={{width: '40%', marginRight: 10}}
+                                        placeholder="filter by"
+                                    >
+                                        <MenuItem key="search_all" value="All">All</MenuItem>
+                                        <MenuItem key="search_tracking" value="Tracking">Tracking Number</MenuItem>
+                                        <MenuItem key="search_member" value={"Member"}>Member</MenuItem>
+                                        <MenuItem key="search_container" value={"Container"}>Container</MenuItem>
+                                    </Select>
                                 </div>
-                                <div className="col-md-6 col-12">
-                                    <div className="d-inline-block w-100">
-                                        <label>Area:</label>
-                                        <Select
-                                            labelId="search-filter-area"
-                                            id="search-filter-area"
-                                            value={searchArea}
-                                            label="Area"
-                                            onChange={this.handleSearchArea}
-                                            size="small"
-                                            className="w-100"
-                                            placeholder="filter by"
-                                        >
-                                            <MenuItem key="all_area" value="All">All</MenuItem>
-                                            {
-                                                isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
-                                                    return <MenuItem key={el.AreaCode} value={el.UserAreaID}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
-                                                })
-                                            }
-                                        </Select>
-                                    </div>
+                            </div>
+                            <div className="col-md-6 col-12">
+                                <div className="d-inline-block w-100">
+                                    <label>Area:</label>
+                                    <Select
+                                        labelId="search-filter-area"
+                                        id="search-filter-area"
+                                        value={searchArea}
+                                        label="Area"
+                                        onChange={this.handleSearchArea}
+                                        size="small"
+                                        className="w-100"
+                                        placeholder="filter by"
+                                    >
+                                        <MenuItem key="all_area" value="All">All</MenuItem>
+                                        {
+                                            isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
+                                                return <MenuItem key={el.AreaCode} value={el.UserAreaID}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
+                                            })
+                                        }
+                                    </Select>
                                 </div>
                             </div>
                         </div>
-                        <div className="col-md-12 col-12 mt-2 stock-date-range-picker">
-                            <ResponsiveDatePickers
-                                rangePicker
-                                openTo="day"
-                                title="FromDate"
-                                value={this.state.datevalue ? this.state.datevalue : ""}
-                                onChange={(e) => this.onDateChange(e)}
-                                variant="outlined"
-                                startPickerPropsOptions={{ placeholder: "From", className: "start-date-picker" }}
-                                endPickerPropsOptions={{ placeholder: "To", className: "end-date-picker" }}
-                            />
-                        </div>
                     </div>
-                    <div className="col-md-8 col-12">
-                        <div className="col-md-12 col-12 m-auto">
-                            <SearchBar id="" placeholder="Enter Member No, Tracking No or Container No to search" buttonOnClick={() => this.onSearch()} onChange={this.handleSearchInput} />
+                    <div className="col-md-4 col-12 mb-2 stock-date-range-picker">
+                        <ResponsiveDatePickers
+                            rangePicker
+                            openTo="day"
+                            title="FromDate"
+                            value={this.state.datevalue ? this.state.datevalue : ""}
+                            onChange={(e) => this.onDateChange(e)}
+                            variant="outlined"
+                            startPickerPropsOptions={{ placeholder: "From", className: "start-date-picker" }}
+                            endPickerPropsOptions={{ placeholder: "To", className: "end-date-picker" }}
+                        />
+                    </div>
+                    <div className="col-md-4 col-12 mb-2 d-flex">
+                        <div className="w-100 mt-auto">
+                            <SearchBar id="" placeholder="Enter Member No, Tracking No or Container No to search" buttonOnClick={() => this.onSearch()} onChange={this.handleSearchInput} className="searchbar-input mt-auto"/>
                         </div>
                     </div>
                 </div>

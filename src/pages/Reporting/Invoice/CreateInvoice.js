@@ -16,11 +16,10 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchBar from "../../../components/SearchBar/SearchBar"
 import TableComponents from "../../../components/TableComponents/TableComponents";
-import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents";
+import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
 import Stack from '@mui/material/Stack';
 import AlertDialog from "../../../components/modal/Modal";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
-import ProformaList from "./ProformaList";
 import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
 
 function mapStateToProps(state) {
@@ -130,6 +129,7 @@ const INITIAL_STATE = {
     selectedDeliveryType: null,
     totalVolumeSelected: null,
     totalWeightSelected: null,
+    searchCategory: "All",
 
     formValue: {
         TrackingNumber: "",
@@ -268,7 +268,7 @@ class CreateInvoice extends Component {
         let weight = 0
         this.state.selectedItems.map((item) => {
             weight = weight + item.ProductWeight
-            mCube = mCube + ((item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight) / 1000000)
+            mCube = mCube + ((item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight))
         })
         this.handleDeliveryModal()
         this.props.history.push({
@@ -429,12 +429,40 @@ class CreateInvoice extends Component {
         this.setState({ formValue: tempFormValue })
     }
 
+    handleSearchCategory(e) {
+        this.setState({ searchCategory: e.target.value })
+    }
+
     render() {
-        const { filteredList, formValue, openDeliveryModal, openRemarkModal } = this.state
+        const { filteredList, formValue, openDeliveryModal, openRemarkModal, searchCategory } = this.state
         console.log(filteredList)
         return (
             <div className="container-fluid">
-                <SearchBar />
+                <div className="row d-flex">
+                    <div className="col-2 m-auto">
+                        <div className="w-100 d-flex filter-dropdown">
+                            <Select
+                                labelId="search-filter-category"
+                                id="search-filter-category"
+                                value={searchCategory}
+                                label="Search By"
+                                onChange={this.handleSearchCategory}
+                                size="small"
+                                IconComponent={FilterListOutlinedIcon}
+                                className="w-75"
+                                placeholder="filter by"
+                            >
+                                <MenuItem key="search_all" value="All">All</MenuItem>
+                                <MenuItem key="search_tracking" value="Tracking">KU</MenuItem>
+                                <MenuItem key="search_member" value="Member">SKU</MenuItem>
+                                <MenuItem key="search_container" value="Container">MSU</MenuItem>
+                            </Select>
+                        </div>
+                    </div>
+                    <div className="col-md-10 col-12 m-auto">
+                        <SearchBar id="" placeholder="Enter Member No, Tracking No or Container No to search" buttonOnClick={() => this.onSearch()} onChange={this.handleSearchInput} />
+                    </div>
+                </div>
                 <hr />
                 {/* <ToggleTabsComponent Tabs={ToggleTabs} size="small" onChange={this.changeTab} /> */}
                 <TableComponents
