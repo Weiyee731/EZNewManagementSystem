@@ -132,6 +132,7 @@ const INITIAL_STATE = {
     openRemarkModal: false,
 
     formValue: {
+        StockID: "",
         TrackingNumber: "",
         TrackingNumberVerified: null,
 
@@ -271,9 +272,14 @@ class OverallStock extends Component {
     }
 
     onTableRowClick = (event, row) => {
+        console.log(row)
         let tempFormValue = this.state.formValue
-
+        tempFormValue.StockID = row.StockID
+        tempFormValue.Item = row.Item
+        tempFormValue.TrackingStatusID = row.TrackingStatusID
         tempFormValue.TrackingNumber = row.TrackingNumber;
+        tempFormValue.ContainerName = row.ContainerName;
+
         tempFormValue.TrackingNumberVerified = !isStringNullOrEmpty(row.TrackingNumber);
         tempFormValue.MemberNumber = row.UserCode;
         tempFormValue.MemberNumberVerified = !isStringNullOrEmpty(row.UserCode);
@@ -286,6 +292,7 @@ class OverallStock extends Component {
         tempFormValue.Weight = row.ProductWeight;
         tempFormValue.WeightVerified = !isStringNullOrEmpty(row.ProductWeight) && !isNaN(row.ProductWeight)
         tempFormValue.Division = Number(row.UserAreaID)
+        tempFormValue.Remark = row.Remark
 
         let additionalCharges = row.AdditionalCharges
         try { additionalCharges = JSON.parse(additionalCharges) } catch (e) { console.log(e); additionalCharges = [] }
@@ -315,8 +322,35 @@ class OverallStock extends Component {
 
     handleUpdateRemark = () => {
         const { formValue } = this.state
-        console.log('update remark')
-        console.log(formValue)
+
+        let extraChangesValue = "";
+        
+        if (formValue.AdditionalCost.length > 0) {
+            for (var i = 0; i < formValue.AdditionalCost.length; i++) {
+                extraChangesValue += formValue.AdditionalCost[i].Charges + ":" + formValue.AdditionalCost[i].Value + ";"
+            }
+        }
+        else{
+            extraChangesValue = "-"
+        }
+
+        let object = {
+            STOCKID: formValue.StockID,
+            USERCODE: formValue.MemberNumber,
+            TRACKINGNUMBER: formValue.TrackingNumber,
+            PRODUCTWEIGHT: formValue.Weight,
+            PRODUCTHEIGHT: formValue.Height,
+            PRODUCTWIDTH: formValue.Width,
+            PRODUCTDEEP: formValue.Depth,
+            AREACODE: formValue.Division,
+            ITEM: formValue.Item,
+            TRACKINGSTATUSID: formValue.TrackingStatusID,
+            CONTAINERNAME: formValue.ContainerName,
+            CONTAINERDATE: formValue.StockDate,
+            REMARK: formValue.Remark,
+            EXTRACHARGE: extraChangesValue,
+        }
+        console.log(object)
     }
 
     handleFormInput = (e) => {
@@ -571,10 +605,12 @@ class OverallStock extends Component {
                     handleToggleDialog={this.handleRemarkModal}  // required, pass the toggle function of modal
                     handleConfirmFunc={this.handleUpdateRemark}    // required, pass the confirm function 
                     showAction={true}                           // required, to show the footer of modal display
-                    title={""}                                  // required, title of the modal
+                    title={this.state.formValue.Item}                                  // required, title of the modal
                     buttonTitle={"Update"}                         // required, title of button
                     singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
                     maxWidth={"md"}
+                    draggable={true}
+
                 >
                     <div className="py-md-3 py-1">
                         <div className="row">

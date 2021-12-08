@@ -13,6 +13,7 @@ const rootEpic = combineEpics(
   gitEpic.User_ViewPage,
   gitEpic.Inventory_ViewStockList,
   gitEpic.Inventory_InsertStock,
+  gitEpic.Inventory_UpdateStockDetailByGet,
   gitEpic.Inventory_UpdateStockDetailByPost,
   // gitEpic.Inventory_UpdateStockStatus,
   gitEpic.Container_ViewContainer,

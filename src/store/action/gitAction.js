@@ -134,16 +134,24 @@ export class GitAction {
 
   static UpdateStockDetailByPost = "UPDATE-STOCKDETAIL-BY-POST";
   static UpdatedStockDetailByPost = "UPDATED-STOCKDETAIL-BY-POST";
-  static ResetUpdatedStockDetailByPost = "RESET-UPDATED-STOCKDETAIL-BY-POST";
   static CallUpdateStockDetailByPost(propsData) {
     return {
       type: GitAction.UpdateStockDetailByPost,
       payload: propsData
     };
   }
-  static CallResetUpdatedStockDetailByPost() {
+  static UpdateStockDetailByGet = "UPDATE-STOCKDETAIL-BY-GET";
+  static UpdatedStockDetailByGet = "UPDATED-STOCKDETAIL-BY-GET";
+  static CallUpdateStockDetailByGet(propsData) {
     return {
-      type: GitAction.ResetUpdatedStockDetailByPost,
+      type: GitAction.UpdateStockDetailByGet,
+      payload: propsData
+    };
+  }
+  static ResetUpdatedStockDetail = "RESET-UPDATED-STOCKDETAIL-BY-POST";
+  static CallResetUpdatedStockDetail() {
+    return {
+      type: GitAction.ResetUpdatedStockDetail,
     };
   }
   
@@ -176,6 +184,8 @@ export class GitAction {
       type: GitAction.ResetInsertedStockReturn,
     };
   }
+
+
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
   static InsertNewTransaction = "INSERT_NEW_TRANSACTION";
   static NewTransactionInserted = "NEW_TRANSACTION_INSERTED";

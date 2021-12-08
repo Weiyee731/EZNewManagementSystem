@@ -343,6 +343,47 @@ export class GitEpic {
   //     }
   // >>>>>>> 37db0b75379f395e9b923fa20c436716dbc39c28
   //   });
+
+  Inventory_UpdateStockDetailByGet = action$ =>
+    action$.ofType(GitAction.UpdateStockDetailByGet).switchMap(async ({ payload }) => {
+      // console.log(url + 
+      //   double_click_and_paste_url_here
+      // )
+      try {
+        const response = await fetch(url +
+          "Inventory_UpdateStockDetail?" +
+          "STOCKID=" + payload.STOCKID +
+          "&USERCODE=" + payload.USERCODE +
+          "&TRACKINGNUMBER=" + payload.TRACKINGNUMBER +
+          "&PRODUCTWEIGHT=" + payload.PRODUCTWEIGHT +
+          "&PRODUCTHEIGHT=" + payload.PRODUCTHEIGHT +
+          "&PRODUCTWIDTH=" + payload.PRODUCTWIDTH +
+          "&PRODUCTDEEP=" + payload.PRODUCTDEEP +
+          "&AREACODE=" + payload.AREACODE +
+          "&ITEM=" + payload.ITEM +
+          "&TRACKINGSTATUSID=" + payload.TRACKINGSTATUSID +
+          "&CONTAINERNAME=" + payload.CONTAINERNAME +
+          "&CONTAINERDATE=" + payload.CONTAINERDATE +
+          "&REMARK=" + payload.REMARK +
+          "&EXTRACHARGE=" + payload.EXTRACHARGE
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UpdatedStockDetailByGet,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_UpdateStockDetailByGet")
+        return {
+          type: GitAction.UpdatedStockDetailByGet,
+          payload: [],
+        };
+      }
+    });
+
   Inventory_UpdateStockDetailByPost = action$ =>
     action$.ofType(GitAction.UpdateStockDetailByPost).switchMap(async ({ payload }) => {
 
@@ -415,32 +456,30 @@ export class GitEpic {
       }
     });
 
-    Inventory_InsertStockByPost = action$ =>
-      action$.ofType(GitAction.InsertStockByPost).switchMap(async ({ payload }) => {
-
+  Inventory_InsertStockByPost = action$ =>
+    action$.ofType(GitAction.InsertStockByPost).switchMap(async ({ payload }) => {
       return fetch(
-        postUrl + "Inventory_InsertStockByPost"
-        , {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            USERCODE: payload.USERCODE,
-            TRACKINGNUMBER: payload.TRACKINGNUMBER,
-            PRODUCTWEIGHT: payload.PRODUCTWEIGHT,
-            PRODUCTHEIGHT: payload.PRODUCTHEIGHT,
-            PRODUCTWIDTH: payload.PRODUCTWIDTH,
-            PRODUCTDEEP: payload.PRODUCTDEEP,
-            AREACODE: payload.AREACODE,
-            ITEM: payload.ITEM,
-            STOCKDATE: payload.STOCKDATE,
-            PACKAGINGDATE: payload.PACKAGINGDATE,
-            REMARK: payload.REMARK,
-            EXTRACHARGE: payload.EXTRACHARGE
-          })
-        }
+        postUrl + "Inventory_InsertStockByPost", {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          USERCODE: payload.USERCODE,
+          TRACKINGNUMBER: payload.TRACKINGNUMBER,
+          PRODUCTWEIGHT: payload.PRODUCTWEIGHT,
+          PRODUCTHEIGHT: payload.PRODUCTHEIGHT,
+          PRODUCTWIDTH: payload.PRODUCTWIDTH,
+          PRODUCTDEEP: payload.PRODUCTDEEP,
+          AREACODE: payload.AREACODE,
+          ITEM: payload.ITEM,
+          STOCKDATE: payload.STOCKDATE,
+          PACKAGINGDATE: payload.PACKAGINGDATE,
+          REMARK: payload.REMARK,
+          EXTRACHARGE: payload.EXTRACHARGE
+        })
+      }
       )
         .then(response => response.json())
         .then(json => {

@@ -120,15 +120,22 @@ export function counterReducer(state = INITIAL_STATE, action) {
     case GitAction.ResetStockStatusReturn:
       return Object.assign({}, state, { stockApproval: [] });
 
-      case GitAction.UpdateStockDetailByPost:
-        return Object.assign({}, state, { loading: true });
-      case GitAction.UpdatedStockDetailByPost:
-        return Object.assign({}, state, {
-          loading: false,
-          stockApproval: action.payload
-        });
-      case GitAction.ResetUpdatedStockDetailByPost:
-        return Object.assign({}, state, { stockApproval: [] });
+    case GitAction.UpdateStockDetailByPost:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.UpdatedStockDetailByPost:
+      return Object.assign({}, state, {
+        loading: false,
+        stockApproval: action.payload
+      });
+    case GitAction.UpdateStockDetailByGet:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.UpdatedStockDetailByGet:
+      return Object.assign({}, state, {
+        loading: false,
+        stockApproval: action.payload
+      });
+    case GitAction.ResetUpdatedStockDetail:
+      return Object.assign({}, state, { stockApproval: [] });
 
     case GitAction.ViewContainer:
       return Object.assign({}, state, { loading: true });

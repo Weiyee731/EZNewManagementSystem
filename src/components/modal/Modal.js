@@ -12,10 +12,23 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import Draggable from 'react-draggable';
+import Paper from '@mui/material/Paper';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
+
+function PaperComponent(props) {
+  return (
+    <Draggable
+      handle="#alert-dialog-title"
+      cancel={'[class*="MuiDialogContent-root"]'}
+    >
+      <Paper {...props} />
+    </Draggable>
+  );
+}
 
 export default function AlertDialog(props) {
   return (
@@ -26,6 +39,7 @@ export default function AlertDialog(props) {
       onClose={() => props.handleToggleDialog()}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
+      PaperComponent={props.draggable ? PaperComponent : null}
     >
       <DialogTitle
         id="alert-dialog-title"
@@ -76,7 +90,6 @@ export default function AlertDialog(props) {
 }
 
 export function ModalPopOut(props) {
-  console.log(props.fullScreen)
   return (
     <Dialog
       fullScreen={props.fullScreen ? props.fullScreen : false}    //fullscreen modal
@@ -87,6 +100,7 @@ export function ModalPopOut(props) {
       onClose={() => props.handleToggleDialog()}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
+      PaperComponent={props.fullScreen ? null : PaperComponent}
     >
       {
         props.fullScreen &&
