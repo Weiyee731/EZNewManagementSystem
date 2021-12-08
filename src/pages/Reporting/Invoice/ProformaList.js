@@ -14,6 +14,7 @@ import CardContent from '@mui/material/CardContent';
 import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
 import { connect } from 'react-redux';
+import { roundOffTotal } from '../../../components/utils'
 
 function mapStateToProps(state) {
     return {
@@ -127,7 +128,7 @@ const ProformaList = (props) => {
     ];
 
     const totalPrice = () => {
-        if(selectedType != 3) {
+        if (selectedType != 3) {
             let total = []
             items.map((item) => {
                 let volume = item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight
@@ -142,10 +143,10 @@ const ProformaList = (props) => {
                     total.push(price)
                 }
             })
-            return total.reduce((a, b) => a + b)
+            return roundOffTotal(total.reduce((a, b) => a + b))
         } else {
             let subKg = weightCompare() - 1
-            return (firstKg + (subKg * subsequentKg)).toFixed(2)
+            return roundOffTotal(firstKg + (subKg * subsequentKg))
         }
     }
 
@@ -216,7 +217,7 @@ const ProformaList = (props) => {
     }
 
     const weightCompare = () => {
-        if(volumeWeight() > totalWeight) {
+        if (volumeWeight() > totalWeight) {
             return volumeWeight()
         } else {
             return totalWeight
@@ -253,7 +254,7 @@ const ProformaList = (props) => {
                                 onChange={(e) => handleChangeSingleUnitPrice(index, e.target.value)}
                             />
                         </TableCell>
-                        <TableCell align="left" sx={{ fontSize: fontsize }}>{volume < 0.013 ? selfPickupPrice : price}</TableCell>
+                        <TableCell align="left" sx={{ fontSize: fontsize }}>{volume < 0.013 ? selfPickupPrice : roundOffTotal(price)}</TableCell>
                     </>
                 }
             </>
