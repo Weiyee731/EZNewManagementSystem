@@ -631,46 +631,57 @@ class OverallStock extends Component {
 
             // if area is not empty
             if (this.state.searchArea !== "All" && this.state.searchCategory === "All") {
+                console.log("searchArea ")
                 tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(this.state.searchArea)) && x.TrackingNumber.includes(searchKeywords))
             }
+            else if (this.state.searchArea === "All" && this.state.searchCategory !== "All") {
+                console.log("searchCategory  ")
 
-            if (this.state.searchArea === "All" && this.state.searchCategory !== "All") {
                 switch (this.state.searchCategory) {
-                    case "Tracking Number":
+                    case "Tracking":
                         tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeywords)))
+                        console.log('Tracking', tempList)
                         break;
 
                     case "Member":
                         tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeywords)))
+                        console.log('Member', tempList)
                         break;
 
                     case "Container":
                         tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeywords)))
+                        console.log('Container', tempList)
                         break;
 
                     default:
+                        console.log(this.state.searchCategory)
                         tempList = this.props.stocks.filter(x =>
                             (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeywords)) ||
                             (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeywords)) ||
                             (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeywords)) ||
                             (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(searchKeywords))
                         )
+                        console.log('default', tempList)
                         break;
                 }
             }
+            else if (this.state.searchArea !== "All" && this.state.searchCategory !== "All") {
+                console.log("searchArea searchCategory")
 
-            if (this.state.searchArea !== "All" && this.state.searchCategory !== "All") {
                 switch (this.state.searchCategory) {
-                    case "Tracking Number":
+                    case "Tracking":
                         tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(this.state.searchArea)) && (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeywords)))
+                        console.log('Tracking', tempList)
                         break;
 
                     case "Member":
-                        tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(this.state.searchArea)) &&  (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeywords)))
+                        tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(this.state.searchArea)) && (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeywords)))
+                        console.log('Member', tempList)
                         break;
 
                     case "Container":
                         tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(this.state.searchArea)) && (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeywords)))
+                        console.log('Container', tempList)
                         break;
 
                     default:
@@ -680,18 +691,12 @@ class OverallStock extends Component {
                             (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeywords)) ||
                             (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(searchKeywords))
                         )
+                        console.log('default', tempList)
                         break;
                 }
 
                 tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(this.state.searchArea)) && x.TrackingNumber.includes(searchKeywords))
             }
-
-            tempList = this.props.stocks.filter(x =>
-                (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeywords)) ||
-                (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeywords)) ||
-                (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeywords)) ||
-                (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(searchKeywords))
-            )
         }
 
         this.setState({
@@ -705,14 +710,6 @@ class OverallStock extends Component {
     }
 
     handleSearchArea(e) {
-        let tempList = [], searchArea = e.target.value
-        if (isArrayNotEmpty(this.props.stocks)) {
-            tempList = this.props.stocks.filter(x =>
-                (!isStringNullOrEmpty(x.AreaCode) && x.TrackingNumber.includes(searchArea)) ||
-                (!isStringNullOrEmpty(x.AreaName) && x.ContainerName.includes(searchArea))
-            )
-        }
-
         this.setState({ searchArea: e.target.value })
     }
 
@@ -921,7 +918,6 @@ class OverallStock extends Component {
                                         endAdornment={<InputAdornment position="start">cm</InputAdornment>}
                                         error={!formValue.WidthVerified}
                                     />
-                                    {console.log(formValue.WidthVerified)}
                                     {!formValue.WidthVerified && <FormHelperText sx={{ color: 'red' }} id="Width-error-text">Invalid</FormHelperText>}
                                 </FormControl>
                             </div>
