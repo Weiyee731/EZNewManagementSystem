@@ -20,7 +20,7 @@ export const isLatitude = (latitude) => { return isFinite(latitude) && Math.abs(
 export const isDecimalValid = (number) => { return (typeof number === 'undefined' || number == '' || !/^[0-9]\d*(\.\d+)?$/.test(number)) ? true : false }
 
 //time functions
-export const convertDateTimeToString = (date) => {
+export const convertDateTimeToString112Format = (date) => {
     try {
         let date112 = typeof date !== "undefined" && date !== "" ? new Date(date) : new Date();
         let dd = (date112.getDate().toString().length <= 1) ? "0" + date112.getDate() : date112.getDate().toString()

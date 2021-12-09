@@ -46,7 +46,9 @@ export default function AlertDialog(props) {
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          fontSize: '18pt',
+          fontWeight: 500,
         }}
       >
         {props.title}
