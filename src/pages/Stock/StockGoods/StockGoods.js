@@ -436,6 +436,7 @@ class StockGoods extends Component {
             <div className="container-fluid">
                 <ModalPopOut
                     open={open}
+                    fullScreen={true}
                     classes='true'
                     // onBackdropClick={() => console.log('backdrop')}
                     handleToggleDialog={() => this.handleCancel("filter")}
@@ -450,17 +451,19 @@ class StockGoods extends Component {
 
                         <div className="col-sm-6 col-12">
                             <Autocomplete
+                                key={options.ContainerID}
                                 options={options}
                                 noOptionsText="Enter to create a new option"
                                 getOptionLabel={(option) => option.ContainerName ? option.ContainerName : option.ReturnMsg}
                                 onInputChange={(e, newValue) => {
                                     this.setState({ ContainerName: newValue });
                                 }}
-                                renderInput={(params) => (
+                                renderInput={(params, idx) => (
                                     <TextField
                                         {...params}
                                         label="Select"
                                         variant="standard"
+                                        key={idx}
                                         onKeyDown={(e) => {
 
                                             if (
@@ -491,7 +494,7 @@ class StockGoods extends Component {
                         message={
                             <EditStockGoods data={this.state.selectedRows} parentCallback={this.handleCallback} />
                         }
-                        // fullScreen={true}
+                    // fullScreen={true}
                     ></ModalPopOut>
 
                 }
