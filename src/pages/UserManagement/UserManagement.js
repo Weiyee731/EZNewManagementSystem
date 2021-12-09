@@ -24,6 +24,7 @@ import SearchBar from "../../components/SearchBar/SearchBar"
 import AlertDialog from "../../components/modal/Modal";
 import { toast } from "react-toastify";
 import CsvDownloader from 'react-csv-downloader';
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 
 const style = {
     position: 'absolute',
@@ -262,7 +263,7 @@ class UserManagement extends Component {
                                 separator=","
                                 columns={headCells}
                                 datas={isArrayNotEmpty(this.state.UserListingfiltered) ? this.state.UserListingfiltered : []}>
-                                <Button className="w-100" variant="contained" color="primary">Download CSV</Button>
+                                <DownloadForOfflineIcon color="primary" sx={{ fontSize: 45 }}></DownloadForOfflineIcon>
                             </CsvDownloader>
                         </div>
                     </div>

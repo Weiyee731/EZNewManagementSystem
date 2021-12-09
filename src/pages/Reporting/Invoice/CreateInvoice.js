@@ -22,6 +22,7 @@ import AlertDialog from "../../../components/modal/Modal";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import CsvDownloader from 'react-csv-downloader';
 import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 
 function mapStateToProps(state) {
     return {
@@ -462,10 +463,10 @@ class CreateInvoice extends Component {
                         </div>
 
                     </div>
-                    <div className="col-md-8 col-8 m-auto">
+                    <div className="col-md-9 col-9 m-auto">
                         <SearchBar id="" placeholder="Enter Member No, Tracking No or Container No to search" buttonOnClick={() => this.onSearch()} onChange={this.handleSearchInput} />
                     </div>
-                    <div className="col-md-2 col-2 m-auto">
+                    <div className="col-md-1 col-1 m-auto">
                         {console.log(filteredList)}
                         <CsvDownloader
                             filename="invoice-list"
@@ -473,7 +474,7 @@ class CreateInvoice extends Component {
                             separator=","
                             columns={headCells}
                             datas={isArrayNotEmpty(filteredList) ? filteredList : []}>
-                            <Button className="w-100" variant="contained" color="primary">Download CSV</Button>
+                            <DownloadForOfflineIcon color="primary" sx={{ fontSize: 45 }}></DownloadForOfflineIcon>
                         </CsvDownloader>
                     </div>
                 </div>

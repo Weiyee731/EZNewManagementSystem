@@ -17,6 +17,8 @@ import Backdrop from '@mui/material/Backdrop';
 import SearchBar from "../../components/SearchBar/SearchBar"
 import CsvDownloader from 'react-csv-downloader';
 import { getWindowDimensions, isArrayNotEmpty } from "../../tools/Helpers";
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+
 function mapStateToProps(state) {
     return {
         transactions: state.counterReducer["transactions"],
@@ -185,17 +187,17 @@ class TransactionHistory extends Component {
             <>
                 <div className="w-100 container-fluid">
                     <div className="row d-flex">
-                        <div className="col-md-10 col-10 m-auto">
+                        <div className="col-md-11 col-11 m-auto">
                             <SearchBar onChange={onChange} />
                         </div>
-                        <div className="col-md-2 col-2 m-auto">
+                        <div className="col-md-1 col-1 m-auto">
                             <CsvDownloader
                                 filename="transactionhistory-list"
                                 extension=".xls"
                                 separator=","
                                 columns={headCells}
                                 datas={isArrayNotEmpty(this.state.TransactionListingFiltered) ? this.state.TransactionListingFiltered : []}>
-                                <Button className="w-100" variant="contained" color="primary">Download CSV</Button>
+                                <DownloadForOfflineIcon color="primary" sx={{ fontSize: 45 }}></DownloadForOfflineIcon>
                             </CsvDownloader>
                         </div>
                     </div>
