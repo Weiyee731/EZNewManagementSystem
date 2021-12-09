@@ -20,7 +20,9 @@ import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
 import Stack from '@mui/material/Stack';
 import AlertDialog from "../../../components/modal/Modal";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import CsvDownloader from 'react-csv-downloader';
 import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 
 function mapStateToProps(state) {
     return {
@@ -39,31 +41,32 @@ function mapDispatchToProps(dispatch) {
 
 const headCells = [
     {
-        id: 'TrackingNo',
+        id: 'TrackingNumber',
         align: 'left',
         disablePadding: false,
         label: 'Tracking No. ',
+        displayName: 'Tracking No. '
     },
     {
-        id: 'Weight',
+        id: 'ProductWeight',
         align: 'left',
         disablePadding: false,
         label: 'Weight (KG)',
     },
     {
-        id: 'Depth',
+        id: 'ProductDimensionDeep',
         align: 'left',
         disablePadding: false,
         label: 'Depth',
     },
     {
-        id: 'Width',
+        id: 'ProductDimensionWidth',
         align: 'left',
         disablePadding: false,
         label: 'Width',
     },
     {
-        id: 'Height',
+        id: 'ProductDimensionHeight',
         align: 'left',
         disablePadding: false,
         label: 'Height',
@@ -81,37 +84,37 @@ const headCells = [
         label: 'Item',
     },
     {
-        id: 'Member',
+        id: 'UserCode',
         align: 'left',
         disablePadding: false,
         label: 'Member',
     },
     {
-        id: 'Division',
+        id: 'AreaCode',
         align: 'left',
         disablePadding: false,
         label: 'Division',
     },
     {
-        id: 'Stockdate',
+        id: 'StockDate',
         align: 'left',
         disablePadding: false,
         label: 'Stock Date',
     },
     {
-        id: 'packagingDate',
+        id: 'PackagingDate',
         align: 'left',
         disablePadding: false,
         label: 'Packaging Date',
     },
     {
-        id: 'ContainerNo',
+        id: 'ContainerName',
         align: 'left',
         disablePadding: false,
         label: 'Container',
     },
     {
-        id: 'Remarks',
+        id: 'Remark',
         align: 'left',
         disablePadding: false,
         label: 'Remarks',
@@ -260,7 +263,7 @@ class CreateInvoice extends Component {
             alert("Please select the tracking records with the same user")
         }
     }
-    
+
     handleSelectDeliveryType = (i) => {
         const { selectedItems, selectedUserID } = this.state
 
@@ -458,9 +461,21 @@ class CreateInvoice extends Component {
                                 <MenuItem key="search_container" value="Container">MSU</MenuItem>
                             </Select>
                         </div>
+
                     </div>
-                    <div className="col-md-10 col-12 m-auto">
+                    <div className="col-md-9 col-9 m-auto">
                         <SearchBar id="" placeholder="Enter Member No, Tracking No or Container No to search" buttonOnClick={() => this.onSearch()} onChange={this.handleSearchInput} />
+                    </div>
+                    <div className="col-md-1 col-1 m-auto">
+                        {console.log(filteredList)}
+                        <CsvDownloader
+                            filename="invoice-list"
+                            extension=".xls"
+                            separator=","
+                            columns={headCells}
+                            datas={isArrayNotEmpty(filteredList) ? filteredList : []}>
+                            <DownloadForOfflineIcon color="primary" sx={{ fontSize: 45 }}></DownloadForOfflineIcon>
+                        </CsvDownloader>
                     </div>
                 </div>
                 <hr />

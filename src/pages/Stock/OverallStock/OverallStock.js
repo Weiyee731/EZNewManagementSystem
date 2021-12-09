@@ -26,6 +26,8 @@ import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUnde
 import ResponsiveDatePickers from '../../../components/datePicker/datePicker';
 import axios from "axios";
 import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
+import CsvDownloader from 'react-csv-downloader';
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 
 import "./OverallStock.css";
 
@@ -50,31 +52,31 @@ function mapDispatchToProps(dispatch) {
 
 const headCells = [
     {
-        id: 'TrackingNo',
+        id: 'TrackingNumber',
         align: 'left',
         disablePadding: false,
         label: 'Tracking No. ',
     },
     {
-        id: 'Weight',
+        id: 'ProductWeight',
         align: 'left',
         disablePadding: false,
         label: 'Weight (KG)',
     },
     {
-        id: 'Depth',
+        id: 'ProductDimensionDeep',
         align: 'left',
         disablePadding: false,
         label: 'Depth (cm)',
     },
     {
-        id: 'Width',
+        id: 'ProductDimensionWidth',
         align: 'left',
         disablePadding: false,
         label: 'Width (cm)',
     },
     {
-        id: 'Height',
+        id: 'ProductDimensionHeight',
         align: 'left',
         disablePadding: false,
         label: 'Height (cm)',
@@ -92,31 +94,31 @@ const headCells = [
         label: 'Item',
     },
     {
-        id: 'Member',
+        id: 'UserCode',
         align: 'left',
         disablePadding: false,
         label: 'Member',
     },
     {
-        id: 'Division',
+        id: 'AreaCode',
         align: 'left',
         disablePadding: false,
         label: 'Division',
     },
     {
-        id: 'Stockdate',
+        id: 'StockDate',
         align: 'left',
         disablePadding: false,
         label: 'Stock Date',
     },
     {
-        id: 'packagingDate',
+        id: 'PackagingDate',
         align: 'left',
         disablePadding: false,
         label: 'Packaging Date',
     },
     {
-        id: 'ContainerNo',
+        id: 'ContainerName',
         align: 'left',
         disablePadding: false,
         label: 'Container',
@@ -128,7 +130,7 @@ const headCells = [
         label: 'Additional Charges',
     },
     {
-        id: 'Remarks',
+        id: 'Remark',
         align: 'left',
         disablePadding: false,
         label: 'Remarks',
@@ -658,6 +660,16 @@ class OverallStock extends Component {
                             <IconButton className="ml-auto" aria-label="Pull Data" variant="contained" color="primary" onClick={() => { this.onFetchLatestData() }}>
                                 <CloudDownloadOutlinedIcon />
                             </IconButton>
+                        </div>
+                        <div className="w-20 mt-auto">
+                            <CsvDownloader
+                                filename="overallstock-list"
+                                extension=".xls"
+                                separator=","
+                                columns={headCells}
+                                datas={isArrayNotEmpty(this.state.filteredList) ? this.state.filteredList : []}>
+                                <DownloadForOfflineIcon color="primary" sx={{ fontSize: 45 }}></DownloadForOfflineIcon>
+                            </CsvDownloader>
                         </div>
                     </div>
                 </div>

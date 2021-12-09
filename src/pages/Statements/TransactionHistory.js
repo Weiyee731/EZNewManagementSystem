@@ -15,6 +15,9 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Backdrop from '@mui/material/Backdrop';
 import SearchBar from "../../components/SearchBar/SearchBar"
+import CsvDownloader from 'react-csv-downloader';
+import { getWindowDimensions, isArrayNotEmpty } from "../../tools/Helpers";
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 
 function mapStateToProps(state) {
     return {
@@ -183,11 +186,25 @@ class TransactionHistory extends Component {
         return (
             <>
                 <div className="w-100 container-fluid">
-                    <SearchBar onChange={onChange} />
+                    <div className="row d-flex">
+                        <div className="col-md-11 col-11 m-auto">
+                            <SearchBar onChange={onChange} />
+                        </div>
+                        <div className="col-md-1 col-1 m-auto">
+                            <CsvDownloader
+                                filename="transactionhistory-list"
+                                extension=".xls"
+                                separator=","
+                                columns={headCells}
+                                datas={isArrayNotEmpty(this.state.TransactionListingFiltered) ? this.state.TransactionListingFiltered : []}>
+                                <DownloadForOfflineIcon color="primary" sx={{ fontSize: 45 }}></DownloadForOfflineIcon>
+                            </CsvDownloader>
+                        </div>
+                    </div>
                     <TableComponents
                         // table settings 
-                        tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}  // optional, it can pass as string or as children elements
-                        tableTopRight={this.renderTableActionButton}                 // optional, it will brings the elements to the table's top right corner
+                        tableTopLeft={<h3 style={{ fontWeight: 700 }}>Transaction History</h3>}  // optional, it can pass as string or as children elements
+                        // tableTopRight={this.renderTableActionButton}                 // optional, it will brings the elements to the table's top right corner
 
                         tableOptions={{
                             dense: false,                // optional, default is false
