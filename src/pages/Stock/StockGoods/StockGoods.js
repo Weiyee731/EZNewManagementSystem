@@ -27,7 +27,7 @@ function mapStateToProps(state) {
         Stocks: state.counterReducer["stocks"],
         stockApproval: state.counterReducer["stockApproval"],
         AllContainer: state.counterReducer["AllContainer"],
-      
+
     };
 }
 
@@ -201,14 +201,7 @@ function renderTableRows(data, index) {
     )
 }
 
-function onTableRowClick(event, row) {
-    this.setState({
-        openEditModal: true,
-        selectedRows: row,
-    });
-    // return <Link to={{ pathname: `/EditStockGoods`, props: row }}></Link>
 
-}
 
 function onAddButtonClick() {
     this.setState({ openAddModal: true })
@@ -225,9 +218,9 @@ class StockGoods extends Component {
         // this.props.CallFetchAllStock({USERID:JSON.parse(localStorage.getItem("loginUser"))[0].UserID});
         this.props.CallFetchAllStock({ USERID: "1" });
         this.props.CallViewContainer();  //view container
-      
-        
-        onTableRowClick = onTableRowClick.bind(this);
+
+
+        this.onTableRowClick = this.onTableRowClick.bind(this);
         onAddButtonClick = onAddButtonClick.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.changeTab = this.changeTab.bind(this);
@@ -290,6 +283,14 @@ class StockGoods extends Component {
                 })
             }
         }
+    }
+
+    onTableRowClick(event, row) {
+        this.setState({
+            openEditModal: true,
+            selectedRows: row,
+        });
+        // return <Link to={{ pathname: `/EditStockGoods`, props: row }}></Link>
     }
 
     handleSearchfilter = (filter) => {
@@ -431,11 +432,11 @@ class StockGoods extends Component {
         ]
 
         const { open, openEditModal, openAddModal, options } = this.state
-console.log(this.props.Stocks)
         return (
             <div className="container-fluid">
                 <ModalPopOut
                     open={open}
+                    fullScreen={true}
                     classes='true'
                     // onBackdropClick={() => console.log('backdrop')}
                     handleToggleDialog={() => this.handleCancel("filter")}
@@ -449,19 +450,20 @@ console.log(this.props.Stocks)
                         </div>
 
                         <div className="col-sm-6 col-12">
-
                             <Autocomplete
+                                key={options.ContainerID}
                                 options={options}
                                 noOptionsText="Enter to create a new option"
                                 getOptionLabel={(option) => option.ContainerName ? option.ContainerName : option.ReturnMsg}
                                 onInputChange={(e, newValue) => {
                                     this.setState({ ContainerName: newValue });
                                 }}
-                                renderInput={(params) => (
+                                renderInput={(params, idx) => (
                                     <TextField
                                         {...params}
                                         label="Select"
                                         variant="standard"
+                                        key={idx}
                                         onKeyDown={(e) => {
 
                                             if (
@@ -471,20 +473,10 @@ console.log(this.props.Stocks)
                                                 options.findIndex((o) => o.ContainerName === e.target.value) === -1
                                             ) {
 
-                                                //     this.setState((o) =>
-                                                //     ({ ContainerName: })
-                                                //    concat(o.ContainerName,e.target.value),
-                                                //     console.log(o.ContainerName.concat)
-                                                //     //  o.concat({ ContainerName: e.target.value })
-                                                //      );
-
-                                                // this.setState({options:{ ContainerName: e.target.value, ContainerDate: this.state.ContainerDate }}, () => {
-                                                //         //callback
-                                                //         console.log("ye", options) // myname
-                                                //     })
-
-
-                                                this.state.options.push({ ContainerName: e.target.value, ContainerDate: this.state.ContainerDate })
+                                                this.setState({
+                                                    options: this.state.options.concat({ ContainerName: e.target.value, ContainerDate: this.state.ContainerDate })
+                                                }, () => { console.log(this.state.options) })
+                                                // this.state.options.push({ ContainerName: e.target.value, ContainerDate: this.state.ContainerDate })
                                             } else console.log("hi")
                                         }}
                                     />
@@ -502,7 +494,7 @@ console.log(this.props.Stocks)
                         message={
                             <EditStockGoods data={this.state.selectedRows} parentCallback={this.handleCallback} />
                         }
-                        fullScreen={true}
+                    // fullScreen={true}
                     ></ModalPopOut>
 
                 }
@@ -556,7 +548,7 @@ console.log(this.props.Stocks)
                             }}
                             selectedIndexKey={"StockID"}
                             Data={this.state.stockFiltered ? this.state.stockFiltered : []}
-                            onTableRowClick={onTableRowClick}
+                            onTableRowClick={this.onTableRowClick}
                             onActionButtonClick={onAddButtonClick}
                             onDeleteButtonClick={onDeleteButtonClick}
                         />

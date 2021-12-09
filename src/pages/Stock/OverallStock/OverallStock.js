@@ -921,6 +921,7 @@ class OverallStock extends Component {
                                         endAdornment={<InputAdornment position="start">cm</InputAdornment>}
                                         error={!formValue.WidthVerified}
                                     />
+                                    {console.log(formValue.WidthVerified)}
                                     {!formValue.WidthVerified && <FormHelperText sx={{ color: 'red' }} id="Width-error-text">Invalid</FormHelperText>}
                                 </FormControl>
                             </div>

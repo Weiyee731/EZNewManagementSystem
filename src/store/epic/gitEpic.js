@@ -252,10 +252,6 @@ export class GitEpic {
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
   Inventory_ViewStockList = action$ =>
     action$.ofType(GitAction.FetchStocks).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Inventory_ViewStockList?" +
-        "TRACKINGSTATUSID=" + payload.USERID
-      );
       try {
         const response = await fetch(url +
           "Inventory_ViewStockList?" +
@@ -472,27 +468,28 @@ export class GitEpic {
   Inventory_InsertStockByPost = action$ =>
     action$.ofType(GitAction.InsertStockByPost).switchMap(async ({ payload }) => {
       return fetch(
-        postUrl + "Inventory_InsertStockByPost", {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          USERCODE: payload.USERCODE,
-          TRACKINGNUMBER: payload.TRACKINGNUMBER,
-          PRODUCTWEIGHT: payload.PRODUCTWEIGHT,
-          PRODUCTHEIGHT: payload.PRODUCTHEIGHT,
-          PRODUCTWIDTH: payload.PRODUCTWIDTH,
-          PRODUCTDEEP: payload.PRODUCTDEEP,
-          AREACODE: payload.AREACODE,
-          ITEM: payload.ITEM,
-          STOCKDATE: payload.STOCKDATE,
-          PACKAGINGDATE: payload.PACKAGINGDATE,
-          REMARK: payload.REMARK,
-          EXTRACHARGE: payload.EXTRACHARGE
-        })
-      }
+        url + "Inventory_InsertStockByPost"
+        , {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            USERCODE: payload.USERCODE,
+            TRACKINGNUMBER: payload.TRACKINGNUMBER,
+            PRODUCTWEIGHT: payload.PRODUCTWEIGHT,
+            PRODUCTHEIGHT: payload.PRODUCTHEIGHT,
+            PRODUCTWIDTH: payload.PRODUCTWIDTH,
+            PRODUCTDEEP: payload.PRODUCTDEEP,
+            AREACODE: payload.AREACODE,
+            ITEM: payload.ITEM,
+            STOCKDATE: payload.STOCKDATE,
+            PACKAGINGDATE: payload.PACKAGINGDATE,
+            REMARK: payload.REMARK,
+            EXTRACHARGE: payload.EXTRACHARGE
+          })
+        }
       )
         .then(response => response.json())
         .then(json => {
