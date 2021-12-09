@@ -16,6 +16,16 @@ export default function ResponsiveDatePickers(props) {
     keyboardDate: "d/MM/yyyy",
   };
   const { startPickerPropsOptions, endPickerPropsOptions } = props
+
+  const updateDateValue = (newValue) => {
+    if (isObjectUndefinedOrNull(props.onChange) && typeof props.onChange !== "function")
+      setValue(newValue)
+    else{
+      props.onChange(newValue)
+      setValue(newValue)
+    }
+  }
+
   return (
     <LocalizationProvider dateFormats={formats} dateAdapter={AdapterDateFns}>
       {
@@ -24,7 +34,7 @@ export default function ResponsiveDatePickers(props) {
             startText={(isObjectUndefinedOrNull(startPickerPropsOptions) && isObjectUndefinedOrNull(startPickerPropsOptions.placeholder)) ? "From" : startPickerPropsOptions.placeholder}
             endText={(isObjectUndefinedOrNull(endPickerPropsOptions) && isObjectUndefinedOrNull(endPickerPropsOptions.placeholder)) ? "To" : endPickerPropsOptions.placeholder}
             value={value}
-            onChange={(newValue) => { setValue(newValue); }}
+            onChange={(newValue) => { updateDateValue(newValue) }}
             renderInput={(startProps, endProps) => (
               <React.Fragment>
                 <TextField
@@ -32,7 +42,7 @@ export default function ResponsiveDatePickers(props) {
                   className={(isObjectUndefinedOrNull(startPickerPropsOptions) && isStringNullOrEmpty(startPickerPropsOptions.className)) ? "" : startPickerPropsOptions.className}
                   variant={(isObjectUndefinedOrNull(startPickerPropsOptions) && isStringNullOrEmpty(startPickerPropsOptions.variant)) ? "standard" : startPickerPropsOptions.varinat}
                 />
-                <Box sx={{ mx: 2 }}> to </Box>
+                <Box sx={{ mx: 1 }}> to </Box>
                 <TextField
                   {...endProps}
                   className={(isObjectUndefinedOrNull(endPickerPropsOptions) && isObjectUndefinedOrNull(endPickerPropsOptions.className)) ? {} : endPickerPropsOptions.className}
@@ -50,7 +60,7 @@ export default function ResponsiveDatePickers(props) {
               views={['year', 'month', 'day']}
               value={props.value}
               readOnly={props.readOnly ? props.readOnly : false}
-              onChange={(e) => props.onChange(e)}
+              onChange={(e) => updateDateValue(e)}
               renderInput={(params) => <TextField {...params} variant={isStringNullOrEmpty(props.variant) ? "standard" : props.variant} />}
             />
           </Stack>

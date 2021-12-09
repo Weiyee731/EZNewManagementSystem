@@ -14,6 +14,7 @@ import CardContent from '@mui/material/CardContent';
 import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
 import { connect } from 'react-redux';
+import { roundOffTotal } from '../../../components/utils'
 
 function mapStateToProps(state) {
     return {
@@ -25,6 +26,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         CallUserProfileByID: (propsData) => dispatch(GitAction.CallUserProfileByID(propsData)),
+        CallInsertTransaction: (propsData) => dispatch(GitAction.CallInsertTransaction(propsData)),
     };
 }
 
@@ -35,11 +37,15 @@ const ProformaList = (props) => {
 
     const [unitPrice, setUnitPrice] = useState(420)
     const [selfPickupPrice, setSelfPickupPrice] = useState(5)
+    const [minPrice, setMinPrice] = useState(500)
+    const [firstKg, setFirstKg] = useState(10)
+    const [subsequentKg, setSubsequentKg] = useState(6)
     const [items, setItems] = useState(state)
     const ref = useRef(false)
 
+    console.log(totalVolume)
+
     useEffect(() => {
-        console.log("hahaha")
         props.CallUserProfileByID({ UserID: userId })
 
         let abc = []
@@ -54,12 +60,6 @@ const ProformaList = (props) => {
 
         setItems(abc)
     }, [])
-
-    // useEffect(() => {
-    //     if(userProfile.length < 1) {
-    //         props.history.goBack()
-    //     }
-    // }, [])
 
     const headCellsWithPrice = [
         {
@@ -128,17 +128,26 @@ const ProformaList = (props) => {
     ];
 
     const totalPrice = () => {
-        let total = []
-        items.map((item) => {
-            let volume = item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight
-            let price = unitPrice * volume
-            if (volume < 0.013) {
-                total.push(selfPickupPrice)
-            } else {
-                total.push(price)
-            }
-        })
-        return total.reduce((a, b) => a + b)
+        if (selectedType != 3) {
+            let total = []
+            items.map((item) => {
+                let volume = item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight
+                let price = item.isFollowStandard ? unitPrice * volume : item.unitPrice * volume
+                if (volume < 0.013) {
+                    if (selectedType == 1) {
+                        total.push(selfPickupPrice)
+                    } else {
+                        total.push(price)
+                    }
+                } else {
+                    total.push(price)
+                }
+            })
+            return roundOffTotal(total.reduce((a, b) => a + b))
+        } else {
+            let subKg = weightCompare() - 1
+            return roundOffTotal(firstKg + (subKg * subsequentKg))
+        }
     }
 
     const handleChangeSingleUnitPrice = (index, value) => {
@@ -172,17 +181,53 @@ const ProformaList = (props) => {
                     return unitPrice
                 }
             }
+        } else {
+            return unitPrice
         }
+    }
 
-        return selfPickupPrice
+    const handleCreateProformaInvoice = () => {
+        let productPrices = []
+        let stockIds = []
+
+        items.map((item) => {
+            let volume = item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight
+            if (selectedType == 1) {
+                if (volume < 0.013) {
+                    productPrices.push(item.unitPrice)
+                } else {
+                    productPrices.push(volume * item.unitPrice)
+                }
+            }
+            stockIds.push(item.StockID)
+        })
+
+        props.CallInsertTransaction({
+            USERID: userId,
+            TYPE: selectedType,
+            ORDERTOTALMOUNT: totalPrice(),
+            ORDERPAIDMOUNT: "-",
+            STOCKID: stockIds,
+            PRODUCTPRICE: productPrices
+        })
+    }
+
+    const volumeWeight = () => {
+        return (totalVolume * 1000000 / 6000).toFixed(3)
+    }
+
+    const weightCompare = () => {
+        if (volumeWeight() > totalWeight) {
+            return volumeWeight()
+        } else {
+            return totalWeight
+        }
     }
 
     const renderTableRows = (data, index) => {
         const fontsize = '9pt'
         const volume = data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight
-        const price = volume * unitPrice
-
-        console.log(singleUnitPrice(volume))
+        const price = data.isFollowStandard ? volume * unitPrice : volume * data.unitPrice
 
         return (
             <>
@@ -209,14 +254,15 @@ const ProformaList = (props) => {
                                 onChange={(e) => handleChangeSingleUnitPrice(index, e.target.value)}
                             />
                         </TableCell>
-                        <TableCell align="left" sx={{ fontSize: fontsize }}>{volume < 0.013 ? selfPickupPrice : price}</TableCell>
+                        <TableCell align="left" sx={{ fontSize: fontsize }}>{volume < 0.013 ? selfPickupPrice : roundOffTotal(price)}</TableCell>
                     </>
                 }
             </>
         )
     }
 
-    console.log(userProfile.length > 0)
+    console.log(userProfile)
+    console.log(volumeWeight(totalVolume))
 
     return (
         <Card>
@@ -231,7 +277,7 @@ const ProformaList = (props) => {
                         <ArrowBackIcon />
                     </IconButton>
                     <Typography variant="h5" component="div">
-                        {userProfile.length > 0 && userProfile[0].UserCode}
+                        {userProfile.length > 0 && `${userProfile[0].UserCode} ${userProfile[0].AreaCode}`}
                     </Typography>
                     <div
                         style={{
@@ -244,7 +290,7 @@ const ProformaList = (props) => {
                             loadingPosition="start"
                             startIcon={<SaveIcon />}
                             variant="contained"
-                            onClick={() => console.log(items)}
+                            onClick={() => handleCreateProformaInvoice()}
                         >
                             Create
                         </LoadingButton>
@@ -254,23 +300,50 @@ const ProformaList = (props) => {
                     // table settings 
                     tableTopLeft={
                         <>
-                            <TextField
-                                variant="standard"
-                                size="small"
-                                label="Unit Price (min.)"
-                                name="unitPrice"
-                                value={selfPickupPrice}
-                                onChange={(e) => setSelfPickupPrice(e.target.value)}
-                            />
-                            <TextField
-                                className="mx-3"
-                                variant="standard"
-                                size="small"
-                                label="Unit Price per m3"
-                                name="unitPrice"
-                                value={unitPrice}
-                                onChange={(e) => handleChangeAllUnitPrice(e)}
-                            />
+                            {selectedType == 1 &&
+                                <TextField
+                                    variant="standard"
+                                    size="small"
+                                    label="Unit Price (min.)"
+                                    name="unitPrice"
+                                    value={selfPickupPrice}
+                                    onChange={(e) => setSelfPickupPrice(e.target.value)}
+                                />
+                            }
+                            {selectedType != 3 &&
+                                <TextField
+                                    className="mx-3"
+                                    variant="standard"
+                                    size="small"
+                                    label="Unit Price per m3"
+                                    name="unitPrice"
+                                    value={unitPrice}
+                                    onChange={(e) => handleChangeAllUnitPrice(e)}
+                                />
+                            }
+                            {selectedType == 3 &&
+                                <>
+                                    <TextField
+                                        className="mx-3"
+                                        variant="standard"
+                                        size="small"
+                                        label="First KG price"
+                                        name="unitPrice"
+                                        value={firstKg}
+                                        onChange={(e) => setFirstKg(e.target.value)}
+                                    />
+
+                                    <TextField
+                                        className="mx-3"
+                                        variant="standard"
+                                        size="small"
+                                        label="Subsequent KG price"
+                                        name="unitPrice"
+                                        value={subsequentKg}
+                                        onChange={(e) => setSubsequentKg(e.target.value)}
+                                    />
+                                </>
+                            }
                         </>
                     }
                     tableOptions={{
@@ -293,19 +366,35 @@ const ProformaList = (props) => {
                 />
                 <hr />
                 <div className='row text-end mb-3'>
+                    {selectedType == 3 &&
+                        <>
+                            <div className='col-10'>
+                                Actual Weight:
+                            </div>
+                            <div className='col-2'>
+                                {totalWeight}
+                            </div>
+                            <div className='col-10'>
+                                m3:
+                            </div>
+                            <div className='col-2'>
+                                {volumeWeight()}
+                            </div>
+                        </>
+                    }
                     <div className='col-10'>
                         Sub total:
                     </div>
                     <div className='col-2'>
                         {totalPrice()}
                     </div>
-                    {selectedType === 4 && totalVolume < 0.5 &&
+                    {selectedType === 4 && totalPrice() < minPrice / 2 &&
                         <>
                             <div className='col-10'>
                                 * Does not meet minimum requirement:
                             </div>
                             <div className='col-2'>
-                                20.00
+                                {minPrice - totalPrice()}
                             </div>
                         </>
                     }
@@ -313,7 +402,15 @@ const ProformaList = (props) => {
                         Total:
                     </div>
                     <div className='col-2'>
-                        120.00
+                        {selectedType === 4 && totalPrice() < minPrice / 2 ?
+                            <>
+                                {minPrice}
+                            </>
+                            :
+                            <>
+                                {totalPrice()}
+                            </>
+                        }
                     </div>
                 </div>
             </CardContent>

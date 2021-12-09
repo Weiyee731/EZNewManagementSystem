@@ -252,10 +252,7 @@ export class GitEpic {
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
   Inventory_ViewStockList = action$ =>
     action$.ofType(GitAction.FetchStocks).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Inventory_ViewStockList?" +
-        "TRACKINGSTATUSID=" + payload.USERID
-      )
+
       try {
         const response = await fetch(url +
           "Inventory_ViewStockList?" +
@@ -343,6 +340,46 @@ export class GitEpic {
   // >>>>>>> 37db0b75379f395e9b923fa20c436716dbc39c28
   //   });
 
+  Inventory_UpdateStockDetailByGet = action$ =>
+    action$.ofType(GitAction.UpdateStockDetailByGet).switchMap(async ({ payload }) => {
+      // console.log(url + 
+      //   double_click_and_paste_url_here
+      // )
+      try {
+        const response = await fetch(url +
+          "Inventory_UpdateStockDetail?" +
+          "STOCKID=" + payload.STOCKID +
+          "&USERCODE=" + payload.USERCODE +
+          "&TRACKINGNUMBER=" + payload.TRACKINGNUMBER +
+          "&PRODUCTWEIGHT=" + payload.PRODUCTWEIGHT +
+          "&PRODUCTHEIGHT=" + payload.PRODUCTHEIGHT +
+          "&PRODUCTWIDTH=" + payload.PRODUCTWIDTH +
+          "&PRODUCTDEEP=" + payload.PRODUCTDEEP +
+          "&AREACODE=" + payload.AREACODE +
+          "&ITEM=" + payload.ITEM +
+          "&TRACKINGSTATUSID=" + payload.TRACKINGSTATUSID +
+          "&CONTAINERNAME=" + payload.CONTAINERNAME +
+          "&CONTAINERDATE=" + payload.CONTAINERDATE +
+          "&REMARK=" + payload.REMARK +
+          "&EXTRACHARGE=" + payload.EXTRACHARGE
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UpdatedStockDetailByGet,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_UpdateStockDetailByGet")
+        return {
+          type: GitAction.UpdatedStockDetailByGet,
+          payload: [],
+        };
+      }
+    });
+
   Inventory_UpdateStockDetailByPost = action$ =>
     action$.ofType(GitAction.UpdateStockDetailByPost).switchMap(async ({ payload }) => {
 
@@ -415,9 +452,8 @@ export class GitEpic {
       }
     });
 
-    Inventory_InsertStockByPost = action$ =>
-      action$.ofType(GitAction.InsertStockByPost).switchMap(async ({ payload }) => {
-
+  Inventory_InsertStockByPost = action$ =>
+    action$.ofType(GitAction.InsertStockByPost).switchMap(async ({ payload }) => {
       return fetch(
         url + "Inventory_InsertStockByPost"
         , {
@@ -457,6 +493,36 @@ export class GitEpic {
           };
         })
         .catch(error => toast.error("Error code: 8003"));
+    });
+
+  Inventory_GetFilteredStockList = action$ =>
+    action$.ofType(GitAction.GetFilteredInventory).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Inventory_ViewStockListByFilter?" +
+        "FILTERCOLUMN=" + payload.FILTERCOLUMN +
+        "FILTERKEYWORD=" + payload.FILTERKEYWORD
+      )
+      try {
+        const response = await fetch(url +
+          "Inventory_ViewStockListByFilter?" +
+          "FILTERCOLUMN=" + payload.FILTERCOLUMN +
+          "FILTERKEYWORD=" + payload.FILTERKEYWORD
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.GotFilteredInventory,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_GetFilteredStockList")
+        return {
+          type: GitAction.GotFilteredInventory,
+          payload: [],
+        };
+      }
     });
 
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
@@ -513,15 +579,6 @@ export class GitEpic {
 
   Transaction_InsertTransaction = action$ =>
     action$.ofType(GitAction.InsertNewTransaction).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Transaction_InsertTransaction?" +
-        "USERID=" + payload.USERID +
-        "&CALCULATIONTYPE=" + payload.TYPE +
-        "&ORDERTOTALMOUNT=" + payload.ORDERTOTALMOUNT +
-        "&ORDERPAIDMOUNT=" + payload.ORDERPAIDMOUNT +
-        "&STOCKID=" + payload.STOCKID +
-        "&PRODUCTPRICE=" + payload.PRODUCTPRICE
-      )
       try {
         const response = await fetch(url +
           "Transaction_InsertTransaction?" +
@@ -573,7 +630,7 @@ export class GitEpic {
         };
       }
       catch (error) {
-        toast.error("Error Code: Transaction_InsertTransaction")
+        toast.error("Error Code: Transaction_UpdateTransactionStatus")
         return {
           type: GitAction.UpdatedTransaction,
           payload: [],

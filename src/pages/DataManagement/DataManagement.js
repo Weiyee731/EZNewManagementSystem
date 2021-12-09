@@ -25,7 +25,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         CallInsertStockByPost: propsData => dispatch(GitAction.CallInsertStockByPost(propsData)),
-        CallResetUpdatedStockDetailByPost: () => dispatch(GitAction.CallResetUpdatedStockDetailByPost()),
+        CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
     };
 }
 
@@ -57,7 +57,7 @@ class DataManagement extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (isArrayNotEmpty(this.props.stockApproval)) {
             console.log("Yes")
-            this.props.CallResetUpdatedStockDetailByPost()
+            this.props.CallResetUpdatedStockDetail()
         }
     }
 
@@ -163,7 +163,7 @@ class DataManagement extends Component {
                 Division += (isStringNullOrEmpty(DataRows[index]["Division"])) ? "-" : DataRows[index]["Division"].trim();
                 StockDate += (isStringNullOrEmpty(DataRows[index]["Stock Date"])) ? "-" : convertDateTimeToString(DataRows[index]["Stock Date"].trim())
                 PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : convertDateTimeToString(DataRows[index]["Packaging Date"].trim())
-                AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "-" : DataRows[index]["Additional Cost"].trim();
+                AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "0" : DataRows[index]["Additional Cost"].trim();
                 Remarks += (isStringNullOrEmpty(DataRows[index]["Remarks"])) ? "-" : DataRows[index]["Remarks"];
 
                 if (index !== DataRows.length - 1) {
@@ -333,6 +333,7 @@ class DataManagement extends Component {
                         }}
                         selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].name : ""}
                         Data={this.state.errorReportData}
+                        fullScreen={true}
                     />
                 </ModalPopOut>
             </div>

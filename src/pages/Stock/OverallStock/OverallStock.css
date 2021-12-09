@@ -31,19 +31,27 @@
 .stock-date-range-picker input {
     border   : none;
     font-size: 10.5pt;
-    padding  : 0.5em;
+    padding  : 8.5px 14px;
 }
 
 .stock-date-range-picker fieldset {
     border: none;
 }
 
-.stock-date-range-picker div:first-child {
-    width: 100%;
+.stock-date-range-picker{
+    display: flex;
 }
+
+.stock-date-range-picker div:first-child {
+   margin-toP: auto;
+}   
 
 .stock-date-range-picker .start-date-picker label,
 .stock-date-range-picker .end-date-picker label{
     font-size: 10.5pt;
-    padding: -6px;
+    top: -3px;
+}
+
+.searchbar-input {
+    margin-bottom: 0px !important;
 }

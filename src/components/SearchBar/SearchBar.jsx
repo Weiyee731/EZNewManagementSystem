@@ -9,9 +9,10 @@ import PropTypes from "prop-types";
 import "./Searchbar.css"
 
 const SearchBox = (props) => {
+    
     return (
         <TextField
-            className={(isStringNullOrEmpty(props.className)) ? "searchbar-input mb-2" : props.className}
+            className={(isStringNullOrEmpty(props.className)) ? "searchbar-input" : props.className}
             fullWidth
             label={isStringNullOrEmpty(props.label) ? "" : props.label}
             id="search-bar"
@@ -25,7 +26,7 @@ const SearchBox = (props) => {
             InputProps={{
                 endAdornment: (
                     <InputAdornment position="end">
-                        <IconButton onClick={() => typeof props.buttonOnClick === "function" ? props.buttonOnClick() : {}}>
+                        <IconButton onClick={() => typeof props.buttonOnClick === "function" ? props.buttonOnClick() : {}} disabled={ typeof props.disableButton !== "undefined" && typeof props.disableButton === "boolean" ? props.disableButton : false}>
                             <SearchIcon />
                         </IconButton>
                     </InputAdornment>

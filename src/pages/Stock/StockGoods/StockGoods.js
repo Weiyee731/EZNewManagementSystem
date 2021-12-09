@@ -491,6 +491,7 @@ class StockGoods extends Component {
                         message={
                             <EditStockGoods data={this.state.selectedRows} parentCallback={this.handleCallback} />
                         }
+                        fullScreen={true}
                     ></ModalPopOut>
 
                 }

@@ -15,6 +15,7 @@ import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CircularProgress from '@mui/material/CircularProgress';
 import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
 import SearchBar from "../../../components/SearchBar/SearchBar"
 import TableComponents from "../../../components/TableComponents/TableComponents";
@@ -23,6 +24,9 @@ import AlertDialog from "../../../components/modal/Modal";
 import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
 import ResponsiveDatePickers from '../../../components/datePicker/datePicker';
 import axios from "axios";
+import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
+import CsvDownloader from 'react-csv-downloader';
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 
 import "./OverallStock.css";
 
@@ -37,36 +41,37 @@ function mapDispatchToProps(dispatch) {
     return {
         CallFetchAllStock: (propsData) => dispatch(GitAction.CallFetchAllStock(propsData)),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
+        CallFilterInventory: (propsData) => dispatch(GitAction.CallFilterInventory(propsData)),
     };
 }
 
 const headCells = [
     {
-        id: 'TrackingNo',
+        id: 'TrackingNumber',
         align: 'left',
         disablePadding: false,
         label: 'Tracking No. ',
     },
     {
-        id: 'Weight',
+        id: 'ProductWeight',
         align: 'left',
         disablePadding: false,
         label: 'Weight (KG)',
     },
     {
-        id: 'Depth',
+        id: 'ProductDimensionDeep',
         align: 'left',
         disablePadding: false,
         label: 'Depth',
     },
     {
-        id: 'Width',
+        id: 'ProductDimensionWidth',
         align: 'left',
         disablePadding: false,
         label: 'Width',
     },
     {
-        id: 'Height',
+        id: 'ProductDimensionHeight',
         align: 'left',
         disablePadding: false,
         label: 'Height',
@@ -84,31 +89,31 @@ const headCells = [
         label: 'Item',
     },
     {
-        id: 'Member',
+        id: 'UserCode',
         align: 'left',
         disablePadding: false,
         label: 'Member',
     },
     {
-        id: 'Division',
+        id: 'AreaCode',
         align: 'left',
         disablePadding: false,
         label: 'Division',
     },
     {
-        id: 'Stockdate',
+        id: 'StockDate',
         align: 'left',
         disablePadding: false,
         label: 'Stock Date',
     },
     {
-        id: 'packagingDate',
+        id: 'PackagingDate',
         align: 'left',
         disablePadding: false,
         label: 'Packaging Date',
     },
     {
-        id: 'ContainerNo',
+        id: 'ContainerName',
         align: 'left',
         disablePadding: false,
         label: 'Container',
@@ -120,7 +125,7 @@ const headCells = [
         label: 'Additional Charges',
     },
     {
-        id: 'Remarks',
+        id: 'Remark',
         align: 'left',
         disablePadding: false,
         label: 'Remarks',
@@ -132,6 +137,7 @@ const INITIAL_STATE = {
     openRemarkModal: false,
 
     formValue: {
+        StockID: "",
         TrackingNumber: "",
         TrackingNumberVerified: null,
 
@@ -158,8 +164,8 @@ const INITIAL_STATE = {
     searchKeywords: "",
     searchCategory: "All",
     searchArea: "All",
-    searchBeginDate: "",
-    searchEndDate: "",
+    searchDates: [],
+    isOnSearch: false,
 }
 
 class OverallStock extends Component {
@@ -167,7 +173,7 @@ class OverallStock extends Component {
         super(props);
         this.state = INITIAL_STATE
 
-        this.props.CallFetchAllStock({ USERID: 1 })
+        // this.props.CallFetchAllStock({ USERID: 1 })
         this.props.CallUserAreaCode()
 
         this.changeTab = this.changeTab.bind(this)
@@ -183,6 +189,7 @@ class OverallStock extends Component {
         this.handleSearchInput = this.handleSearchInput.bind(this)
         this.handleSearchCategory = this.handleSearchCategory.bind(this)
         this.handleSearchArea = this.handleSearchArea.bind(this)
+        this.onDateChange = this.onDateChange.bind(this)
     }
 
     componentDidMount() {
@@ -191,10 +198,13 @@ class OverallStock extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (this.state.filteredList === null && isArrayNotEmpty(this.props.stocks)) {
             const { stocks } = this.props
-            // console.log(stocks)
+            
             this.setState({
-                filteredList: (isStringNullOrEmpty(stocks.ReturnVal) && stocks.ReturnVal == 0) ? [] : stocks
+                filteredList: (isStringNullOrEmpty(stocks.ReturnVal) && stocks.ReturnVal == 0) ? [] : stocks,
+                isOnSearch: false
             })
+
+            toast.dismiss();
         }
     }
 
@@ -253,7 +263,7 @@ class OverallStock extends Component {
                 >
                     {data.TrackingNumber}
                 </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * 100).toFixed(1)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionWidth * 100).toFixed(1)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionHeight * 100).toFixed(1)}</TableCell>
@@ -271,9 +281,14 @@ class OverallStock extends Component {
     }
 
     onTableRowClick = (event, row) => {
+        console.log(row)
         let tempFormValue = this.state.formValue
-
+        tempFormValue.StockID = row.StockID
+        tempFormValue.Item = row.Item
+        tempFormValue.TrackingStatusID = row.TrackingStatusID
         tempFormValue.TrackingNumber = row.TrackingNumber;
+        tempFormValue.ContainerName = row.ContainerName;
+
         tempFormValue.TrackingNumberVerified = !isStringNullOrEmpty(row.TrackingNumber);
         tempFormValue.MemberNumber = row.UserCode;
         tempFormValue.MemberNumberVerified = !isStringNullOrEmpty(row.UserCode);
@@ -286,6 +301,7 @@ class OverallStock extends Component {
         tempFormValue.Weight = row.ProductWeight;
         tempFormValue.WeightVerified = !isStringNullOrEmpty(row.ProductWeight) && !isNaN(row.ProductWeight)
         tempFormValue.Division = Number(row.UserAreaID)
+        tempFormValue.Remark = row.Remark
 
         let additionalCharges = row.AdditionalCharges
         try { additionalCharges = JSON.parse(additionalCharges) } catch (e) { console.log(e); additionalCharges = [] }
@@ -315,8 +331,35 @@ class OverallStock extends Component {
 
     handleUpdateRemark = () => {
         const { formValue } = this.state
-        console.log('update remark')
-        console.log(formValue)
+
+        let extraChangesValue = "";
+
+        if (formValue.AdditionalCost.length > 0) {
+            for (var i = 0; i < formValue.AdditionalCost.length; i++) {
+                extraChangesValue += formValue.AdditionalCost[i].Charges + ":" + formValue.AdditionalCost[i].Value + ";"
+            }
+        }
+        else {
+            extraChangesValue = "-"
+        }
+
+        let object = {
+            STOCKID: formValue.StockID,
+            USERCODE: formValue.MemberNumber,
+            TRACKINGNUMBER: formValue.TrackingNumber,
+            PRODUCTWEIGHT: formValue.Weight,
+            PRODUCTHEIGHT: formValue.Height,
+            PRODUCTWIDTH: formValue.Width,
+            PRODUCTDEEP: formValue.Depth,
+            AREACODE: formValue.Division,
+            ITEM: formValue.Item,
+            TRACKINGSTATUSID: formValue.TrackingStatusID,
+            CONTAINERNAME: formValue.ContainerName,
+            CONTAINERDATE: formValue.StockDate,
+            REMARK: formValue.Remark,
+            EXTRACHARGE: extraChangesValue,
+        }
+        console.log(object)
     }
 
     handleFormInput = (e) => {
@@ -444,7 +487,46 @@ class OverallStock extends Component {
     }
 
     onSearch() {
-        console.log('search')
+        const { filteredList, searchKeywords, searchCategory, searchArea, searchDates, isOnSearch } = this.state
+        const { stocks } = this.props
+
+        let date_range = (typeof searchDates === "string" && !Array.isArray(searchDates)) ? JSON.parse(searchDates) : searchDates
+
+        // CallFilterInventory
+        if (searchArea === "All" && searchCategory === "All" && isStringNullOrEmpty(searchKeywords) && !isArrayNotEmpty(date_range)) {
+            this.props.CallFetchAllStock({ USERID: 1 })
+            toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark"})
+            this.setState({ isOnSearch: true })
+        }
+        else {
+            let tempList = stocks
+
+            let filteringKeywords = {
+                FILTERCOLUMN: "",
+                FILTERKEYWORD: ""
+            }
+            console.log(filteringKeywords)
+            // this.props.CallFilterInventory(filteringKeywords)
+
+            console.log(searchKeywords)
+            console.log(searchCategory)
+            console.log(searchArea)
+            console.log(date_range)
+
+            if (!isStringNullOrEmpty(searchKeywords)) {
+                if (searchCategory !== "All" || searchArea !== "All") {
+                    console.log(tempList)
+                    // filteredList.filter()
+                }
+                else{
+
+                }
+            }
+
+            if (isArrayNotEmpty(stocks)) {
+
+            }
+        }
     }
 
     handleSearchInput(e) {
@@ -457,6 +539,10 @@ class OverallStock extends Component {
 
     handleSearchArea(e) {
         this.setState({ searchArea: e.target.value })
+    }
+
+    onDateChange(e) {
+        this.setState({ searchDates: e })
     }
 
     render() {
@@ -472,71 +558,79 @@ class OverallStock extends Component {
         return (
             <div className="container-fluid">
                 <div className="row">
-                    <div className="col-md-4 col-12">
-                        <div className="col-md-12 col-12">
-                            <div className="filter-dropdown row">
-                                <div className="col-md-6 col-12">
-                                    <div className="d-inline-block w-100">
-                                        <label className="">Filter By:</label>
-                                        <Select
-                                            labelId="search-filter-category"
-                                            id="search-filter-category"
-                                            value={searchCategory}
-                                            label="Search By"
-                                            onChange={this.handleSearchCategory}
-                                            size="small"
-                                            IconComponent={FilterListOutlinedIcon}
-                                            className="w-100"
-                                            // style={{width: '40%', marginRight: 10}}
-                                            placeholder="filter by"
-                                        >
-                                            <MenuItem key="search_all" value="All">All</MenuItem>
-                                            <MenuItem key="search_tracking" value="Tracking">Tracking Number</MenuItem>
-                                            <MenuItem key="search_member" value={"Member"}>Member</MenuItem>
-                                            <MenuItem key="search_container" value={"Container"}>Container</MenuItem>
-                                        </Select>
-                                    </div>
+                    <div className="col-md-4 col-12 mb-2">
+                        <div className="filter-dropdown row">
+                            <div className="col-md-6 col-12">
+                                <div className="d-inline-block w-100">
+                                    <label className="">Filter By:</label>
+                                    <Select
+                                        labelId="search-filter-category"
+                                        id="search-filter-category"
+                                        value={searchCategory}
+                                        label="Search By"
+                                        onChange={this.handleSearchCategory}
+                                        size="small"
+                                        IconComponent={FilterListOutlinedIcon}
+                                        className="w-100"
+                                        // style={{width: '40%', marginRight: 10}}
+                                        placeholder="filter by"
+                                    >
+                                        <MenuItem key="search_all" value="All">All</MenuItem>
+                                        <MenuItem key="search_tracking" value="Tracking">Tracking Number</MenuItem>
+                                        <MenuItem key="search_member" value={"Member"}>Member</MenuItem>
+                                        <MenuItem key="search_container" value={"Container"}>Container</MenuItem>
+                                    </Select>
                                 </div>
-                                <div className="col-md-6 col-12">
-                                    <div className="d-inline-block w-100">
-                                        <label>Area:</label>
-                                        <Select
-                                            labelId="search-filter-area"
-                                            id="search-filter-area"
-                                            value={searchArea}
-                                            label="Area"
-                                            onChange={this.handleSearchArea}
-                                            size="small"
-                                            className="w-100"
-                                            placeholder="filter by"
-                                        >
-                                            <MenuItem key="all_area" value="All">All</MenuItem>
-                                            {
-                                                isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
-                                                    return <MenuItem key={el.AreaCode} value={el.UserAreaID}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
-                                                })
-                                            }
-                                        </Select>
-                                    </div>
+                            </div>
+                            <div className="col-md-6 col-12">
+                                <div className="d-inline-block w-100">
+                                    <label>Area:</label>
+                                    <Select
+                                        labelId="search-filter-area"
+                                        id="search-filter-area"
+                                        value={searchArea}
+                                        label="Area"
+                                        onChange={this.handleSearchArea}
+                                        size="small"
+                                        className="w-100"
+                                        placeholder="filter by"
+                                    >
+                                        <MenuItem key="all_area" value="All">All</MenuItem>
+                                        {
+                                            isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
+                                                return <MenuItem key={el.AreaCode} value={el.UserAreaID}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
+                                            })
+                                        }
+                                    </Select>
                                 </div>
                             </div>
                         </div>
-                        <div className="col-md-12 col-12 mt-2 stock-date-range-picker">
-                            <ResponsiveDatePickers
-                                rangePicker
-                                openTo="day"
-                                title="FromDate"
-                                value={this.state.datevalue ? this.state.datevalue : ""}
-                                onChange={(e) => this.onDateChange(e)}
-                                variant="outlined"
-                                startPickerPropsOptions={{ placeholder: "From", className: "start-date-picker" }}
-                                endPickerPropsOptions={{ placeholder: "To", className: "end-date-picker" }}
-                            />
-                        </div>
                     </div>
-                    <div className="col-md-8 col-12">
-                        <div className="col-md-12 col-12 m-auto">
-                            <SearchBar id="" placeholder="Enter Member No, Tracking No or Container No to search" buttonOnClick={() => this.onSearch()} onChange={this.handleSearchInput} />
+                    <div className="col-md-4 col-12 mb-2 stock-date-range-picker">
+                        <ResponsiveDatePickers
+                            rangePicker
+                            openTo="day"
+                            title="FromDate"
+                            value={this.state.datevalue ? this.state.datevalue : ""}
+                            onChange={(e) => this.onDateChange(e)}
+                            variant="outlined"
+                            startPickerPropsOptions={{ placeholder: "From", className: "start-date-picker" }}
+                            endPickerPropsOptions={{ placeholder: "To", className: "end-date-picker" }}
+                        />
+                    </div>
+                    <div className="col-md-4 col-12 mb-2 d-flex">
+                        <div className="w-100 mt-auto">
+                            <SearchBar id="" placeholder="Enter Member No, Tracking No or Container No to search" buttonOnClick={() => this.onSearch()} onChange={this.handleSearchInput} className="searchbar-input mt-auto" disableButton={this.state.isOnSearch} />
+                        </div>
+                        <div className="w-20 mt-auto">
+                            <CsvDownloader
+                                filename="overallstock-list"
+                                extension=".xls"
+                                separator=","
+                                columns={headCells}
+                                datas={isArrayNotEmpty(this.state.filteredList) ? this.state.filteredList : []}>
+                                <DownloadForOfflineIcon color="primary" sx={{ fontSize: 45 }}></DownloadForOfflineIcon>
+                            </CsvDownloader>
                         </div>
                     </div>
                 </div>
@@ -571,10 +665,12 @@ class OverallStock extends Component {
                     handleToggleDialog={this.handleRemarkModal}  // required, pass the toggle function of modal
                     handleConfirmFunc={this.handleUpdateRemark}    // required, pass the confirm function 
                     showAction={true}                           // required, to show the footer of modal display
-                    title={""}                                  // required, title of the modal
+                    title={this.state.formValue.Item}                                  // required, title of the modal
                     buttonTitle={"Update"}                         // required, title of button
                     singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
                     maxWidth={"md"}
+                    draggable={true}
+
                 >
                     <div className="py-md-3 py-1">
                         <div className="row">
