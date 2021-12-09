@@ -19,10 +19,11 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import { getWindowDimensions } from "../../tools/Helpers";
+import { getWindowDimensions, isArrayNotEmpty } from "../../tools/Helpers";
 import SearchBar from "../../components/SearchBar/SearchBar"
 import AlertDialog from "../../components/modal/Modal";
 import { toast } from "react-toastify";
+import CsvDownloader from 'react-csv-downloader';
 
 const style = {
     position: 'absolute',
@@ -250,7 +251,21 @@ class UserManagement extends Component {
         return (
             <>
                 <div className="w-100 container-fluid">
-                    <SearchBar onChange={onChange} />
+                    <div className="row d-flex">
+                        <div className="col-md-10 col-10 m-auto">
+                            <SearchBar onChange={onChange} />
+                        </div>
+                        <div className="col-md-2 col-2 m-auto">
+                            <CsvDownloader
+                                filename="user-list"
+                                extension=".xls"
+                                separator=","
+                                columns={headCells}
+                                datas={isArrayNotEmpty(this.state.UserListingfiltered) ? this.state.UserListingfiltered : []}>
+                                <Button className="w-100" variant="contained" color="primary">Download CSV</Button>
+                            </CsvDownloader>
+                        </div>
+                    </div>
                     <TableComponents
                         // table settings 
                         tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}  // optional, it can pass as string or as children elements
