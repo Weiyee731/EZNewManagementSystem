@@ -69,7 +69,7 @@ export const convertArrayToStringWithSpecialCharacter = (list, sc) => {
         return text;
     }
 }
-export const extractNumberFromStrings = (text) => { return (typeof text === "string") ? Number(text.replace(/[^0-9\.]+/g, "")) : 0 }
+export const extractNumberFromStrings = (text) => { return (typeof text === "string") ? Number("5g".replace(/[^0-9\.]+/g, "")) : 0 }
 
 // image utilities functions
 export const getImageOrientationType = (imageWidth, imageHeight) => {
@@ -163,45 +163,92 @@ export const roundOffTotal = (val) => {
             let lastDigit = decimal.pop()
 
             let roundingOff;
-            switch (Number(lastDigit)) {
-                case 0:
-                case 1:
-                case 2:
-                    roundingOff = firstDigit.toString() + "0"
-                    return (amount.toString().concat("." + roundingOff.toString()))
-                    break;
-
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                    roundingOff = firstDigit.toString() + "5"
-                    return (amount.toString().concat("." + roundingOff.toString()))
-                    break;
-
-                case 8:
-                case 9:
-                    if (firstDigit == 9) {
-                        amount = Number(amount) + 1
-                        roundingOff = amount.toString() + ".00"
-                    }
-                    else {
-                        firstDigit = Number(firstDigit) + 1
-                        roundingOff = amount.toString() + "." + firstDigit.toString() + "0"
-                    }
-                    return (roundingOff)
-                    break;
-
-                default:
-                    alert("Error Code: function -> roundingOff() received non-numeric value")
-                    break;
+            if (Number(lastDigit) < 5) {
+                roundingOff = firstDigit.toString() + "0"
+                return amount.toString().concat("." + roundingOff.toString())
+            } else {
+                if (firstDigit == 9) {
+                    amount = Number(amount) + 1
+                    roundingOff = amount.toString() + ".00"
+                }
+                else {
+                    firstDigit = Number(firstDigit) + 1
+                    roundingOff = amount.toString() + "." + firstDigit.toString() + "0"
+                }
+                return roundingOff
             }
+            // switch (Number(lastDigit)) {
+            //     case 0:
+            //     case 1:
+            //     case 2:
+            //         roundingOff = firstDigit.toString() + "0"
+            //         return Number(amount.toString().concat("." + roundingOff.toString())).toFixed(2)
+            //         break;
+
+            //     case 3:
+            //     case 4:
+            //     case 5:
+            //     case 6:
+            //     case 7:
+            //         roundingOff = firstDigit.toString() + "5"
+            //         return Number(amount.toString().concat("." + roundingOff.toString())).toFixed(2)
+            //         break;
+
+            //     case 8:
+            //     case 9:
+            //         if (firstDigit == 9) {
+            //             amount = Number(amount) + 1
+            //             roundingOff = amount.toString() + ".00"
+            //         }
+            //         else {
+            //             firstDigit = Number(firstDigit) + 1
+            //             roundingOff = amount.toString() + "." + firstDigit.toString() + "0"
+            //         }
+            //         return Number(roundingOff).toFixed(2)
+            //         break;
+
+            //     default:
+            //         break;
+            // }
         }
     }
     catch (e) { console.error("Error: " + e) }
 }
 
+// round up for weight
+export const round = (num, places) => {
+    let amount = Number(num).toFixed(4).toString();
+    let decimal = amount.split(".").pop()
+    amount = amount.split(".")[0]
+    decimal = decimal.toString().split("")
+
+    let forthDigit = decimal[places]
+    let roundingUp;
+    if (Number(forthDigit) > 0) {
+        decimal[places - 1] = Number(decimal[places - 1]) + 1
+        decimal.pop()
+        roundingUp = `${amount.toString()}.${decimal.join("")}`
+    } else {
+        roundingUp = `${amount.toString()}.${decimal.join("")}`
+    }
+    return Number(roundingUp).toFixed(3)
+}
+
+export const testRounding = (num, places) => {
+    num = parseFloat(num);
+    places = (places ? parseInt(places, 10) : 0)
+    if (places > 0) {
+        let length = places;
+        places = "1";
+        for (let i = 0; i < length; i++) {
+            places += "0";
+            places = parseInt(places, 10);
+        }
+    } else {
+        places = 1;
+    }
+    return (Math.round((num + Number.EPSILON) * (1 * places)) / (1 * places))
+}
 
 // localStorage
 export const resetLocalStorage = () => { localStorage.clear() }
