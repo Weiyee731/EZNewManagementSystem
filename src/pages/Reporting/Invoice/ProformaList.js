@@ -3,7 +3,7 @@ import { GitAction } from "../../../store/action/gitAction";
 import { withRouter } from 'react-router'
 import TableComponents from '../../../components/TableComponents/TableComponents';
 import Button from '@mui/material/Button';
-import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
+import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull, roundOffTotal, round } from "../../../tools/Helpers";
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -14,7 +14,6 @@ import CardContent from '@mui/material/CardContent';
 import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
 import { connect } from 'react-redux';
-import { roundOffTotal } from '../../../components/utils'
 
 function mapStateToProps(state) {
     return {
@@ -31,19 +30,16 @@ function mapDispatchToProps(dispatch) {
 }
 
 const ProformaList = (props) => {
-    console.log(props)
     const { selectedType, state, userId, totalVolume, totalWeight } = props.location
     const { userProfile } = props
 
     const [unitPrice, setUnitPrice] = useState(420)
     const [selfPickupPrice, setSelfPickupPrice] = useState(5)
-    const [minPrice, setMinPrice] = useState(500)
+    const [minPrice, setMinPrice] = useState((500).toFixed(2))
     const [firstKg, setFirstKg] = useState(10)
     const [subsequentKg, setSubsequentKg] = useState(6)
     const [items, setItems] = useState(state)
     const ref = useRef(false)
-
-    console.log(totalVolume)
 
     useEffect(() => {
         props.CallUserProfileByID({ UserID: userId })
@@ -131,11 +127,12 @@ const ProformaList = (props) => {
         if (selectedType != 3) {
             let total = []
             items.map((item) => {
-                let volume = item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight
+                let volume = (item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight) / 1000000
+                volume = round(volume, 3)
                 let price = item.isFollowStandard ? unitPrice * volume : item.unitPrice * volume
                 if (volume < 0.013) {
                     if (selectedType == 1) {
-                        total.push(selfPickupPrice)
+                        total.push(Number(selfPickupPrice))
                     } else {
                         total.push(price)
                     }
@@ -143,10 +140,10 @@ const ProformaList = (props) => {
                     total.push(price)
                 }
             })
-            return roundOffTotal(total.reduce((a, b) => a + b))
+            return !isNaN(roundOffTotal(total.reduce((a, b) => a + b))) ? roundOffTotal(total.reduce((a, b) => a + b)) : 0.00
         } else {
             let subKg = weightCompare() - 1
-            return roundOffTotal(firstKg + (subKg * subsequentKg))
+            return !isNaN(roundOffTotal(firstKg + (subKg * subsequentKg))) ? roundOffTotal(firstKg + (subKg * subsequentKg)) : 0.00
         }
     }
 
@@ -213,7 +210,7 @@ const ProformaList = (props) => {
     }
 
     const volumeWeight = () => {
-        return (totalVolume * 1000000 / 6000).toFixed(3)
+        return Math.ceil(totalVolume * 1000000 / 6000)
     }
 
     const weightCompare = () => {
@@ -225,9 +222,27 @@ const ProformaList = (props) => {
     }
 
     const renderTableRows = (data, index) => {
-        const fontsize = '9pt'
-        const volume = data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight
-        const price = data.isFollowStandard ? volume * unitPrice : volume * data.unitPrice
+        let fontsize = '9pt'
+        let volume = (data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight) / 1000000
+        volume = round(volume, 3)
+
+        const subTotal = () => {
+            let price = data.isFollowStandard ? volume * unitPrice : volume * data.unitPrice
+            if(volume < 0.013 && selectedType == 1) {
+                console.log(selfPickupPrice)
+                if(selfPickupPrice != "") {
+                    return Number(selfPickupPrice).toFixed(2)
+                } else {
+                    return 0
+                }
+            } else {
+                if(price != "") {
+                    return price.toFixed(2)
+                } else {
+                    return 0
+                }
+            }
+        }
 
         return (
             <>
@@ -241,28 +256,24 @@ const ProformaList = (props) => {
                     {data.TrackingNumber}
                 </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{volume.toFixed(3)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{volume}</TableCell>
                 {selectedType !== 3 &&
                     <>
                         <TableCell align="left" sx={{ fontSize: fontsize }}>
                             <TextField
                                 variant="outlined"
                                 size="small"
-                                // label="Unit Price"
                                 name="unitPrice"
                                 value={data.isFollowStandard ? singleUnitPrice(volume) : data.unitPrice}
                                 onChange={(e) => handleChangeSingleUnitPrice(index, e.target.value)}
                             />
                         </TableCell>
-                        <TableCell align="left" sx={{ fontSize: fontsize }}>{volume < 0.013 ? selfPickupPrice : roundOffTotal(price)}</TableCell>
+                        <TableCell align="left" sx={{ fontSize: fontsize }}>{subTotal()}</TableCell>
                     </>
                 }
             </>
         )
     }
-
-    console.log(userProfile)
-    console.log(volumeWeight(totalVolume))
 
     return (
         <Card>
@@ -304,6 +315,7 @@ const ProformaList = (props) => {
                                 <TextField
                                     variant="standard"
                                     size="small"
+                                    type={'number'}
                                     label="Unit Price (min.)"
                                     name="unitPrice"
                                     value={selfPickupPrice}
@@ -315,6 +327,7 @@ const ProformaList = (props) => {
                                     className="mx-3"
                                     variant="standard"
                                     size="small"
+                                    type={'number'}
                                     label="Unit Price per m3"
                                     name="unitPrice"
                                     value={unitPrice}
@@ -327,6 +340,7 @@ const ProformaList = (props) => {
                                         className="mx-3"
                                         variant="standard"
                                         size="small"
+                                        type={'number'}
                                         label="First KG price"
                                         name="unitPrice"
                                         value={firstKg}
@@ -337,12 +351,25 @@ const ProformaList = (props) => {
                                         className="mx-3"
                                         variant="standard"
                                         size="small"
+                                        type={'number'}
                                         label="Subsequent KG price"
                                         name="unitPrice"
                                         value={subsequentKg}
                                         onChange={(e) => setSubsequentKg(e.target.value)}
                                     />
                                 </>
+                            }
+                            {selectedType == 4 &&
+                                <TextField
+                                    className="mx-3"
+                                    variant="standard"
+                                    size="small"
+                                    type={'number'}
+                                    label="Minimum price"
+                                    name="unitPrice"
+                                    value={minPrice}
+                                    onChange={(e) => setMinPrice(e.target.value)}
+                                />
                             }
                         </>
                     }
@@ -369,13 +396,13 @@ const ProformaList = (props) => {
                     {selectedType == 3 &&
                         <>
                             <div className='col-10'>
-                                Actual Weight:
+                                Actual Weight (kg):
                             </div>
                             <div className='col-2'>
-                                {totalWeight}
+                                {Math.ceil(totalWeight)}
                             </div>
                             <div className='col-10'>
-                                m3:
+                                Volumatric Weight (kg):
                             </div>
                             <div className='col-2'>
                                 {volumeWeight()}
@@ -394,7 +421,7 @@ const ProformaList = (props) => {
                                 * Does not meet minimum requirement:
                             </div>
                             <div className='col-2'>
-                                {minPrice - totalPrice()}
+                                {(minPrice - totalPrice()).toFixed(2)}
                             </div>
                         </>
                     }
