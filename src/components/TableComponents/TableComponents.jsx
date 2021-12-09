@@ -224,10 +224,21 @@ export default function TableComponents(props) {
     // }, [props.Data]);
 
     useEffect(() => {
-        setTableHeaders(props.tableHeaders)
-        setRows(props.Data)
-        setTableTopRight(props.tableTopRight)
-        setObjectKey(props.selectedIndexKey)
+        let isMounted = true
+        if(isMounted) {
+            setTableHeaders(props.tableHeaders)
+            setRows(props.Data)
+            setTableTopRight(props.tableTopRight)
+            setObjectKey(props.selectedIndexKey)
+        }
+        return() => {
+            setTableHeaders([])
+            setRows([])
+            setTableTopRight(null)
+            setObjectKey("id")
+            console.log("unmount")
+            isMounted = false
+        }
     }, [props]);
 
     // useEffect(() => {
@@ -271,6 +282,7 @@ export default function TableComponents(props) {
     }
 
     const handleRowClick = (event, row) => {
+        console.log("testing...")
         if (!onRowSelect) {
             if (typeof props.onTableRowClick !== "undefined")
                 props.onTableRowClick(event, row)

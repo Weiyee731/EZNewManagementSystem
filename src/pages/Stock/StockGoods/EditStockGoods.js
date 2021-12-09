@@ -18,7 +18,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
+import { isArrayNotEmpty, isStringNullOrEmpty, extractNumberFromStrings, isObjectUndefinedOrNull } from "../../../tools/Helpers";
 
 function mapStateToProps(state) {
     return {
@@ -36,30 +36,44 @@ function mapDispatchToProps(dispatch) {
 
 const INITIAL_STATE = {
 
-}
-
-var validation = {
     TrackingNumberVerified: null,
     MemberNumberVerified: null,
     DepthVerified: null,
     WidthVerified: null,
     HeightVerified: null,
     WeightVerified: null,
+    formData: ""
 }
+
 class EditStockGoods extends Component {
     constructor(props) {
         super(props);
         this.state = INITIAL_STATE
 
         this.props.CallUserAreaCode();
-
+        this.state.formData = this.formValue;
         this.handleAdditionalCostInputs = this.handleAdditionalCostInputs.bind(this)
         this.RenderAdditionalCost = this.RenderAdditionalCost.bind(this)
         this.handleRemoveAdditionalCosts = this.handleRemoveAdditionalCosts.bind(this)
         this.removeAllAdditionalCost = this.removeAllAdditionalCost.bind(this)
     }
+    formValue = this.props.data ? this.props.data : [];
+
 
     componentDidMount() {
+        let additionalCharges = this.formValue.AdditionalCharges
+        try { additionalCharges = JSON.parse(additionalCharges) } catch (e) { console.log(e); additionalCharges = [] }
+        this.formValue.AdditionalCost = isObjectUndefinedOrNull(additionalCharges) ? [] : additionalCharges
+        this.formValue.AdditionalCost.length > 0 && this.formValue.AdditionalCost.map((el, idx) => {
+            el.validated = !(isStringNullOrEmpty(el.Charges)) && !(isStringNullOrEmpty(el.Value)) && !isNaN(el.Value) && (Number(el.Value) > 0)
+        })
+
+        this.state.TrackingNumberVerified = !isStringNullOrEmpty(this.formValue.TrackingNumber);
+        this.state.MemberNumberVerified = !isStringNullOrEmpty(this.formValue.UserCode);
+        this.state.DepthVerified = !isStringNullOrEmpty(this.formValue.ProductDimensionDeep) && !isNaN(this.formValue.ProductDimensionDeep)
+        this.state.WidthVerified = !isStringNullOrEmpty(this.formValue.ProductDimensionWidth) && !isNaN(this.formValue.ProductDimensionDeep)
+        this.state.HeightVerified = !isStringNullOrEmpty(this.formValue.ProductDimensionHeight) && !isNaN(this.formValue.ProductDimensionHeight)
+        this.state.WeightVerified = !isStringNullOrEmpty(this.formValue.ProductWeight) && !isNaN(this.formValue.ProductWeight)
 
     }
 
@@ -71,33 +85,32 @@ class EditStockGoods extends Component {
         const value = event.target.value
 
         if (statement === "TrackingNumber") {
-            validation.TrackingNumberVerified = !isStringNullOrEmpty(value)
+            this.setState({ TrackingNumberVerified: !isStringNullOrEmpty(value) })
             this.props.parentCallback({ "TrackingNumber": value });
             event.preventDefault();
         }
         if (statement === "UserCode") {
-            validation.MemberNumberVerified = !isStringNullOrEmpty(value)
-            console.log(validation.MemberNumberVerified)
+            this.setState({ MemberNumberVerified: !isStringNullOrEmpty(value) })
             this.props.parentCallback({ "UserCode": value });
             event.preventDefault();
         }
         if (statement === "ProductDimensionWidth") {
-            validation.WidthVerified = !isStringNullOrEmpty(value) && !isNaN(value)
+            this.setState({ WidthVerified: !isStringNullOrEmpty(value) && !isNaN(value) })
             this.props.parentCallback({ "ProductDimensionWidth": value });
             event.preventDefault();
         }
         if (statement === "ProductDimensionHeight") {
-            validation.HeightVerified = !isStringNullOrEmpty(value) && !isNaN(value)
+            this.setState({ HeightVerified: !isStringNullOrEmpty(value) && !isNaN(value) })
             this.props.parentCallback({ "ProductDimensionHeight": value });
             event.preventDefault();
         }
         if (statement === "ProductDimensionDeep") {
-            validation.DepthVerified = !isStringNullOrEmpty(value) && !isNaN(value)
+            this.setState({ DepthVerified: !isStringNullOrEmpty(value) && !isNaN(value) })
             this.props.parentCallback({ "ProductDimensionDeep": value });
             event.preventDefault();
         }
         if (statement === "ProductWeight") {
-            validation.WeightVerified = !isStringNullOrEmpty(value) && !isNaN(value)
+            this.setState({ WeightVerified: !isStringNullOrEmpty(value) && !isNaN(value) })
             this.props.parentCallback({ "ProductWeight": value });
             event.preventDefault();
         }
@@ -122,28 +135,30 @@ class EditStockGoods extends Component {
     handleAdditionalCostInputs = (e, index) => {
         let validated;
         const { value, name } = e.target
-        let tempFormValue = this.state.formValue
+        let tempFormValue = this.formValue
         let additionalCostItems = tempFormValue.AdditionalCost
 
         switch (name) {
             case "AdditionalChargedRemark":
-                const chargedAmount = additionalCostItems[index].chargedAmount
-                validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(chargedAmount)) && !isNaN(chargedAmount) && (Number(value) > 0)
-                additionalCostItems[index].chargedRemark = value
+                const Value = additionalCostItems[index].Value
+                validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(Value)) && !isNaN(Value) && (Number(value) > 0)
+                additionalCostItems[index].Charges = value
                 additionalCostItems[index].validated = validated
                 tempFormValue.AdditionalCost = additionalCostItems
 
-                this.setState({ formValue: tempFormValue })
+                this.setState({ formData: tempFormValue })
+                this.props.parentCallback({ "AdditionalCharges": tempFormValue.AdditionalCost });
                 break;
 
             case "AdditionalChargedAmount":
-                const chargedRemark = additionalCostItems[index].chargedRemark
-                validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(chargedRemark)) && !isNaN(e.target.value) && (Number(value) > 0)
-                additionalCostItems[index].chargedAmount = value
+                const Charges = additionalCostItems[index].Charges
+                validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(Charges)) && !isNaN(e.target.value) && (Number(value) > 0)
+                additionalCostItems[index].Value = value
                 additionalCostItems[index].validated = validated
                 tempFormValue.AdditionalCost = additionalCostItems
 
-                this.setState({ formValue: tempFormValue })
+                this.setState({ formData: tempFormValue })
+                this.props.parentCallback({ "AdditionalCharges": tempFormValue.AdditionalCost });
                 break;
 
             default:
@@ -152,11 +167,13 @@ class EditStockGoods extends Component {
 
     RenderAdditionalCost = () => {
         // const { formValue } = this.state
-        let tempFormValue = validation;
-        let additionalCostItems = (!isObjectUndefinedOrNull(tempFormValue.AdditionalCost)) ? validation.AdditionalCost : []
+
+        let tempFormValue = this.state.formData
+
+        let additionalCostItems = (!isObjectUndefinedOrNull(tempFormValue.AdditionalCost)) ? this.formValue.AdditionalCost : []
         let obj = {
-            chargedRemark: "",
-            chargedAmount: "",
+            Charges: "",
+            Value: "",
             validated: null
         }
 
@@ -168,44 +185,43 @@ class EditStockGoods extends Component {
             additionalCostItems.push(obj)
 
         tempFormValue.AdditionalCost = additionalCostItems
-        validation = tempFormValue;
-        // this.setState({ formValue: tempFormValue })
+        // this.state.validation = tempFormValue;
+        this.setState({ formData: tempFormValue })
     }
 
     handleRemoveAdditionalCosts(index) {
         // const { formValue } = this.state
-        let tempFormValue = validation
+        let tempFormValue = this.state.formData
         let additionalCostItems = (!isObjectUndefinedOrNull(tempFormValue.AdditionalCost)) ? tempFormValue.AdditionalCost : []
 
         if (additionalCostItems.length > 0) {
             additionalCostItems.splice(index, 1)
-            console.log(tempFormValue)
-            validation = tempFormValue;
+            // this.state.validation = tempFormValue;
+            this.setState({ formData: tempFormValue })
         }
-
+        console.log(tempFormValue)
     }
 
     removeAllAdditionalCost() {
-        let tempFormValue = validation
+        let tempFormValue = this.formValue
         tempFormValue.AdditionalCost = []
-        validation = tempFormValue;
+        this.setState({ formData: tempFormValue })
     }
 
     render() {
-        const formValue = this.props.data ? this.props.data : [];
-
+        const formValue = this.state.formData ? this.state.formData : [];
+        console.log(formValue)
         return (
             <div>
                 <div className="py-md-3 py-1">
                     <div className="row">
                         <div className="col-12 col-md-4">
-                            <TextField variant="standard" size="small" fullWidth label="Tracking Number" name="TrackingNumber" defaultValue={formValue.TrackingNumber} onChange={(e) => this.onTrigger(e, "TrackingNumber")} error={!validation.TrackingNumberVerified} />
-                            {!validation.TrackingNumberVerified && <FormHelperText sx={{ color: 'red' }} id="TrackingNumber-error-text">Invalid</FormHelperText>}
+                            <TextField variant="standard" size="small" fullWidth label="Tracking Number" name="TrackingNumber" defaultValue={formValue.TrackingNumber} onChange={(e) => this.onTrigger(e, "TrackingNumber")} error={!this.state.TrackingNumberVerified} />
+                            {!this.state.TrackingNumberVerified && <FormHelperText sx={{ color: 'red' }} id="TrackingNumber-error-text">Invalid</FormHelperText>}
                         </div>
                         <div className="col-12 col-md-4">
-                            <TextField variant="standard" size="small" fullWidth label="Member Number" name="MemberNumber" defaultValue={formValue.UserCode} onChange={(e) => this.onTrigger(e, "UserCode")} error={!validation.MemberNumberVerified} />
-                            {console.log("member", validation.MemberNumberVerified)}
-                            {!validation.MemberNumberVerified && <FormHelperText sx={{ color: 'red' }} id="MemberNumber-error-text">Invalid</FormHelperText>}
+                            <TextField variant="standard" size="small" fullWidth label="Member Number" name="MemberNumber" defaultValue={formValue.UserCode} onChange={(e) => this.onTrigger(e, "UserCode")} error={!this.state.MemberNumberVerified} />
+                            {!this.state.MemberNumberVerified && <FormHelperText sx={{ color: 'red' }} id="MemberNumber-error-text">Invalid</FormHelperText>}
                         </div>
                         <div className="col-12 col-md-4">
                             <FormControl variant="standard" size="small" fullWidth>
@@ -214,11 +230,10 @@ class EditStockGoods extends Component {
                                     labelId="Division"
                                     id="Division"
                                     name="Division"
-                                    defaultValue={formValue.UserAreaID}
+                                    defaultValue={extractNumberFromStrings(formValue.UserAreaID)}
                                     onChange={(e) => this.onTrigger(e, "UserAreaID")}
                                     label="Division"
                                 >
-                                    {console.log("UserAreaID", formValue.UserAreaID)}
                                     {
                                         isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
                                             return <MenuItem value={el.UserAreaID} key={idx}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
@@ -239,9 +254,9 @@ class EditStockGoods extends Component {
                                     defaultValue={formValue.ProductDimensionDeep}
                                     onChange={(e) => this.onTrigger(e, "ProductDimensionDeep")}
                                     endAdornment={<InputAdornment position="start">m</InputAdornment>}
-                                    error={!validation.DepthVerified}
+                                    error={!this.state.DepthVerified}
                                 />
-                                {!validation.DepthVerified && <FormHelperText sx={{ color: 'red' }} id="Depth-error-text">Invalid</FormHelperText>}
+                                {!this.state.DepthVerified && <FormHelperText sx={{ color: 'red' }} id="Depth-error-text">Invalid</FormHelperText>}
                             </FormControl>
                         </div>
                         <div className="col-4 col-sm-3">
@@ -254,9 +269,9 @@ class EditStockGoods extends Component {
                                     defaultValue={formValue.ProductDimensionWidth}
                                     onChange={(e) => this.onTrigger(e, "ProductDimensionWidth")}
                                     endAdornment={<InputAdornment position="start">m</InputAdornment>}
-                                    error={!validation.WidthVerified}
+                                    error={!this.state.WidthVerified}
                                 />
-                                {!validation.WidthVerified && <FormHelperText sx={{ color: 'red' }} id="Width-error-text">Invalid</FormHelperText>}
+                                {!this.state.WidthVerified && <FormHelperText sx={{ color: 'red' }} id="Width-error-text">Invalid</FormHelperText>}
                             </FormControl>
                         </div>
                         <div className="col-4 col-sm-3">
@@ -269,9 +284,9 @@ class EditStockGoods extends Component {
                                     defaultValue={formValue.ProductDimensionHeight}
                                     onChange={(e) => this.onTrigger(e, "ProductDimensionHeight")}
                                     endAdornment={<InputAdornment position="start">m</InputAdornment>}
-                                    error={!validation.HeightVerified}
+                                    error={!this.state.HeightVerified}
                                 />
-                                {!validation.HeightVerified && <FormHelperText sx={{ color: 'red' }} id="Height-error-text">Invalid</FormHelperText>}
+                                {!this.state.HeightVerified && <FormHelperText sx={{ color: 'red' }} id="Height-error-text">Invalid</FormHelperText>}
                             </FormControl>
                         </div>
                         <div className="col-12 col-sm-3">
@@ -284,9 +299,9 @@ class EditStockGoods extends Component {
                                     defaultValue={formValue.ProductWeight}
                                     onChange={(e) => this.onTrigger(e, "ProductWeight")}
                                     endAdornment={<InputAdornment position="start">KG</InputAdornment>}
-                                    error={!validation.WeightVerified}
+                                    error={!this.state.WeightVerified}
                                 />
-                                {!validation.WeightVerified && <FormHelperText sx={{ color: 'red' }} id="Weight-error-text">Invalid</FormHelperText>}
+                                {!this.state.WeightVerified && <FormHelperText sx={{ color: 'red' }} id="Weight-error-text">Invalid</FormHelperText>}
                             </FormControl>
                         </div>
                     </div>
@@ -294,12 +309,12 @@ class EditStockGoods extends Component {
                         <div className="col-12">
                             <Button className="my-1 w-100" color="success" variant="contained" size="small" onClick={() => { this.RenderAdditionalCost() }}>Add Additional Costs</Button>
                         </div>
-
                     </div>
                     {
                         isArrayNotEmpty(formValue.AdditionalCost) && formValue.AdditionalCost.map((el, idx) => {
+                            console.log(formValue.AdditionalCost)
                             return (
-                                <div className="row">
+                                <div className="row" key={idx}>
                                     <div className="col-6 col-sm-8">
                                         <TextField
                                             variant="standard"
@@ -307,7 +322,7 @@ class EditStockGoods extends Component {
                                             fullWidth
                                             label={"Add. Chg. " + (idx + 1)}
                                             name="AdditionalChargedRemark"
-                                            defaultValue={el.Remark}
+                                            value={el.Charges}
                                             onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
                                             error={!el.validated}
                                         />
@@ -320,7 +335,7 @@ class EditStockGoods extends Component {
                                                 variant="standard"
                                                 size="small"
                                                 name="AdditionalChargedAmount"
-                                                defaultValue={el.chargedAmount}
+                                                value={el.Value}
                                                 onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
                                                 startAdornment={<InputAdornment position="start">RM</InputAdornment>}
                                                 error={!el.validated}

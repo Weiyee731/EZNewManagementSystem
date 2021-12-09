@@ -419,7 +419,7 @@ export class GitEpic {
       action$.ofType(GitAction.InsertStockByPost).switchMap(async ({ payload }) => {
 
       return fetch(
-        postUrl + "Inventory_InsertStockByPost"
+        url + "Inventory_InsertStockByPost"
         , {
           method: 'POST',
           headers: {
