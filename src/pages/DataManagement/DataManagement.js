@@ -150,9 +150,6 @@ class DataManagement extends Component {
             let PackagingDate = ""
             let AdditionalCost = ""
             let Remarks = ""
-            console.log(DataRows[1]["Stock Date"].trim())
-            console.log(convertDateTimeToString112Format(DataRows[1]["Stock Date"]))
-            console.log(convertDateTimeToString112Format(DataRows[1]["Stock Date"].trim()))
             for (let index = 0; index < DataRows.length; index++) {
                 Courier += (isStringNullOrEmpty(DataRows[index]["Courier"])) ? "-" : DataRows[index]["Courier"].trim();
                 TrackingNo += (isStringNullOrEmpty(DataRows[index]["Tracking No"])) ? "-" : DataRows[index]["Tracking No"].trim();
