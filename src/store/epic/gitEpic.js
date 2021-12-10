@@ -163,9 +163,6 @@ export class GitEpic {
 
   User_ProfileByID = action$ =>
     action$.ofType(GitAction.GetUserProfileByID).switchMap(async ({ payload }) => {
-      // console.log(url + 
-      //   double_click_and_paste_url_here
-      // )
       try {
         const response = await fetch(url +
           "User_ViewProfileByID?" +
@@ -252,7 +249,6 @@ export class GitEpic {
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
   Inventory_ViewStockList = action$ =>
     action$.ofType(GitAction.FetchStocks).switchMap(async ({ payload }) => {
-
       try {
         const response = await fetch(url +
           "Inventory_ViewStockList?" +
@@ -342,9 +338,23 @@ export class GitEpic {
 
   Inventory_UpdateStockDetailByGet = action$ =>
     action$.ofType(GitAction.UpdateStockDetailByGet).switchMap(async ({ payload }) => {
-      // console.log(url + 
-      //   double_click_and_paste_url_here
-      // )
+      console.log(url +
+        "Inventory_UpdateStockDetail?" +
+        "STOCKID=" + payload.STOCKID +
+        "&USERCODE=" + payload.USERCODE +
+        "&TRACKINGNUMBER=" + payload.TRACKINGNUMBER +
+        "&PRODUCTWEIGHT=" + payload.PRODUCTWEIGHT +
+        "&PRODUCTHEIGHT=" + payload.PRODUCTHEIGHT +
+        "&PRODUCTWIDTH=" + payload.PRODUCTWIDTH +
+        "&PRODUCTDEEP=" + payload.PRODUCTDEEP +
+        "&AREACODE=" + payload.AREACODE +
+        "&ITEM=" + payload.ITEM +
+        "&TRACKINGSTATUSID=" + payload.TRACKINGSTATUSID +
+        "&CONTAINERNAME=" + payload.CONTAINERNAME +
+        "&CONTAINERDATE=" + payload.CONTAINERDATE +
+        "&REMARK=" + payload.REMARK +
+        "&EXTRACHARGE=" + payload.EXTRACHARGE
+      );
       try {
         const response = await fetch(url +
           "Inventory_UpdateStockDetail?" +
@@ -500,13 +510,13 @@ export class GitEpic {
       console.log(url +
         "Inventory_ViewStockListByFilter?" +
         "FILTERCOLUMN=" + payload.FILTERCOLUMN +
-        "FILTERKEYWORD=" + payload.FILTERKEYWORD
+        "&FILTERKEYWORD=" + payload.FILTERKEYWORD
       )
       try {
         const response = await fetch(url +
           "Inventory_ViewStockListByFilter?" +
           "FILTERCOLUMN=" + payload.FILTERCOLUMN +
-          "FILTERKEYWORD=" + payload.FILTERKEYWORD
+          "&FILTERKEYWORD=" + payload.FILTERKEYWORD
         );
 
         let json = await response.json();

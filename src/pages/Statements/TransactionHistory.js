@@ -159,7 +159,7 @@ class TransactionHistory extends Component {
     }
 
     onTableRowClick = (event, row) => {
-        this.props.history.push(`/InvoiceDetail/${row.TransactionID}`)
+        this.props.history.push(`/TransactionHistoryDetail/${row.TransactionID}`)
     }
 
     handleClose = () => {

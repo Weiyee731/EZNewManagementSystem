@@ -18,6 +18,7 @@ import Box from '@mui/material/Box';
 import TableComponents from "../../components/TableComponents/TableComponents"
 import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
+import ToggleTabsComponent from "../../components/ToggleTabsComponent/ToggleTabComponents";
 
 function mapStateToProps(state) {
   return {
@@ -94,7 +95,8 @@ class UserDetail extends Component {
       Email: "",
       Contact: "",
       Address: "",
-      Transaction: []
+      Transaction: [],
+      filteredList: []
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.props.CallUserProfileByID(this.state)
@@ -112,6 +114,7 @@ class UserDetail extends Component {
           Contact: this.props.userProfile[0].UserContactNo,
           Address: this.props.userProfile[0].UserAddress,
           Transaction: JSON.parse(this.props.userProfile[0].Transaction),
+          filteredList: JSON.parse(this.props.userProfile[0].Transaction),
         });
       }
     }
@@ -128,6 +131,7 @@ class UserDetail extends Component {
           Contact: this.props.userProfile[0].UserContactNo,
           Address: this.props.userProfile[0].UserAddress,
           Transaction: JSON.parse(this.props.userProfile[0].Transaction),
+          filteredList: JSON.parse(this.props.userProfile[0].Transaction),
         });
       }
     } else {
@@ -140,6 +144,7 @@ class UserDetail extends Component {
           Contact: prevProps.userProfile[0].UserContactNo,
           Address: prevProps.userProfile[0].UserAddress,
           Transaction: JSON.parse(prevProps.userProfile[0].Transaction),
+          filteredList: JSON.parse(prevProps.userProfile[0].Transaction),
         });
       }
     }
@@ -208,7 +213,34 @@ class UserDetail extends Component {
 
   }
 
+  changeTab = (key) => {
+    switch (key) {
+      case "All":
+        this.setState({
+          filteredList: this.state.Transaction
+        })
+        break;
+      case "Payable":
+        this.setState({
+          filteredList: this.state.Transaction.filter(x => x.TrackingStatus === "Pending")
+        })
+        break;
+      case "Paid":
+        this.setState({
+          filteredList: this.state.Transaction.filter(x => x.TrackingStatus === "Completed")
+        })
+        break;
+      default:
+        break;
+    }
+  }
+
   render() {
+    const ToggleTabs = [
+      { children: "All", key: "All" },
+      { children: "Payable", key: "Payable" },
+      { children: "Paid", key: "Paid" }
+  ]
     return (
       <div>
         <Card>
@@ -229,15 +261,7 @@ class UserDetail extends Component {
                 style={{
                   textAlign: 'end',
                   flex: 1
-                }}
-              >
-                {/* <Button
-                  onClick={() => console.log("save")}
-                  variant="contained"
-                  color="primary"
-                >
-                  Save
-                </Button> */}
+                }}>
                 <LoadingButton
                   loading={this.props.loading}
                   loadingPosition="start"
@@ -303,8 +327,9 @@ class UserDetail extends Component {
           </CardContent>
         </Card>
         <div className="mt-4">
+          <ToggleTabsComponent Tabs={ToggleTabs} size="small" onChange={this.changeTab} />
           <TableComponents
-            tableTopLeft={<h3 style={{ fontWeight: 700 }}>Invoice</h3>}
+            tableTopLeft={<h3 style={{ fontWeight: 700 }}>History Transaction</h3>}
             tableTopRight={this.renderTableActionButton}
             tableOptions={{
               dense: false,
@@ -322,7 +347,7 @@ class UserDetail extends Component {
               onRowClickSelect: false
             }}
             selectedIndexKey={"pid"}
-            Data={this.state.Transaction}
+            Data={this.state.filteredList}
             onTableRowClick={this.onTableRowClick}
 
           />

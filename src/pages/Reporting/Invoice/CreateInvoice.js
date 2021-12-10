@@ -21,7 +21,7 @@ import Stack from '@mui/material/Stack';
 import AlertDialog from "../../../components/modal/Modal";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import CsvDownloader from 'react-csv-downloader';
-import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
+import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull, round, testRounding } from "../../../tools/Helpers";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 
 function mapStateToProps(state) {
@@ -48,7 +48,13 @@ const headCells = [
         displayName: 'Tracking No. '
     },
     {
-        id: 'ProductWeight',
+        id: 'Member',
+        align: 'left',
+        disablePadding: false,
+        label: 'Member',
+    },
+    {
+        id: 'Weight',
         align: 'left',
         disablePadding: false,
         label: 'Weight (KG)',
@@ -84,13 +90,7 @@ const headCells = [
         label: 'Item',
     },
     {
-        id: 'UserCode',
-        align: 'left',
-        disablePadding: false,
-        label: 'Member',
-    },
-    {
-        id: 'AreaCode',
+        id: 'Division',
         align: 'left',
         disablePadding: false,
         label: 'Division',
@@ -133,6 +133,7 @@ const INITIAL_STATE = {
     totalVolumeSelected: null,
     totalWeightSelected: null,
     searchCategory: "All",
+    onSearchText: "",
 
     formValue: {
         TrackingNumber: "",
@@ -200,13 +201,13 @@ class CreateInvoice extends Component {
                 >
                     {data.TrackingNumber}
                 </TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight ? data.ProductWeight.toFixed(2) : ""}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep ? data.ProductDimensionDeep.toFixed(2) : ""}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth ? data.ProductDimensionWidth.toFixed(2) : ""}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight ? data.ProductDimensionHeight.toFixed(2) : ""}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight).toFixed(2)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.PackagingDate}</TableCell>
@@ -245,14 +246,9 @@ class CreateInvoice extends Component {
 
     onDeleteButtonClick = (items) => {
         let arr = []
-        console.log('delete button')
-        console.log(items)
         items.map((item) => {
-            console.log(item.UserID)
             arr.push(item.UserID)
         })
-        console.log(items[0].UserID)
-        console.log((arr.filter((el) => el === items[0].UserID)).length === arr.length)
         if ((arr.filter((el) => el === items[0].UserID)).length === arr.length) {
             this.setState({
                 selectedItems: items,
@@ -271,7 +267,7 @@ class CreateInvoice extends Component {
         let weight = 0
         this.state.selectedItems.map((item) => {
             weight = weight + item.ProductWeight
-            mCube = mCube + ((item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight))
+            mCube = mCube + ((item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight)) / 1000000
         })
         this.handleDeliveryModal()
         this.props.history.push({
@@ -326,8 +322,6 @@ class CreateInvoice extends Component {
                 break;
 
             case "Division":
-                console.log(e)
-                console.log(value)
                 tempForm.Division = value
                 this.setState({ formValue: tempForm })
                 break;
@@ -420,7 +414,6 @@ class CreateInvoice extends Component {
 
         if (additionalCostItems.length > 0) {
             additionalCostItems.splice(index, 1)
-            console.log(tempFormValue)
             this.setState({ formValue: tempFormValue })
         }
 
@@ -433,48 +426,89 @@ class CreateInvoice extends Component {
     }
 
     handleSearchCategory(e) {
-        this.setState({ searchCategory: e.target.value })
+        if (isArrayNotEmpty(this.state.filteredList)) {
+            this.setState({
+                searchCategory: e.target.value,
+                filteredList: this.state.filteredList.filter((el) => el.AreaCode == e.target.value)
+            })
+        } else {
+            this.setState({
+                searchCategory: e.target.value,
+                filteredList: this.props.stocks.filter((el) => el.AreaCode == e.target.value)
+            })
+        }
+    }
+
+    onSearch = (e) => {
+        if (isArrayNotEmpty(this.state.filteredList)) {
+            this.setState({
+                onSearchText: e.target.value,
+                filteredList:
+                    this.state.filteredList.filter((el) =>
+                        el.TrackingNumber.toLowerCase().trim().includes(e.target.value.toLowerCase().trim())
+                        ||
+                        el.UserCode.trim().includes(e.target.value.trim())
+                    )
+            })
+        } else {
+            this.setState({
+                onSearchText: e.target.value,
+                filteredList:
+                    this.props.stocks.filter((el) =>
+                        el.TrackingNumber.toLowerCase().trim().includes(e.target.value.toLowerCase().trim())
+                        ||
+                        el.UserCode.trim().includes(e.target.value.trim())
+                    )
+            })
+        }
     }
 
     render() {
-        const { filteredList, formValue, openDeliveryModal, openRemarkModal, searchCategory } = this.state
-        console.log(filteredList)
+        const { filteredList, formValue, openDeliveryModal, openRemarkModal, searchCategory, onSearchText } = this.state
+        const { userAreaCode, stocks } = this.props
+        
         return (
             <div className="container-fluid">
-                <div className="row d-flex">
-                    <div className="col-2 m-auto">
-                        <div className="w-100 d-flex filter-dropdown">
+                <div className="row">
+                    <div className="col-2 d-flex flex-column justify-content-end">
+                        <div className="w-100 filter-dropdown">
                             <Select
                                 labelId="search-filter-category"
                                 id="search-filter-category"
                                 value={searchCategory}
                                 label="Search By"
-                                onChange={this.handleSearchCategory}
+                                onChange={(e) => this.handleSearchCategory(e)}
                                 size="small"
                                 IconComponent={FilterListOutlinedIcon}
                                 className="w-75"
                                 placeholder="filter by"
                             >
-                                <MenuItem key="search_all" value="All">All</MenuItem>
-                                <MenuItem key="search_tracking" value="Tracking">KU</MenuItem>
-                                <MenuItem key="search_member" value="Member">SKU</MenuItem>
-                                <MenuItem key="search_container" value="Container">MSU</MenuItem>
+                                <MenuItem value="All">All</MenuItem>
+                                {userAreaCode.map((data, index) => {
+                                    return (
+                                        <MenuItem key={`area_${index}`} value={data.AreaCode}>{data.AreaCode}</MenuItem>
+                                    )
+                                })}
                             </Select>
                         </div>
 
                     </div>
-                    <div className="col-md-9 col-9 m-auto">
-                        <SearchBar id="" placeholder="Enter Member No, Tracking No or Container No to search" buttonOnClick={() => this.onSearch()} onChange={this.handleSearchInput} />
+                    <div className="col-9">
+                        <SearchBar
+                            id=""
+                            placeholder="Search by Member No. or Tracking No."
+                            onChange={(e) => this.onSearch(e)}
+                        />
                     </div>
-                    <div className="col-md-1 col-1 m-auto">
-                        {console.log(filteredList)}
+                    <div className="col-1 d-flex flex-column justify-content-end">
                         <CsvDownloader
                             filename="invoice-list"
                             extension=".xls"
                             separator=","
                             columns={headCells}
-                            datas={isArrayNotEmpty(filteredList) ? filteredList : []}>
-                            <DownloadForOfflineIcon color="primary" sx={{ fontSize: 45 }}></DownloadForOfflineIcon>
+                            datas={searchCategory == "All" && onSearchText == "" ? stocks : filteredList}
+                        >
+                            <DownloadForOfflineIcon color="primary" sx={{ fontSize: 45 }} />
                         </CsvDownloader>
                     </div>
                 </div>
@@ -499,7 +533,7 @@ class CreateInvoice extends Component {
                         onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                     }}
                     selectedIndexKey={"StockID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
-                    Data={isArrayNotEmpty(filteredList) ? filteredList : []}                                  // required, the data that listing in the table
+                    Data={searchCategory == "All" && onSearchText == "" ? stocks : filteredList}                                  // required, the data that listing in the table
                     onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                     onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                     onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items

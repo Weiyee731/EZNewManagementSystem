@@ -46,7 +46,9 @@ export default function AlertDialog(props) {
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          fontSize: '18pt',
+          fontWeight: 500,
         }}
       >
         {props.title}
@@ -96,6 +98,7 @@ export function ModalPopOut(props) {
       hideBackdrop={props.hideBackdrop ? props.hideBackdrop : false}   //hide back
       // BackDropProps={props.BackDropProps ? props.BackDropProps : false}
       // onBackdropClick={this.onClose= 'open'}
+      onBackdropClick={props.onBackdropClick}
       open={props.open}
       onClose={() => props.handleToggleDialog()}
       aria-labelledby="alert-dialog-title"
