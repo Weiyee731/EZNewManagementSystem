@@ -246,7 +246,15 @@ export class GitAction {
       payload: propsData
     };
   }
-  
+
+  ///////////////////////////////////////////////////   Dashboard   ///////////////////////////////////////////////////
+  static FetchDashboardData = "FETCH_DASHBOARD_DATA";
+  static DashboardDataFetched = "DASHBOARD_DATA_FETCHED";
+  static CallFetchDashboardData() {
+    return {
+      type: GitAction.FetchDashboardData,
+    };
+  }
 
 }
 
