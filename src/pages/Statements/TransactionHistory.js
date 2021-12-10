@@ -204,7 +204,7 @@ class TransactionHistory extends Component {
     }
 
     onUpdateTransactionPayment = (event, row) => {
-        this.props.CallUpdateTransactionPayment({ TransactionID: row.TransactionID, PaymentAmmount: this.state.Payment })
+        this.props.CallUpdateTransactionPayment(this.state)
     }
 
     handleInputChange = (e) => {
