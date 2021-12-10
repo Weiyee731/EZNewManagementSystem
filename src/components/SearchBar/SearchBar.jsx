@@ -21,7 +21,7 @@ const SearchBox = (props) => {
             onChange={(e) => typeof props.onChange === "function" ? props.onChange(e) : {}}
             autoFocus={props.autoFocus ? props.autoFocus : false}
             size="small"
-            margin="dense"
+            margin="normal"
             variant="outlined"
             InputProps={{
                 endAdornment: (

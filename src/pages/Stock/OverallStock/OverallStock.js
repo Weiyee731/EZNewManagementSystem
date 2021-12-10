@@ -15,13 +15,14 @@ import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
+import CachedIcon from '@mui/icons-material/Cached';
 import SearchBar from "../../../components/SearchBar/SearchBar"
 import TableComponents from "../../../components/TableComponents/TableComponents";
 import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents";
 import AlertDialog from "../../../components/modal/Modal";
-import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull } from "../../../tools/Helpers";
+import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull, convertDateTimeToString112Format } from "../../../tools/Helpers";
 import ResponsiveDatePickers from '../../../components/datePicker/datePicker';
 import axios from "axios";
 import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
@@ -34,6 +35,7 @@ function mapStateToProps(state) {
     return {
         stocks: state.counterReducer["stocks"],
         userAreaCode: state.counterReducer["userAreaCode"],
+        stockApproval: state.counterReducer["stockApproval"],
     };
 }
 
@@ -42,6 +44,9 @@ function mapDispatchToProps(dispatch) {
         CallFetchAllStock: (propsData) => dispatch(GitAction.CallFetchAllStock(propsData)),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
         CallFilterInventory: (propsData) => dispatch(GitAction.CallFilterInventory(propsData)),
+        CallUpdateStockDetailByGet: (propsData) => dispatch(GitAction.CallUpdateStockDetailByGet(propsData)),
+        CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
+        CallResetStocks: () => dispatch(GitAction.CallResetStocks()),
     };
 }
 
@@ -62,25 +67,25 @@ const headCells = [
         id: 'ProductDimensionDeep',
         align: 'left',
         disablePadding: false,
-        label: 'Depth',
+        label: 'Depth (cm)',
     },
     {
         id: 'ProductDimensionWidth',
         align: 'left',
         disablePadding: false,
-        label: 'Width',
+        label: 'Width (cm)',
     },
     {
         id: 'ProductDimensionHeight',
         align: 'left',
         disablePadding: false,
-        label: 'Height',
+        label: 'Height (cm)',
     },
     {
         id: 'Dimension',
         align: 'left',
         disablePadding: false,
-        label: 'Dimension',
+        label: 'Dimension (m cubic)',
     },
     {
         id: 'Item',
@@ -134,10 +139,15 @@ const headCells = [
 
 const INITIAL_STATE = {
     filteredList: null,
-    openRemarkModal: false,
+    openAddChrgModal: false,
 
     formValue: {
         StockID: "",
+        Item: "",
+        TrackingStatusID: "",
+        ContainerName: "",
+        StockDate: "",
+
         TrackingNumber: "",
         TrackingNumberVerified: null,
 
@@ -158,14 +168,17 @@ const INITIAL_STATE = {
         Weight: "",
         WeightVerified: null,
 
-        AdditionalCost: []
+        AdditionalCost: [],
+
+        Remark: "",
+
     },
 
     searchKeywords: "",
     searchCategory: "All",
     searchArea: "All",
     searchDates: [],
-    isOnSearch: false,
+    isDataFetching: false,
 }
 
 class OverallStock extends Component {
@@ -178,8 +191,8 @@ class OverallStock extends Component {
 
         this.changeTab = this.changeTab.bind(this)
         this.onAddButtonClick = this.onAddButtonClick.bind(this)
-        this.handleRemarkModal = this.handleRemarkModal.bind(this)
-        this.handleUpdateRemark = this.handleUpdateRemark.bind(this)
+        this.handleAddChrgModal = this.handleAddChrgModal.bind(this)
+        this.handleSubmitUpdate = this.handleSubmitUpdate.bind(this)
         this.handleFormInput = this.handleFormInput.bind(this)
         this.handleAdditionalCostInputs = this.handleAdditionalCostInputs.bind(this)
         this.RenderAdditionalCost = this.RenderAdditionalCost.bind(this)
@@ -190,6 +203,7 @@ class OverallStock extends Component {
         this.handleSearchCategory = this.handleSearchCategory.bind(this)
         this.handleSearchArea = this.handleSearchArea.bind(this)
         this.onDateChange = this.onDateChange.bind(this)
+        this.onFetchLatestData = this.onFetchLatestData.bind(this)
     }
 
     componentDidMount() {
@@ -198,13 +212,19 @@ class OverallStock extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (this.state.filteredList === null && isArrayNotEmpty(this.props.stocks)) {
             const { stocks } = this.props
-            
             this.setState({
                 filteredList: (isStringNullOrEmpty(stocks.ReturnVal) && stocks.ReturnVal == 0) ? [] : stocks,
-                isOnSearch: false
+                isDataFetching: false
             })
-
             toast.dismiss();
+        }
+
+        if (isArrayNotEmpty(this.props.stockApproval)) {
+            console.log(this.props.stockApproval)
+            this.props.CallResetUpdatedStockDetail()
+            this.props.CallResetStocks()
+            this.props.CallFetchAllStock({ USERID: 1 })
+            this.setState({ openAddChrgModal: false, isDataFetching: true, filteredList: null })
         }
     }
 
@@ -264,10 +284,10 @@ class OverallStock extends Component {
                     {data.TrackingNumber}
                 </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)} </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * 100).toFixed(1)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionWidth * 100).toFixed(1)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionHeight * 100).toFixed(1)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight).toFixed(3)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep).toFixed(1)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionWidth).toFixed(1)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionHeight).toFixed(1)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight / 1000000).toFixed(3)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>
@@ -281,14 +301,15 @@ class OverallStock extends Component {
     }
 
     onTableRowClick = (event, row) => {
-        console.log(row)
+        console.log("row", row)
         let tempFormValue = this.state.formValue
         tempFormValue.StockID = row.StockID
         tempFormValue.Item = row.Item
         tempFormValue.TrackingStatusID = row.TrackingStatusID
-        tempFormValue.TrackingNumber = row.TrackingNumber;
         tempFormValue.ContainerName = row.ContainerName;
+        tempFormValue.StockDate = row.StockDate;
 
+        tempFormValue.TrackingNumber = row.TrackingNumber;
         tempFormValue.TrackingNumberVerified = !isStringNullOrEmpty(row.TrackingNumber);
         tempFormValue.MemberNumber = row.UserCode;
         tempFormValue.MemberNumberVerified = !isStringNullOrEmpty(row.UserCode);
@@ -301,19 +322,29 @@ class OverallStock extends Component {
         tempFormValue.Weight = row.ProductWeight;
         tempFormValue.WeightVerified = !isStringNullOrEmpty(row.ProductWeight) && !isNaN(row.ProductWeight)
         tempFormValue.Division = Number(row.UserAreaID)
-        tempFormValue.Remark = row.Remark
+        tempFormValue.Remark = !isStringNullOrEmpty(row.Remark) ? row.Remark : ""
 
         let additionalCharges = row.AdditionalCharges
         try { additionalCharges = JSON.parse(additionalCharges) } catch (e) { console.log(e); additionalCharges = [] }
+
         tempFormValue.AdditionalCost = isObjectUndefinedOrNull(additionalCharges) ? [] : additionalCharges
         tempFormValue.AdditionalCost.length > 0 && tempFormValue.AdditionalCost.map((el, idx) => {
+            el.Value = !(isStringNullOrEmpty(el.Value)) && !isNaN(el.Value) && (Number(el.Value) > 0) ? 0 : el.Value
             el.validated = !(isStringNullOrEmpty(el.Charges)) && !(isStringNullOrEmpty(el.Value)) && !isNaN(el.Value) && (Number(el.Value) > 0)
         })
+        console.log("tempFormValue", tempFormValue)
 
         this.setState({
-            openRemarkModal: true,
+            openAddChrgModal: true,
             formValue: tempFormValue,
         })
+    }
+
+    onFetchLatestData() {
+        this.props.CallResetStocks()
+        this.props.CallFetchAllStock({ USERID: 1 })
+        toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
+        this.setState({ filteredList: null, isDataFetching: true })
     }
 
     onAddButtonClick = () => {
@@ -325,18 +356,23 @@ class OverallStock extends Component {
         console.log(items)
     }
 
-    handleRemarkModal = () => {
-        this.setState({ openRemarkModal: !this.state.openRemarkModal })
+    handleAddChrgModal = () => {
+        this.setState({ openAddChrgModal: !this.state.openAddChrgModal })
     }
 
-    handleUpdateRemark = () => {
+    handleSubmitUpdate = () => {
         const { formValue } = this.state
-
-        let extraChangesValue = "";
+        let extraChangesValue = "", isNotVerified = 0;
 
         if (formValue.AdditionalCost.length > 0) {
             for (var i = 0; i < formValue.AdditionalCost.length; i++) {
-                extraChangesValue += formValue.AdditionalCost[i].Charges + ":" + formValue.AdditionalCost[i].Value + ";"
+                extraChangesValue += formValue.AdditionalCost[i].Charges + "=" + formValue.AdditionalCost[i].Value + ";"
+
+                //check extra charge
+                if (formValue.AdditionalCost[i].validated === false) {
+                    isNotVerified++;
+                    console.log('AdditionalCost')
+                }
             }
         }
         else {
@@ -352,14 +388,45 @@ class OverallStock extends Component {
             PRODUCTWIDTH: formValue.Width,
             PRODUCTDEEP: formValue.Depth,
             AREACODE: formValue.Division,
-            ITEM: formValue.Item,
+            ITEM: isStringNullOrEmpty(formValue.Item) ? "-" : formValue.Item,
             TRACKINGSTATUSID: formValue.TrackingStatusID,
-            CONTAINERNAME: formValue.ContainerName,
-            CONTAINERDATE: formValue.StockDate,
+            CONTAINERNAME: !isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : '-',
+            CONTAINERDATE: !isStringNullOrEmpty(formValue.StockDate) ? formValue.StockDate : "-",
             REMARK: formValue.Remark,
             EXTRACHARGE: extraChangesValue,
         }
+
+        // check member
+        if (isStringNullOrEmpty(object.USERCODE) || formValue.MemberNumberVerified === false) {
+            console.log('USERCODE')
+            isNotVerified++;
+        }
+
+        // check tracking number
+        if (isStringNullOrEmpty(object.TRACKINGNUMBER) || formValue.TrackingNumberVerified === false) {
+            console.log('TRACKINGNUMBER')
+            isNotVerified++;
+        }
+
+        // check area code / division
+        if (isStringNullOrEmpty(object.AREACODE)) {
+            console.log('AREACODE')
+            isNotVerified++;
+        }
+
+        // check width x height x depth x weight
+        if (!formValue.DepthVerified || !formValue.WidthVerified || !formValue.HeightVerified || !formValue.WeightVerified) {
+            console.log('WHD')
+            isNotVerified++;
+        }
+
+        console.log(formValue)
         console.log(object)
+        console.log(isNotVerified)
+
+        this.props.CallUpdateStockDetailByGet(object)
+        toast.loading("Submitting data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
+        this.setState({ isDataFetching: false })
     }
 
     handleFormInput = (e) => {
@@ -407,6 +474,11 @@ class OverallStock extends Component {
             case "Weight":
                 tempForm.Weight = value
                 tempForm.WeightVerified = !isStringNullOrEmpty(value) && !isNaN(value)
+                this.setState({ formValue: tempForm })
+                break;
+
+            case "Remark":
+                tempForm.Remark = value
                 this.setState({ formValue: tempForm })
                 break;
 
@@ -474,7 +546,6 @@ class OverallStock extends Component {
 
         if (additionalCostItems.length > 0) {
             additionalCostItems.splice(index, 1)
-            console.log(tempFormValue)
             this.setState({ formValue: tempFormValue })
         }
 
@@ -487,7 +558,7 @@ class OverallStock extends Component {
     }
 
     onSearch() {
-        const { filteredList, searchKeywords, searchCategory, searchArea, searchDates, isOnSearch } = this.state
+        const { filteredList, searchKeywords, searchCategory, searchArea, searchDates, isDataFetching } = this.state
         const { stocks } = this.props
 
         let date_range = (typeof searchDates === "string" && !Array.isArray(searchDates)) ? JSON.parse(searchDates) : searchDates
@@ -495,31 +566,55 @@ class OverallStock extends Component {
         // CallFilterInventory
         if (searchArea === "All" && searchCategory === "All" && isStringNullOrEmpty(searchKeywords) && !isArrayNotEmpty(date_range)) {
             this.props.CallFetchAllStock({ USERID: 1 })
-            toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark"})
-            this.setState({ isOnSearch: true })
+            toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
+            this.setState({ isDataFetching: true, filteredList: null })
         }
         else {
-            let tempList = stocks
+            let filteringKeywords, tempList;
 
-            let filteringKeywords = {
-                FILTERCOLUMN: "",
-                FILTERKEYWORD: ""
-            }
-            console.log(filteringKeywords)
-            // this.props.CallFilterInventory(filteringKeywords)
-
-            console.log(searchKeywords)
-            console.log(searchCategory)
-            console.log(searchArea)
-            console.log(date_range)
-
+            // if search keywords is exists
             if (!isStringNullOrEmpty(searchKeywords)) {
-                if (searchCategory !== "All" || searchArea !== "All") {
-                    console.log(tempList)
-                    // filteredList.filter()
-                }
-                else{
+                // if doesn't need to filter by area or category
+                if (searchCategory === "All" && searchArea === "All") {
+                    filteringKeywords = {
+                        FILTERCOLUMN: "TRACKINGNUMBER",
+                        FILTERKEYWORD: searchKeywords
+                    }
 
+                    tempList = stocks.filter(x => x.TrackingNumber.includes(searchKeywords))
+                    if (tempList.length < 1) {
+                        this.setState({ filteredList: null, isDataFetching: true })
+                        this.props.CallFilterInventory(filteringKeywords)
+                        toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
+                    }
+                    else {
+                        this.setState({ filteredList: tempList })
+                    }
+                }
+                else {
+                    if (searchCategory !== "All") {
+                        console.log(searchCategory)
+                        tempList = stocks.filter(x => x.TrackingNumber.includes(searchKeywords))
+                    }
+                    this.setState({
+                        filteredList: stocks.filter(x =>
+                            (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeywords)) ||
+                            (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeywords)) ||
+                            (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeywords)) ||
+                            (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(searchKeywords))
+                        )
+                    })
+                }
+            }
+            else {
+                if (searchArea !== "All") {
+                    this.setState({ searchCategory: "All", searchDates: [], filteredList: stocks.filter(x => x.AreaCode === searchArea) })
+                    console.log(searchArea)
+                }
+
+                if (date_range.length === 2 && date_range[0] !== null && date_range[2] !== null) {
+                    this.setState({ searchArea: "All", searchCategory: "All" })
+                    console.log(date_range)
                 }
             }
 
@@ -529,8 +624,85 @@ class OverallStock extends Component {
         }
     }
 
+
     handleSearchInput(e) {
-        this.setState({ searchKeywords: e.target.value })
+        let tempList = [], searchKeywords = e.target.value
+        if (isArrayNotEmpty(this.props.stocks)) {
+
+            // if area is not empty
+            if (this.state.searchArea !== "All" && this.state.searchCategory === "All") {
+                console.log("searchArea ")
+                tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(this.state.searchArea)) && x.TrackingNumber.includes(searchKeywords))
+            }
+            else if (this.state.searchArea === "All" && this.state.searchCategory !== "All") {
+                console.log("searchCategory  ")
+
+                switch (this.state.searchCategory) {
+                    case "Tracking":
+                        tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeywords)))
+                        console.log('Tracking', tempList)
+                        break;
+
+                    case "Member":
+                        tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeywords)))
+                        console.log('Member', tempList)
+                        break;
+
+                    case "Container":
+                        tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeywords)))
+                        console.log('Container', tempList)
+                        break;
+
+                    default:
+                        console.log(this.state.searchCategory)
+                        tempList = this.props.stocks.filter(x =>
+                            (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeywords)) ||
+                            (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeywords)) ||
+                            (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeywords)) ||
+                            (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(searchKeywords))
+                        )
+                        console.log('default', tempList)
+                        break;
+                }
+            }
+            else if (this.state.searchArea !== "All" && this.state.searchCategory !== "All") {
+                console.log("searchArea searchCategory")
+
+                switch (this.state.searchCategory) {
+                    case "Tracking":
+                        tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(this.state.searchArea)) && (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeywords)))
+                        console.log('Tracking', tempList)
+                        break;
+
+                    case "Member":
+                        tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(this.state.searchArea)) && (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeywords)))
+                        console.log('Member', tempList)
+                        break;
+
+                    case "Container":
+                        tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(this.state.searchArea)) && (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeywords)))
+                        console.log('Container', tempList)
+                        break;
+
+                    default:
+                        tempList = this.props.stocks.filter(x =>
+                            (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeywords)) ||
+                            (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeywords)) ||
+                            (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeywords)) ||
+                            (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(searchKeywords))
+                        )
+                        console.log('default', tempList)
+                        break;
+                }
+
+                tempList = this.props.stocks.filter(x => (!isStringNullOrEmpty(x.AreaName) && x.AreaName.includes(this.state.searchArea)) && x.TrackingNumber.includes(searchKeywords))
+            }
+        }
+
+        this.setState({
+            searchKeywords: searchKeywords,
+            filteredList: tempList,
+        })
     }
 
     handleSearchCategory(e) {
@@ -572,7 +744,6 @@ class OverallStock extends Component {
                                         size="small"
                                         IconComponent={FilterListOutlinedIcon}
                                         className="w-100"
-                                        // style={{width: '40%', marginRight: 10}}
                                         placeholder="filter by"
                                     >
                                         <MenuItem key="search_all" value="All">All</MenuItem>
@@ -598,7 +769,7 @@ class OverallStock extends Component {
                                         <MenuItem key="all_area" value="All">All</MenuItem>
                                         {
                                             isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
-                                                return <MenuItem key={el.AreaCode} value={el.UserAreaID}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
+                                                return <MenuItem key={el.AreaName + "_" + idx} value={el.UserAreaID}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
                                             })
                                         }
                                     </Select>
@@ -606,7 +777,7 @@ class OverallStock extends Component {
                             </div>
                         </div>
                     </div>
-                    <div className="col-md-4 col-12 mb-2 stock-date-range-picker">
+                    <div className="col-md-auto col-12 mb-2 stock-date-range-picker">
                         <ResponsiveDatePickers
                             rangePicker
                             openTo="day"
@@ -619,19 +790,29 @@ class OverallStock extends Component {
                         />
                     </div>
                     <div className="col-md-4 col-12 mb-2 d-flex">
-                        <div className="w-100 mt-auto">
-                            <SearchBar id="" placeholder="Enter Member No, Tracking No or Container No to search" buttonOnClick={() => this.onSearch()} onChange={this.handleSearchInput} className="searchbar-input mt-auto" disableButton={this.state.isOnSearch} />
+                        <div className="mt-auto pr-1" style={{ width: '70%' }}>
+                            <SearchBar id="" placeholder="Enter Member No, Tracking No or Container No to search" buttonOnClick={() => this.onSearch()} onChange={this.handleSearchInput} className="searchbar-input mt-auto" disableButton={this.state.isDataFetching} />
                         </div>
-                        <div className="w-20 mt-auto">
-                            <CsvDownloader
-                                filename="overallstock-list"
-                                extension=".xls"
-                                separator=","
-                                columns={headCells}
-                                datas={isArrayNotEmpty(this.state.filteredList) ? this.state.filteredList : []}>
-                                <DownloadForOfflineIcon color="primary" sx={{ fontSize: 45 }}></DownloadForOfflineIcon>
-                            </CsvDownloader>
+                        <div className="mt-auto" style={{ width: '30%', paddingLeft: 3 }}>
+                            <div className="d-flex">
+                                <IconButton aria-label="Pull Data" color="primary" onClick={() => { this.onFetchLatestData() }} sx={{ marginTop: 'auto', marginLeft: 'auto', marginRight: 'auto' }} >
+                                    <CachedIcon fontSize="large" />
+                                </IconButton>
+                                <CsvDownloader
+                                    filename="overallstock-list"
+                                    extension=".xls"
+                                    separator=","
+                                    columns={headCells}
+                                    datas={isArrayNotEmpty(this.state.filteredList) ? this.state.filteredList : []}
+                                >
+                                    <IconButton >
+                                        <DownloadForOfflineIcon color="primary" fontSize="large" sx={{ marginTop: 'auto', marginLeft: 'auto', marginRight: 'auto' }} />
+                                    </IconButton>
+                                </CsvDownloader>
+                            </div>
+
                         </div>
+
                     </div>
                 </div>
                 <hr />
@@ -661,9 +842,9 @@ class OverallStock extends Component {
                 />
 
                 <AlertDialog
-                    open={this.state.openRemarkModal}              // required, pass the boolean whether modal is open or close
-                    handleToggleDialog={this.handleRemarkModal}  // required, pass the toggle function of modal
-                    handleConfirmFunc={this.handleUpdateRemark}    // required, pass the confirm function 
+                    open={this.state.openAddChrgModal}              // required, pass the boolean whether modal is open or close
+                    handleToggleDialog={this.handleAddChrgModal}  // required, pass the toggle function of modal
+                    handleConfirmFunc={this.handleSubmitUpdate}    // required, pass the confirm function 
                     showAction={true}                           // required, to show the footer of modal display
                     title={this.state.formValue.Item}                                  // required, title of the modal
                     buttonTitle={"Update"}                         // required, title of button
@@ -674,6 +855,13 @@ class OverallStock extends Component {
                 >
                     <div className="py-md-3 py-1">
                         <div className="row">
+                            <div className="col-12" style={{ fontSize: '9pt' }}>
+                                <div className="clearfix">
+                                    <div className="float-start"> <b>Container: </b>{!isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : " N/A "}  </div>
+                                    <div className="float-end"> <b>Container Date: </b> {!isStringNullOrEmpty(formValue.StockDate) ? formValue.StockDate : " N/A "}  </div>
+                                </div>
+                                <hr />
+                            </div>
                             <div className="col-12 col-md-4">
                                 <TextField variant="standard" size="small" fullWidth label="Tracking Number" name="TrackingNumber" value={formValue.TrackingNumber} onChange={this.handleFormInput} error={!formValue.TrackingNumberVerified} />
                                 {!formValue.TrackingNumberVerified && <FormHelperText sx={{ color: 'red' }} id="TrackingNumber-error-text">Invalid</FormHelperText>}
@@ -695,7 +883,7 @@ class OverallStock extends Component {
                                     >
                                         {
                                             isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
-                                                return <MenuItem key={el.AreaName} value={el.UserAreaID} >{el.AreaName + " - " + el.AreaCode}</MenuItem>
+                                                return <MenuItem key={el.AreaName + '_' + idx} value={el.UserAreaID} >{el.AreaName + " - " + el.AreaCode}</MenuItem>
                                             })
                                         }
                                     </Select>
@@ -703,7 +891,7 @@ class OverallStock extends Component {
                             </div>
                         </div>
                         <div className="row">
-                            <div className="col-4 col-sm-3">
+                            <div className="col-4 col-sm-2">
                                 <FormControl variant="standard" size="small" fullWidth>
                                     <InputLabel htmlFor="Depth">Depth</InputLabel>
                                     <Input
@@ -712,13 +900,13 @@ class OverallStock extends Component {
                                         name="Depth"
                                         value={formValue.Depth}
                                         onChange={this.handleFormInput}
-                                        endAdornment={<InputAdornment position="start">m</InputAdornment>}
+                                        endAdornment={<InputAdornment position="start">cm</InputAdornment>}
                                         error={!formValue.DepthVerified}
                                     />
                                     {!formValue.DepthVerified && <FormHelperText sx={{ color: 'red' }} id="Depth-error-text">Invalid</FormHelperText>}
                                 </FormControl>
                             </div>
-                            <div className="col-4 col-sm-3">
+                            <div className="col-4 col-sm-2">
                                 <FormControl variant="standard" size="small" fullWidth>
                                     <InputLabel htmlFor="Width">Width</InputLabel>
                                     <Input
@@ -727,13 +915,13 @@ class OverallStock extends Component {
                                         name="Width"
                                         value={formValue.Width}
                                         onChange={this.handleFormInput}
-                                        endAdornment={<InputAdornment position="start">m</InputAdornment>}
+                                        endAdornment={<InputAdornment position="start">cm</InputAdornment>}
                                         error={!formValue.WidthVerified}
                                     />
                                     {!formValue.WidthVerified && <FormHelperText sx={{ color: 'red' }} id="Width-error-text">Invalid</FormHelperText>}
                                 </FormControl>
                             </div>
-                            <div className="col-4 col-sm-3">
+                            <div className="col-4 col-sm-2">
                                 <FormControl variant="standard" size="small" fullWidth>
                                     <InputLabel htmlFor="Height">Height</InputLabel>
                                     <Input
@@ -742,13 +930,26 @@ class OverallStock extends Component {
                                         name="Height"
                                         value={formValue.Height}
                                         onChange={this.handleFormInput}
-                                        endAdornment={<InputAdornment position="start">m</InputAdornment>}
+                                        endAdornment={<InputAdornment position="start">cm</InputAdornment>}
                                         error={!formValue.HeightVerified}
                                     />
                                     {!formValue.HeightVerified && <FormHelperText sx={{ color: 'red' }} id="Height-error-text">Invalid</FormHelperText>}
                                 </FormControl>
                             </div>
-                            <div className="col-12 col-sm-3">
+                            <div className="col-4 col-sm-2">
+                                <FormControl variant="standard" size="small" fullWidth>
+                                    <InputLabel htmlFor="Height">Dimension</InputLabel>
+                                    <Input
+                                        variant="standard"
+                                        size="small"
+                                        name="Dimension"
+                                        value={(formValue.Width * formValue.Height * formValue.Depth / 1000000).toFixed(3)}
+                                        endAdornment={<InputAdornment position="start">m <sup>3</sup></InputAdornment>}
+                                        disabled
+                                    />
+                                </FormControl>
+                            </div>
+                            <div className="col-12 col-sm-4">
                                 <FormControl variant="standard" size="small" fullWidth>
                                     <InputLabel htmlFor="Weight">Weight</InputLabel>
                                     <Input
@@ -803,7 +1004,7 @@ class OverallStock extends Component {
                                             </FormControl>
                                         </div>
                                         <div className="col-2 col-sm-1 d-flex">
-                                            <IconButton className='m-auto' color="primary" size="small" aria-label="remove-additional-cost" component="span" onClick={() => this.handleRemoveAdditionalCosts(idx)}>
+                                            <IconButton className='m-auto' color="primary" size="small" aria-label="remove-additional-cost" component="span" onClick={() => this.handleRemoveAdditionalCosts(idx)} disabled={this.state.isDataFetching}>
                                                 <DeleteIcon size="inherit" />
                                             </IconButton>
                                         </div>
@@ -817,6 +1018,21 @@ class OverallStock extends Component {
                                 <Button className="my-1 w-100" color="error" variant="contained" size="small" onClick={() => { this.removeAllAdditionalCost() }} startIcon={<DeleteIcon />}>Clear Additional Costs</Button>
                             </div>
                         }
+                        <div className="row mt-2">
+                            <div className="col-12">
+                                <Box sx={{ width: '100%' }}>
+                                    <TextField
+                                        variant="outlined"
+                                        size="large"
+                                        name="Remark"
+                                        label="Remark"
+                                        value={formValue.Remark}
+                                        onChange={this.handleFormInput}
+                                        fullWidth
+                                    />
+                                </Box>
+                            </div>
+                        </div>
                     </div>
                 </AlertDialog>
             </div>

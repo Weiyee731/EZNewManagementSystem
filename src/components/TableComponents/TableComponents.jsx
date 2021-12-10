@@ -27,7 +27,7 @@ import AddIcon from '@mui/icons-material/Add';
 import SearchBar from "../SearchBar/SearchBar"
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import { isObjectUndefinedOrNull, isArrayNotEmpty, isStringNullOrEmpty } from "../../tools/Helpers"
+import { isObjectUndefinedOrNull, isArrayNotEmpty, isStringNullOrEmpty, round } from "../../tools/Helpers"
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) return -1;
@@ -153,7 +153,7 @@ const EnhancedTableToolbar = (props) => {
                         variant="subtitle1"
                         component="div"
                     >
-                        {numSelected} selected {extraInfo && ` | ${mCube.toFixed(3)} m3 | ${weight} kg`}
+                        {numSelected} selected {extraInfo && ` | ${round(mCube, 3)} m3 | ${round(weight, 3)} kg`}
                     </Typography>
                 ) : (
                     <Typography
@@ -224,10 +224,21 @@ export default function TableComponents(props) {
     // }, [props.Data]);
 
     useEffect(() => {
-        setTableHeaders(props.tableHeaders)
-        setRows(props.Data)
-        setTableTopRight(props.tableTopRight)
-        setObjectKey(props.selectedIndexKey)
+        let isMounted = true
+        if(isMounted) {
+            setTableHeaders(props.tableHeaders)
+            setRows(props.Data)
+            setTableTopRight(props.tableTopRight)
+            setObjectKey(props.selectedIndexKey)
+        }
+        return() => {
+            setTableHeaders([])
+            setRows([])
+            setTableTopRight(null)
+            setObjectKey("id")
+            // console.log("unmount")
+            isMounted = false
+        }
     }, [props]);
 
     // useEffect(() => {
@@ -271,6 +282,7 @@ export default function TableComponents(props) {
     }
 
     const handleRowClick = (event, row) => {
+        console.log("testing...")
         if (!onRowSelect) {
             if (typeof props.onTableRowClick !== "undefined")
                 props.onTableRowClick(event, row)

@@ -51,6 +51,7 @@ class Dashboard extends Component {
 
         this.handleInputChange = this.handleInputChange.bind(this)
         this.OnSubmitLogin = this.OnSubmitLogin.bind(this)
+        this.OnEnterToSubmitLogin = this.OnEnterToSubmitLogin.bind(this)
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -93,6 +94,11 @@ class Dashboard extends Component {
         }
     }
 
+    OnEnterToSubmitLogin = (e) => {
+        if (e.key === 'Enter' || e.keyCode === 13) 
+            this.OnSubmitLogin()
+    }
+
     render() {
         return (
             <div style={{ display: 'flex', width: '100%', height: '100vh', }}>
@@ -107,6 +113,7 @@ class Dashboard extends Component {
                                 id="login-username"
                                 value={this.state.username}
                                 onChange={(e) => this.handleInputChange(e)}
+                                onKeyUp={(e) => { this.OnEnterToSubmitLogin(e) }}
                                 size="small"
                                 startAdornment={
                                     <InputAdornment position="start">
@@ -122,6 +129,7 @@ class Dashboard extends Component {
                                 type={this.state.showPassword ? 'text' : 'password'}
                                 value={this.state.password}
                                 onChange={(e) => this.handleInputChange(e)}
+                                onKeyUp={(e) => { this.OnEnterToSubmitLogin(e) }}
                                 size="small"
                                 startAdornment={
                                     <InputAdornment position="start">
