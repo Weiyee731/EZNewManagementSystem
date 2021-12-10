@@ -48,6 +48,7 @@ function mapDispatchToProps(dispatch) {
         CallUpdateStockDetailByGet: (propsData) => dispatch(GitAction.CallUpdateStockDetailByGet(propsData)),
         CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
         CallResetStocks: () => dispatch(GitAction.CallResetStocks()),
+        CallFilterInventoryByDate: (propsData) => dispatch(GitAction.CallFilterInventoryByDate(propsData)),
     };
 }
 
@@ -214,10 +215,15 @@ class OverallStock extends Component {
         if (this.state.filteredList === null && isArrayNotEmpty(this.props.stocks)) {
             const { stocks } = this.props
             this.setState({
-                filteredList: (isStringNullOrEmpty(stocks.ReturnVal) && stocks.ReturnVal == 0) ? [] : stocks,
+                filteredList: (!isStringNullOrEmpty(stocks[0].ReturnVal) && stocks[0].ReturnVal == 0) ? [] : stocks,
                 isDataFetching: false
             })
             toast.dismiss();
+
+            if ((!isStringNullOrEmpty(stocks[0].ReturnVal) && stocks[0].ReturnVal == 0)) {
+                toast.warning("Fetched data is empty. ", { autoClose: 3000, theme: "dark" });
+
+            }
         }
 
         if (isArrayNotEmpty(this.props.stockApproval)) {
@@ -569,6 +575,7 @@ class OverallStock extends Component {
 
         // CallFilterInventory
         if (searchArea === "All" && searchCategory === "All" && isStringNullOrEmpty(searchKeys)) {
+            this.props.CallResetStocks()
             this.props.CallFetchAllStock({ USERID: 1 })
             toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
             this.setState({ isDataFetching: true, filteredList: null })
@@ -624,10 +631,14 @@ class OverallStock extends Component {
     onDatabaseSearch() {
         const { searchDates } = this.state
         let date_range = (typeof searchDates === "string" && !Array.isArray(searchDates)) ? JSON.parse(searchDates) : searchDates
-
+        // 
         if (!date_range.includes(null)) {
-            console.log(convertDateTimeToString112Format(date_range[0]))
-            console.log(convertDateTimeToString112Format(date_range[1]))
+            this.props.CallResetStocks()
+            const object = { STARTDATE: convertDateTimeToString112Format(date_range[0], false), ENDDATE: convertDateTimeToString112Format(date_range[1], false) }
+            this.props.CallFilterInventoryByDate(object)
+            toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
+            this.setState({ isDataFetching: true, filteredList: null })
+            this.forceUpdate()
         }
         else {
             if (date_range[0] === null)
@@ -669,7 +680,7 @@ class OverallStock extends Component {
             return (
                 <div className="d-flex">
                     <Tooltip title="Synchronize Data">
-                        <IconButton aria-label="Pull Data" size="small" onClick={() => { this.onFetchLatestData() }} >
+                        <IconButton aria-label="Pull Data" size="small" onClick={() => { this.onFetchLatestData() }} disabled={this.state.isDataFetching}>
                             <CachedIcon fontSize="large" />
                         </IconButton>
                     </Tooltip>
@@ -704,8 +715,14 @@ class OverallStock extends Component {
                             startPickerPropsOptions={{ placeholder: "From", className: "start-date-picker" }}
                             endPickerPropsOptions={{ placeholder: "To", className: "end-date-picker" }}
                         />
-                        <Tooltip title="Search database">
-                            <IconButton aria-label="Search Database" size="small" onClick={() => { this.onDatabaseSearch() }} sx={{ marginTop: 'auto', marginBottom: 'auto', marginLeft: '5px', border: '1px solid rgba(33, 33, 33, 0.6)' }} >
+                        <Tooltip title="Search Date">
+                            <IconButton
+                                aria-label="Search Date"
+                                size="small"
+                                onClick={() => { this.onDatabaseSearch() }}
+                                sx={{ marginTop: 'auto', marginBottom: 'auto', marginLeft: '5px', border: '1px solid rgba(33, 33, 33, 0.6)' }}
+                                disabled={this.state.isDataFetching}
+                            >
                                 <ManageSearchOutlinedIcon fontSize="medium" />
                             </IconButton>
                         </Tooltip>

@@ -535,6 +535,36 @@ export class GitEpic {
       }
     });
 
+  Inventory_ViewStockListByDate = action$ =>
+    action$.ofType(GitAction.GetFilteredInventoryByDate).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Inventory_ViewStockListByDate?" +
+        "STARTDATE=" + payload.STARTDATE +
+        "&ENDDATE=" + payload.ENDDATE
+      )
+      try {
+        const response = await fetch(url +
+          "Inventory_ViewStockListByDate?" +
+          "STARTDATE=" + payload.STARTDATE +
+          "&ENDDATE=" + payload.ENDDATE
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.GotFilteredInventoryByDate,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_ViewStockListByDate")
+        return {
+          type: GitAction.GotFilteredInventoryByDate,
+          payload: [],
+        };
+      }
+    });
+
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
 
 
@@ -648,7 +678,7 @@ export class GitEpic {
       }
     });
 
-    Transaction_UpdateTransactionPayment = action$ =>
+  Transaction_UpdateTransactionPayment = action$ =>
     action$.ofType(GitAction.UpdateTransactionPayment).switchMap(async ({ payload }) => {
       try {
         const response = await fetch(url +
@@ -657,7 +687,7 @@ export class GitEpic {
           "&PAYMENTAMMOUNT=" + payload.PaymentAmmount +
           "&PAYMENTMETHOD=" + payload.PaymentMethod +
           "&REFERENCENO=" + payload.ReferenceNo +
-          "&DATETIME=" + payload.Datetime 
+          "&DATETIME=" + payload.Datetime
         );
 
         let json = await response.json();
