@@ -316,11 +316,12 @@ class OverallStock extends Component {
         tempFormValue.Remark = !isStringNullOrEmpty(row.Remark) ? row.Remark : ""
 
         let additionalCharges = row.AdditionalCharges
-        try { additionalCharges = JSON.parse(additionalCharges) } catch (e) { console.log(e); additionalCharges = [] }
+        console.log(additionalCharges)
 
+        try { additionalCharges = JSON.parse(additionalCharges) } catch (e) { console.log(e); additionalCharges = [] }
         tempFormValue.AdditionalCost = isObjectUndefinedOrNull(additionalCharges) ? [] : additionalCharges
         tempFormValue.AdditionalCost.length > 0 && tempFormValue.AdditionalCost.map((el, idx) => {
-            el.Value = !(isStringNullOrEmpty(el.Value)) && !isNaN(el.Value) && (Number(el.Value) > 0) ? 0 : el.Value
+            el.Value = (!isStringNullOrEmpty(el.Value)) && (!isNaN(el.Value) && (Number(el.Value) > 0)) ? el.Value : 0
             el.validated = !(isStringNullOrEmpty(el.Charges)) && !(isStringNullOrEmpty(el.Value)) && !isNaN(el.Value) && (Number(el.Value) > 0)
         })
         console.log("tempFormValue", tempFormValue)
@@ -386,6 +387,7 @@ class OverallStock extends Component {
             REMARK: formValue.Remark,
             EXTRACHARGE: extraChangesValue,
         }
+        console.log(object)
 
         // check member
         if (isStringNullOrEmpty(object.USERCODE) || formValue.MemberNumberVerified === false) {
@@ -415,9 +417,11 @@ class OverallStock extends Component {
         console.log(object)
         console.log(isNotVerified)
 
-        this.props.CallUpdateStockDetailByGet(object)
-        toast.loading("Submitting data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
-        this.setState({ isDataFetching: false })
+        if (isNotVerified === 0) {
+            this.props.CallUpdateStockDetailByGet(object)
+            toast.loading("Submitting data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
+            this.setState({ isDataFetching: false })
+        }
     }
 
     handleFormInput = (e) => {
@@ -675,7 +679,7 @@ class OverallStock extends Component {
     onDatabaseSearch() {
         const { searchDates } = this.state
         let date_range = (typeof searchDates === "string" && !Array.isArray(searchDates)) ? JSON.parse(searchDates) : searchDates
-       
+
         if (!date_range.includes(null)) {
             console.log(convertDateTimeToString112Format(date_range[0]))
             console.log(convertDateTimeToString112Format(date_range[1]))
