@@ -191,7 +191,6 @@ class OverallStock extends Component {
         this.props.CallUserAreaCode()
 
         this.changeTab = this.changeTab.bind(this)
-        this.onAddButtonClick = this.onAddButtonClick.bind(this)
         this.handleAddChrgModal = this.handleAddChrgModal.bind(this)
         this.handleSubmitUpdate = this.handleSubmitUpdate.bind(this)
         this.handleFormInput = this.handleFormInput.bind(this)
@@ -222,7 +221,6 @@ class OverallStock extends Component {
         }
 
         if (isArrayNotEmpty(this.props.stockApproval)) {
-            console.log(this.props.stockApproval)
             this.props.CallResetUpdatedStockDetail()
             this.props.CallResetStocks()
             this.props.CallFetchAllStock({ USERID: 1 })
@@ -292,7 +290,6 @@ class OverallStock extends Component {
     }
 
     onTableRowClick = (event, row) => {
-        console.log("row", row)
         let tempFormValue = this.state.formValue
         tempFormValue.StockID = row.StockID
         tempFormValue.Item = row.Item
@@ -316,20 +313,13 @@ class OverallStock extends Component {
         tempFormValue.Remark = !isStringNullOrEmpty(row.Remark) ? row.Remark : ""
 
         let additionalCharges = row.AdditionalCharges
-        console.log(additionalCharges)
-
         try { additionalCharges = JSON.parse(additionalCharges) } catch (e) { console.log(e); additionalCharges = [] }
         tempFormValue.AdditionalCost = isObjectUndefinedOrNull(additionalCharges) ? [] : additionalCharges
         tempFormValue.AdditionalCost.length > 0 && tempFormValue.AdditionalCost.map((el, idx) => {
             el.Value = (!isStringNullOrEmpty(el.Value)) && (!isNaN(el.Value) && (Number(el.Value) > 0)) ? el.Value : 0
             el.validated = !(isStringNullOrEmpty(el.Charges)) && !(isStringNullOrEmpty(el.Value)) && !isNaN(el.Value) && (Number(el.Value) > 0)
         })
-        console.log("tempFormValue", tempFormValue)
-
-        this.setState({
-            openAddChrgModal: true,
-            formValue: tempFormValue,
-        })
+        this.setState({ openAddChrgModal: true, formValue: tempFormValue, })
     }
 
     onFetchLatestData() {
@@ -337,15 +327,6 @@ class OverallStock extends Component {
         this.props.CallFetchAllStock({ USERID: 1 })
         toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
         this.setState({ filteredList: null, isDataFetching: true })
-    }
-
-    onAddButtonClick = () => {
-        console.log('add button')
-    }
-
-    onDeleteButtonClick = (items) => {
-        console.log('delete button')
-        console.log(items)
     }
 
     handleAddChrgModal = () => {
@@ -361,15 +342,12 @@ class OverallStock extends Component {
                 extraChangesValue += formValue.AdditionalCost[i].Charges + "=" + formValue.AdditionalCost[i].Value + ";"
 
                 //check extra charge
-                if (formValue.AdditionalCost[i].validated === false) {
+                if (formValue.AdditionalCost[i].validated === false)
                     isNotVerified++;
-                    console.log('AdditionalCost')
-                }
             }
         }
-        else {
+        else
             extraChangesValue = "-"
-        }
 
         let object = {
             STOCKID: formValue.StockID,
@@ -387,40 +365,34 @@ class OverallStock extends Component {
             REMARK: formValue.Remark,
             EXTRACHARGE: extraChangesValue,
         }
-        console.log(object)
 
         // check member
         if (isStringNullOrEmpty(object.USERCODE) || formValue.MemberNumberVerified === false) {
-            console.log('USERCODE')
             isNotVerified++;
         }
 
         // check tracking number
         if (isStringNullOrEmpty(object.TRACKINGNUMBER) || formValue.TrackingNumberVerified === false) {
-            console.log('TRACKINGNUMBER')
             isNotVerified++;
         }
 
         // check area code / division
         if (isStringNullOrEmpty(object.AREACODE)) {
-            console.log('AREACODE')
             isNotVerified++;
         }
 
         // check width x height x depth x weight
         if (!formValue.DepthVerified || !formValue.WidthVerified || !formValue.HeightVerified || !formValue.WeightVerified) {
-            console.log('WHD')
             isNotVerified++;
         }
-
-        console.log(formValue)
-        console.log(object)
-        console.log(isNotVerified)
 
         if (isNotVerified === 0) {
             this.props.CallUpdateStockDetailByGet(object)
             toast.loading("Submitting data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
             this.setState({ isDataFetching: false })
+        }
+        else {
+            toast.error("Invalid to update data!", { autoClose: 3000, position: "top-center", transition: Flip, theme: "dark" })
         }
     }
 
@@ -442,8 +414,6 @@ class OverallStock extends Component {
                 break;
 
             case "Division":
-                console.log(e)
-                console.log(value)
                 tempForm.Division = value
                 this.setState({ formValue: tempForm })
                 break;
@@ -483,15 +453,13 @@ class OverallStock extends Component {
     }
 
     handleAdditionalCostInputs = (e, index) => {
-        let validated;
+        let validated, tempFormValue = this.state.formValue
         const { value, name } = e.target
-        let tempFormValue = this.state.formValue
         let additionalCostItems = tempFormValue.AdditionalCost
-
         switch (name) {
             case "AdditionalChargedRemark":
                 const chargedAmount = additionalCostItems[index].Value
-                validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(chargedAmount)) && !isNaN(chargedAmount) && (Number(value) > 0)
+                validated = (!isStringNullOrEmpty(value)) && ((!isStringNullOrEmpty(chargedAmount)) && (!isNaN(chargedAmount) && (Number(chargedAmount) > 0)))
                 additionalCostItems[index].Charges = value
                 additionalCostItems[index].validated = validated
                 tempFormValue.AdditionalCost = additionalCostItems
@@ -501,14 +469,13 @@ class OverallStock extends Component {
 
             case "AdditionalChargedAmount":
                 const chargedRemark = additionalCostItems[index].Charges
-                validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(chargedRemark)) && !isNaN(e.target.value) && (Number(value) > 0)
+                validated = (!isStringNullOrEmpty(chargedRemark)) && ((!isStringNullOrEmpty(value)) && (!isNaN(e.target.value) && (Number(value) > 0)))
                 additionalCostItems[index].Value = value
                 additionalCostItems[index].validated = validated
                 tempFormValue.AdditionalCost = additionalCostItems
 
                 this.setState({ formValue: tempFormValue })
                 break;
-
             default:
         }
     }
@@ -552,65 +519,45 @@ class OverallStock extends Component {
     }
 
     onCategoryFilter(stocks, searchCategory, searchKeys) {
-        let tempList = []
         switch (searchCategory) {
             case "Tracking":
-                tempList = stocks.filter(x => (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)))
-                console.log('Tracking', tempList)
-                break;
+                return stocks.filter(x => (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)))
 
             case "Member":
-                tempList = stocks.filter(x => (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)))
-                console.log('Member', tempList)
-                break;
+                return stocks.filter(x => (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)))
 
             case "Container":
-                tempList = stocks.filter(x => (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
-                console.log('Container', tempList)
-                break;
+                return stocks.filter(x => (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
 
             default:
-                tempList = stocks.filter(x =>
+                return stocks.filter(x =>
                     (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
                     (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) ||
                     (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
                     (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys))
                 )
-                console.log('default', tempList)
-                break;
         }
-        return tempList
     }
 
     onCategoryAndAreaFilter(stocks, searchCategory, searchArea, searchKeys) {
-        let tempList = []
         switch (searchCategory) {
             case "Tracking":
-                tempList = stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)))
-                console.log('Tracking', tempList)
-                break;
+                return stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)))
 
             case "Member":
-                tempList = stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)))
-                console.log('Member', tempList)
-                break;
+                return stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)))
 
             case "Container":
-                tempList = stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
-                console.log('Container', tempList)
-                break;
+                return stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
 
             default:
-                tempList = this.props.stocks.filter(x =>
+                return this.props.stocks.filter(x =>
                     (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
                     (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) ||
                     (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
                     (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys))
                 )
-                console.log('default', tempList)
-                break;
         }
-        return tempList
     }
 
     onSearch(param) {
@@ -628,14 +575,12 @@ class OverallStock extends Component {
         }
         else {
             let tempList;
-
             if (!isStringNullOrEmpty(searchKeys)) {
                 // if search keywords is exists
                 if (isArrayNotEmpty(stocks)) {
                     if (searchArea !== "All" && searchCategory === "All") {
                         // if area is not empty
                         tempList = stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (x.TrackingNumber.includes(searchKeys)))
-
                     }
                     else if (searchArea === "All" && searchCategory !== "All") {
                         // if category is not empty
@@ -690,12 +635,7 @@ class OverallStock extends Component {
 
             if (date_range[1] === null)
                 toast.error("Require valid end dates", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
-
         }
-
-        // this.props.CallFetchAllStock({ USERID: 1 })
-        // toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
-        // this.setState({ isDataFetching: true, filteredList: null })
     }
 
 
@@ -899,6 +839,7 @@ class OverallStock extends Component {
                                         value={formValue.Division}
                                         onChange={this.handleFormInput}
                                         label="Division"
+                                        error={(formValue.Division === 0)}
                                     >
                                         {
                                             isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
@@ -906,6 +847,7 @@ class OverallStock extends Component {
                                             })
                                         }
                                     </Select>
+                                    {(formValue.Division === 0) && <FormHelperText sx={{ color: 'red' }} id="MemberNumber-error-text">Invalid</FormHelperText>}
                                 </FormControl>
                             </div>
                         </div>
