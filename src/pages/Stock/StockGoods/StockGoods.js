@@ -20,7 +20,7 @@ import EditStockGoods from "./EditStockGoods";
 import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents";
 import MenuItem from '@mui/material/MenuItem';
 import Autocomplete from '@mui/material/Autocomplete';
-import { isStringNullOrEmpty, getWindowDimensions, isArrayNotEmpty } from "../../../tools/Helpers";
+import { isStringNullOrEmpty, getWindowDimensions, isArrayNotEmpty, isObjectUndefinedOrNull } from "../../../tools/Helpers";
 
 function mapStateToProps(state) {
     return {
@@ -42,12 +42,12 @@ function mapDispatchToProps(dispatch) {
 }
 
 const headCells = [
-    {
-        id: 'Courier',
-        numeric: false,
-        disablePadding: false,
-        label: 'Courier',
-    },
+    // {
+    //     id: 'Courier',
+    //     numeric: false,
+    //     disablePadding: false,
+    //     label: 'Courier',
+    // },
     {
         id: 'Tracking_No',
         numeric: true,
@@ -84,17 +84,17 @@ const headCells = [
         disablePadding: false,
         label: 'Dimension (m^3)',
     },
+    // {
+    //     id: 'Category_Name',
+    //     numeric: true,
+    //     disablePadding: false,
+    //     label: 'Category Name',
+    // },
     {
-        id: 'Category_Name',
+        id: 'Item',
         numeric: true,
         disablePadding: false,
-        label: 'Category Name',
-    },
-    {
-        id: 'Quantity',
-        numeric: true,
-        disablePadding: false,
-        label: 'Quantity',
+        label: 'Item',
     },
     {
         id: 'Member_No',
@@ -103,28 +103,40 @@ const headCells = [
         label: 'Member No',
     },
     {
-        id: 'Division',
+        id: 'AreaCode',
         numeric: true,
         disablePadding: false,
         label: 'Division',
     },
     {
-        id: 'Charged_remark',
-        numeric: true,
-        disablePadding: false,
-        label: 'Charged Remark',
-    },
-    {
-        id: 'Stock_Date',
+        id: 'StockDate',
         numeric: true,
         disablePadding: false,
         label: 'Stock Date',
     },
     {
-        id: 'Packaging_Date',
+        id: 'PackagingDate',
         numeric: true,
         disablePadding: false,
         label: 'Packaging Date',
+    },
+    {
+        id: 'ContainerName',
+        numeric: true,
+        disablePadding: false,
+        label: 'Container',
+    },
+    {
+        id: 'AdditionalCharges',
+        numeric: true,
+        disablePadding: false,
+        label: 'Additional Charges',
+    },
+    {
+        id: 'Remark',
+        numeric: true,
+        disablePadding: false,
+        label: 'Remarks',
     },
     {
         id: 'Approve',
@@ -163,45 +175,6 @@ const INITIAL_STATE = {
     AdditionalCharges: "0",
     Remark: "no",
 }
-
-
-function renderTableRows(data, index) {
-    const fontsize = '9pt'
-    var dimension = data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight;
-    return (
-        <>
-            <TableCell
-                component="th"
-                id={`enhanced-table-checkbox-${index}`}
-                scope="row"
-                padding="normal"
-                sx={{ fontSize: fontsize }}
-            >
-                {data.Courier}
-            </TableCell>
-            <TableCell sx={{ fontSize: fontsize }}>{data.TrackingNumber}</TableCell>
-            <TableCell sx={{ fontSize: fontsize }}>{data.ProductWeight}</TableCell>
-            <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep}</TableCell>
-            <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth}</TableCell>
-            <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight}</TableCell>
-            <TableCell sx={{ fontSize: fontsize }}>{dimension}</TableCell>
-            <TableCell sx={{ fontSize: fontsize }}>{data.Category_Name}</TableCell>
-            <TableCell sx={{ fontSize: fontsize }}>{data.Quantity}</TableCell>
-            <TableCell sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
-            <TableCell sx={{ fontSize: fontsize }}>{data.AreaCode}</TableCell>
-            <TableCell sx={{ fontSize: fontsize }}>{data.Remark}</TableCell>
-            <TableCell sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>
-            <TableCell sx={{ fontSize: fontsize }}>{data.PackagingDate}</TableCell>
-            <TableCell className="sticky" key={data.Tracking_No} sx={{ fontSize: fontsize }}>
-                <Tooltip title="Approve">
-                    <IconButton style={{ backgroundColor: "#f2f2f3 " }}><CheckIcon /></IconButton>
-                </Tooltip>
-            </TableCell>
-        </>
-    )
-}
-
-
 
 function onAddButtonClick() {
     this.setState({ openAddModal: true })
@@ -283,6 +256,57 @@ class StockGoods extends Component {
                 })
             }
         }
+    }
+
+    renderTableRows(data, index) {
+        const fontsize = '9pt'
+        var dimension = data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight;
+        const renderAdditionalCost = (charges) => {
+            let renderStrings = ""
+            try {
+                charges = JSON.parse(charges)
+                charges.length > 0 && charges.map(el => { renderStrings = renderStrings + el.Charges + ": " + el.Value + "; " })
+                return renderStrings
+            }
+            catch (e) {
+                return renderStrings
+            }
+        }
+
+        return (
+            <>
+                {/* <TableCell
+                    component="th"
+                    id={`enhanced-table-checkbox-${index}`}
+                    scope="row"
+                    padding="normal"
+                    sx={{ fontSize: fontsize }}
+                >
+                    {data.Courier}
+                </TableCell> */}
+                {console.log(data)}
+                <TableCell sx={{ fontSize: fontsize }}>{data.TrackingNumber}</TableCell>
+                <TableCell sx={{ fontSize: fontsize }}>{data.ProductWeight}</TableCell>
+                <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep}</TableCell>
+                <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth}</TableCell>
+                <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight}</TableCell>
+                <TableCell sx={{ fontSize: fontsize }}>{dimension}</TableCell>
+                {/* <TableCell sx={{ fontSize: fontsize }}>{data.Category_Name}</TableCell> */}
+                <TableCell sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
+                <TableCell sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
+                <TableCell sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>
+                <TableCell sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>
+                <TableCell sx={{ fontSize: fontsize }}>{data.PackagingDate}</TableCell>
+                <TableCell sx={{ fontSize: fontsize }}>{data.ContainerName}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{!isStringNullOrEmpty(data.AdditionalCharges) && renderAdditionalCost(data.AdditionalCharges)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Remark}</TableCell>
+                <TableCell className="sticky" key={data.Tracking_No} sx={{ fontSize: fontsize }}>
+                    <Tooltip title="Approve">
+                        <IconButton style={{ backgroundColor: "#f2f2f3 " }}><CheckIcon /></IconButton>
+                    </Tooltip>
+                </TableCell>
+            </>
+        )
     }
 
     onTableRowClick(event, row) {
@@ -541,7 +565,7 @@ class StockGoods extends Component {
 
                             tableHeaders={headCells}
                             tableRows={{
-                                renderTableRows: renderTableRows,
+                                renderTableRows: this.renderTableRows,
                                 checkbox: true,
                                 checkboxColor: "primary",
                                 onRowClickSelect: false
