@@ -117,7 +117,7 @@ export class GitAction {
     };
   }
 
-  
+
   static UpdateInventoryStockStatus = "UPDATE-INVENTORY-STOCK-STATUS";
   static UpdatedInventoryStockStatus = "UPDATED-INVENTORY-STOCK-STATUS";
   static ResetStockStatusReturn = "RESET-STOCK-STATUS_RETURN";
@@ -155,7 +155,7 @@ export class GitAction {
       type: GitAction.ResetUpdatedStockDetail,
     };
   }
-  
+
   static ViewContainer = "VIEW-CONTAINER";
   static ViewedContainer = "VIEWED-CONTAINER";
   static ResetViewedContainer = "RESET-VIEWED-CONTAINER";
@@ -170,7 +170,7 @@ export class GitAction {
       type: GitAction.ResetViewedContainer,
     };
   }
-  
+
   static InsertStockByPost = "INSERT-STOCK-BY-POST";
   static StockInsertedByPost = "STOCK-INSERTED-BY-POST";
   static ResetInsertedStockReturn = "RESET-INSERTED-STOCK-RETURN";
@@ -194,7 +194,16 @@ export class GitAction {
       payload: propsData
     };
   }
- 
+
+  static GetFilteredInventoryByDate = "GET-FILTERED-INVENTORY-BY-DATE";
+  static GotFilteredInventoryByDate = "GOT-FILTERED-INVENTORY-BY-DATE";
+  static CallFilterInventoryByDate(propsData) {
+    return {
+      type: GitAction.GetFilteredInventoryByDate,
+      payload: propsData
+    };
+  }
+
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
   static InsertNewTransaction = "INSERT_NEW_TRANSACTION";
   static NewTransactionInserted = "NEW_TRANSACTION_INSERTED";
