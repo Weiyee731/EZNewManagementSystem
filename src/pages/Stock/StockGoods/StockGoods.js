@@ -191,7 +191,7 @@ class StockGoods extends Component {
         // this.props.CallFetchAllStock({USERID:JSON.parse(localStorage.getItem("loginUser"))[0].UserID});
         this.props.CallFetchAllStock({ USERID: "1" });
         this.props.CallViewContainer();  //view container
-
+        this.state.stockListing = this.props.Stocks;
 
         this.onTableRowClick = this.onTableRowClick.bind(this);
         onAddButtonClick = onAddButtonClick.bind(this);
@@ -206,25 +206,29 @@ class StockGoods extends Component {
         if (this.state.options !== this.props.AllContainer) {
             this.setState({ options: this.props.AllContainer })
         } //set container return to the state: option
-
         if (this.props.Stocks.length !== this.state.stockListing.length) {
             if (this.props.Stocks !== undefined && this.props.Stocks[0] !== undefined && this.props.ReturnVal !== "0") {
                 this.setState({ stockListing: this.props.Stocks, stockFiltered: this.props.Stocks });
             } else { console.log(("no")) }
         } else { console.log(("no")) }
+
+        if (!isArrayNotEmpty(this.state.stockFiltered === null) && isArrayNotEmpty(this.props.Stocks)) {
+            const { Stocks } = this.props
+            this.setState({
+                stockFiltered: (isStringNullOrEmpty(Stocks.ReturnVal) && Stocks.ReturnVal == 0) ? [] : Stocks
+            })
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.AllContainer.length !== this.props.AllContainer.length) {
             if (this.props.AllContainer !== undefined && this.props.AllContainer[0] !== undefined) {
                 this.setState({ options: this.props.AllContainer });
-                console.log("1", this.state.options)
             } else { console.log("match wo") }
         }
 
-        if (this.state.stockFiltered === null && isArrayNotEmpty(this.props.Stocks)) {
+        if (this.state.stockFiltered === [] && isArrayNotEmpty(this.props.Stocks)) {
             const { Stocks } = this.props
-            console.log(Stocks)
             this.setState({
                 stockFiltered: (isStringNullOrEmpty(Stocks.ReturnVal) && Stocks.ReturnVal == 0) ? [] : Stocks
             })
@@ -284,7 +288,6 @@ class StockGoods extends Component {
                 >
                     {data.Courier}
                 </TableCell> */}
-                {console.log(data)}
                 <TableCell sx={{ fontSize: fontsize }}>{data.TrackingNumber}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.ProductWeight}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep}</TableCell>
@@ -314,7 +317,6 @@ class StockGoods extends Component {
             openEditModal: true,
             selectedRows: row,
         });
-        // return <Link to={{ pathname: `/EditStockGoods`, props: row }}></Link>
     }
 
     handleSearchfilter = (filter) => {
@@ -403,7 +405,12 @@ class StockGoods extends Component {
             // this.state.stockListing[0].ReturnVal !== undefined &&
             // this.state.stockListing[0].ReturnVal !== "0"
         ) {
-            const FilterArr = this.state.stockListing.filter((searchedItem) => searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()) || searchedItem.UserCode.includes(e.target.value.toLowerCase()) || searchedItem.AreaCode.toLowerCase().includes(e.target.value.toLowerCase()))
+
+            const FilterArr = this.state.stockListing.filter((searchedItem) =>
+                searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                searchedItem.UserCode.includes(e.target.value.toLowerCase()))
+            // isStringNullOrEmpty(searchedItem.AreaCode) ? "" : (searchedItem.AreaCode.toLowerCase().includes(e.target.value.toLowerCase())
+
             this.setState({ stockFiltered: FilterArr })
             if (FilterArr.length === 1 && FilterArr[0].TrackingNumber === e.target.value) {
                 this.setState({ selectedRows: FilterArr[0], openEditModal: !this.state.openEditModal });
@@ -462,7 +469,6 @@ class StockGoods extends Component {
                     open={open}
                     fullScreen={true}
                     classes='true'
-                    // onBackdropClick={() => console.log('backdrop')}
                     handleToggleDialog={() => this.handleCancel("filter")}
                     handleConfirmFunc={() => this.handleSearchfilter("open")}
                     title={"Please select the container number and date desired"}
@@ -512,7 +518,6 @@ class StockGoods extends Component {
                 {openEditModal &&
                     <ModalPopOut
                         open={openEditModal}
-                        // onBackdropClick={() => console.log('backdrop')}
                         handleToggleDialog={() => this.handleCancel("form")}
                         handleConfirmFunc={() => this.handleSearchfilter("openEditModal")}
                         message={
@@ -525,7 +530,6 @@ class StockGoods extends Component {
                 {openAddModal &&
                     <ModalPopOut
                         open={openAddModal}
-                        // onBackdropClick={() => console.log('backdrop')}
                         handleToggleDialog={() => this.handleCancel("form")}
                         handleConfirmFunc={() => this.handleSearchfilter("openAddModal")}
                         message={
