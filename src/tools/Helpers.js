@@ -30,7 +30,7 @@ export const convertDateTimeToString = (date) => {
         let MM = (date112.getMinutes().toString().length <= 1) ? "0" + date112.getMinutes() : date112.getMinutes().toString()
         let ss = (date112.getSeconds().toString().length <= 1) ? "0" + date112.getSeconds() : date112.getSeconds().toString()
 
-        return (yyyy.toString() + mm + dd + HH + MM + ss)
+        return (yyyy.toString() + "/" + mm + "/" + dd  + " " + HH  + ":" + MM  + ":" + ss)
     }
     catch (e) {
         let date112 = new Date();
@@ -41,7 +41,7 @@ export const convertDateTimeToString = (date) => {
         let MM = (date112.getMinutes().toString().length <= 1) ? "0" + date112.getMinutes() : date112.getMinutes().toString()
         let ss = (date112.getSeconds().toString().length <= 1) ? "0" + date112.getSeconds() : date112.getSeconds().toString()
 
-        return (yyyy.toString() + mm + dd + HH + MM + ss)
+        return (yyyy.toString() + "/" + mm + "/" + dd  + " " + HH  + ":" + MM  + ":" + ss)
     }
 }
 
@@ -169,7 +169,6 @@ export const roundOffTotal = (val) => {
                 case 2:
                     roundingOff = firstDigit.toString() + "0"
                     return (amount.toString().concat("." + roundingOff.toString()))
-                    break;
 
                 case 3:
                 case 4:
@@ -178,7 +177,6 @@ export const roundOffTotal = (val) => {
                 case 7:
                     roundingOff = firstDigit.toString() + "5"
                     return (amount.toString().concat("." + roundingOff.toString()))
-                    break;
 
                 case 8:
                 case 9:
@@ -191,7 +189,6 @@ export const roundOffTotal = (val) => {
                         roundingOff = amount.toString() + "." + firstDigit.toString() + "0"
                     }
                     return (roundingOff)
-                    break;
 
                 default:
                     alert("Error Code: function -> roundingOff() received non-numeric value")

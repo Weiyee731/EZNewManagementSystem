@@ -163,9 +163,6 @@ export class GitEpic {
 
   User_ProfileByID = action$ =>
     action$.ofType(GitAction.GetUserProfileByID).switchMap(async ({ payload }) => {
-      // console.log(url + 
-      //   double_click_and_paste_url_here
-      // )
       try {
         const response = await fetch(url +
           "User_ViewProfileByID?" +
