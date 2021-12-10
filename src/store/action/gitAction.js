@@ -214,6 +214,15 @@ export class GitAction {
     };
   }
 
+  static UpdateTransactionPayment = "UPDATE_TRANSACTION_PAYMENT";
+  static UpdatedTransactionPayment = "TRANSACTION_UPDATEED_PAYMENT";
+  static CallUpdateTransactionPayment(propsData) {
+    return {
+      type: GitAction.UpdateTransactionPayment,
+      payload: propsData
+    };
+  }
+
   static CallResetTransaction() {
     return {
       type: GitAction.ResetTransactionReturn,

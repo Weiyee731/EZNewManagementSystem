@@ -30,6 +30,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         CallFetchAllTransaction: (data) => dispatch(GitAction.CallFetchAllTransaction(data)),
+        CallUpdateTransactionPayment: (data) => dispatch(GitAction.CallUpdateTransactionPayment(data)),
     };
 }
 
@@ -110,9 +111,12 @@ class TransactionHistory extends Component {
             TransactionListing: [],
             TransactionListingFiltered: [],
             TrackingStatusID: 4,
-            filteredList: []
+            filteredList: [],
+            selectedRow: [],
+            Payment: ""
         }
         this.renderTableRows = this.renderTableRows.bind(this)
+        this.handleInputChange = this.handleInputChange.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
         this.props.CallFetchAllTransaction(this.state);
     }
@@ -179,12 +183,20 @@ class TransactionHistory extends Component {
     }
 
     onAddButtonClick = (event, row) => {
-        this.setState({ AddModalOpen: true });
+        this.setState({ AddModalOpen: true, selectedRow: row });
     }
 
     onDeleteButtonClick = (items) => {
         console.log('delete button')
 
+    }
+
+    onUpdateTransactionPayment = (event, row) => {
+        this.props.CallUpdateTransactionPayment({ TransactionID: row.TransactionID, PaymentAmmount: this.state.payment})
+    }
+
+    handleInputChange = (e) => {
+        this.setState({ payment: e.target.value.trim() })
     }
 
     changeTab = (key) => {
@@ -282,10 +294,11 @@ class TransactionHistory extends Component {
                                     <Grid item xs={12} sm={12}>
                                         <TextField
                                             autoComplete="given-name"
-                                            name="Full Name"
+                                            name="payment"
                                             required
                                             fullWidth
-                                            id="Fullname"
+                                            onChange={(e) => this.handleInputChange(e)}
+                                            id="payment"
                                             label="Pay ammount"
                                             autoFocus
                                         />
@@ -336,6 +349,7 @@ class TransactionHistory extends Component {
                                     fullWidth
                                     variant="contained"
                                     sx={{ mt: 3, mb: 2 }}
+                                    onClick={(e) => { this.onUpdateTransactionPayment(e, this.state.selectedRow) }}
                                 >
                                     Update Payment
                                 </Button>
