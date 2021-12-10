@@ -18,6 +18,8 @@ import SearchBar from "../../components/SearchBar/SearchBar"
 import CsvDownloader from 'react-csv-downloader';
 import { getWindowDimensions, isArrayNotEmpty } from "../../tools/Helpers";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+import ToggleTabsComponent from "../../components/ToggleTabsComponent/ToggleTabComponents";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 function mapStateToProps(state) {
     return {
@@ -36,8 +38,8 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '65%',
-    height: '50%',
+    width: '40%',
+    height: '25%',
     bgcolor: 'background.paper',
     border: '0px solid #000',
     boxShadow: 24,
@@ -46,54 +48,60 @@ const style = {
 
 const headCells = [
     {
-      id: 'OrderDate',
-      align: 'left',
-      disablePadding: false,
-      label: 'Invoice Date',
+        id: 'OrderDate',
+        align: 'left',
+        disablePadding: false,
+        label: 'Invoice Date',
     },
     {
-      id: 'TransactionName',
-      align: 'left',
-      disablePadding: false,
-      label: 'Invoice No.',
+        id: 'TransactionName',
+        align: 'left',
+        disablePadding: false,
+        label: 'Invoice No.',
     },
     {
-      id: 'UserCode',
-      align: 'left',
-      disablePadding: false,
-      label: 'Code',
+        id: 'UserCode',
+        align: 'left',
+        disablePadding: false,
+        label: 'Code',
     },
     {
-      id: 'AreaCode',
-      align: 'center',
-      disablePadding: false,
-      label: 'Area',
+        id: 'AreaCode',
+        align: 'center',
+        disablePadding: false,
+        label: 'Area',
     },
     {
-      id: 'Fullname',
-      align: 'center',
-      disablePadding: false,
-      label: 'Name',
+        id: 'Fullname',
+        align: 'center',
+        disablePadding: false,
+        label: 'Name',
     },
     {
-      id: 'OrderTotalAmount',
-      align: 'center',
-      disablePadding: false,
-      label: 'Total Amount',
+        id: 'OrderTotalAmount',
+        align: 'center',
+        disablePadding: false,
+        label: 'Total Amount',
     },
     {
-      id: 'OrderPaidAmount',
-      align: 'center',
-      disablePadding: false,
-      label: 'Paid',
+        id: 'OrderPaidAmount',
+        align: 'center',
+        disablePadding: false,
+        label: 'Paid',
     },
     {
-      id: 'OrderStatus',
-      align: 'center',
-      disablePadding: false,
-      label: 'Status',
+        id: 'OrderStatus',
+        align: 'center',
+        disablePadding: false,
+        label: 'Status',
     },
-  ];
+    {
+        id: 'action',
+        align: 'center',
+        disablePadding: false,
+        label: '',
+    },
+];
 class TransactionHistory extends Component {
     constructor(props) {
         super(props);
@@ -101,7 +109,8 @@ class TransactionHistory extends Component {
             AddModalOpen: false,
             TransactionListing: [],
             TransactionListingFiltered: [],
-            TrackingStatusID:4
+            TrackingStatusID: 4,
+            filteredList: []
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
@@ -134,14 +143,17 @@ class TransactionHistory extends Component {
     renderTableRows = (data, index) => {
         return (
             <>
-                <TableCell component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{data.OrderDate}</TableCell>
-                <TableCell>{data.TransactionName}</TableCell>
-                <TableCell>{data.UserCode}</TableCell>
-                <TableCell>{data.AreaCode}</TableCell>
-                <TableCell>{data.Fullname}</TableCell>
-                <TableCell align="center"><Box color={data.OrderColor}>{data.OrderTotalAmount}</Box></TableCell>
-                <TableCell align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
-                <TableCell align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
+                <TableCell onClick={(event) => this.onTableRowClick(event, data)} component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{data.OrderDate}</TableCell>
+                <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.TransactionName}</TableCell>
+                <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.UserCode}</TableCell>
+                <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.AreaCode}</TableCell>
+                <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.Fullname}</TableCell>
+                <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderTotalAmount}</Box></TableCell>
+                <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
+                <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
+                {
+                    data.OrderStatus === "Unpaid" ? <TableCell onClick={(event) => this.onAddButtonClick(event, data)} align="center"><CheckCircleIcon color="grey" sx={{ fontSize: 30 }}></CheckCircleIcon></TableCell> : ""
+                }
             </>
         )
     }
@@ -149,11 +161,11 @@ class TransactionHistory extends Component {
     renderTableActionButton = () => {
         return (
             <div className="d-flex">
-                <Tooltip sx={{ marginLeft: 5 }} title="Add New Items">
+                {/* <Tooltip sx={{ marginLeft: 5 }} title="Add New Items">
                     <IconButton onClick={(event) => { this.onAddButtonClick() }}>
                         <AddIcon />
                     </IconButton>
-                </Tooltip>
+                </Tooltip> */}
             </div>
         )
     }
@@ -166,7 +178,7 @@ class TransactionHistory extends Component {
         this.setState({ AddModalOpen: false });
     }
 
-    onAddButtonClick = () => {
+    onAddButtonClick = (event, row) => {
         this.setState({ AddModalOpen: true });
     }
 
@@ -175,13 +187,38 @@ class TransactionHistory extends Component {
 
     }
 
-
+    changeTab = (key) => {
+        switch (key) {
+            case "All":
+                this.setState({
+                    TransactionListingFiltered: this.state.TransactionListing
+                })
+                break;
+            case "Unpaid":
+                this.setState({
+                    TransactionListingFiltered: this.state.TransactionListing.filter(x => x.OrderStatus === "Unpaid")
+                })
+                break;
+            case "Paid":
+                this.setState({
+                    TransactionListingFiltered: this.state.TransactionListing.filter(x => x.OrderStatus === "Paid")
+                })
+                break;
+            default:
+                break;
+        }
+    }
 
     render() {
         const onChange = (e) => {
-            const FilterArr = this.state.TransactionListing.filter((searchedItem) =>searchedItem.UserCode.toLowerCase().includes(e.target.value))
+            const FilterArr = this.state.TransactionListing.filter((searchedItem) => searchedItem.UserCode.toLowerCase().includes(e.target.value))
             this.setState({ TransactionListingFiltered: FilterArr });
         }
+        const ToggleTabs = [
+            { children: "All", key: "All" },
+            { children: "Unpaid", key: "Unpaid" },
+            { children: "Paid", key: "Paid" }
+        ]
 
         return (
             <>
@@ -201,6 +238,7 @@ class TransactionHistory extends Component {
                             </CsvDownloader>
                         </div>
                     </div>
+                    <ToggleTabsComponent Tabs={ToggleTabs} size="small" onChange={this.changeTab} />
                     <TableComponents
                         // table settings 
                         tableTopLeft={<h3 style={{ fontWeight: 700 }}>Transaction History</h3>}  // optional, it can pass as string or as children elements
@@ -223,7 +261,7 @@ class TransactionHistory extends Component {
                         }}
                         selectedIndexKey={"pid"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
                         Data={this.state.TransactionListingFiltered}                                  // required, the data that listing in the table
-                        onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
+                        // onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                         onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                         onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items
                     />
@@ -238,60 +276,60 @@ class TransactionHistory extends Component {
                         BackdropComponent={Backdrop}
                         BackdropProps={{ timeout: 500 }}>
                         <Box sx={style} component="main" maxWidth="xs">
-                            <Typography component="h1" variant="h5">Sign up</Typography>
+                            <Typography component="h1" variant="h5">Update Payment</Typography>
                             <Box component="form" noValidate sx={{ mt: 3 }}>
                                 <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
+                                    <Grid item xs={12} sm={12}>
                                         <TextField
                                             autoComplete="given-name"
                                             name="Full Name"
                                             required
                                             fullWidth
                                             id="Fullname"
-                                            label="Full Name"
+                                            label="Pay ammount"
                                             autoFocus
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            id="UserCode"
-                                            label="User Code"
-                                            name="UserCode"
-                                            autoComplete="family-name"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            id="email"
-                                            label="Email Address"
-                                            name="email"
-                                            autoComplete="email"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            name="Contact"
-                                            label="Contact"
-                                            id="contact"
-                                            autoComplete="contact"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            name="Address"
-                                            label="Address"
-                                            id="address"
-                                            autoComplete="address"
-                                        />
-                                    </Grid>
+                                    {/* <Grid item xs={12} sm={6}>
+                    <TextField
+                      required
+                      fullWidth
+                      id="UserCode"
+                      label="User Code"
+                      name="UserCode"
+                      autoComplete="family-name"
+                    />
+                  </Grid> */}
+                                    {/* <Grid item xs={12} sm={6}>
+                    <TextField
+                      required
+                      fullWidth
+                      id="email"
+                      label="Email Address"
+                      name="email"
+                      autoComplete="email"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      required
+                      fullWidth
+                      name="Contact"
+                      label="Contact"
+                      id="contact"
+                      autoComplete="contact"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      required
+                      fullWidth
+                      name="Address"
+                      label="Address"
+                      id="address"
+                      autoComplete="address"
+                    />
+                  </Grid> */}
                                 </Grid>
                                 <Button
                                     type="submit"
@@ -299,7 +337,7 @@ class TransactionHistory extends Component {
                                     variant="contained"
                                     sx={{ mt: 3, mb: 2 }}
                                 >
-                                    Add New User
+                                    Update Payment
                                 </Button>
                             </Box>
                         </Box>
