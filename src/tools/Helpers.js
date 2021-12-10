@@ -234,20 +234,10 @@ export const round = (num, places) => {
     return Number(roundingUp).toFixed(3)
 }
 
-export const testRounding = (num, places) => {
-    num = parseFloat(num);
-    places = (places ? parseInt(places, 10) : 0)
-    if (places > 0) {
-        let length = places;
-        places = "1";
-        for (let i = 0; i < length; i++) {
-            places += "0";
-            places = parseInt(places, 10);
-        }
-    } else {
-        places = 1;
-    }
-    return (Math.round((num + Number.EPSILON) * (1 * places)) / (1 * places))
+export const volumeCalc = (depth, width, height) => {
+    let volume = (depth * width * height) / 1000000 
+    volume = round(volume, 3)
+    return volume
 }
 
 // localStorage

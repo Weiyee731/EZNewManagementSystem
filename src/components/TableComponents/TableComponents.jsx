@@ -236,7 +236,6 @@ export default function TableComponents(props) {
             setRows([])
             setTableTopRight(null)
             setObjectKey("id")
-            // console.log("unmount")
             isMounted = false
         }
     }, [props]);
@@ -282,7 +281,6 @@ export default function TableComponents(props) {
     }
 
     const handleRowClick = (event, row) => {
-        console.log("testing...")
         if (!onRowSelect) {
             if (typeof props.onTableRowClick !== "undefined")
                 props.onTableRowClick(event, row)
