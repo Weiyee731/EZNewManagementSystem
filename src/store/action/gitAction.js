@@ -14,6 +14,7 @@ export class GitAction {
   static Logout = "USER_LOGOUT";
   static LoggedOutSuccess = "USER_LOGGED_OUT_SUCCESS";
   static CallUserLogout(propsData) {
+    
     return {
       type: GitAction.Logout,
       payload: propsData
@@ -116,7 +117,7 @@ export class GitAction {
     };
   }
 
-  
+
   static UpdateInventoryStockStatus = "UPDATE-INVENTORY-STOCK-STATUS";
   static UpdatedInventoryStockStatus = "UPDATED-INVENTORY-STOCK-STATUS";
   static ResetStockStatusReturn = "RESET-STOCK-STATUS_RETURN";
@@ -154,7 +155,7 @@ export class GitAction {
       type: GitAction.ResetUpdatedStockDetail,
     };
   }
-  
+
   static ViewContainer = "VIEW-CONTAINER";
   static ViewedContainer = "VIEWED-CONTAINER";
   static ResetViewedContainer = "RESET-VIEWED-CONTAINER";
@@ -169,7 +170,7 @@ export class GitAction {
       type: GitAction.ResetViewedContainer,
     };
   }
-  
+
   static InsertStockByPost = "INSERT-STOCK-BY-POST";
   static StockInsertedByPost = "STOCK-INSERTED-BY-POST";
   static ResetInsertedStockReturn = "RESET-INSERTED-STOCK-RETURN";
@@ -193,7 +194,16 @@ export class GitAction {
       payload: propsData
     };
   }
- 
+
+  static GetFilteredInventoryByDate = "GET-FILTERED-INVENTORY-BY-DATE";
+  static GotFilteredInventoryByDate = "GOT-FILTERED-INVENTORY-BY-DATE";
+  static CallFilterInventoryByDate(propsData) {
+    return {
+      type: GitAction.GetFilteredInventoryByDate,
+      payload: propsData
+    };
+  }
+
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
   static InsertNewTransaction = "INSERT_NEW_TRANSACTION";
   static NewTransactionInserted = "NEW_TRANSACTION_INSERTED";
@@ -210,6 +220,15 @@ export class GitAction {
   static CallUpdateTransaction(propsData) {
     return {
       type: GitAction.UpdateTransaction,
+      payload: propsData
+    };
+  }
+
+  static UpdateTransactionPayment = "UPDATE_TRANSACTION_PAYMENT";
+  static UpdatedTransactionPayment = "TRANSACTION_UPDATEED_PAYMENT";
+  static CallUpdateTransactionPayment(propsData) {
+    return {
+      type: GitAction.UpdateTransactionPayment,
       payload: propsData
     };
   }
@@ -237,7 +256,15 @@ export class GitAction {
       payload: propsData
     };
   }
-  
+
+  ///////////////////////////////////////////////////   Dashboard   ///////////////////////////////////////////////////
+  static FetchDashboardData = "FETCH_DASHBOARD_DATA";
+  static DashboardDataFetched = "DASHBOARD_DATA_FETCHED";
+  static CallFetchDashboardData() {
+    return {
+      type: GitAction.FetchDashboardData,
+    };
+  }
 
 }
 

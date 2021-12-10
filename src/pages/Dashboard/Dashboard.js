@@ -2,22 +2,23 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { GitAction } from "../../store/action/gitAction";
 import { browserHistory } from "react-router";
+import { isArrayNotEmpty } from "../../tools/Helpers";
 
 function mapStateToProps(state) {
     return {
-        stocks: state.counterReducer["stocks"],
+        dashboard: state.counterReducer["dashboard"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        CallFetchAllStock: (propsData) => dispatch(GitAction.CallFetchAllStock(propsData)),
+        CallFetchDashboardData: () => dispatch(GitAction.CallFetchDashboardData()),
     };
 }
 
 
 const INITIAL_STATE = {
-
+    dashboard_data: []
 }
 
 class Dashboard extends Component {
@@ -25,11 +26,13 @@ class Dashboard extends Component {
         super(props);
         this.state = INITIAL_STATE
 
-        this.props.CallFetchAllStock({USERID: 1})
+        this.props.CallFetchDashboardData();
     }
 
     componentDidMount() {
-        
+        if(isArrayNotEmpty(this.props.dashboard)){
+            this.setState({ dashboard_data: this.props.dashboard})
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {

@@ -11,14 +11,15 @@ import TextField from '@mui/material/TextField';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import IconButton from '@mui/material/IconButton';
 import TableCell from '@mui/material/TableCell';
-import Tooltip from '@mui/material/Tooltip';
-import AddIcon from '@mui/icons-material/Add';
+import Grid from '@mui/material/Grid';
+import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TableComponents from "../../components/TableComponents/TableComponents"
 import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
 import ToggleTabsComponent from "../../components/ToggleTabsComponent/ToggleTabComponents";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 function mapStateToProps(state) {
   return {
@@ -30,8 +31,22 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     CallUserProfileByID: (data) => dispatch(GitAction.CallUserProfileByID(data)),
+    CallUpdateTransactionPayment: (data) => dispatch(GitAction.CallUpdateTransactionPayment(data)),
   };
 }
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '40%',
+  height: '25%',
+  bgcolor: 'background.paper',
+  border: '0px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 const headCells = [
   {
@@ -82,6 +97,12 @@ const headCells = [
     disablePadding: false,
     label: 'Status',
   },
+  {
+    id: 'action',
+    align: 'center',
+    disablePadding: false,
+    label: '',
+  },
 ];
 
 class UserDetail extends Component {
@@ -96,7 +117,10 @@ class UserDetail extends Component {
       Contact: "",
       Address: "",
       Transaction: [],
-      filteredList: []
+      filteredList: [],
+      selectedRow: [],
+      payment: "",
+      selectedindex: ""
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.props.CallUserProfileByID(this.state)
@@ -169,22 +193,40 @@ class UserDetail extends Component {
       case "address":
         this.setState({ Address: e.target.value })
         break;
+      case "payment":
+        this.setState({ payment: e.target.value.trim() })
+        break;
       default:
         break;
     }
   }
 
+  onUpdateTransactionPayment = (event, row) => {
+    this.props.CallUpdateTransactionPayment({ TransactionID: row.TransactionID, PaymentAmmount: this.state.payment })
+    this.state.filteredList[this.state.selectedindex].OrderPaidAmount =  this.state.payment;
+    if(this.state.filteredList[this.state.selectedindex].OrderTotalAmount <=  this.state.payment){
+      this.state.filteredList[this.state.selectedindex].OrderStatus = 'Paid'
+      this.state.filteredList[this.state.selectedindex].OrderColor = 'green'
+    }
+    console.log(this.state.filteredList)
+    this.setState({ AddModalOpen: false }) 
+  }
+
+
   renderTableRows = (data, index) => {
     return (
       <>
-        <TableCell component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{data.OrderDate}</TableCell>
-        <TableCell>{data.TransactionName}</TableCell>
-        <TableCell>{data.UserCode}</TableCell>
-        <TableCell>{data.AreaCode}</TableCell>
-        <TableCell>{data.Fullname}</TableCell>
-        <TableCell align="center"><Box color={data.OrderColor}>{data.OrderTotalAmount}</Box></TableCell>
-        <TableCell align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
-        <TableCell align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)} component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{data.OrderDate}</TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.TransactionName}</TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.UserCode}</TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.AreaCode}</TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.Fullname}</TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderTotalAmount}</Box></TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
+        {
+          data.OrderStatus === "Unpaid" ? <TableCell onClick={(event) => this.onAddButtonClick(event, data, index)} align="center"><CheckCircleIcon color="grey" sx={{ fontSize: 30 }}></CheckCircleIcon></TableCell> : ""
+        }
       </>
     )
   }
@@ -197,15 +239,15 @@ class UserDetail extends Component {
   }
 
   onTableRowClick = (event, row) => {
-    this.props.history.push(`/UserDetail/${row.UserID}/${row.UserCode}`)
+    this.props.history.push(`/TransactionHistoryDetail/${row.TransactionID}`)
   }
 
   handleClose = () => {
     this.setState({ AddModalOpen: false });
   }
 
-  onAddButtonClick = () => {
-    this.setState({ AddModalOpen: true });
+  onAddButtonClick = (event, row, index) => {
+    this.setState({ AddModalOpen: true, selectedRow: row, selectedindex: index });
   }
 
   onDeleteButtonClick = (items) => {
@@ -220,14 +262,14 @@ class UserDetail extends Component {
           filteredList: this.state.Transaction
         })
         break;
-      case "Payable":
+      case "Unpaid":
         this.setState({
-          filteredList: this.state.Transaction.filter(x => x.TrackingStatus === "Pending")
+          filteredList: this.state.Transaction.filter(x => x.OrderStatus === "Unpaid")
         })
         break;
       case "Paid":
         this.setState({
-          filteredList: this.state.Transaction.filter(x => x.TrackingStatus === "Completed")
+          filteredList: this.state.Transaction.filter(x => x.OrderStatus === "Paid")
         })
         break;
       default:
@@ -238,9 +280,9 @@ class UserDetail extends Component {
   render() {
     const ToggleTabs = [
       { children: "All", key: "All" },
-      { children: "Payable", key: "Payable" },
+      { children: "Unpaid", key: "Unpaid" },
       { children: "Paid", key: "Paid" }
-  ]
+    ]
     return (
       <div>
         <Card>
@@ -348,9 +390,88 @@ class UserDetail extends Component {
             }}
             selectedIndexKey={"pid"}
             Data={this.state.filteredList}
-            onTableRowClick={this.onTableRowClick}
+          // onTableRowClick={this.onTableRowClick}
 
           />
+        </div>
+        <div>
+          <Modal
+            open={this.state.AddModalOpen}
+            onClose={this.handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+            closeAfterTransition
+            BackdropComponent={Backdrop}
+            BackdropProps={{ timeout: 500 }}>
+            <Box sx={style} component="main" maxWidth="xs">
+              <Typography component="h1" variant="h5">Update Payment</Typography>
+              <Box noValidate sx={{ mt: 3 }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={12}>
+                    <TextField
+                      autoComplete="given-name"
+                      name="payment"
+                      required
+                      fullWidth
+                      onChange={(e) => this.handleInputChange(e)}
+                      id="payment"
+                      label="Pay ammount"
+                      autoFocus
+                    />
+                  </Grid>
+                  {/* <Grid item xs={12} sm={6}>
+                    <TextField
+                      required
+                      fullWidth
+                      id="UserCode"
+                      label="User Code"
+                      name="UserCode"
+                      autoComplete="family-name"
+                    />
+                  </Grid> */}
+                  {/* <Grid item xs={12} sm={6}>
+                    <TextField
+                      required
+                      fullWidth
+                      id="email"
+                      label="Email Address"
+                      name="email"
+                      autoComplete="email"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      required
+                      fullWidth
+                      name="Contact"
+                      label="Contact"
+                      id="contact"
+                      autoComplete="contact"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      required
+                      fullWidth
+                      name="Address"
+                      label="Address"
+                      id="address"
+                      autoComplete="address"
+                    />
+                  </Grid> */}
+                </Grid>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                  onClick={(e) => { this.onUpdateTransactionPayment(e, this.state.selectedRow) }}
+                >
+                  Update Payment
+                </Button>
+              </Box>
+            </Box>
+          </Modal>
         </div>
       </div>
     )

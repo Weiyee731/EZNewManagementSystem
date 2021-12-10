@@ -535,6 +535,36 @@ export class GitEpic {
       }
     });
 
+  Inventory_ViewStockListByDate = action$ =>
+    action$.ofType(GitAction.GetFilteredInventoryByDate).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Inventory_ViewStockListByDate?" +
+        "STARTDATE=" + payload.STARTDATE +
+        "&ENDDATE=" + payload.ENDDATE
+      )
+      try {
+        const response = await fetch(url +
+          "Inventory_ViewStockListByDate?" +
+          "STARTDATE=" + payload.STARTDATE +
+          "&ENDDATE=" + payload.ENDDATE
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.GotFilteredInventoryByDate,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_ViewStockListByDate")
+        return {
+          type: GitAction.GotFilteredInventoryByDate,
+          payload: [],
+        };
+      }
+    });
+
   ///////////////////////////////////////////////////  stocks management ///////////////////////////////////////////////////
 
 
@@ -641,6 +671,43 @@ export class GitEpic {
       }
       catch (error) {
         toast.error("Error Code: Transaction_UpdateTransactionStatus")
+        return {
+          type: GitAction.UpdatedTransaction,
+          payload: [],
+        };
+      }
+    });
+
+  Transaction_UpdateTransactionPayment = action$ =>
+    action$.ofType(GitAction.UpdateTransactionPayment).switchMap(async ({ payload }) => {
+      
+      console.log(url +
+        "Transaction_UpdateTransactionPayment?" +
+          "TRANSACTIONID=" + payload.TransactionID +
+          "&PAYMENTAMMOUNT=" + payload.Payment +
+          "&PAYMENTMETHOD=" + payload.PaymentMethod +
+          "&REFERENCENO=" + payload.ReferenceNo +
+          "&DATETIME=" + payload.Datetime 
+      )
+      try {
+        const response = await fetch(url +
+          "Transaction_UpdateTransactionPayment?" +
+          "TRANSACTIONID=" + payload.TransactionID +
+          "&PAYMENTAMMOUNT=" + payload.PaymentAmmount +
+          "&PAYMENTMETHOD=" + payload.PaymentMethod +
+          "&REFERENCENO=" + payload.ReferenceNo +
+          "&DATETIME=" + payload.Datetime
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UpdatedTransactionPayment,
+          // payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Transaction_UpdateTransactionPayment")
         return {
           type: GitAction.UpdatedTransaction,
           payload: [],

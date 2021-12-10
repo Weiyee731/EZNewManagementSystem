@@ -150,9 +150,6 @@ class DataManagement extends Component {
             let PackagingDate = ""
             let AdditionalCost = ""
             let Remarks = ""
-            console.log(DataRows[1]["Stock Date"].trim())
-            console.log(convertDateTimeToString112Format(DataRows[1]["Stock Date"]))
-            console.log(convertDateTimeToString112Format(DataRows[1]["Stock Date"].trim()))
             for (let index = 0; index < DataRows.length; index++) {
                 Courier += (isStringNullOrEmpty(DataRows[index]["Courier"])) ? "-" : DataRows[index]["Courier"].trim();
                 TrackingNo += (isStringNullOrEmpty(DataRows[index]["Tracking No"])) ? "-" : DataRows[index]["Tracking No"].trim();
@@ -163,8 +160,8 @@ class DataManagement extends Component {
                 Item += (isStringNullOrEmpty(DataRows[index]["Item"])) ? "-" : DataRows[index]["Item"].trim();
                 Member += (isStringNullOrEmpty(DataRows[index]["Member"])) ? "-" : DataRows[index]["Member"].trim();
                 Division += (isStringNullOrEmpty(DataRows[index]["Division"])) ? "-" : DataRows[index]["Division"].trim();
-                StockDate += (isStringNullOrEmpty(DataRows[index]["Stock Date"])) ? "-" : convertDateTimeToString112Format(DataRows[index]["Stock Date"].trim())
-                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : convertDateTimeToString112Format(DataRows[index]["Packaging Date"].trim())
+                StockDate += (isStringNullOrEmpty(DataRows[index]["Stock Date"])) ? "-" : convertDateTimeToString112Format(DataRows[index]["Stock Date"].trim(), true)
+                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : convertDateTimeToString112Format(DataRows[index]["Packaging Date"].trim(), true)
                 AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "0" : DataRows[index]["Additional Cost"].trim();
                 Remarks += (isStringNullOrEmpty(DataRows[index]["Remarks"])) ? "-" : DataRows[index]["Remarks"];
 
