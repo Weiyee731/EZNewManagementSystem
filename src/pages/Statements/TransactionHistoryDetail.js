@@ -477,7 +477,7 @@ class TransactionHistoryDetail extends Component {
                 </div>
               </div>
             </div>
-            <div>
+            {/* <div>
               <Modal
                 open={this.state.AddModalOpen}
                 onClose={this.handleClose}
@@ -560,11 +560,11 @@ class TransactionHistoryDetail extends Component {
                 </Box>
               </Modal>
 
-            </div>
+            </div> */}
             <div>
               <Modal
-                open={this.state.AddModalOpen2}
-                onClose={this.handleClose2}
+                open={this.state.AddModalOpen}
+                onClose={this.handleClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
                 closeAfterTransition
