@@ -647,6 +647,34 @@ export class GitEpic {
         };
       }
     });
+
+    Transaction_UpdateTransactionPayment = action$ =>
+    action$.ofType(GitAction.UpdateTransactionPayment).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Transaction_UpdateTransactionPayment?" +
+          "TRANSACTIONID=" + payload.TransactionID +
+          "&PAYMENTAMMOUNT=" + payload.PaymentAmmount +
+          "&PAYMENTMETHOD=" + payload.PaymentMethod +
+          "&REFERENCENO=" + payload.ReferenceNo +
+          "&DATETIME=" + payload.Datetime 
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UpdatedTransactionPayment,
+          // payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Transaction_UpdateTransactionPayment")
+        return {
+          type: GitAction.UpdatedTransaction,
+          payload: [],
+        };
+      }
+    });
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
 
 
