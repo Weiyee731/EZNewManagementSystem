@@ -14,6 +14,7 @@ export class GitAction {
   static Logout = "USER_LOGOUT";
   static LoggedOutSuccess = "USER_LOGGED_OUT_SUCCESS";
   static CallUserLogout(propsData) {
+    
     return {
       type: GitAction.Logout,
       payload: propsData
