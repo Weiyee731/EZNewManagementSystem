@@ -649,5 +649,31 @@ export class GitEpic {
     });
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
 
+
+  ///////////////////////////////////////////////////   Dashboard  ///////////////////////////////////////////////////
+
+  Dashboard_View = action$ =>
+    action$.ofType(GitAction.FetchDashboardData).switchMap(async ({ payload }) => {
+      console.log(url + "Dashboard_View")
+      try {
+        const response = await fetch(url + "Dashboard_View");
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.DashboardDataFetched,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Dashboard_View")
+        return {
+          type: GitAction.DashboardDataFetched,
+          payload: [],
+        };
+      }
+    });
+
+  ///////////////////////////////////////////////////   Dashboard  ///////////////////////////////////////////////////
+
 }
 export let gitEpic = new GitEpic();

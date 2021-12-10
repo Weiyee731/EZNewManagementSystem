@@ -15,6 +15,7 @@ const INITIAL_STATE = {
   transactions: [],
   transaction: [],
   transactionReturn: [],
+  dashboard: [],
 };
 
 export function counterReducer(state = INITIAL_STATE, action) {
@@ -195,6 +196,16 @@ export function counterReducer(state = INITIAL_STATE, action) {
         loading: false,
         transaction: action.payload
       });
+
+    /////////////////////////////////////////////////// Transaction Management ///////////////////////////////////////////////////
+    case GitAction.FetchDashboardData:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.DashboardDataFetched:
+      return Object.assign({}, state, {
+        loading: false,
+        dashboard: action.payload
+      });
+
     /////////////////////////////////////////////////// Default ///////////////////////////////////////////////////
     default:
       return state;

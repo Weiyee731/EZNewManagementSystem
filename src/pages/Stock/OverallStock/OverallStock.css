@@ -42,9 +42,14 @@
     display: flex;
 }
 
-.stock-date-range-picker div:first-child {
-   margin-toP: auto;
+.stock-date-range-picker div{
+   margin-top: auto;
+   margin-bottom: auto;
 }   
+
+/* .stock-date-range-picker .MuiBox-root{
+    width: 10%;
+} */
 
 .stock-date-range-picker .start-date-picker label,
 .stock-date-range-picker .end-date-picker label{
@@ -54,4 +59,9 @@
 
 .searchbar-input {
     margin-bottom: 0px !important;
+    margin-top: 0px !important;
+}
+
+.start-date-picker, .end-date-picker{
+    width: 45%;
 }
