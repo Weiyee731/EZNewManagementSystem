@@ -25,6 +25,11 @@ const routes = [
         element: <Dashboard />,
     },
     {
+        path: "/EZ",
+        exact: true,
+        element: <Dashboard />,
+    },
+    {
         path: "/UserManagement",
         exact: true,
         element: <UserManagement />,
