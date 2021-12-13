@@ -276,8 +276,6 @@ class StockGoods extends Component {
         let Remark = []
         let AdditionalCharges = []
         //status id ===2
-
-        console.log(row)
         row.map((row) => {
             StockID.push(row.StockID)
             TrackingNumber.push(row.TrackingNumber)
@@ -375,7 +373,6 @@ class StockGoods extends Component {
     handleSearchfilter = (filter) => {
         switch (filter) {
             case "open":
-                console.log(this.state.ContainerDate)
                 if ((this.state.ContainerName && this.state.ContainerDate) !== "" || undefined) {
                     this.setState({ open: !this.state.open });
                 }
@@ -529,7 +526,6 @@ class StockGoods extends Component {
                     open={open}
                     classes='true'
                     showCancel={false}
-                    // onBackdropClick={()=>console.log("do nothing")}
                     handleToggleDialog={() => this.handleCancel("filter")}
                     handleConfirmFunc={() => this.handleSearchfilter("open")}
                     title={"Please select the container number and date desired"}

@@ -392,7 +392,7 @@ export class GitEpic {
 
   Inventory_UpdateStockDetailByPost = action$ =>
     action$.ofType(GitAction.UpdateStockDetailByPost).switchMap(async ({ payload }) => {
-      console.log(payload)
+    
       return fetch(
         postUrl + "Inventory_UpdateStockDetailByPost"
         , {
