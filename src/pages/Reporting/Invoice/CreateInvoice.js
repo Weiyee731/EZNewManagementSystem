@@ -574,7 +574,7 @@ class CreateInvoice extends Component {
                                     >
                                         {
                                             isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
-                                                return <MenuItem value={el.UserAreaID} >{el.AreaName + " - " + el.AreaCode}</MenuItem>
+                                                return <MenuItem key={idx} value={el.UserAreaID} >{el.AreaName + " - " + el.AreaCode}</MenuItem>
                                             })
                                         }
                                     </Select>
@@ -652,7 +652,7 @@ class CreateInvoice extends Component {
                         {
                             isArrayNotEmpty(formValue.AdditionalCost) && formValue.AdditionalCost.map((el, idx) => {
                                 return (
-                                    <div className="row">
+                                    <div className="row" key={idx}>
                                         <div className="col-6 col-sm-8">
                                             <TextField
                                                 variant="standard"

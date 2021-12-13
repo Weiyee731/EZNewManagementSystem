@@ -30,7 +30,7 @@ import CsvDownloader from 'react-csv-downloader';
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import Tooltip from '@mui/material/Tooltip';
-import "./OverallStock.css";
+import "./ArchivedStock.css";
 
 function mapStateToProps(state) {
     return {
@@ -183,7 +183,7 @@ const INITIAL_STATE = {
     isDataFetching: false,
 }
 
-class OverallStock extends Component {
+class ArchivedStock extends Component {
     constructor(props) {
         super(props);
         this.state = INITIAL_STATE
@@ -1017,4 +1017,4 @@ class OverallStock extends Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(OverallStock);
+export default connect(mapStateToProps, mapDispatchToProps)(ArchivedStock);

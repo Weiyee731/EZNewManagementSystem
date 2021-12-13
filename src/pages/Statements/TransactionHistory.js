@@ -6,8 +6,11 @@ import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
+import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
 import Button from '@mui/material/Button';
 import TableComponents from "../../components/TableComponents/TableComponents"
 import TextField from '@mui/material/TextField';
@@ -20,6 +23,10 @@ import { getWindowDimensions, isArrayNotEmpty } from "../../tools/Helpers";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import ToggleTabsComponent from "../../components/ToggleTabsComponent/ToggleTabComponents";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import DateTimePicker from '@mui/lab/DateTimePicker';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import ResponsiveDatePickers from '../../components/datePicker/datePicker';
 
 function mapStateToProps(state) {
     return {
@@ -30,6 +37,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         CallFetchAllTransaction: (data) => dispatch(GitAction.CallFetchAllTransaction(data)),
+        CallUpdateTransactionPayment: (data) => dispatch(GitAction.CallUpdateTransactionPayment(data)),
     };
 }
 
@@ -39,12 +47,12 @@ const style = {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '40%',
-    height: '25%',
+    height: '45%',
     bgcolor: 'background.paper',
     border: '0px solid #000',
     boxShadow: 24,
     p: 4,
-};
+  };
 
 const headCells = [
     {
@@ -110,9 +118,17 @@ class TransactionHistory extends Component {
             TransactionListing: [],
             TransactionListingFiltered: [],
             TrackingStatusID: 4,
-            filteredList: []
+            filteredList: [],
+            selectedRow: [],
+            TransactionID:0,
+            searchCategory: "Cash",
+            Payment: "",
+            Datetime: "",
+            ReferenceNo: ""
         }
         this.renderTableRows = this.renderTableRows.bind(this)
+        this.handleInputChange = this.handleInputChange.bind(this)
+        this.handleSearchCategory = this.handleSearchCategory.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
         this.props.CallFetchAllTransaction(this.state);
     }
@@ -179,12 +195,43 @@ class TransactionHistory extends Component {
     }
 
     onAddButtonClick = (event, row) => {
-        this.setState({ AddModalOpen: true });
+        this.setState({ AddModalOpen: true, selectedRow: row, TransactionID: row.TransactionID });
     }
 
     onDeleteButtonClick = (items) => {
         console.log('delete button')
 
+    }
+
+    onUpdateTransactionPayment = (event, row) => {
+        this.props.CallUpdateTransactionPayment(this.state)
+    }
+
+    handleInputChange = (e) => {
+        const elementId = e.target.id
+        switch (elementId) {
+            case "payment":
+                this.setState({ Payment: e.target.value.trim() })
+                break;
+
+            case "date":
+                this.setState({ Datetime: e.target.value })
+                break;
+            case "reference":
+                this.setState({ ReferenceNo: e.target.value })
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    onDateChange(e) {
+        this.setState({ Datetime: e })
+    }
+
+    handleSearchCategory(e) {
+        this.setState({ PaymentMethod: e.target.value })
     }
 
     changeTab = (key) => {
@@ -277,50 +324,61 @@ class TransactionHistory extends Component {
                         BackdropProps={{ timeout: 500 }}>
                         <Box sx={style} component="main" maxWidth="xs">
                             <Typography component="h1" variant="h5">Update Payment</Typography>
-                            <Box component="form" noValidate sx={{ mt: 3 }}>
+                            <Box noValidate sx={{ mt: 3 }}>
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={12}>
+                                        <label className="my-auto col-3">Payment Method:</label>
+                                        <Select
+                                            labelId="search-filter-category"
+                                            id="search-filter-category"
+                                            value={this.state.PaymentMethod}
+                                            label="Search By"
+                                            onChange={this.handleSearchCategory}
+                                            size="large"
+                                            IconComponent={FilterListOutlinedIcon}
+                                            className="col-9"
+                                            placeholder="filter by"
+                                        >
+                                            <MenuItem key="search_all" value="Cash">Cash</MenuItem>
+                                            <MenuItem key="search_tracking" value="Tracking">Bank Transfer</MenuItem>
+                                            <MenuItem key="search_member" value={"Member"}>Boost</MenuItem>
+                                            <MenuItem key="search_container" value={"Container"}>S Pay Global</MenuItem>
+                                        </Select>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
                                         <TextField
                                             autoComplete="given-name"
-                                            name="Full Name"
+                                            name="payment"
                                             required
                                             fullWidth
-                                            id="Fullname"
+                                            onChange={(e) => this.handleInputChange(e)}
+                                            id="payment"
                                             label="Pay ammount"
                                             autoFocus
                                         />
                                     </Grid>
-                                    {/* <Grid item xs={12} sm={6}>
-                    <TextField
-                      required
-                      fullWidth
-                      id="UserCode"
-                      label="User Code"
-                      name="UserCode"
-                      autoComplete="family-name"
-                    />
-                  </Grid> */}
-                                    {/* <Grid item xs={12} sm={6}>
-                    <TextField
-                      required
-                      fullWidth
-                      id="email"
-                      label="Email Address"
-                      name="email"
-                      autoComplete="email"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="Contact"
-                      label="Contact"
-                      id="contact"
-                      autoComplete="contact"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
+                                    <Grid item xs={12} sm={6}>
+                                        <ResponsiveDatePickers
+                                            // rangePicker
+                                            openTo="day"
+                                            title="Date"
+                                            value={this.state.Datetime ? this.state.Datetime : ""}
+                                            onChange={(e) => this.onDateChange(e)}
+                                            variant="outlined"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={12}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            name="reference"
+                                            label="reference"
+                                            id="reference"
+                                            onChange={(e) => this.handleInputChange(e)}
+                                            autoComplete="reference"
+                                        />
+                                    </Grid>
+                                    {/*<Grid item xs={12}>
                     <TextField
                       required
                       fullWidth
@@ -336,6 +394,7 @@ class TransactionHistory extends Component {
                                     fullWidth
                                     variant="contained"
                                     sx={{ mt: 3, mb: 2 }}
+                                    onClick={(e) => { this.onUpdateTransactionPayment(e, this.state.selectedRow) }}
                                 >
                                     Update Payment
                                 </Button>

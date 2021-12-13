@@ -20,7 +20,7 @@ export const isLatitude = (latitude) => { return isFinite(latitude) && Math.abs(
 export const isDecimalValid = (number) => { return (typeof number === 'undefined' || number == '' || !/^[0-9]\d*(\.\d+)?$/.test(number)) ? true : false }
 
 //time functions
-export const convertDateTimeToString112Format = (date) => {
+export const convertDateTimeToString112Format = (date, fetchTime) => {
     try {
         let date112 = typeof date !== "undefined" && date !== "" ? new Date(date) : new Date();
         let dd = (date112.getDate().toString().length <= 1) ? "0" + date112.getDate() : date112.getDate().toString()
@@ -30,7 +30,7 @@ export const convertDateTimeToString112Format = (date) => {
         let MM = (date112.getMinutes().toString().length <= 1) ? "0" + date112.getMinutes() : date112.getMinutes().toString()
         let ss = (date112.getSeconds().toString().length <= 1) ? "0" + date112.getSeconds() : date112.getSeconds().toString()
 
-        return (yyyy.toString() + "/" + mm + "/" + dd  + " " + HH  + ":" + MM  + ":" + ss)
+        return (fetchTime === true) ? (yyyy.toString() + "/" + mm + "/" + dd  + " " + HH  + ":" + MM  + ":" + ss) : (yyyy.toString() + "/" + mm + "/" + dd )
     }
     catch (e) {
         let date112 = new Date();
@@ -41,7 +41,7 @@ export const convertDateTimeToString112Format = (date) => {
         let MM = (date112.getMinutes().toString().length <= 1) ? "0" + date112.getMinutes() : date112.getMinutes().toString()
         let ss = (date112.getSeconds().toString().length <= 1) ? "0" + date112.getSeconds() : date112.getSeconds().toString()
 
-        return (yyyy.toString() + "/" + mm + "/" + dd  + " " + HH  + ":" + MM  + ":" + ss)
+        return (fetchTime === true) ? (yyyy.toString() + "/" + mm + "/" + dd  + " " + HH  + ":" + MM  + ":" + ss) : (yyyy.toString() + "/" + mm + "/" + dd )
     }
 }
 
@@ -234,20 +234,10 @@ export const round = (num, places) => {
     return Number(roundingUp).toFixed(3)
 }
 
-export const testRounding = (num, places) => {
-    num = parseFloat(num);
-    places = (places ? parseInt(places, 10) : 0)
-    if (places > 0) {
-        let length = places;
-        places = "1";
-        for (let i = 0; i < length; i++) {
-            places += "0";
-            places = parseInt(places, 10);
-        }
-    } else {
-        places = 1;
-    }
-    return (Math.round((num + Number.EPSILON) * (1 * places)) / (1 * places))
+export const volumeCalc = (depth, width, height) => {
+    let volume = (depth * width * height) / 1000000 
+    volume = round(volume, 3)
+    return volume
 }
 
 // localStorage

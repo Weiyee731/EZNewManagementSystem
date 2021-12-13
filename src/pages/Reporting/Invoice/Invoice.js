@@ -172,8 +172,6 @@ class Invoice extends Component {
 
     }
 
-
-
     render() {
         const onChange = (e) => {
             const FilterArr = this.state.TransactionListing.filter((searchedItem) =>searchedItem.UserCode.toLowerCase().includes(e.target.value))
@@ -184,9 +182,10 @@ class Invoice extends Component {
             <>
                 <div className="w-100 container-fluid">
                     <SearchBar onChange={onChange} />
+                    <hr />
                     <TableComponents
                         // table settings 
-                        tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}  // optional, it can pass as string or as children elements
+                        tableTopLeft={<h3 style={{ fontWeight: 700 }}>Invoice</h3>}  // optional, it can pass as string or as children elements
                         tableTopRight={this.renderTableActionButton}                 // optional, it will brings the elements to the table's top right corner
 
                         tableOptions={{
@@ -219,7 +218,8 @@ class Invoice extends Component {
                         aria-describedby="modal-modal-description"
                         closeAfterTransition
                         BackdropComponent={Backdrop}
-                        BackdropProps={{ timeout: 500 }}>
+                        BackdropProps={{ timeout: 500 }}
+                        >
                         <Box sx={style} component="main" maxWidth="xs">
                             <Typography component="h1" variant="h5">Sign up</Typography>
                             <Box component="form" noValidate sx={{ mt: 3 }}>

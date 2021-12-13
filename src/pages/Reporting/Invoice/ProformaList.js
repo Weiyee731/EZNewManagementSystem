@@ -3,7 +3,7 @@ import { GitAction } from "../../../store/action/gitAction";
 import { withRouter } from 'react-router'
 import TableComponents from '../../../components/TableComponents/TableComponents';
 import Button from '@mui/material/Button';
-import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull, roundOffTotal, round } from "../../../tools/Helpers";
+import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull, roundOffTotal, round, volumeCalc } from "../../../tools/Helpers";
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -14,11 +14,13 @@ import CardContent from '@mui/material/CardContent';
 import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
 import { connect } from 'react-redux';
+import { toast } from 'react-toastify';
 
 function mapStateToProps(state) {
     return {
         loading: state.counterReducer["loading"],
         userProfile: state.counterReducer["userProfile"],
+        transactionReturn: state.counterReducer["transactionReturn"],
     };
 }
 
@@ -57,6 +59,16 @@ const ProformaList = (props) => {
         setItems(abc)
     }, [])
 
+    useEffect(() => {
+        console.log(props.transactionReturn)
+        if(props.transactionReturn[0].ReturnVal == 1) {
+            toast.success(props.transactionReturn[0].ReturnMsg)
+            props.history.push(`/InvoiceDetail/${props.transactionReturn[0].TransactionID}`)
+        } else {
+            toast.error("Something went wrong. Please try again")
+        }
+    }, [props.transactionReturn])
+
     const headCellsWithPrice = [
         {
             id: 'no',
@@ -80,7 +92,7 @@ const ProformaList = (props) => {
             id: 'volume',
             align: 'left',
             disablePadding: false,
-            label: 'm3',
+            label: 'Volume (m3)',
         },
         {
             id: 'unitPrice',
@@ -92,7 +104,7 @@ const ProformaList = (props) => {
             id: 'price',
             align: 'left',
             disablePadding: false,
-            label: 'Price',
+            label: 'Price (RM)',
         },
     ];
 
@@ -119,7 +131,7 @@ const ProformaList = (props) => {
             id: 'volume',
             align: 'left',
             disablePadding: false,
-            label: 'm3',
+            label: 'Volume (m3)',
         },
     ];
 
@@ -127,12 +139,11 @@ const ProformaList = (props) => {
         if (selectedType != 3) {
             let total = []
             items.map((item) => {
-                let volume = (item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight) / 1000000
-                volume = round(volume, 3)
+                let volume = volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
                 let price = item.isFollowStandard ? unitPrice * volume : item.unitPrice * volume
                 if (volume < 0.013) {
                     if (selectedType == 1) {
-                        total.push(Number(selfPickupPrice))
+                        total.push(item.isFollowStandard ? Number(selfPickupPrice) : Number(item.unitPrice))
                     } else {
                         total.push(price)
                     }
@@ -152,6 +163,15 @@ const ProformaList = (props) => {
         newItems[index]['isFollowStandard'] = false;
         newItems[index]['unitPrice'] = value;
         setItems(newItems)
+    }
+
+    const handleChangeMinSingleUnitPrice = (e) => {
+        const newItems = [...items];
+        newItems.map((item) => {
+            item.isFollowStandard = true
+        })
+        setItems(newItems)
+        setSelfPickupPrice(e.target.value)
     }
 
     const handleChangeAllUnitPrice = (e) => {
@@ -188,13 +208,15 @@ const ProformaList = (props) => {
         let stockIds = []
 
         items.map((item) => {
-            let volume = item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight
-            if (selectedType == 1) {
-                if (volume < 0.013) {
-                    productPrices.push(item.unitPrice)
-                } else {
-                    productPrices.push(volume * item.unitPrice)
+            let volume = volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
+            if (volume < 0.013 && selectedType == 1) {
+                if (item.isFollowStandard && selfPickupPrice != "") {
+                    productPrices.push(Number(selfPickupPrice).toFixed(2)) 
+                } else if (!item.isFollowStandard) {
+                    productPrices.push(Number(item.unitPrice).toFixed(2))
                 }
+            } else {
+                productPrices.push(volume * item.unitPrice)
             }
             stockIds.push(item.StockID)
         })
@@ -203,7 +225,7 @@ const ProformaList = (props) => {
             USERID: userId,
             TYPE: selectedType,
             ORDERTOTALMOUNT: totalPrice(),
-            ORDERPAIDMOUNT: "-",
+            ORDERPAIDMOUNT: 0,
             STOCKID: stockIds,
             PRODUCTPRICE: productPrices
         })
@@ -223,20 +245,20 @@ const ProformaList = (props) => {
 
     const renderTableRows = (data, index) => {
         let fontsize = '9pt'
-        let volume = (data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight) / 1000000
-        volume = round(volume, 3)
+        let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
 
         const subTotal = () => {
             let price = data.isFollowStandard ? volume * unitPrice : volume * data.unitPrice
-            if(volume < 0.013 && selectedType == 1) {
-                console.log(selfPickupPrice)
-                if(selfPickupPrice != "") {
+            if (volume < 0.013 && selectedType == 1) {
+                if (data.isFollowStandard && selfPickupPrice != "") {
                     return Number(selfPickupPrice).toFixed(2)
+                } else if (!data.isFollowStandard) {
+                    return Number(data.unitPrice).toFixed(2)
                 } else {
                     return 0
                 }
             } else {
-                if(price != "") {
+                if (price != "") {
                     return price.toFixed(2)
                 } else {
                     return 0
@@ -274,6 +296,8 @@ const ProformaList = (props) => {
             </>
         )
     }
+
+    console.log(userProfile)
 
     return (
         <Card>
@@ -319,7 +343,7 @@ const ProformaList = (props) => {
                                     label="Unit Price (min.)"
                                     name="unitPrice"
                                     value={selfPickupPrice}
-                                    onChange={(e) => setSelfPickupPrice(e.target.value)}
+                                    onChange={(e) => handleChangeMinSingleUnitPrice(e)}
                                 />
                             }
                             {selectedType != 3 &&
@@ -413,7 +437,7 @@ const ProformaList = (props) => {
                         Sub total:
                     </div>
                     <div className='col-2'>
-                        {totalPrice()}
+                        RM {totalPrice()}
                     </div>
                     {selectedType === 4 && totalPrice() < minPrice / 2 &&
                         <>
@@ -431,11 +455,11 @@ const ProformaList = (props) => {
                     <div className='col-2'>
                         {selectedType === 4 && totalPrice() < minPrice / 2 ?
                             <>
-                                {minPrice}
+                                RM {minPrice}
                             </>
                             :
                             <>
-                                {totalPrice()}
+                                RM {totalPrice()}
                             </>
                         }
                     </div>

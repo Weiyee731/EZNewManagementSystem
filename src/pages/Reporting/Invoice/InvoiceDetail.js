@@ -98,19 +98,19 @@ const headCells = [
 
 const companyTitle = {
   fontWeight: "bolder",
-  fontSize: "25px",
+  fontSize: "20px",
   textAlign: "center"
 };
 
 const companyDetailTitle = {
   fontWeight: "bold",
-  fontSize: "16px",
+  fontSize: "14px",
   float: "center",
   textAlign: "center"
 };
 
 const companyDetail = {
-  fontSize: "14px",
+  fontSize: "12px",
   fontWeight: "bold",
 };
 
@@ -121,14 +121,14 @@ const quotation = {
 };
 
 const tncTitle = {
-  fontSize: "16px",
+  fontSize: "14px",
   color: "#0070C0",
 };
 
 const tncDiv = {
-  margin: "1%",
+  // margin: "1%",
   fontWeight: "bold",
-  fontSize: "14px",
+  fontSize: "12px",
 };
 
 function printPDF() {
@@ -292,8 +292,8 @@ class InvoicerDetail extends Component {
   onClickConfirmInvoice = (items) => {
     var isDeliveryExist = false
     this.props.CallUpdateTransaction(this.state);
-    this.state.TransactionDetail.map((search)=>{
-      if(search.Description === "Delivery Fee"){
+    this.state.TransactionDetail.map((search) => {
+      if (search.Description === "Delivery Fee") {
         search.ProductPrice = this.state.DeliveryFee
         isDeliveryExist = true
       }
@@ -330,112 +330,132 @@ class InvoicerDetail extends Component {
   };
 
   render() {
+    const {
+      OrderDate,
+      Transaction,
+      TransactionName,
+      Fullname,
+      UserCode,
+      AreaCode,
+      Contact,
+      Address,
+      OrderTotalAmount,
+      OrderPaidAmount,
+      TransactionDetail,
+      AddModalOpen,
+      TransportationBool,
+      Remark,
+      DeliveryFee,
+      AddModalOpen2
+    } = this.state
     return (
       <div>
         <Card>
           <CardContent>
-            <div className="d-flex align-items-center row">
-              <div className="col-1">
-                <IconButton
-                  color="primary"
-                  aria-label="back"
-                  component="span"
-                  onClick={() => this.props.history.goBack()}>
-                  <ArrowBackIcon />
-                </IconButton>
-              </div>
-              <div className="col-9"></div>
-              <div className="col-1" style={{ textAlign: "end" }}>
-                <IconButton
-                  color="primary"
-                  aria-label="back"
-                  component="span"
-                  onClick={this.onAddButtonClick}>
-                  <PrintIcon />
-                </IconButton>
-              </div>
+            <div className="d-flex align-items-center justify-content-between">
+              <IconButton
+                color="primary"
+                aria-label="back"
+                component="span"
+                onClick={() => this.props.history.goBack()}>
+                <ArrowBackIcon />
+              </IconButton>
+              <IconButton
+                color="primary"
+                aria-label="back"
+                component="span"
+                onClick={this.onAddButtonClick}>
+                <PrintIcon />
+              </IconButton>
             </div>
-            <div style={{ width: "100%", padding: "3%" }}
-              className="Post"
-              ref={(el) => (this.componentRef = el)}>
+            <div
+              className="Post w-100"
+              style={{ padding: '80px' }}
+              ref={(el) => (this.componentRef = el)}
+            >
               <div className="row">
-                <div>
-                  <div>
-                    <div>
-                      <div style={companyTitle}>
-                        EZ TRANSIT AND LOGISTICS SDN BHD
-                      </div>
-                      <div style={companyDetailTitle}>
-                        NO.2, LORONG A, TAMAN BDC
-                      </div>
-                      <div style={companyDetailTitle}>
-                        JALAN STUTONG 93350 KUCHING, SARAWAK
-                      </div>
-                      <div style={companyDetailTitle}>
-                        EL: 019 - 883 6783 / 012 - 895 7769
-                      </div>
-                      <div
-                        style={{
-                          width: "100%",
-                          borderTop: "none",
-                          borderRight: "none",
-                          borderLeft: "none",
-                          borderImage: "initial",
-                          borderBottom: "1pt solid rgb(0, 112, 192)",
-                          padding: "0 5px",
-                          height: "20px",
-                          verticalAlign: "top",
-                        }}
-                      />
-                    </div>
-                    <div style={companyDetailTitle}>
-                      INVOICE:
-                    </div>
-                    <div className="row" style={companyDetail}>
-                      <span className="col-6">{this.state.UserCode}-{this.state.AreaCode}{this.state.Fullname}</span>
-                      <span className="col-1"></span>
-                      <span className="col-1">No</span>
-                      <span className="col-4">: {this.state.TransactionName}</span>
-                    </div>
-                    <div className="row" style={companyDetail}>
-                      <span className="col-6">{this.state.Address}</span>
-                      <span className="col-1"></span>
-                      <span className="col-1">Terms</span>
-                      <span className="col-4">: C.O.D</span>
-                    </div>
-                    <div className="row" style={companyDetail} >
-                      <span className="col-6">Tel : {this.state.Contact}</span>
-                      <span className="col-1"></span>
-                      <span className="col-1">Date</span>
-                      <span className="col-4">: {this.state.OrderDate}</span>
-                    </div>
-                  </div>
+                <div style={companyTitle}>
+                  EZ TRANSIT AND LOGISTICS SDN BHD
+                </div>
+                <div style={companyDetailTitle}>
+                  NO.2, LORONG A, TAMAN BDC
+                </div>
+                <div style={companyDetailTitle}>
+                  JALAN STUTONG 93350 KUCHING, SARAWAK
+                </div>
+                <div style={companyDetailTitle}>
+                  TEL: 019 - 883 6783 / 012 - 895 7769
+                </div>
+                <div
+                  style={{
+                    width: "100%",
+                    borderTop: "none",
+                    borderRight: "none",
+                    borderLeft: "none",
+                    borderImage: "initial",
+                    borderBottom: "1pt solid rgb(0, 112, 192)",
+                    padding: "0 5px",
+                    height: "20px",
+                    verticalAlign: "top",
+                  }}
+                />
+                <div style={companyDetailTitle}>
+                  INVOICE
+                </div>
+                <div className="row" style={companyDetail}>
+                  <span className="col-6">{UserCode}-{AreaCode}{Fullname}</span>
+                  <span className="col-1"></span>
+                  <span className="col-1">No</span>
+                  <span className="col-4">: {TransactionName}</span>
+                </div>
+                <div className="row" style={companyDetail}>
+                  <span className="col-6">{Address}</span>
+                  <span className="col-1"></span>
+                  <span className="col-1">Terms</span>
+                  <span className="col-4">: C.O.D</span>
+                </div>
+                <div className="row" style={companyDetail} >
+                  <span className="col-6">Tel : {Contact}</span>
+                  <span className="col-1"></span>
+                  <span className="col-1">Date</span>
+                  <span className="col-4">: {OrderDate}</span>
+                </div>
+                <div className="row" style={companyDetail}>
+                  <span className="col-1 offset-7">Page</span>
+                  <span className="col-4">: 1 of 2</span>
                 </div>
               </div>
+              <div
+                style={{
+                  marginTop: "-40px"
+                }}
+              >
+                <TableComponents
+                  style={{
+                    boxShadow: "0px",
+                  }}
+                  elevation={"0"}
+                  tableOptions={{
+                    dense: true,
+                    tableOrderBy: 'asc',
+                    sortingIndex: "fat",
+                    stickyTableHeader: false,
+                    stickyTableHeight: 100,
+                  }}
+                  tableHeaders={headCells}
+                  tableRows={{
+                    renderTableRows: this.renderTableRows,
+                    checkbox: false,
+                    checkboxColor: "primary",
+                    onRowClickSelect: false
+                  }}
+                  selectedIndexKey={"pid"}
+                  Data={TransactionDetail}
+                />
+              </div>
 
-              <TableComponents style={{ boxShadow: "0px" }}
-                // tableTopLeft={""}
-                // tableTopRight={this.renderTableActionButton}
-                elevation={"0"}
-                tableOptions={{
-                  dense: false,
-                  tableOrderBy: 'asc',
-                  sortingIndex: "fat",
-                  stickyTableHeader: false,
-                  stickyTableHeight: 100,
-                }}
-                tableHeaders={headCells}
-                tableRows={{
-                  renderTableRows: this.renderTableRows,
-                  checkbox: false,
-                  checkboxColor: "primary",
-                  onRowClickSelect: false
-                }}
-                selectedIndexKey={"pid"}
-                Data={this.state.TransactionDetail}
-              />
               <div className="row">
-                <div style={tncDiv} className="col-7">
+                <div style={tncDiv} className="col-7 mt-4">
                   <div style={tncTitle}>Terms and Conditions</div>
                   <br />
                   <div>
@@ -454,32 +474,116 @@ class InvoicerDetail extends Component {
                   </div>
                 </div>
                 <div style={tncDiv} className="col-4">
-                  <div>
-                    <p>
-                      Sub Total : {this.state.OrderTotalAmount}
-                      <br />
-                      Total     : {(parseFloat(this.state.OrderTotalAmount) + parseFloat(this.state.DeliveryFee))}
-                    </p>
-                  </div>
+                  Total item :
+                  <span style={{ float: 'right' }}>{Transaction.length}</span>
+                  <br />
+                  Sub Total (RM) :
+                  <span style={{ float: 'right' }}>{OrderTotalAmount}</span>
+                  <br />
+                  Total (RM) :
+                  <span style={{ float: 'right' }}>{(parseFloat(OrderTotalAmount) + parseFloat(DeliveryFee))}</span>
                 </div>
               </div>
-              <div className="row">
-                <div style={tncDiv} className="col-7">
-                  __________________________________
-                  <p>EZ TRANSIT AND LOGISTICS SDN BHD</p>
-                </div>
+              <div className="row mt-5 text-center">
                 <div style={tncDiv} className="col-4">
                   __________________________________
-                  <p>Name  : </p>
-                  <p>IC NO : </p>
-                  <p>DATE  : </p>
+                  <div className="text-center">
+                    <div>EZ TRANSIT AND LOGISTICS</div>
+                    <div>SDN BHD</div>
+                  </div>
+                </div>
+                <div style={{textAlign: 'left', ...tncDiv}} className="col-4 offset-4">
+                  __________________________________
+                  <div>Name  : </div>
+                  <div>IC NO : </div>
+                  <div>DATE  : </div>
                 </div>
               </div>
             </div>
+            <Modal
+              open={AddModalOpen}
+              onClose={this.handleClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+              closeAfterTransition
+              BackdropComponent={Backdrop}
+              BackdropProps={{ timeout: 500 }}
+            >
+              <Box sx={style} component="main" maxWidth="xs">
+                <Typography component="h1" variant="h4" style={{ textAlign: "center" }}>Additional Charges</Typography>
+                <Box component="form" noValidate sx={{ mt: 3 }}>
+                  <div className="row">
+                    <h4 style={{ textAlign: "center" }}>
+                      Before Print, please select the delivery method
+                    </h4>
+                    <div className="row" style={{ textAlign: "center", margin: "auto" }}>
+                      <div style={{ display: "inline", width: "100%" }}>
+                        <Grid component="label" container alignItems="center" spacing={1} style={{ width: "100%", display: "inline" }}>
+                          <div>
+                            <Grid item style={{ display: "inline-grid" }}>Self Pick Up</Grid>
+                            <Grid item style={{ display: "inline-grid" }}>
+                              <Switch
+                                checked={TransportationBool}
+                                onChange={(e) => { this.handleChange(e) }}
+                                value="checkedA"
+                              />
+                            </Grid>
+                            <Grid item style={{ display: "inline-grid" }}>Delivery</Grid>
+                          </div>
+                        </Grid>
+                      </div>
+                    </div>
+                    {TransportationBool && (
+                      <div className="row">
+                        <div className="col-5 col-sm-7">
+                          <TextField
+                            variant="standard"
+                            size="small"
+                            fullWidth
+                            id="remark"
+                            label={"Remark "}
+                            name="AdditionalChargedRemark"
+                            value={Remark}
+                            onChange={(e) => { this.handleInputChange(e) }}
+                            error={false}
+                          />
+                          {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
+                        </div>
+                        <div className="col-4 col-sm-3">
+                          <FormControl variant="standard" size="small" fullWidth>
+                            <InputLabel htmlFor="AdditionalChargedAmount"></InputLabel>
+                            <Input
+                              variant="standard"
+                              size="small"
+                              name="AdditionalChargedAmount"
+                              value={DeliveryFee}
+                              id="deliveryfee"
+                              onChange={(e) => { this.handleInputChange(e) }}
+                              startAdornment={<InputAdornment position="start">RM</InputAdornment>}
+                              error={false}
+                            />
+                            {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
+                          </FormControl>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                    onClick={(e1) => this.onClickConfirmInvoice(e1)}
+                  >
+                    {TransportationBool ? "Add Additional Charge" : "Submit"}
+                  </Button>
+                </Box>
+              </Box>
+            </Modal>
             <div>
               <Modal
-                open={this.state.AddModalOpen}
-                onClose={this.handleClose}
+                open={AddModalOpen2}
+                onClose={this.handleClose2}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
                 closeAfterTransition
@@ -487,89 +591,6 @@ class InvoicerDetail extends Component {
                 BackdropProps={{ timeout: 500 }}
               >
                 <Box sx={style} component="main" maxWidth="xs">
-                  <Typography component="h1" variant="h4" style={{ textAlign: "center" }}>Additional Charges</Typography>
-                  <Box component="form" noValidate sx={{ mt: 3 }}>
-                    <div className="row">
-                      <h4 style={{ textAlign: "center" }}>
-                        Before Print, please select the delivery method
-                      </h4>
-                      <div className="row" style={{ textAlign: "center", margin: "auto" }}>
-                        <div style={{ display: "inline", width: "100%" }}>
-                          <Grid component="label" container alignItems="center" spacing={1} style={{ width: "100%", display: "inline" }}>
-                            <div>
-                              <Grid item style={{ display: "inline-grid" }}>Self Pick Up</Grid>
-                              <Grid item style={{ display: "inline-grid" }}>
-                                <Switch
-                                  checked={this.state.TransportationBool}
-                                  onChange={(e) => { this.handleChange(e) }}
-                                  value="checkedA"
-                                />
-                              </Grid>
-                              <Grid item style={{ display: "inline-grid" }}>Delivery</Grid>
-                            </div>
-                          </Grid>
-                        </div>
-                      </div>
-                      {this.state.TransportationBool && (
-                        <div className="row">
-                          <div className="col-5 col-sm-7">
-                            <TextField
-                              variant="standard"
-                              size="small"
-                              fullWidth
-                              id="remark"
-                              label={"Remark "}
-                              name="AdditionalChargedRemark"
-                              value={this.state.Remark}
-                              onChange={(e) => { this.handleInputChange(e) }}
-                              error={false}
-                            />
-                            {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
-                          </div>
-                          <div className="col-4 col-sm-3">
-                            <FormControl variant="standard" size="small" fullWidth>
-                              <InputLabel htmlFor="AdditionalChargedAmount"></InputLabel>
-                              <Input
-                                variant="standard"
-                                size="small"
-                                name="AdditionalChargedAmount"
-                                value={this.state.DeliveryFee}
-                                id="deliveryfee"
-                                onChange={(e) => { this.handleInputChange(e) }}
-                                startAdornment={<InputAdornment position="start">RM</InputAdornment>}
-                                error={false}
-                              />
-                              {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
-
-                            </FormControl>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <Button
-                      type="submit"
-                      fullWidth
-                      variant="contained"
-                      sx={{ mt: 3, mb: 2 }}
-                      onClick={(e1) => this.onClickConfirmInvoice(e1)}
-                    >Add Additional Charge
-                    </Button>
-
-                  </Box>
-                </Box>
-              </Modal>
-
-            </div>
-            <div>
-              <Modal
-                open={this.state.AddModalOpen2}
-                onClose={this.handleClose2}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-                closeAfterTransition
-                BackdropComponent={Backdrop}
-                BackdropProps={{ timeout: 500 }}
-              ><Box sx={style} component="main" maxWidth="xs">
                   <Typography component="h1" variant="h5">Printing Invoice</Typography>
                   <Box component="form" noValidate sx={{ mt: 3 }} style={{ textAlign: "center", margin: "auto" }}>
                     <div className="row" style={{ width: "100%", display: "inline" }}>
