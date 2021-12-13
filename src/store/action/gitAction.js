@@ -266,5 +266,15 @@ export class GitAction {
     };
   }
 
+  ///////////////////////////////////////////////////   Archived Data Management   ///////////////////////////////////////////////////
+  static FetchArchivedStocks = "FETCH-ARCHIVED-STOCK";
+  static ArchivedStocksFetched = "ARCHIVED-STOCK-FETCHED";
+  static CallFetchArchivedStock(propsData) {
+    return {
+      type: GitAction.FetchArchivedStocks,
+      payload: propsData
+    };
+  }
+
 }
 

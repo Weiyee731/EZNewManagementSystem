@@ -65,3 +65,11 @@
 .start-date-picker, .end-date-picker{
     width: 45%;
 }
+
+.table-col-title{
+    font-weight: 600 !important;
+}
+
+.table-col-value, .table-col-title{
+    font-size: 11pt !important;
+}

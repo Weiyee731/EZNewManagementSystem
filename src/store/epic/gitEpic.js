@@ -742,5 +742,37 @@ export class GitEpic {
     });
   ///////////////////////////////////////////////////   Dashboard  ///////////////////////////////////////////////////
 
+
+  ///////////////////////////////////////////////////   Dashboard  ///////////////////////////////////////////////////
+  Inventory_ViewArchiveStockListByDate = action$ =>
+    action$.ofType(GitAction.FetchArchivedStocks).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Inventory_ViewArchiveStockListByDate?" +
+        "&STARTDATE=" + payload.STARTDATE +
+        "&ENDDATE=" + payload.ENDDATE)
+      try {
+        const response = await fetch(url +
+          "Inventory_ViewArchiveStockListByDate?" +
+          "&STARTDATE=" + payload.STARTDATE +
+          "&ENDDATE=" + payload.ENDDATE
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.ArchivedStocksFetched,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_ViewArchiveStockListByDate")
+        return {
+          type: GitAction.ArchivedStocksFetched,
+          payload: [],
+        };
+      }
+    });
+  ///////////////////////////////////////////////////   Dashboard  ///////////////////////////////////////////////////
+
 }
 export let gitEpic = new GitEpic();

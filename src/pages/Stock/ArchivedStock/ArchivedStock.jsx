@@ -42,7 +42,7 @@ import "./ArchivedStock.css";
 
 function mapStateToProps(state) {
     return {
-        stocks: state.counterReducer["stocks"],
+        archivedData: state.counterReducer["archivedData"],
         userAreaCode: state.counterReducer["userAreaCode"],
         stockApproval: state.counterReducer["stockApproval"],
     };
@@ -57,6 +57,7 @@ function mapDispatchToProps(dispatch) {
         CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
         CallResetStocks: () => dispatch(GitAction.CallResetStocks()),
         CallFilterInventoryByDate: (propsData) => dispatch(GitAction.CallFilterInventoryByDate(propsData)),
+        CallFetchArchivedStock: (propsData) => dispatch(GitAction.CallFetchArchivedStock(propsData)),
     };
 }
 
@@ -164,7 +165,6 @@ class ArchivedStock extends Component {
         super(props);
         this.state = INITIAL_STATE
 
-        // this.props.CallFetchAllStock({ USERID: 1 })
         this.props.CallUserAreaCode()
 
         this.changeTab = this.changeTab.bind(this)
@@ -188,15 +188,15 @@ class ArchivedStock extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.state.filteredList === null && isArrayNotEmpty(this.props.stocks)) {
-            const { stocks } = this.props
+        if (this.state.filteredList === null && isArrayNotEmpty(this.props.archivedData)) {
+            const { archivedData } = this.props
             this.setState({
-                filteredList: (!isStringNullOrEmpty(stocks[0].ReturnVal) && stocks[0].ReturnVal == 0) ? [] : stocks,
+                filteredList: (!isStringNullOrEmpty(archivedData[0].ReturnVal) && archivedData[0].ReturnVal == 0) ? [] : archivedData,
                 isDataFetching: false
             })
             toast.dismiss();
 
-            if ((!isStringNullOrEmpty(stocks[0].ReturnVal) && stocks[0].ReturnVal == 0)) {
+            if ((!isStringNullOrEmpty(archivedData[0].ReturnVal) && archivedData[0].ReturnVal == 0)) {
                 toast.warning("Fetched data is empty. ", { autoClose: 3000, theme: "dark" });
 
             }
@@ -204,8 +204,8 @@ class ArchivedStock extends Component {
 
         if (isArrayNotEmpty(this.props.stockApproval)) {
             this.props.CallResetUpdatedStockDetail()
-            this.props.CallResetStocks()
-            this.props.CallFetchAllStock({ USERID: 1 })
+            this.props.ResetStocks()
+            this.props.CallFetchArchivedStock({ STARTDATE: new Date().getFullYear() + '/1/1/', ENDDATE: new Date().getFullYear() + '/12/31/', })
             this.setState({ openAddChrgModal: false, isDataFetching: true, filteredList: null })
         }
     }
@@ -213,19 +213,19 @@ class ArchivedStock extends Component {
     changeTab = (key) => {
         switch (key) {
             case "All":
-                this.setState({ filteredList: this.props.stocks })
+                this.setState({ filteredList: this.props.archivedData })
                 break;
 
             case "Unchecked":
-                this.setState({ filteredList: this.props.stocks.filter(x => x.TrackingStatusID === "1" || x.TrackingStatusID === 1) })
+                this.setState({ filteredList: this.props.archivedData.filter(x => x.TrackingStatusID === "1" || x.TrackingStatusID === 1) })
                 break;
 
             case "Checked":
-                this.setState({ filteredList: this.props.stocks.filter(x => x.TrackingStatusID === "2" || x.TrackingStatusID === 2) })
+                this.setState({ filteredList: this.props.archivedData.filter(x => x.TrackingStatusID === "2" || x.TrackingStatusID === 2) })
                 break;
 
             default:
-                this.setState({ filteredList: this.props.stocks })
+                this.setState({ filteredList: this.props.archivedData })
                 break;
         }
     }
@@ -278,14 +278,13 @@ class ArchivedStock extends Component {
         row.AdditionalCost = isObjectUndefinedOrNull(additionalCharges) ? [] : additionalCharges
         row.AdditionalCost.length > 0 && row.AdditionalCost.map((el, idx) => {
             el.Value = (!isStringNullOrEmpty(el.Value)) && (!isNaN(el.Value) && (Number(el.Value) > 0)) ? el.Value : 0
-            el.validated = !(isStringNullOrEmpty(el.Charges)) && !(isStringNullOrEmpty(el.Value)) && !isNaN(el.Value) && (Number(el.Value) > 0)
         })
         this.setState({ openAddChrgModal: true, selectedRow: row })
     }
 
     onFetchLatestData() {
         this.props.CallResetStocks()
-        this.props.CallFetchAllStock({ USERID: 1 })
+        this.props.CallFetchArchivedStock({ STARTDATE: new Date().getFullYear() + '/1/1/', ENDDATE: new Date().getFullYear() + '/12/31/', })
         toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
         this.setState({ filteredList: null, isDataFetching: true })
     }
@@ -479,19 +478,19 @@ class ArchivedStock extends Component {
         this.setState({ formValue: tempFormValue })
     }
 
-    onCategoryFilter(stocks, searchCategory, searchKeys) {
+    onCategoryFilter(archivedData, searchCategory, searchKeys) {
         switch (searchCategory) {
             case "Tracking":
-                return stocks.filter(x => (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)))
+                return archivedData.filter(x => (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)))
 
             case "Member":
-                return stocks.filter(x => (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)))
+                return archivedData.filter(x => (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)))
 
             case "Container":
-                return stocks.filter(x => (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
+                return archivedData.filter(x => (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
 
             default:
-                return stocks.filter(x =>
+                return archivedData.filter(x =>
                     (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
                     (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) ||
                     (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
@@ -500,19 +499,19 @@ class ArchivedStock extends Component {
         }
     }
 
-    onCategoryAndAreaFilter(stocks, searchCategory, searchArea, searchKeys) {
+    onCategoryAndAreaFilter(archivedData, searchCategory, searchArea, searchKeys) {
         switch (searchCategory) {
             case "Tracking":
-                return stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)))
+                return archivedData.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)))
 
             case "Member":
-                return stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)))
+                return archivedData.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)))
 
             case "Container":
-                return stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
+                return archivedData.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
 
             default:
-                return this.props.stocks.filter(x =>
+                return this.props.archivedData.filter(x =>
                     (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
                     (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) ||
                     (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
@@ -523,7 +522,7 @@ class ArchivedStock extends Component {
 
     onSearch(param) {
         const { filteredList, searchKeywords, searchCategory, searchArea, searchDates, isDataFetching } = this.state
-        const { stocks } = this.props
+        const { archivedData } = this.props
         let searchKeys = ((!isStringNullOrEmpty(param))) ? param : searchKeywords
         searchKeys = (!isStringNullOrEmpty(searchKeys)) ? searchKeys.toUpperCase() : searchKeys
         let date_range = (typeof searchDates === "string" && !Array.isArray(searchDates)) ? JSON.parse(searchDates) : searchDates
@@ -539,22 +538,22 @@ class ArchivedStock extends Component {
             let tempList;
             if (!isStringNullOrEmpty(searchKeys)) {
                 // if search keywords is exists
-                if (isArrayNotEmpty(stocks)) {
+                if (isArrayNotEmpty(archivedData)) {
                     if (searchArea !== "All" && searchCategory === "All") {
                         // if area is not empty
-                        tempList = stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (x.TrackingNumber.includes(searchKeys)))
+                        tempList = archivedData.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (x.TrackingNumber.includes(searchKeys)))
                     }
                     else if (searchArea === "All" && searchCategory !== "All") {
                         // if category is not empty
-                        tempList = this.onCategoryFilter(stocks, searchCategory, searchKeys)
+                        tempList = this.onCategoryFilter(archivedData, searchCategory, searchKeys)
                     }
                     else if (searchArea !== "All" && searchCategory !== "All") {
                         // if area and category is in the list of filtering options
-                        tempList = this.onCategoryAndAreaFilter(stocks, searchCategory, searchArea, searchKeys)
+                        tempList = this.onCategoryAndAreaFilter(archivedData, searchCategory, searchArea, searchKeys)
                     }
                     else {
                         // if want to search with all options
-                        tempList = stocks.filter(x =>
+                        tempList = archivedData.filter(x =>
                             (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
                             (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) ||
                             (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
@@ -567,16 +566,16 @@ class ArchivedStock extends Component {
             else {
                 if (searchCategory === "All" && searchArea !== "All") {
                     // if area is not empty but search string is empty
-                    this.setState({ searchCategory: "All", searchDates: [], filteredList: stocks.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) })
+                    this.setState({ searchCategory: "All", searchDates: [], filteredList: archivedData.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) })
                 }
                 else if (searchCategory !== "All" && searchArea === "All") {
                     // if category is not empty but search string is empty
                     // no point to search with category if there are no searching keywords
-                    this.setState({ searchArea: "All", searchDates: [], filteredList: stocks })
+                    this.setState({ searchArea: "All", searchDates: [], filteredList: archivedData })
                     toast.warning("Please enter searching keywords", { autoClose: 1500, position: "top-center", transition: Flip, theme: "dark" })
                 }
                 else {
-                    this.setState({ searchCategory: "All", searchArea: "All", searchDates: [], filteredList: stocks })
+                    this.setState({ searchCategory: "All", searchArea: "All", searchDates: [], filteredList: archivedData })
                     toast.warning("Please enter searching keywords", { autoClose: 1500, position: "top-center", transition: Flip, theme: "dark" })
                 }
             }
@@ -777,7 +776,7 @@ class ArchivedStock extends Component {
                     handleToggleDialog={this.handleAddChrgModal}  // required, pass the toggle function of modal
                     // handleConfirmFunc={this.handleSubmitUpdate}    // required, pass the confirm function 
                     showAction={false}                           // required, to show the footer of modal display
-                    title={selectedRow.TrackingNumber}                                  // required, title of the modal
+                    title={"Stock Info - " + selectedRow.TrackingNumber}                                  // required, title of the modal
                     buttonTitle={"Update"}                         // required, title of button
                     // singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
                     maxWidth={"md"}
@@ -789,64 +788,69 @@ class ArchivedStock extends Component {
                             <div className="col-12">
                                 <TableContainer component={Paper}>
                                     <Table sx={{ minWidth: "100%" }} aria-label="Item Info" size="small">
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell></TableCell>
-                                                <TableCell align="left">Value</TableCell>
-                                            </TableRow>
-                                        </TableHead>
                                         <TableBody>
                                             <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
-                                                <TableCell component="th" scope="row"> Tracking Number:  </TableCell>
-                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.TrackingNumber) ? selectedRow.TrackingNumber : " - "} </TableCell>
+                                                <TableCell colSpan={4} component="th" scope="row" className="text-center text-uppercase" style={{ color: 'black', backgroundColor: "rgba(33 ,33 ,33, 0.1)" }} > <b>Container Info</b>  </TableCell>
                                             </TableRow>
                                             <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
-                                                <TableCell component="th" scope="row"> Item  </TableCell>
-                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.Item) ? selectedRow.Item : " - "} </TableCell>
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Tracking Number:  </TableCell>
+                                                <TableCell colSpan={1} align="left" className="table-col-value"> {!isStringNullOrEmpty(selectedRow.TrackingNumber) ? selectedRow.TrackingNumber : " - "} </TableCell>
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Tracking Status:  </TableCell>
+                                                <TableCell colSpan={1} align="left" className="table-col-value"> {!isStringNullOrEmpty(selectedRow.TrackingStatus) ? selectedRow.TrackingStatus : "Err"} </TableCell>
                                             </TableRow>
                                             <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
-                                                <TableCell component="th" scope="row"> Container Name  </TableCell>
-                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.ContainerName) ? selectedRow.ContainerName : " - "} </TableCell>
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Container Name  </TableCell>
+                                                <TableCell colSpan={3} align="left" className="table-col-value"> {!isStringNullOrEmpty(selectedRow.ContainerName) ? selectedRow.ContainerName : " - "} </TableCell>
                                             </TableRow>
                                             <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
-                                                <TableCell component="th" scope="row"> Packaging Date  </TableCell>
-                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.StockDate) ? selectedRow.StockDate : " - "} </TableCell>
-                                                <TableCell component="th" scope="row"> Stock Date  </TableCell>
-                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.PackagingDate) ? selectedRow.PackagingDate : " - "} </TableCell>
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Packaging Date  </TableCell>
+                                                <TableCell colSpan={1} align="left" className="table-col-value"> {!isStringNullOrEmpty(selectedRow.StockDate) ? selectedRow.StockDate : " - "} </TableCell>
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Stock Date  </TableCell>
+                                                <TableCell colSpan={1} align="left" className="table-col-value"> {!isStringNullOrEmpty(selectedRow.PackagingDate) ? selectedRow.PackagingDate : " - "} </TableCell>
                                             </TableRow>
                                             <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
-                                                <TableCell colSpan={2} component="th" scope="row" className="text-center" style={{ color: 'black', backgroundColor: "rgba(33 ,33 ,33, 0.1)" }} > <b>Member Info</b>  </TableCell>
+                                                <TableCell colSpan={4} component="th" scope="row" className="text-center text-uppercase" style={{ color: 'black', backgroundColor: "rgba(33 ,33 ,33, 0.1)" }} > <b>Member Info</b>  </TableCell>
                                             </TableRow>
                                             <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
-                                                <TableCell component="th" scope="row"> Member Number  </TableCell>
-                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.UserCode) ? selectedRow.UserCode : " - "} </TableCell>
-                                                <TableCell component="th" scope="row"> Name  </TableCell>
-                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.Username) ? selectedRow.Username : " Nil "} </TableCell>
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Member Number  </TableCell>
+                                                <TableCell colSpan={1} align="left" className="table-col-value"> {!isStringNullOrEmpty(selectedRow.UserCode) ? selectedRow.UserCode : " - "} </TableCell>
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Name  </TableCell>
+                                                <TableCell colSpan={1} align="left" className="table-col-value"> {!isStringNullOrEmpty(selectedRow.Fullname) ? selectedRow.Fullname : " Nil "} </TableCell>
                                             </TableRow>
                                             <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
-                                                <TableCell component="th" scope="row"> Contact   </TableCell>
-                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.UserContactNo) ? selectedRow.UserContactNo : " - "} </TableCell>
-                                                <TableCell component="th" scope="row"> Email Address  </TableCell>
-                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.UserEmailAddress) ? selectedRow.UserEmailAddress : "  -  "} </TableCell>
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Contact   </TableCell>
+                                                <TableCell colSpan={1} align="left" className="table-col-value"> {!isStringNullOrEmpty(selectedRow.UserContactNo) ? selectedRow.UserContactNo : " - "} </TableCell>
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Email Address  </TableCell>
+                                                <TableCell colSpan={1} align="left" className="table-col-value"> {!isStringNullOrEmpty(selectedRow.UserEmailAddress) ? selectedRow.UserEmailAddress : "  -  "} </TableCell>
                                             </TableRow>
                                             <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
-                                                <TableCell component="th" scope="row"> Division  </TableCell>
-                                                <TableCell align="left"> {selectedRow.AreaCode + " - " + selectedRow.AreaName} </TableCell>
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Address  </TableCell>
+                                                <TableCell colSpan={3} align="left" className="table-col-value"> {selectedRow.UserAddress} </TableCell>
                                             </TableRow>
                                             <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
-                                                <TableCell component="th" scope="row"> Dimension (D x W x H) </TableCell>
-                                                <TableCell align="left">
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Division  </TableCell>
+                                                <TableCell colSpan={3} align="left" className="table-col-value"> {selectedRow.AreaCode + " - " + selectedRow.AreaName} </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell colSpan={4} component="th" scope="row" className="text-center text-uppercase" style={{ color: 'black', backgroundColor: "rgba(33 ,33 ,33, 0.1)" }} > <b>Item Info</b>  </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Item  </TableCell>
+                                                <TableCell colSpan={3} align="left" className="table-col-value"> {!isStringNullOrEmpty(selectedRow.Item) ? selectedRow.Item : " - "} </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Dimension (D x W x H) </TableCell>
+                                                <TableCell colSpan={1} align="left" className="table-col-value">
                                                     {selectedRow.ProductDimensionDeep + "cm X " + selectedRow.ProductDimensionWidth + "cm X " + selectedRow.ProductDimensionHeight + "cm"} =
                                                     <b> {(selectedRow.ProductDimensionDeep * selectedRow.ProductDimensionWidth * selectedRow.ProductDimensionHeight / 1000000).toFixed(3)} m <sup>3</sup> </b>
                                                 </TableCell>
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Weight  </TableCell>
+                                                <TableCell colSpan={1} align="left" className="table-col-value"> {selectedRow.ProductWeight} kg </TableCell>
                                             </TableRow>
+
                                             <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
-                                                <TableCell component="th" scope="row"> Division  </TableCell>
-                                                <TableCell align="left"> {selectedRow.AreaCode + " - " + selectedRow.AreaName} </TableCell>
-                                            </TableRow>
-                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
-                                                <TableCell component="th" scope="row"> Additional Charge  </TableCell>
-                                                <TableCell align="left">
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Additional Charge  </TableCell>
+                                                <TableCell colSpan={3} align="left" className="table-col-value">
                                                     {
                                                         isArrayNotEmpty(selectedRow.AdditionalCost) && selectedRow.AdditionalCost.map((el, idx) => {
                                                             return (
@@ -861,15 +865,14 @@ class ArchivedStock extends Component {
                                                 </TableCell>
                                             </TableRow>
                                             <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
-                                                <TableCell component="th" scope="row"> Remarks  </TableCell>
-                                                <TableCell align="left"> {selectedRow.Remark} </TableCell>
+                                                <TableCell colSpan={1} component="th" scope="row" className="table-col-title"> Remarks  </TableCell>
+                                                <TableCell colSpan={3} align="left"> {selectedRow.Remark} </TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
                             </div>
                         </div>
-
                     </div>
                 </AlertDialog>
             </div>
