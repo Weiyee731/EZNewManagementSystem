@@ -212,8 +212,6 @@ class EditStockGoods extends Component {
         const formValue = this.state.formData ? this.state.formData : [];
         const ContainerDate = this.props.ContainerDate ? this.props.ContainerDate : [];
         const ContainerName = this.props.ContainerName ? this.props.ContainerName : [];
-        console.log(ContainerDate);
-        console.log(ContainerName)
         return (
             <div>
                 <div className="py-md-3 py-1">
