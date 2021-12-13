@@ -282,7 +282,6 @@ export default function TableComponents(props) {
     }
 
     const handleRowClick = (event, row) => {
-        console.log("testing...")
         if (!onRowSelect) {
             if (typeof props.onTableRowClick !== "undefined")
                 props.onTableRowClick(event, row)
