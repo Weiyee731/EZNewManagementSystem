@@ -30,6 +30,14 @@ import CsvDownloader from 'react-csv-downloader';
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import Tooltip from '@mui/material/Tooltip';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
+
 import "./ArchivedStock.css";
 
 function mapStateToProps(state) {
@@ -142,39 +150,7 @@ const headCells = [
 const INITIAL_STATE = {
     filteredList: null,
     openAddChrgModal: false,
-
-    formValue: {
-        StockID: "",
-        Item: "",
-        TrackingStatusID: "",
-        ContainerName: "",
-        StockDate: "",
-
-        TrackingNumber: "",
-        TrackingNumberVerified: null,
-
-        MemberNumber: "",
-        MemberNumberVerified: null,
-
-        Division: "1",
-
-        Depth: "",
-        DepthVerified: null,
-
-        Width: "",
-        WidthVerified: null,
-
-        Height: "",
-        HeightVerified: null,
-
-        Weight: "",
-        WeightVerified: null,
-
-        AdditionalCost: [],
-
-        Remark: "",
-
-    },
+    selectedRow: [],
 
     searchKeywords: "",
     searchCategory: "All",
@@ -296,36 +272,15 @@ class ArchivedStock extends Component {
     }
 
     onTableRowClick = (event, row) => {
-        let tempFormValue = this.state.formValue
-        tempFormValue.StockID = row.StockID
-        tempFormValue.Item = row.Item
-        tempFormValue.TrackingStatusID = row.TrackingStatusID
-        tempFormValue.ContainerName = row.ContainerName;
-        tempFormValue.StockDate = row.StockDate;
-
-        tempFormValue.TrackingNumber = row.TrackingNumber;
-        tempFormValue.TrackingNumberVerified = !isStringNullOrEmpty(row.TrackingNumber);
-        tempFormValue.MemberNumber = row.UserCode;
-        tempFormValue.MemberNumberVerified = !isStringNullOrEmpty(row.UserCode);
-        tempFormValue.Depth = row.ProductDimensionDeep;
-        tempFormValue.DepthVerified = !isStringNullOrEmpty(row.ProductDimensionDeep) && !isNaN(row.ProductDimensionDeep)
-        tempFormValue.Width = row.ProductDimensionWidth;
-        tempFormValue.WidthVerified = !isStringNullOrEmpty(row.ProductDimensionWidth) && !isNaN(row.ProductDimensionDeep)
-        tempFormValue.Height = row.ProductDimensionHeight;
-        tempFormValue.HeightVerified = !isStringNullOrEmpty(row.ProductDimensionHeight) && !isNaN(row.ProductDimensionHeight)
-        tempFormValue.Weight = row.ProductWeight;
-        tempFormValue.WeightVerified = !isStringNullOrEmpty(row.ProductWeight) && !isNaN(row.ProductWeight)
-        tempFormValue.Division = Number(row.UserAreaID)
-        tempFormValue.Remark = !isStringNullOrEmpty(row.Remark) ? row.Remark : ""
-
+        console.log(row)
         let additionalCharges = row.AdditionalCharges
         try { additionalCharges = JSON.parse(additionalCharges) } catch (e) { console.log(e); additionalCharges = [] }
-        tempFormValue.AdditionalCost = isObjectUndefinedOrNull(additionalCharges) ? [] : additionalCharges
-        tempFormValue.AdditionalCost.length > 0 && tempFormValue.AdditionalCost.map((el, idx) => {
+        row.AdditionalCost = isObjectUndefinedOrNull(additionalCharges) ? [] : additionalCharges
+        row.AdditionalCost.length > 0 && row.AdditionalCost.map((el, idx) => {
             el.Value = (!isStringNullOrEmpty(el.Value)) && (!isNaN(el.Value) && (Number(el.Value) > 0)) ? el.Value : 0
             el.validated = !(isStringNullOrEmpty(el.Charges)) && !(isStringNullOrEmpty(el.Value)) && !isNaN(el.Value) && (Number(el.Value) > 0)
         })
-        this.setState({ openAddChrgModal: true, formValue: tempFormValue, })
+        this.setState({ openAddChrgModal: true, selectedRow: row })
     }
 
     onFetchLatestData() {
@@ -675,7 +630,7 @@ class ArchivedStock extends Component {
             { children: "Checked", key: "Checked" },
         ]
 
-        const { filteredList, formValue, searchCategory, searchArea } = this.state
+        const { filteredList, selectedRow, searchCategory, searchArea } = this.state
         const renderTableTopRightButtons = () => {
             return (
                 <div className="d-flex">
@@ -820,196 +775,101 @@ class ArchivedStock extends Component {
                 <AlertDialog
                     open={this.state.openAddChrgModal}              // required, pass the boolean whether modal is open or close
                     handleToggleDialog={this.handleAddChrgModal}  // required, pass the toggle function of modal
-                    handleConfirmFunc={this.handleSubmitUpdate}    // required, pass the confirm function 
-                    showAction={true}                           // required, to show the footer of modal display
-                    title={this.state.formValue.Item}                                  // required, title of the modal
+                    // handleConfirmFunc={this.handleSubmitUpdate}    // required, pass the confirm function 
+                    showAction={false}                           // required, to show the footer of modal display
+                    title={selectedRow.TrackingNumber}                                  // required, title of the modal
                     buttonTitle={"Update"}                         // required, title of button
-                    singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
+                    // singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
                     maxWidth={"md"}
                     draggable={true}
 
                 >
                     <div className="py-md-3 py-1">
                         <div className="row">
-                            <div className="col-12" style={{ fontSize: '9pt' }}>
-                                <div className="clearfix">
-                                    <div className="float-start"> <b>Container: </b>{!isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : " N/A "}  </div>
-                                    <div className="float-end"> <b>Container Date: </b> {!isStringNullOrEmpty(formValue.StockDate) ? formValue.StockDate : " N/A "}  </div>
-                                </div>
-                                <hr />
-                            </div>
-                            <div className="col-12 col-md-4">
-                                <TextField variant="standard" size="small" fullWidth label="Tracking Number" name="TrackingNumber" value={formValue.TrackingNumber} onChange={this.handleFormInput} error={!formValue.TrackingNumberVerified} />
-                                {!formValue.TrackingNumberVerified && <FormHelperText sx={{ color: 'red' }} id="TrackingNumber-error-text">Invalid</FormHelperText>}
-                            </div>
-                            <div className="col-12 col-md-4">
-                                <TextField variant="standard" size="small" fullWidth label="Member Number" name="MemberNumber" value={formValue.MemberNumber} onChange={this.handleFormInput} error={!formValue.MemberNumberVerified} />
-                                {!formValue.MemberNumberVerified && <FormHelperText sx={{ color: 'red' }} id="MemberNumber-error-text">Invalid</FormHelperText>}
-                            </div>
-                            <div className="col-12 col-md-4">
-                                <FormControl variant="standard" size="small" fullWidth>
-                                    <InputLabel id="Division-label">Division</InputLabel>
-                                    <Select
-                                        labelId="Division"
-                                        id="Division"
-                                        name="Division"
-                                        value={formValue.Division}
-                                        onChange={this.handleFormInput}
-                                        label="Division"
-                                        error={(formValue.Division === 0)}
-                                    >
-                                        {
-                                            isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
-                                                return <MenuItem key={el.AreaName + '_' + idx} value={el.UserAreaID} >{el.AreaName + " - " + el.AreaCode}</MenuItem>
-                                            })
-                                        }
-                                    </Select>
-                                    {(formValue.Division === 0) && <FormHelperText sx={{ color: 'red' }} id="MemberNumber-error-text">Invalid</FormHelperText>}
-                                </FormControl>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-4 col-sm-2">
-                                <FormControl variant="standard" size="small" fullWidth>
-                                    <InputLabel htmlFor="Depth">Depth</InputLabel>
-                                    <Input
-                                        variant="standard"
-                                        size="small"
-                                        name="Depth"
-                                        value={formValue.Depth}
-                                        onChange={this.handleFormInput}
-                                        endAdornment={<InputAdornment position="start">cm</InputAdornment>}
-                                        error={!formValue.DepthVerified}
-                                    />
-                                    {!formValue.DepthVerified && <FormHelperText sx={{ color: 'red' }} id="Depth-error-text">Invalid</FormHelperText>}
-                                </FormControl>
-                            </div>
-                            <div className="col-4 col-sm-2">
-                                <FormControl variant="standard" size="small" fullWidth>
-                                    <InputLabel htmlFor="Width">Width</InputLabel>
-                                    <Input
-                                        variant="standard"
-                                        size="small"
-                                        name="Width"
-                                        value={formValue.Width}
-                                        onChange={this.handleFormInput}
-                                        endAdornment={<InputAdornment position="start">cm</InputAdornment>}
-                                        error={!formValue.WidthVerified}
-                                    />
-                                    {!formValue.WidthVerified && <FormHelperText sx={{ color: 'red' }} id="Width-error-text">Invalid</FormHelperText>}
-                                </FormControl>
-                            </div>
-                            <div className="col-4 col-sm-2">
-                                <FormControl variant="standard" size="small" fullWidth>
-                                    <InputLabel htmlFor="Height">Height</InputLabel>
-                                    <Input
-                                        variant="standard"
-                                        size="small"
-                                        name="Height"
-                                        value={formValue.Height}
-                                        onChange={this.handleFormInput}
-                                        endAdornment={<InputAdornment position="start">cm</InputAdornment>}
-                                        error={!formValue.HeightVerified}
-                                    />
-                                    {!formValue.HeightVerified && <FormHelperText sx={{ color: 'red' }} id="Height-error-text">Invalid</FormHelperText>}
-                                </FormControl>
-                            </div>
-                            <div className="col-4 col-sm-2">
-                                <FormControl variant="standard" size="small" fullWidth>
-                                    <InputLabel htmlFor="Height">Dimension</InputLabel>
-                                    <Input
-                                        variant="standard"
-                                        size="small"
-                                        name="Dimension"
-                                        value={(formValue.Width * formValue.Height * formValue.Depth / 1000000).toFixed(3)}
-                                        endAdornment={<InputAdornment position="start">m <sup>3</sup></InputAdornment>}
-                                        disabled
-                                    />
-                                </FormControl>
-                            </div>
-                            <div className="col-12 col-sm-4">
-                                <FormControl variant="standard" size="small" fullWidth>
-                                    <InputLabel htmlFor="Weight">Weight</InputLabel>
-                                    <Input
-                                        variant="standard"
-                                        size="small"
-                                        name="Weight"
-                                        value={formValue.Weight}
-                                        onChange={this.handleFormInput}
-                                        endAdornment={<InputAdornment position="start">KG</InputAdornment>}
-                                        error={!formValue.WeightVerified}
-                                    />
-                                    {!formValue.WeightVerified && <FormHelperText sx={{ color: 'red' }} id="Weight-error-text">Invalid</FormHelperText>}
-                                </FormControl>
-                            </div>
-                        </div>
-                        <div className="my-1 row">
                             <div className="col-12">
-                                <Button className="my-1 w-100" color="success" variant="contained" size="small" onClick={() => { this.RenderAdditionalCost() }}>Add Additional Costs</Button>
+                                <TableContainer component={Paper}>
+                                    <Table sx={{ minWidth: "100%" }} aria-label="Item Info" size="small">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell></TableCell>
+                                                <TableCell align="left">Value</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell component="th" scope="row"> Tracking Number:  </TableCell>
+                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.TrackingNumber) ? selectedRow.TrackingNumber : " - "} </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell component="th" scope="row"> Item  </TableCell>
+                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.Item) ? selectedRow.Item : " - "} </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell component="th" scope="row"> Container Name  </TableCell>
+                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.ContainerName) ? selectedRow.ContainerName : " - "} </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell component="th" scope="row"> Packaging Date  </TableCell>
+                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.StockDate) ? selectedRow.StockDate : " - "} </TableCell>
+                                                <TableCell component="th" scope="row"> Stock Date  </TableCell>
+                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.PackagingDate) ? selectedRow.PackagingDate : " - "} </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell colSpan={2} component="th" scope="row" className="text-center" style={{ color: 'black', backgroundColor: "rgba(33 ,33 ,33, 0.1)" }} > <b>Member Info</b>  </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell component="th" scope="row"> Member Number  </TableCell>
+                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.UserCode) ? selectedRow.UserCode : " - "} </TableCell>
+                                                <TableCell component="th" scope="row"> Name  </TableCell>
+                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.Username) ? selectedRow.Username : " Nil "} </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell component="th" scope="row"> Contact   </TableCell>
+                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.UserContactNo) ? selectedRow.UserContactNo : " - "} </TableCell>
+                                                <TableCell component="th" scope="row"> Email Address  </TableCell>
+                                                <TableCell align="left"> {!isStringNullOrEmpty(selectedRow.UserEmailAddress) ? selectedRow.UserEmailAddress : "  -  "} </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell component="th" scope="row"> Division  </TableCell>
+                                                <TableCell align="left"> {selectedRow.AreaCode + " - " + selectedRow.AreaName} </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell component="th" scope="row"> Dimension (D x W x H) </TableCell>
+                                                <TableCell align="left">
+                                                    {selectedRow.ProductDimensionDeep + "cm X " + selectedRow.ProductDimensionWidth + "cm X " + selectedRow.ProductDimensionHeight + "cm"} =
+                                                    <b> {(selectedRow.ProductDimensionDeep * selectedRow.ProductDimensionWidth * selectedRow.ProductDimensionHeight / 1000000).toFixed(3)} m <sup>3</sup> </b>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell component="th" scope="row"> Division  </TableCell>
+                                                <TableCell align="left"> {selectedRow.AreaCode + " - " + selectedRow.AreaName} </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell component="th" scope="row"> Additional Charge  </TableCell>
+                                                <TableCell align="left">
+                                                    {
+                                                        isArrayNotEmpty(selectedRow.AdditionalCost) && selectedRow.AdditionalCost.map((el, idx) => {
+                                                            return (
+                                                                <div key={idx} className="row">
+                                                                    <div className="col-1 col-sm-1"><b>{idx + 1}  </b></div>
+                                                                    <div className="col-6 col-sm-6">{el.Charges} : </div>
+                                                                    <div className="col-5 col-sm-5">RM {el.Value}</div>
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
+                                                <TableCell component="th" scope="row"> Remarks  </TableCell>
+                                                <TableCell align="left"> {selectedRow.Remark} </TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
                             </div>
                         </div>
-                        {
-                            isArrayNotEmpty(formValue.AdditionalCost) && formValue.AdditionalCost.map((el, idx) => {
-                                return (
-                                    <div key={idx} className="row">
-                                        <div className="col-6 col-sm-8">
-                                            <TextField
-                                                variant="standard"
-                                                size="small"
-                                                fullWidth
-                                                label={"Add. Chg. " + (idx + 1)}
-                                                name="AdditionalChargedRemark"
-                                                value={el.Charges}
-                                                onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
-                                                error={!el.validated}
-                                            />
-                                            {!el.validated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
-                                        </div>
-                                        <div className="col-4 col-sm-3">
-                                            <FormControl variant="standard" size="small" fullWidth>
-                                                <InputLabel htmlFor="AdditionalChargedAmount"></InputLabel>
-                                                <Input
-                                                    variant="standard"
-                                                    size="small"
-                                                    name="AdditionalChargedAmount"
-                                                    value={el.Value}
-                                                    onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
-                                                    startAdornment={<InputAdornment position="start">RM</InputAdornment>}
-                                                    error={!el.validated}
-                                                />
-                                                {!el.validated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
-                                            </FormControl>
-                                        </div>
-                                        <div className="col-2 col-sm-1 d-flex">
-                                            <IconButton className='m-auto' color="primary" size="small" aria-label="remove-additional-cost" component="span" onClick={() => this.handleRemoveAdditionalCosts(idx)} disabled={this.state.isDataFetching}>
-                                                <DeleteIcon size="inherit" />
-                                            </IconButton>
-                                        </div>
-                                    </div>
-                                )
-                            })
-                        }
-                        {
-                            isArrayNotEmpty(formValue.AdditionalCost) &&
-                            <div className="mt-3 col-12">
-                                <Button className="my-1 w-100" color="error" variant="contained" size="small" onClick={() => { this.removeAllAdditionalCost() }} startIcon={<DeleteIcon />}>Clear Additional Costs</Button>
-                            </div>
-                        }
-                        <div className="row mt-2">
-                            <div className="col-12">
-                                <Box sx={{ width: '100%' }}>
-                                    <TextField
-                                        variant="outlined"
-                                        size="large"
-                                        name="Remark"
-                                        label="Remark"
-                                        value={formValue.Remark}
-                                        onChange={this.handleFormInput}
-                                        fullWidth
-                                    />
-                                </Box>
-                            </div>
-                        </div>
+
                     </div>
                 </AlertDialog>
             </div>
