@@ -17,6 +17,7 @@ import UserDetail from "../../../pages/UserManagement/UserDetail"
 import AddUser from "../../../pages/UserManagement/AddUser";
 import EditStockGoods from "../../../pages/Stock/StockGoods/EditStockGoods";
 import ProformaList from "../../../pages/Reporting/Invoice/ProformaList";
+import ArchivedStock from "../../../pages/Stock/ArchivedStock/ArchivedStock";
 
 const routes = [
     {
@@ -118,6 +119,11 @@ const routes = [
         path: "/ProformaList",
         exact: true,
         element: <ProformaList />,
+    },
+    {
+        path: "/ArchivedStock",
+        exact: true,
+        element: <ArchivedStock />,
     },
 ]
 
