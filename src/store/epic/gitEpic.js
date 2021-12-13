@@ -392,7 +392,7 @@ export class GitEpic {
 
   Inventory_UpdateStockDetailByPost = action$ =>
     action$.ofType(GitAction.UpdateStockDetailByPost).switchMap(async ({ payload }) => {
-
+      console.log(payload)
       return fetch(
         postUrl + "Inventory_UpdateStockDetailByPost"
         , {
@@ -402,21 +402,21 @@ export class GitEpic {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            STOCKID: payload.STOCKID,
-            USERCODE: payload.USERCODE,
-            TRACKINGNUMBER: payload.TRACKINGNUMBER,
-            PRODUCTWEIGHT: payload.PRODUCTWEIGHT,
-            PRODUCTHEIGHT: payload.PRODUCTHEIGHT,
-            PRODUCTWIDTH: payload.PRODUCTWIDTH,
-            PRODUCTDEEP: payload.PRODUCTDEEP,
-            AREACODE: payload.AREACODE,
-            ITEM: payload.ITEM,
+            STOCKID: payload.StockID,
+            USERCODE: payload.UserCode,
+            TRACKINGNUMBER: payload.TrackingNumber,
+            PRODUCTWEIGHT: payload.ProductWeight,
+            PRODUCTHEIGHT: payload.ProductDimensionHeight,
+            PRODUCTWIDTH: payload.ProductDimensionWidth,
+            PRODUCTDEEP: payload.ProductDimensionDeep,
+            AREACODE: payload.AreaCode,
+            ITEM: payload.Item,
             TRACKINGSTATUSID: payload.TRACKINGSTATUSID,
-            CONTAINERNAME: payload.CONTAINERNAME,
+            CONTAINERNAME: payload.ContainerName,
 
-            CONTAINERDATE: payload.CONTAINERDATE,
-            REMARK: payload.REMARK,
-            EXTRACHARGE: payload.EXTRACHARGE
+            CONTAINERDATE: payload.ContainerDate,
+            REMARK: payload.Remark,
+            EXTRACHARGE: payload.AdditionalCharges
           })
         }
       )
