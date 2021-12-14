@@ -30,14 +30,15 @@ import SearchBar from "../../../components/SearchBar/SearchBar"
 
 function mapStateToProps(state) {
     return {
-        transactions: state.counterReducer["transactions"],
+        archivedData: state.counterReducer["archivedData"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         CallFetchAllTransaction: (data) => dispatch(GitAction.CallFetchAllTransaction(data)),
-        CallUpdateTransactionPayment: (data) => dispatch(GitAction.CallUpdateTransactionPayment(data)),
+        CallFetchArchivedTransactions: (data) => dispatch(GitAction.CallFetchArchivedTransactions(data)),
+        CallResetArchivedData: () => dispatch(GitAction.CallResetArchivedData()),
     };
 }
 
@@ -52,7 +53,7 @@ const style = {
     border: '0px solid #000',
     boxShadow: 24,
     p: 4,
-  };
+};
 
 const headCells = [
     {
@@ -103,12 +104,7 @@ const headCells = [
         disablePadding: false,
         label: 'Status',
     },
-    {
-        id: 'action',
-        align: 'center',
-        disablePadding: false,
-        label: '',
-    },
+
 ];
 class ArchivedTransaction extends Component {
     constructor(props) {
@@ -120,7 +116,7 @@ class ArchivedTransaction extends Component {
             TrackingStatusID: 4,
             filteredList: [],
             selectedRow: [],
-            TransactionID:0,
+            TransactionID: 0,
             searchCategory: "Cash",
             Payment: "",
             Datetime: "",
@@ -130,28 +126,28 @@ class ArchivedTransaction extends Component {
         this.handleInputChange = this.handleInputChange.bind(this)
         this.handleSearchCategory = this.handleSearchCategory.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
-        this.props.CallFetchAllTransaction(this.state);
+
+        this.props.CallFetchArchivedTransactions({ STARTDATE: new Date().getFullYear() + '/1/1', ENDDATE: new Date().getFullYear() + '/12/31', })
     }
 
-
-
     componentDidMount() {
-        if (this.props.transactions.length !== this.state.TransactionListing.length) {
-            if (this.props.transactions !== undefined && this.props.transactions[0] !== undefined) {
-                this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
+        if (this.props.archivedData.length !== this.state.TransactionListing.length) {
+            if (this.props.archivedData !== undefined && this.props.archivedData[0] !== undefined) {
+                this.setState({ TransactionListing: this.props.archivedData, TransactionListingFiltered: this.props.archivedData });
             }
         }
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps.transactions.length !== this.props.transactions.length) {
-            console.log(this.props.transactions !== undefined && this.props.transactions[0] !== undefined)
-            if (this.props.transactions !== undefined && this.props.transactions[0] !== undefined) {
-                this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
+        console.log(this.props.archivedData)
+        if (prevProps.archivedData.length !== this.props.archivedData.length) {
+            console.log(this.props.archivedData !== undefined && this.props.archivedData[0] !== undefined)
+            if (this.props.archivedData !== undefined && this.props.archivedData[0] !== undefined) {
+                this.setState({ TransactionListing: this.props.archivedData, TransactionListingFiltered: this.props.archivedData });
             }
         } else {
-            if (prevProps.transactions.length !== this.state.TransactionListing.length) {
-                this.setState({ TransactionListing: prevProps.transactions, TransactionListingFiltered: prevProps.transactions });
+            if (prevProps.archivedData.length !== this.state.TransactionListing.length) {
+                this.setState({ TransactionListing: prevProps.archivedData, TransactionListingFiltered: prevProps.archivedData });
             }
         }
     }
@@ -167,9 +163,6 @@ class ArchivedTransaction extends Component {
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderTotalAmount}</Box></TableCell>
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
-                {
-                    data.OrderStatus === "Unpaid" ? <TableCell onClick={(event) => this.onAddButtonClick(event, data)} align="center"><CheckCircleIcon color="grey" sx={{ fontSize: 30 }}></CheckCircleIcon></TableCell> : ""
-                }
             </>
         )
     }
@@ -290,13 +283,12 @@ class ArchivedTransaction extends Component {
                         // table settings 
                         tableTopLeft={<h3 style={{ fontWeight: 700 }}>Transaction History</h3>}  // optional, it can pass as string or as children elements
                         // tableTopRight={this.renderTableActionButton}                 // optional, it will brings the elements to the table's top right corner
-
                         tableOptions={{
                             dense: false,                // optional, default is false
                             tableOrderBy: 'asc',        // optional, default is asc
                             sortingIndex: "fat",        // require, it must the same as the desired table header
                             stickyTableHeader: true,    // optional, default is true
-                            stickyTableHeight: 300,     // optional, default is 300px
+                            stickyTableHeight: getWindowDimensions().screenHeight * 0.8,     // optional, default is 300px
                         }}
                         paginationOptions={[20, 50, 100, { label: 'All', value: -1 }]} // optional, by default it will hide the table pagination. You should set settings for pagination options as in array, eg.: [5, 100, 250, { label: 'All', value: -1 }]
                         tableHeaders={headCells}        //required

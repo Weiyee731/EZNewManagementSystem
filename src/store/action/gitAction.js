@@ -274,6 +274,23 @@ export class GitAction {
       payload: propsData
     };
   }
+  
+  static FetchArchivedTransaction = "FETCH-ARCHIVED-TRANSACTIONS";
+  static ArchivedTransactionFetched = "ARCHIVED-TRANSACTIONS-FETCHED";
+  static CallFetchArchivedTransactions(propsData) {
+    return {
+      type: GitAction.FetchArchivedTransaction,
+      payload: propsData
+    };
+  }
+
+  static ResetArchivedData = "RESET-ARCHIVED_DATA";
+  static CallResetArchivedData() {
+    return {
+      type: GitAction.ResetArchivedData,
+    };
+  }
+
 
 }
 

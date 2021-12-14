@@ -52,7 +52,7 @@ function mapDispatchToProps(dispatch) {
     return {
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
         CallFilterInventory: (propsData) => dispatch(GitAction.CallFilterInventory(propsData)),
-        CallResetStocks: () => dispatch(GitAction.CallResetStocks()),
+        CallResetArchivedData: () => dispatch(GitAction.CallResetArchivedData()),
         CallFetchArchivedStock: (propsData) => dispatch(GitAction.CallFetchArchivedStock(propsData)),
     };
 }
@@ -268,7 +268,7 @@ class ArchivedStock extends Component {
     }
 
     onFetchLatestData() {
-        this.props.CallResetStocks()
+        this.props.CallResetArchivedData()
         this.props.CallFetchArchivedStock({ STARTDATE: new Date().getFullYear() + '/1/1', ENDDATE: new Date().getFullYear() + '/12/31', })
         toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
         this.setState({ filteredList: null, isDataFetching: true })
@@ -352,7 +352,7 @@ class ArchivedStock extends Component {
 
         // CallFilterInventory
         if (areaSearchKeys === "All" && searchCategory === "All" && isStringNullOrEmpty(searchKeys)) {
-            this.props.CallResetStocks()
+            this.props.CallResetArchivedData()
             this.props.CallFetchArchivedStock({ STARTDATE: new Date().getFullYear() + '/1/1', ENDDATE: new Date().getFullYear() + '/12/31', })
             toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
             this.setState({ isDataFetching: true, filteredList: null })
@@ -415,7 +415,7 @@ class ArchivedStock extends Component {
         let date_range = (typeof searchDates === "string" && !Array.isArray(searchDates)) ? JSON.parse(searchDates) : searchDates
         // 
         if (!date_range.includes(null)) {
-            this.props.CallResetStocks()
+            this.props.CallResetArchivedData()
             const object = { STARTDATE: convertDateTimeToString112Format(date_range[0], false), ENDDATE: convertDateTimeToString112Format(date_range[1], false) }
             this.props.CallFetchArchivedStock(object)
             toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })

@@ -27,6 +27,7 @@ const rootEpic = combineEpics(
   gitEpic.Dashboard_View,
   gitEpic.Inventory_ViewStockListByDate,
   gitEpic.Inventory_ViewArchiveStockListByDate,
+  gitEpic.Transaction_ViewArchiveTransaction,
 );
 
 const rootReducer = combineReducers({ counterReducer });

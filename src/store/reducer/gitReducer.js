@@ -229,6 +229,20 @@ export function counterReducer(state = INITIAL_STATE, action) {
         archivedData: action.payload
       });
 
+    case GitAction.FetchArchivedTransaction:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.ArchivedTransactionFetched:
+      return Object.assign({}, state, {
+        loading: false,
+        archivedData: action.payload
+      });
+
+    case GitAction.ResetArchivedData:
+      return Object.assign({}, state, {
+        loading: false,
+        archivedData: []
+      });
+
     /////////////////////////////////////////////////// Default ///////////////////////////////////////////////////
     default:
       return state;
