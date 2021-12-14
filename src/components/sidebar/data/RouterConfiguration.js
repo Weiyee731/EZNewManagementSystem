@@ -17,7 +17,8 @@ import UserDetail from "../../../pages/UserManagement/UserDetail"
 import AddUser from "../../../pages/UserManagement/AddUser";
 import EditStockGoods from "../../../pages/Stock/StockGoods/EditStockGoods";
 import ProformaList from "../../../pages/Reporting/Invoice/ProformaList";
-import ArchivedStock from "../../../pages/Stock/ArchivedStock/ArchivedStock";
+import ArchivedStock from "../../../pages/ArchivedData/ArchivedStock/ArchivedStock.jsx";
+import ArchivedTransaction from "../../../pages/ArchivedData/ArchivedTransaction/ArchivedTransaction.js";
 
 const routes = [
     {
@@ -124,6 +125,11 @@ const routes = [
         path: "/ArchivedStock",
         exact: true,
         element: <ArchivedStock />,
+    },
+    {
+        path: "/ArchivedTransaction",
+        exact: true,
+        element: <ArchivedTransaction />,
     },
 ]
 
