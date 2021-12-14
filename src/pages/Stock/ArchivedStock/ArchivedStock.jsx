@@ -50,13 +50,9 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        CallFetchAllStock: (propsData) => dispatch(GitAction.CallFetchAllStock(propsData)),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
         CallFilterInventory: (propsData) => dispatch(GitAction.CallFilterInventory(propsData)),
-        CallUpdateStockDetailByGet: (propsData) => dispatch(GitAction.CallUpdateStockDetailByGet(propsData)),
-        CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
         CallResetStocks: () => dispatch(GitAction.CallResetStocks()),
-        CallFilterInventoryByDate: (propsData) => dispatch(GitAction.CallFilterInventoryByDate(propsData)),
         CallFetchArchivedStock: (propsData) => dispatch(GitAction.CallFetchArchivedStock(propsData)),
     };
 }
@@ -169,12 +165,7 @@ class ArchivedStock extends Component {
 
         this.changeTab = this.changeTab.bind(this)
         this.handleAddChrgModal = this.handleAddChrgModal.bind(this)
-        this.handleSubmitUpdate = this.handleSubmitUpdate.bind(this)
-        this.handleFormInput = this.handleFormInput.bind(this)
-        this.handleAdditionalCostInputs = this.handleAdditionalCostInputs.bind(this)
         this.RenderAdditionalCost = this.RenderAdditionalCost.bind(this)
-        this.handleRemoveAdditionalCosts = this.handleRemoveAdditionalCosts.bind(this)
-        this.removeAllAdditionalCost = this.removeAllAdditionalCost.bind(this)
         this.onSearch = this.onSearch.bind(this)
         this.handleSearchInput = this.handleSearchInput.bind(this)
         this.handleSearchCategory = this.handleSearchCategory.bind(this)
@@ -188,6 +179,7 @@ class ArchivedStock extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
+        console.log(this.props.archivedData)
         if (this.state.filteredList === null && isArrayNotEmpty(this.props.archivedData)) {
             const { archivedData } = this.props
             this.setState({
@@ -200,13 +192,6 @@ class ArchivedStock extends Component {
                 toast.warning("Fetched data is empty. ", { autoClose: 3000, theme: "dark" });
 
             }
-        }
-
-        if (isArrayNotEmpty(this.props.stockApproval)) {
-            this.props.CallResetUpdatedStockDetail()
-            this.props.ResetStocks()
-            this.props.CallFetchArchivedStock({ STARTDATE: new Date().getFullYear() + '/1/1/', ENDDATE: new Date().getFullYear() + '/12/31/', })
-            this.setState({ openAddChrgModal: false, isDataFetching: true, filteredList: null })
         }
     }
 
@@ -284,7 +269,7 @@ class ArchivedStock extends Component {
 
     onFetchLatestData() {
         this.props.CallResetStocks()
-        this.props.CallFetchArchivedStock({ STARTDATE: new Date().getFullYear() + '/1/1/', ENDDATE: new Date().getFullYear() + '/12/31/', })
+        this.props.CallFetchArchivedStock({ STARTDATE: new Date().getFullYear() + '/1/1', ENDDATE: new Date().getFullYear() + '/12/31', })
         toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
         this.setState({ filteredList: null, isDataFetching: true })
     }
@@ -293,152 +278,6 @@ class ArchivedStock extends Component {
         this.setState({ openAddChrgModal: !this.state.openAddChrgModal })
     }
 
-    handleSubmitUpdate = () => {
-        const { formValue } = this.state
-        let extraChangesValue = "", isNotVerified = 0;
-
-        if (formValue.AdditionalCost.length > 0) {
-            for (var i = 0; i < formValue.AdditionalCost.length; i++) {
-                extraChangesValue += formValue.AdditionalCost[i].Charges + "=" + formValue.AdditionalCost[i].Value + ";"
-
-                //check extra charge
-                if (formValue.AdditionalCost[i].validated === false)
-                    isNotVerified++;
-            }
-        }
-        else
-            extraChangesValue = "-"
-
-        let object = {
-            STOCKID: formValue.StockID,
-            USERCODE: formValue.MemberNumber,
-            TRACKINGNUMBER: formValue.TrackingNumber,
-            PRODUCTWEIGHT: formValue.Weight,
-            PRODUCTHEIGHT: formValue.Height,
-            PRODUCTWIDTH: formValue.Width,
-            PRODUCTDEEP: formValue.Depth,
-            AREACODE: formValue.Division,
-            ITEM: isStringNullOrEmpty(formValue.Item) ? "-" : formValue.Item,
-            TRACKINGSTATUSID: formValue.TrackingStatusID,
-            CONTAINERNAME: !isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : '-',
-            CONTAINERDATE: !isStringNullOrEmpty(formValue.StockDate) ? formValue.StockDate : "-",
-            REMARK: formValue.Remark,
-            EXTRACHARGE: extraChangesValue,
-        }
-
-        // check member
-        if (isStringNullOrEmpty(object.USERCODE) || formValue.MemberNumberVerified === false) {
-            isNotVerified++;
-        }
-
-        // check tracking number
-        if (isStringNullOrEmpty(object.TRACKINGNUMBER) || formValue.TrackingNumberVerified === false) {
-            isNotVerified++;
-        }
-
-        // check area code / division
-        if (isStringNullOrEmpty(object.AREACODE)) {
-            isNotVerified++;
-        }
-
-        // check width x height x depth x weight
-        if (!formValue.DepthVerified || !formValue.WidthVerified || !formValue.HeightVerified || !formValue.WeightVerified) {
-            isNotVerified++;
-        }
-
-        if (isNotVerified === 0) {
-            this.props.CallUpdateStockDetailByGet(object)
-            toast.loading("Submitting data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
-            this.setState({ isDataFetching: false })
-        }
-        else {
-            toast.error("Invalid to update data!", { autoClose: 3000, position: "top-center", transition: Flip, theme: "dark" })
-        }
-    }
-
-    handleFormInput = (e) => {
-        const { formValue } = this.state
-        const { value, name } = e.target
-        let tempForm = formValue
-        switch (name) {
-            case "TrackingNumber":
-                tempForm.TrackingNumber = value
-                tempForm.TrackingNumberVerified = !isStringNullOrEmpty(value)
-                this.setState({ formValue: tempForm })
-                break;
-
-            case "MemberNumber":
-                tempForm.MemberNumber = value
-                tempForm.MemberNumberVerified = !isStringNullOrEmpty(value)
-                this.setState({ formValue: tempForm })
-                break;
-
-            case "Division":
-                tempForm.Division = value
-                this.setState({ formValue: tempForm })
-                break;
-
-            case "Depth":
-                tempForm.Depth = value
-                tempForm.DepthVerified = !isStringNullOrEmpty(value) && !isNaN(value)
-                this.setState({ formValue: tempForm })
-                break;
-
-            case "Width":
-                tempForm.Width = value
-                tempForm.WidthVerified = !isStringNullOrEmpty(value) && !isNaN(value)
-                this.setState({ formValue: tempForm })
-                break;
-
-            case "Height":
-                tempForm.Height = value
-                tempForm.HeightVerified = !isStringNullOrEmpty(value) && !isNaN(value)
-                this.setState({ formValue: tempForm })
-                break;
-
-            case "Weight":
-                tempForm.Weight = value
-                tempForm.WeightVerified = !isStringNullOrEmpty(value) && !isNaN(value)
-                this.setState({ formValue: tempForm })
-                break;
-
-            case "Remark":
-                tempForm.Remark = value
-                this.setState({ formValue: tempForm })
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    handleAdditionalCostInputs = (e, index) => {
-        let validated, tempFormValue = this.state.formValue
-        const { value, name } = e.target
-        let additionalCostItems = tempFormValue.AdditionalCost
-        switch (name) {
-            case "AdditionalChargedRemark":
-                const chargedAmount = additionalCostItems[index].Value
-                validated = (!isStringNullOrEmpty(value)) && ((!isStringNullOrEmpty(chargedAmount)) && (!isNaN(chargedAmount) && (Number(chargedAmount) > 0)))
-                additionalCostItems[index].Charges = value
-                additionalCostItems[index].validated = validated
-                tempFormValue.AdditionalCost = additionalCostItems
-
-                this.setState({ formValue: tempFormValue })
-                break;
-
-            case "AdditionalChargedAmount":
-                const chargedRemark = additionalCostItems[index].Charges
-                validated = (!isStringNullOrEmpty(chargedRemark)) && ((!isStringNullOrEmpty(value)) && (!isNaN(e.target.value) && (Number(value) > 0)))
-                additionalCostItems[index].Value = value
-                additionalCostItems[index].validated = validated
-                tempFormValue.AdditionalCost = additionalCostItems
-
-                this.setState({ formValue: tempFormValue })
-                break;
-            default:
-        }
-    }
 
     RenderAdditionalCost = () => {
         const { formValue } = this.state
@@ -458,23 +297,6 @@ class ArchivedStock extends Component {
             additionalCostItems.push(obj)
 
         tempFormValue.AdditionalCost = additionalCostItems
-        this.setState({ formValue: tempFormValue })
-    }
-
-    handleRemoveAdditionalCosts(index) {
-        const { formValue } = this.state
-        let tempFormValue = formValue
-        let additionalCostItems = (!isObjectUndefinedOrNull(tempFormValue.AdditionalCost)) ? tempFormValue.AdditionalCost : []
-
-        if (additionalCostItems.length > 0) {
-            additionalCostItems.splice(index, 1)
-            this.setState({ formValue: tempFormValue })
-        }
-    }
-
-    removeAllAdditionalCost() {
-        let tempFormValue = this.state.formValue
-        tempFormValue.AdditionalCost = []
         this.setState({ formValue: tempFormValue })
     }
 
@@ -520,17 +342,18 @@ class ArchivedStock extends Component {
         }
     }
 
-    onSearch(param) {
+    onSearch(keywords, area) {
         const { filteredList, searchKeywords, searchCategory, searchArea, searchDates, isDataFetching } = this.state
         const { archivedData } = this.props
-        let searchKeys = ((!isStringNullOrEmpty(param))) ? param : searchKeywords
+        let searchKeys = ((!isStringNullOrEmpty(keywords))) ? keywords : searchKeywords
         searchKeys = (!isStringNullOrEmpty(searchKeys)) ? searchKeys.toUpperCase() : searchKeys
-        let date_range = (typeof searchDates === "string" && !Array.isArray(searchDates)) ? JSON.parse(searchDates) : searchDates
+
+        let areaSearchKeys = ((!isStringNullOrEmpty(area))) ? area : searchArea
 
         // CallFilterInventory
-        if (searchArea === "All" && searchCategory === "All" && isStringNullOrEmpty(searchKeys)) {
+        if (areaSearchKeys === "All" && searchCategory === "All" && isStringNullOrEmpty(searchKeys)) {
             this.props.CallResetStocks()
-            this.props.CallFetchAllStock({ USERID: 1 })
+            this.props.CallFetchArchivedStock({ STARTDATE: new Date().getFullYear() + '/1/1', ENDDATE: new Date().getFullYear() + '/12/31', })
             toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
             this.setState({ isDataFetching: true, filteredList: null })
         }
@@ -539,19 +362,24 @@ class ArchivedStock extends Component {
             if (!isStringNullOrEmpty(searchKeys)) {
                 // if search keywords is exists
                 if (isArrayNotEmpty(archivedData)) {
-                    if (searchArea !== "All" && searchCategory === "All") {
+                    if (areaSearchKeys !== "All" && searchCategory === "All") {
+                        console.log(areaSearchKeys)
+
                         // if area is not empty
-                        tempList = archivedData.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (x.TrackingNumber.includes(searchKeys)))
+                        tempList = archivedData.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) && (x.TrackingNumber.includes(searchKeys) || x.UserCode.includes(searchKeys)))
                     }
-                    else if (searchArea === "All" && searchCategory !== "All") {
+                    else if (areaSearchKeys === "All" && searchCategory !== "All") {
                         // if category is not empty
                         tempList = this.onCategoryFilter(archivedData, searchCategory, searchKeys)
                     }
-                    else if (searchArea !== "All" && searchCategory !== "All") {
+                    else if (areaSearchKeys !== "All" && searchCategory !== "All") {
+                        console.log(areaSearchKeys)
                         // if area and category is in the list of filtering options
-                        tempList = this.onCategoryAndAreaFilter(archivedData, searchCategory, searchArea, searchKeys)
+                        tempList = this.onCategoryAndAreaFilter(archivedData, searchCategory, areaSearchKeys, searchKeys)
                     }
                     else {
+                        console.log(areaSearchKeys)
+
                         // if want to search with all options
                         tempList = archivedData.filter(x =>
                             (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
@@ -564,18 +392,18 @@ class ArchivedStock extends Component {
                 this.setState({ filteredList: tempList })
             }
             else {
-                if (searchCategory === "All" && searchArea !== "All") {
+                if (searchCategory === "All" && areaSearchKeys !== "All") {
                     // if area is not empty but search string is empty
-                    this.setState({ searchCategory: "All", searchDates: [], filteredList: archivedData.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) })
+                    this.setState({ searchCategory: "All", searchDates: [], filteredList: archivedData.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) })
                 }
-                else if (searchCategory !== "All" && searchArea === "All") {
+                else if (searchCategory !== "All" && areaSearchKeys === "All") {
                     // if category is not empty but search string is empty
                     // no point to search with category if there are no searching keywords
-                    this.setState({ searchArea: "All", searchDates: [], filteredList: archivedData })
+                    this.setState({ areaSearchKeys: "All", searchDates: [], filteredList: archivedData })
                     toast.warning("Please enter searching keywords", { autoClose: 1500, position: "top-center", transition: Flip, theme: "dark" })
                 }
                 else {
-                    this.setState({ searchCategory: "All", searchArea: "All", searchDates: [], filteredList: archivedData })
+                    this.setState({ searchCategory: "All", areaSearchKeys: "All", searchDates: [], filteredList: archivedData })
                     toast.warning("Please enter searching keywords", { autoClose: 1500, position: "top-center", transition: Flip, theme: "dark" })
                 }
             }
@@ -589,7 +417,7 @@ class ArchivedStock extends Component {
         if (!date_range.includes(null)) {
             this.props.CallResetStocks()
             const object = { STARTDATE: convertDateTimeToString112Format(date_range[0], false), ENDDATE: convertDateTimeToString112Format(date_range[1], false) }
-            this.props.CallFilterInventoryByDate(object)
+            this.props.CallFetchArchivedStock(object)
             toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
             this.setState({ isDataFetching: true, filteredList: null })
             this.forceUpdate()
@@ -606,7 +434,7 @@ class ArchivedStock extends Component {
 
     handleSearchInput(e) {
         let searchKeywords = e.target.value
-        this.onSearch(searchKeywords)
+        this.onSearch(searchKeywords, "")
         this.setState({ searchKeywords: searchKeywords })
     }
 
@@ -615,6 +443,7 @@ class ArchivedStock extends Component {
     }
 
     handleSearchArea(e) {
+        this.onSearch("", e.target.value)
         this.setState({ searchArea: e.target.value })
     }
 
@@ -735,7 +564,7 @@ class ArchivedStock extends Component {
                             <SearchBar
                                 id=""
                                 placeholder="Enter Member No, Tracking No or Container No to search"
-                                buttonOnClick={() => this.onSearch("")}
+                                buttonOnClick={() => this.onSearch("", "")}
                                 onChange={this.handleSearchInput}
                                 className="searchbar-input mb-auto"
                                 disableButton={this.state.isDataFetching}
@@ -774,7 +603,6 @@ class ArchivedStock extends Component {
                 <AlertDialog
                     open={this.state.openAddChrgModal}              // required, pass the boolean whether modal is open or close
                     handleToggleDialog={this.handleAddChrgModal}  // required, pass the toggle function of modal
-                    // handleConfirmFunc={this.handleSubmitUpdate}    // required, pass the confirm function 
                     showAction={false}                           // required, to show the footer of modal display
                     title={"Stock Info - " + selectedRow.TrackingNumber}                                  // required, title of the modal
                     buttonTitle={"Update"}                         // required, title of button

@@ -566,15 +566,16 @@ class OverallStock extends Component {
         }
     }
 
-    onSearch(param) {
+    onSearch(keywords, area) {
         const { filteredList, searchKeywords, searchCategory, searchArea, searchDates, isDataFetching } = this.state
-        const { stocks } = this.props
-        let searchKeys = ((!isStringNullOrEmpty(param))) ? param : searchKeywords
+        const { archivedData } = this.props
+        let searchKeys = ((!isStringNullOrEmpty(keywords))) ? keywords : searchKeywords
         searchKeys = (!isStringNullOrEmpty(searchKeys)) ? searchKeys.toUpperCase() : searchKeys
-        let date_range = (typeof searchDates === "string" && !Array.isArray(searchDates)) ? JSON.parse(searchDates) : searchDates
+
+        let areaSearchKeys = ((!isStringNullOrEmpty(area))) ? area : searchArea
 
         // CallFilterInventory
-        if (searchArea === "All" && searchCategory === "All" && isStringNullOrEmpty(searchKeys)) {
+        if (areaSearchKeys === "All" && searchCategory === "All" && isStringNullOrEmpty(searchKeys)) {
             this.props.CallResetStocks()
             this.props.CallFetchAllStock({ USERID: 1 })
             toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
@@ -584,22 +585,27 @@ class OverallStock extends Component {
             let tempList;
             if (!isStringNullOrEmpty(searchKeys)) {
                 // if search keywords is exists
-                if (isArrayNotEmpty(stocks)) {
-                    if (searchArea !== "All" && searchCategory === "All") {
+                if (isArrayNotEmpty(archivedData)) {
+                    if (areaSearchKeys !== "All" && searchCategory === "All") {
+                        console.log(areaSearchKeys)
+
                         // if area is not empty
-                        tempList = stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (x.TrackingNumber.includes(searchKeys)))
+                        tempList = archivedData.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) && (x.TrackingNumber.includes(searchKeys) || x.UserCode.includes(searchKeys) ))
                     }
-                    else if (searchArea === "All" && searchCategory !== "All") {
+                    else if (areaSearchKeys === "All" && searchCategory !== "All") {
                         // if category is not empty
-                        tempList = this.onCategoryFilter(stocks, searchCategory, searchKeys)
+                        tempList = this.onCategoryFilter(archivedData, searchCategory, searchKeys)
                     }
-                    else if (searchArea !== "All" && searchCategory !== "All") {
+                    else if (areaSearchKeys !== "All" && searchCategory !== "All") {
+                        console.log(areaSearchKeys)
                         // if area and category is in the list of filtering options
-                        tempList = this.onCategoryAndAreaFilter(stocks, searchCategory, searchArea, searchKeys)
+                        tempList = this.onCategoryAndAreaFilter(archivedData, searchCategory, areaSearchKeys, searchKeys)
                     }
                     else {
+                        console.log(areaSearchKeys)
+
                         // if want to search with all options
-                        tempList = stocks.filter(x =>
+                        tempList = archivedData.filter(x =>
                             (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
                             (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) ||
                             (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
@@ -610,18 +616,18 @@ class OverallStock extends Component {
                 this.setState({ filteredList: tempList })
             }
             else {
-                if (searchCategory === "All" && searchArea !== "All") {
+                if (searchCategory === "All" && areaSearchKeys !== "All") {
                     // if area is not empty but search string is empty
-                    this.setState({ searchCategory: "All", searchDates: [], filteredList: stocks.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) })
+                    this.setState({ searchCategory: "All", searchDates: [], filteredList: archivedData.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) })
                 }
-                else if (searchCategory !== "All" && searchArea === "All") {
+                else if (searchCategory !== "All" && areaSearchKeys === "All") {
                     // if category is not empty but search string is empty
                     // no point to search with category if there are no searching keywords
-                    this.setState({ searchArea: "All", searchDates: [], filteredList: stocks })
+                    this.setState({ areaSearchKeys: "All", searchDates: [], filteredList: archivedData })
                     toast.warning("Please enter searching keywords", { autoClose: 1500, position: "top-center", transition: Flip, theme: "dark" })
                 }
                 else {
-                    this.setState({ searchCategory: "All", searchArea: "All", searchDates: [], filteredList: stocks })
+                    this.setState({ searchCategory: "All", areaSearchKeys: "All", searchDates: [], filteredList: archivedData })
                     toast.warning("Please enter searching keywords", { autoClose: 1500, position: "top-center", transition: Flip, theme: "dark" })
                 }
             }
@@ -661,6 +667,7 @@ class OverallStock extends Component {
     }
 
     handleSearchArea(e) {
+        this.onSearch("", e.target.value)
         this.setState({ searchArea: e.target.value })
     }
 
@@ -781,7 +788,7 @@ class OverallStock extends Component {
                             <SearchBar
                                 id=""
                                 placeholder="Enter Member No, Tracking No or Container No to search"
-                                buttonOnClick={() => this.onSearch("")}
+                                buttonOnClick={() => this.onSearch("", "")}
                                 onChange={this.handleSearchInput}
                                 className="searchbar-input mb-auto"
                                 disableButton={this.state.isDataFetching}

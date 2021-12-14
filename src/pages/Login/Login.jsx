@@ -55,6 +55,7 @@ class Dashboard extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
+        console.log(this.props.logonUser)
         if (!this.props.loading && isArrayNotEmpty(this.props.logonUser)) {
             setLogonUser(this.props.logonUser, this.props.sidebars)
         }
@@ -90,6 +91,7 @@ class Dashboard extends Component {
                 username: this.state.username,
                 password: this.state.password,
             }
+            console.log(object)
             this.props.CallUserLogin(object)
         }
     }
@@ -113,7 +115,7 @@ class Dashboard extends Component {
                                 id="login-username"
                                 value={this.state.username}
                                 onChange={(e) => this.handleInputChange(e)}
-                                onKeyUp={(e) => { this.OnEnterToSubmitLogin(e) }}
+                                onKeyDown={(e) => { this.OnEnterToSubmitLogin(e) }}
                                 size="small"
                                 startAdornment={
                                     <InputAdornment position="start">
@@ -129,7 +131,7 @@ class Dashboard extends Component {
                                 type={this.state.showPassword ? 'text' : 'password'}
                                 value={this.state.password}
                                 onChange={(e) => this.handleInputChange(e)}
-                                onKeyUp={(e) => { this.OnEnterToSubmitLogin(e) }}
+                                onKeyDown={(e) => { this.OnEnterToSubmitLogin(e) }}
                                 size="small"
                                 startAdornment={
                                     <InputAdornment position="start">

@@ -4,7 +4,6 @@ export class GitAction {
   static Login = "USER_LOGIN";
   static LoginSuccess = "USER_LOGIN_SUCCESS";
   static CallUserLogin(propsData) {
-    console.log(propsData)
     return {
       type: GitAction.Login,
       payload: propsData
@@ -35,7 +34,7 @@ export class GitAction {
       type: GitAction.ResetRegistrationReturn,
     };
   }
-
+  
   static GetUserProfileByID = "GET_USER_PROFILEBYID";
   static GotUserProfileByID = "GOT_USER_PROFILEBYID";
   static ResetUserProfileByID = "RESET-USER_PROFILEBYID";

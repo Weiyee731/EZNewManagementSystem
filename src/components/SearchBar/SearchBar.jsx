@@ -20,6 +20,7 @@ const SearchBox = (props) => {
             placeholder={isStringNullOrEmpty(props.placeholder) ? "Type to search" : props.placeholder}
             helperText={isStringNullOrEmpty(props.helperText) ? "" : props.helperText}
             onChange={(e) => typeof props.onChange === "function" ? props.onChange(e) : {}}
+            onKeyDown={(e) => (e.key === 'Enter' || e.keyCode === 13) && typeof props.onChange === "function" ? props.onChange(e) : {}}
             autoFocus={props.autoFocus ? props.autoFocus : false}
             size="small"
             margin="normal"
