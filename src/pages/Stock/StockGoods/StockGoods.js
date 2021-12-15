@@ -21,6 +21,7 @@ import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleT
 import MenuItem from '@mui/material/MenuItem';
 import Autocomplete from '@mui/material/Autocomplete';
 import { isStringNullOrEmpty, getWindowDimensions, isArrayNotEmpty, isObjectUndefinedOrNull } from "../../../tools/Helpers";
+import { toast } from "react-toastify";
 
 function mapStateToProps(state) {
     return {
@@ -109,16 +110,16 @@ const headCells = [
         label: 'Division',
     },
     {
-        id: 'StockDate',
-        numeric: true,
-        disablePadding: false,
-        label: 'Stock Date',
-    },
-    {
         id: 'PackagingDate',
         numeric: true,
         disablePadding: false,
         label: 'Packaging Date',
+    },
+    {
+        id: 'StockDate',
+        numeric: true,
+        disablePadding: false,
+        label: 'Stock Date',
     },
     {
         id: 'ContainerName',
@@ -151,6 +152,7 @@ const INITIAL_STATE = {
     open: true,
     key: "All",
     openEditModal: false,
+    selectedStocks: [],
     selectedRows: [],
     stockListing: [],
     stockFiltered: [],
@@ -163,7 +165,7 @@ const INITIAL_STATE = {
     openAddModal: false,
 
     ContainerName: "",
-    ContainerDate: new Date(),
+    ContainerDate: "",
     TrackingNumber: "",
     UserCode: "",
     ProductDimensionWidth: "",
@@ -179,7 +181,6 @@ const INITIAL_STATE = {
 function onAddButtonClick() {
     this.setState({ openAddModal: true })
 }
-
 class StockGoods extends Component {
     constructor(props) {
         super(props);
@@ -259,6 +260,59 @@ class StockGoods extends Component {
         }
     }
 
+    onDeleteButtonClick = () => {
+        const { selectedStocks } = this.state
+        let StockID = []
+        let TrackingNumber = []
+        let ProductWeight = []
+        let ProductDimensionHeight = []
+        let ProductDimensionWidth = []
+        let ProductDimensionDeep = []
+        let AreaCode = []
+        let UserCode = []
+        let Item = []
+        let TRACKINGSTATUSID = []
+        let ContainerName = []
+        let ContainerDate = []
+        let Remark = []
+        let AdditionalCharges = []
+        //status id ===2
+        selectedStocks.map((row) => {
+            StockID.push(row.StockID)
+            TrackingNumber.push(row.TrackingNumber)
+            ProductWeight.push(row.ProductWeight)
+            ProductDimensionHeight.push(row.ProductDimensionHeight)
+            ProductDimensionWidth.push(row.ProductDimensionWidth)
+            ProductDimensionDeep.push(row.ProductDimensionDeep)
+            AreaCode.push(row.AreaCode)
+            UserCode.push(row.UserCode)
+            Item.push(row.Item)
+            TRACKINGSTATUSID.push(2)
+            ContainerName.push(this.state.ContainerName)
+            ContainerDate.push(this.state.ContainerDate)
+            Remark.push(row.Remark)
+            AdditionalCharges.push(row.AdditionalCharges)
+        })
+
+        this.props.CallUpdateStockDetailByPost(
+            {
+                StockID: StockID.join(","),
+                TrackingNumber: TrackingNumber.join(","),
+                ProductWeight: ProductWeight.join(","),
+                ProductDimensionHeight: ProductDimensionHeight.join(","),
+                ProductDimensionWidth: ProductDimensionWidth.join(","),
+                ProductDimensionDeep: ProductDimensionDeep.join(","),
+                AreaCode: AreaCode.join(","),
+                UserCode: UserCode.join(","),
+                Item: Item.join(","),
+                TRACKINGSTATUSID: TRACKINGSTATUSID.join(","),
+                ContainerName: ContainerName.join(","),
+                ContainerDate: ContainerDate.join(","),
+                Remark: Remark.join(","),
+                AdditionalCharges: AdditionalCharges.join(",")
+            })
+    }
+
     renderTableRows(data, index) {
         const fontsize = '9pt'
         var dimension = data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight;
@@ -295,8 +349,8 @@ class StockGoods extends Component {
                 <TableCell sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>
-                <TableCell sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.PackagingDate}</TableCell>
+                <TableCell sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.ContainerName}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isStringNullOrEmpty(data.AdditionalCharges) && renderAdditionalCost(data.AdditionalCharges)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Remark}</TableCell>
@@ -319,26 +373,30 @@ class StockGoods extends Component {
     handleSearchfilter = (filter) => {
         switch (filter) {
             case "open":
-                this.setState({ open: !this.state.open });
+                if ((this.state.ContainerName && this.state.ContainerDate) !== "" || undefined) {
+                    this.setState({ open: !this.state.open });
+                }
+                else { toast.warning("Please fill in the all the details before proceed") }
+
                 break;
 
             case "openEditModal":
                 this.setState({ openEditModal: !this.state.openEditModal });
                 this.props.CallUpdateStockDetailByPost({
-                    STOCKID: this.state.selectedRows.StockID,
-                    TRACKINGNUMBER: this.state.TrackingNumber,
-                    PRODUCTWEIGHT: this.state.ProductWeight,
-                    PRODUCTHEIGHT: this.state.ProductDimensionHeight,
-                    PRODUCTWIDTH: this.state.ProductDimensionWidth,
-                    PRODUCTDEEP: this.state.ProductDimensionDeep,
-                    AREACODE: this.state.AreaCode,
-                    USERCODE: this.state.UserCode,
-                    ITEM: this.state.Item,
+                    StockID: this.state.selectedRows.StockID,
+                    TrackingNumber: this.state.TrackingNumber,
+                    ProductWeight: this.state.ProductWeight,
+                    ProductDimensionHeight: this.state.ProductDimensionHeight,
+                    ProductDimensionWidth: this.state.ProductDimensionWidth,
+                    ProductDimensionDeep: this.state.ProductDimensionDeep,
+                    AreaCode: this.state.AreaCode,
+                    UserCode: this.state.UserCode,
+                    Item: this.state.Item,
                     TRACKINGSTATUSID: 1,
-                    CONTAINERNAME: this.state.ContainerName,
-                    CONTAINERDATE: this.state.ContainerDate,
-                    REMARK: this.state.Remark,
-                    EXTRACHARGE: this.state.AdditionalCharges
+                    ContainerName: this.state.ContainerName,
+                    ContainerDate: this.state.ContainerDate,
+                    Remark: this.state.Remark,
+                    AdditionalCharges: this.state.AdditionalCharges
                 })
                 break;
 
@@ -452,6 +510,20 @@ class StockGoods extends Component {
 
     }
 
+    renderTableActionButton = () => {
+        return (
+            <IconButton onClick={(event) => { this.onDeleteButtonClick() }}>
+                <CheckIcon />
+            </IconButton>
+        )
+    }
+
+    onSelectRow = (items) => {
+        this.setState({
+            selectedStocks: items
+        })
+    }
+
     render() {
         const ToggleTabs = [
             { children: "All", key: "All" },
@@ -464,8 +536,8 @@ class StockGoods extends Component {
             <div className="container-fluid">
                 <ModalPopOut
                     open={open}
-                    fullScreen={true}
                     classes='true'
+                    showCancel={false}
                     handleToggleDialog={() => this.handleCancel("filter")}
                     handleConfirmFunc={() => this.handleSearchfilter("open")}
                     title={"Please select the container number and date desired"}
@@ -514,18 +586,19 @@ class StockGoods extends Component {
                 />
                 {openEditModal &&
                     <ModalPopOut
+                        showCancel={true}
                         open={openEditModal}
                         handleToggleDialog={() => this.handleCancel("form")}
                         handleConfirmFunc={() => this.handleSearchfilter("openEditModal")}
                         message={
-                            <EditStockGoods data={this.state.selectedRows} parentCallback={this.handleCallback} />
+                            <EditStockGoods data={this.state.selectedRows} ContainerDate={this.state.ContainerDate ? this.state.ContainerDate : ""} ContainerName={this.state.ContainerName ? this.state.ContainerName : ""} parentCallback={this.handleCallback} />
                         }
-                    // fullScreen={true}
                     ></ModalPopOut>
 
                 }
                 {openAddModal &&
                     <ModalPopOut
+                        showCancel={true}
                         open={openAddModal}
                         handleToggleDialog={() => this.handleCancel("form")}
                         handleConfirmFunc={() => this.handleSearchfilter("openAddModal")}
@@ -552,7 +625,7 @@ class StockGoods extends Component {
                         <SearchBar placeholder={"Search anything"} autoFocus={true} onChange={(e) => this.onSearchChange(e)} />
                         <TableComponents
                             tableTopLeft={<h3 style={{ fontWeight: 700 }}>Stocks</h3>}
-                            tableTopRight={this.renderTableActionButton}
+                            actionIcon={this.renderTableActionButton()}
 
                             tableOptions={{
                                 dense: true,
@@ -575,6 +648,7 @@ class StockGoods extends Component {
                             Data={this.state.stockFiltered ? this.state.stockFiltered : []}
                             onTableRowClick={this.onTableRowClick}
                             onActionButtonClick={onAddButtonClick}
+                            onSelectRow={this.onSelectRow}
                         />
                     </div>
                 </div>

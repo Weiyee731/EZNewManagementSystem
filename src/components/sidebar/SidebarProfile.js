@@ -7,14 +7,14 @@ export default function Profile(props) {
                 padding: '24px',
                 textTransform: 'uppercase',
                 fontWeight: 'bold',
-                fontSize: 14,
+                fontSize: 13,
                 letterSpacing: '1px',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
             }}
         >
-            Testing
+            EZ TRANSIT AND LOGISTICS
         </div>
     )
 }
