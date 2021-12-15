@@ -43,14 +43,18 @@ class Dashboard extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (isArrayNotEmpty(this.props.dashboard) && this.state.dashboard_data === null) {
-            let CardView = [], Sales = [];
+            let CardView = [], Sales = [], SalesByContainer = [];
             if (!isStringNullOrEmpty(this.props.dashboard[0].CardView))
                 CardView = JSON.parse(this.props.dashboard[0].CardView)
 
             if (!isStringNullOrEmpty(this.props.dashboard[0].Sales))
                 Sales = JSON.parse(this.props.dashboard[0].Sales)
 
-            let obj = { CardView: CardView, Sales: Sales }
+            if (!isStringNullOrEmpty(this.props.dashboard[0].SalesByContainer))
+                SalesByContainer = JSON.parse(this.props.dashboard[0].SalesByContainer)
+
+
+            let obj = { CardView: CardView, Sales: Sales, SalesByContainer: SalesByContainer }
             console.log(obj)
             this.setState({ dashboard_data: obj })
         }
@@ -114,6 +118,29 @@ class Dashboard extends Component {
                             <Legend />
                             <Bar dataKey="ActualSaleCollected" stackId="Sales" barSize={20} fill="#2a9d8f" />
                             <Bar dataKey="ActualSaleNoCollected" stackId="Sales" barSize={20} fill="#e76f51" />
+                            <Line type="monotone" dataKey="TotalSales" stroke="#9b2226" />
+                        </ComposedChart>
+                    </ResponsiveContainer>
+                </div>
+                <div className="row mt-2">
+                    <ResponsiveContainer width={getWindowDimensions().screenWidth * .8} height={getWindowDimensions().screenHeight * 0.4}>
+                        <ComposedChart
+                            width={500}
+                            height={400}
+                            data={!isObjectUndefinedOrNull(dashboard_data) && isArrayNotEmpty(dashboard_data.SalesByContainer) ? dashboard_data.SalesByContainer : []}
+                            margin={{
+                                top: 20,
+                                right: 20,
+                                bottom: 20,
+                                left: 20,
+                            }}
+                        >
+                            <CartesianGrid stroke="#f5f5f5" />
+                            <XAxis dataKey="ContainerName" scale="band" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="ActualSaleCollected" stackId="TotalItem" barSize={20} fill="#2a9d8f" />
                             <Line type="monotone" dataKey="TotalSales" stroke="#9b2226" />
                         </ComposedChart>
                     </ResponsiveContainer>
