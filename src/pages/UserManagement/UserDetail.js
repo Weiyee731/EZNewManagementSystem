@@ -20,7 +20,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
 import ToggleTabsComponent from "../../components/ToggleTabsComponent/ToggleTabComponents";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-
+import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 function mapStateToProps(state) {
   return {
     userProfile: state.counterReducer["userProfile"],
@@ -120,9 +120,12 @@ class UserDetail extends Component {
       filteredList: [],
       selectedRow: [],
       payment: "",
-      selectedindex: ""
+      selectedindex: "",
+      isOnEditMode: false,
     }
     this.handleInputChange = this.handleInputChange.bind(this)
+    this.toggleEditMode = this.toggleEditMode.bind(this)
+    this.handleOnSave = this.handleOnSave.bind(this)
     this.props.CallUserProfileByID(this.state)
   }
 
@@ -203,16 +206,24 @@ class UserDetail extends Component {
 
   onUpdateTransactionPayment = (event, row) => {
     this.props.CallUpdateTransactionPayment({ TransactionID: row.TransactionID, PaymentAmmount: this.state.payment })
-    this.state.filteredList[this.state.selectedindex].OrderPaidAmount =  this.state.payment;
-    if(this.state.filteredList[this.state.selectedindex].OrderTotalAmount <=  this.state.payment){
+    this.state.filteredList[this.state.selectedindex].OrderPaidAmount = this.state.payment;
+    if (this.state.filteredList[this.state.selectedindex].OrderTotalAmount <= this.state.payment) {
       this.state.filteredList[this.state.selectedindex].OrderStatus = 'Paid'
       this.state.filteredList[this.state.selectedindex].OrderColor = 'green'
     }
     console.log(this.state.filteredList)
-    this.setState({ AddModalOpen: false }) 
+    this.setState({ AddModalOpen: false })
   }
 
+  toggleEditMode() {
+    this.setState({ isOnEditMode: true })
+  }
 
+  handleOnSave = () => {
+    console.log("Save")
+    this.setState({ isOnEditMode: false })
+
+  }
   renderTableRows = (data, index) => {
     return (
       <>
@@ -273,6 +284,7 @@ class UserDetail extends Component {
   }
 
   render() {
+    const { isOnEditMode } = this.state
     const ToggleTabs = [
       { children: "All", key: "All" },
       { children: "Unpaid", key: "Unpaid" },
@@ -291,23 +303,30 @@ class UserDetail extends Component {
               >
                 <ArrowBackIcon />
               </IconButton>
-              <Typography variant="h5" component="div">
-                Edit Profile
-              </Typography>
-              <div
-                style={{
-                  textAlign: 'end',
-                  flex: 1
-                }}>
-                <LoadingButton
-                  loading={this.props.loading}
-                  loadingPosition="start"
-                  startIcon={<SaveIcon />}
-                  variant="contained"
-                  onClick={() => console.log("save")}
-                >
-                  Save
-                </LoadingButton>
+              <Typography variant="h5" component="div"> Edit Profile </Typography>
+              <div style={{ textAlign: 'end', flex: 1 }}>
+                {
+                  this.state.isOnEditMode ?
+                    <LoadingButton
+                      loading={this.props.loading}
+                      loadingPosition="end"
+                      endIcon={<SaveIcon />}
+                      variant="contained"
+                      onClick={() => this.handleOnSave()}
+                    >
+                      Save
+                    </LoadingButton>
+                    :
+                    <Button
+                      variant="outlined"
+                      sx={{ bgcolor: "white", border: '1px solid rgba(22, 22, 22, 0.95)', color: 'rgba(22, 22, 22, 0.95)' }}
+                      onClick={() => { this.toggleEditMode() }}
+                      endIcon={<ModeEditOutlineOutlinedIcon />}
+                    >
+                      Edit
+                    </Button>
+                }
+
               </div>
             </div>
             <div className="row">
@@ -363,6 +382,7 @@ class UserDetail extends Component {
             />
           </CardContent>
         </Card>
+
         <div className="mt-4">
           <ToggleTabsComponent Tabs={ToggleTabs} size="small" onChange={this.changeTab} />
           <TableComponents
