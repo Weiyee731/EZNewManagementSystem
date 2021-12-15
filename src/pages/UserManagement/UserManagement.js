@@ -93,6 +93,7 @@ class UserManagement extends Component {
         this.state = {
             AddModalOpen: false,
             UserListing: [],
+            selectedRows: [],
             UserListingfiltered: [],
             name: "",
             username: "",
@@ -179,8 +180,9 @@ class UserManagement extends Component {
         this.setState({ AddModalOpen: !this.state.AddModalOpen });
     }
 
-    onDeleteButtonClick = (items) => {
-        console.log('delete button', items)
+    onDeleteButtonClick = () => {
+        const { selectedRows } = this.state
+        console.log('delete button', selectedRows)
     }
 
     onTextFieldOnChange = (e) => {
@@ -242,6 +244,22 @@ class UserManagement extends Component {
         this.props.CallUserRegistration(this.state)
     }
 
+    onSelectItem = (item) => {
+        this.setState({
+            selectedRows: item
+        })
+    }
+
+    renderTableActionButton = () => {
+        return (
+            <div className="d-flex">
+                <IconButton onClick={(event) => { this.onDeleteButtonClick() }}>
+                    <DeleteIcon color="error" />
+                </IconButton>
+            </div>
+        )
+    }
+
     render() {
 
         const onChange = (e) => {
@@ -267,10 +285,11 @@ class UserManagement extends Component {
                             </CsvDownloader>
                         </div>
                     </div>
+                    <hr />
                     <TableComponents
                         // table settings 
                         tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}  // optional, it can pass as string or as children elements
-                        tableTopRight={this.renderTableActionButton}                 // optional, it will brings the elements to the table's top right corner
+                        // tableTopRight={this.renderTableActionButton}                 // optional, it will brings the elements to the table's top right corner
 
                         tableOptions={{
                             dense: false,                // optional, default is false
@@ -291,8 +310,8 @@ class UserManagement extends Component {
                         Data={this.state.UserListingfiltered}                                  // required, the data that listing in the table
                         onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                         onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
-                        onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items
-                        actionIcon={<DeleteIcon />}
+                        actionIcon={this.renderTableActionButton()}
+                        onSelectRow={this.onSelectItem}
                     />
                 </div>
                 <div>

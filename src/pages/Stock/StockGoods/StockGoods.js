@@ -152,6 +152,7 @@ const INITIAL_STATE = {
     open: true,
     key: "All",
     openEditModal: false,
+    selectedStocks: [],
     selectedRows: [],
     stockListing: [],
     stockFiltered: [],
@@ -259,8 +260,8 @@ class StockGoods extends Component {
         }
     }
 
-    onDeleteButtonClick = (row) => {
-
+    onDeleteButtonClick = () => {
+        const { selectedStocks } = this.state
         let StockID = []
         let TrackingNumber = []
         let ProductWeight = []
@@ -276,7 +277,7 @@ class StockGoods extends Component {
         let Remark = []
         let AdditionalCharges = []
         //status id ===2
-        row.map((row) => {
+        selectedStocks.map((row) => {
             StockID.push(row.StockID)
             TrackingNumber.push(row.TrackingNumber)
             ProductWeight.push(row.ProductWeight)
@@ -292,7 +293,6 @@ class StockGoods extends Component {
             Remark.push(row.Remark)
             AdditionalCharges.push(row.AdditionalCharges)
         })
-
 
         this.props.CallUpdateStockDetailByPost(
             {
@@ -510,7 +510,19 @@ class StockGoods extends Component {
 
     }
 
+    renderTableActionButton = () => {
+        return (
+            <IconButton onClick={(event) => { this.onDeleteButtonClick() }}>
+                <CheckIcon />
+            </IconButton>
+        )
+    }
 
+    onSelectRow = (items) => {
+        this.setState({
+            selectedStocks: items
+        })
+    }
 
     render() {
         const ToggleTabs = [
@@ -613,11 +625,7 @@ class StockGoods extends Component {
                         <SearchBar placeholder={"Search anything"} autoFocus={true} onChange={(e) => this.onSearchChange(e)} />
                         <TableComponents
                             tableTopLeft={<h3 style={{ fontWeight: 700 }}>Stocks</h3>}
-                            actionIcon={
-                                <Tooltip title="Approve">
-                                    <CheckIcon />
-                                </Tooltip>
-                            }
+                            actionIcon={this.renderTableActionButton()}
 
                             tableOptions={{
                                 dense: true,
@@ -640,7 +648,7 @@ class StockGoods extends Component {
                             Data={this.state.stockFiltered ? this.state.stockFiltered : []}
                             onTableRowClick={this.onTableRowClick}
                             onActionButtonClick={onAddButtonClick}
-                            onDeleteButtonClick={this.onDeleteButtonClick}
+                            onSelectRow={this.onSelectRow}
                         />
                     </div>
                 </div>

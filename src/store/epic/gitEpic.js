@@ -680,15 +680,6 @@ export class GitEpic {
 
   Transaction_UpdateTransactionPayment = action$ =>
     action$.ofType(GitAction.UpdateTransactionPayment).switchMap(async ({ payload }) => {
-
-      console.log(url +
-        "Transaction_UpdateTransactionPayment?" +
-        "TRANSACTIONID=" + payload.TransactionID +
-        "&PAYMENTAMMOUNT=" + payload.Payment +
-        "&PAYMENTMETHOD=" + payload.PaymentMethod +
-        "&REFERENCENO=" + payload.ReferenceNo +
-        "&DATETIME=" + payload.Datetime
-      )
       try {
         const response = await fetch(url +
           "Transaction_UpdateTransactionPayment?" +
@@ -714,6 +705,31 @@ export class GitEpic {
         };
       }
     });
+
+  Transaction_DeleteTransaction = action$ =>
+    action$.ofType(GitAction.CancelTransaction).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Transaction_DeleteTransaction?" +
+          "TRANSACTIONID=" + payload
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.CancelledTransaction,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Transaction_DeleteTransaction")
+        return {
+          type: GitAction.CancelledTransaction,
+          payload: [],
+        };
+      }
+    });
+
   ///////////////////////////////////////////////////   Transaction Management  ///////////////////////////////////////////////////
 
 

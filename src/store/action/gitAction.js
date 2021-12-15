@@ -232,6 +232,15 @@ export class GitAction {
     };
   }
 
+  static CancelTransaction = "CANCEL_TRANSACTION";
+  static CancelledTransaction = "TRANSACTION_CANCELLED";
+  static CallCancelTransaction(propsData) {
+    return {
+      type: GitAction.CancelTransaction,
+      payload: propsData
+    };
+  }
+
   static CallResetTransaction() {
     return {
       type: GitAction.ResetTransactionReturn,

@@ -23,6 +23,7 @@ import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutli
 import CsvDownloader from 'react-csv-downloader';
 import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull, round, testRounding } from "../../../tools/Helpers";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+import { toast } from "react-toastify";
 
 function mapStateToProps(state) {
     return {
@@ -36,6 +37,7 @@ function mapDispatchToProps(dispatch) {
     return {
         CallFetchAllStock: (propsData) => dispatch(GitAction.CallFetchAllStock(propsData)),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
+        CallCancelTransaction: (propsData) => dispatch(GitAction.CallCancelTransaction(propsData)),
     };
 }
 
@@ -126,6 +128,8 @@ const INITIAL_STATE = {
     openRemarkModal: false,
     openProformaModal: false,
     openDeliveryModal: false,
+    openCancelModal: false,
+    selectedRows: [],
     selectedItems: [],
     selectedProductPrice: [],
     selectedUserID: null,
@@ -181,11 +185,19 @@ class CreateInvoice extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { stocks } = this.props
+        const { stocks, transactionReturn } = this.props
         if (this.state.filteredList === null && isArrayNotEmpty(stocks)) {
             this.setState({
                 filteredList: stocks[0].ReturnVal == '0' ? [] : stocks
             })
+        }
+
+        if (prevProps.transactionReturn !== transactionReturn) {
+            if (transactionReturn[0].ReturnVal == 1) {
+                toast.success(transactionReturn[0].ReturnMsg)
+            } else {
+                toast.error("Something went wrong. Please try again")
+            }
         }
     }
 
@@ -240,19 +252,41 @@ class CreateInvoice extends Component {
         })
     }
 
+    onSelectItem = (item) => {
+        this.setState({
+            selectedRows: item
+        })
+    }
+
     onAddButtonClick = () => {
         console.log('add button')
     }
 
-    onDeleteButtonClick = (items) => {
+    onCancelModalPop = () => {
+        this.setState({
+            openCancelModal: !this.state.openCancelModal
+        })
+    }
+
+    onDeleteButtonClick = () => {
+        const { selectedRows } = this.state
+        let selectedRowId = []
+        selectedRows.map((row) => {
+            selectedRowId.push(row.StockID)
+        })
+        this.props.CallCancelTransaction(selectedRowId)
+    }
+
+    handleCreateInvoice = () => {
+        const { selectedRows } = this.state
         let arr = []
-        items.map((item) => {
+        selectedRows.map((item) => {
             arr.push(item.UserID)
         })
-        if ((arr.filter((el) => el === items[0].UserID)).length === arr.length) {
+        if ((arr.filter((el) => el === selectedRows[0].UserID)).length === arr.length) {
             this.setState({
-                selectedItems: items,
-                selectedUserID: items[0].UserID
+                selectedItems: selectedRows,
+                selectedUserID: selectedRows[0].UserID
             })
             this.handleDeliveryModal()
         } else {
@@ -294,14 +328,6 @@ class CreateInvoice extends Component {
         const { formValue } = this.state
         console.log('update remark')
         console.log(formValue)
-    }
-
-
-    handleProductPrice = (item) => {
-        console.log(item)
-        // this.setState({
-        //     selectedProductPrice: item
-        // })
     }
 
     handleFormInput = (e) => {
@@ -463,14 +489,27 @@ class CreateInvoice extends Component {
         }
     }
 
+    renderTableActionButton = () => {
+        return (
+            <div className="d-flex">
+                <IconButton onClick={(event) => { this.handleCreateInvoice() }}>
+                    <DriveFileRenameOutlineIcon />
+                </IconButton>
+                <IconButton onClick={(event) => { this.onCancelModalPop() }}>
+                    <DeleteIcon color="error" />
+                </IconButton>
+            </div>
+        )
+    }
+
     render() {
-        const { filteredList, formValue, openDeliveryModal, openRemarkModal, searchCategory, onSearchText } = this.state
+        const { filteredList, formValue, openDeliveryModal, openRemarkModal, searchCategory, onSearchText, openCancelModal } = this.state
         const { userAreaCode, stocks } = this.props
-        
+
         return (
             <div className="container-fluid">
                 <div className="row">
-                    <div className="col-2 d-flex flex-column justify-content-end">
+                    <div className="col-2">
                         <div className="w-100 filter-dropdown">
                             <Select
                                 labelId="search-filter-category"
@@ -500,7 +539,7 @@ class CreateInvoice extends Component {
                             onChange={(e) => this.onSearch(e)}
                         />
                     </div>
-                    <div className="col-1 d-flex flex-column justify-content-end">
+                    <div className="col-1">
                         <CsvDownloader
                             filename="invoice-list"
                             extension=".xls"
@@ -534,11 +573,11 @@ class CreateInvoice extends Component {
                     }}
                     selectedIndexKey={"StockID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
                     Data={searchCategory == "All" && onSearchText == "" ? stocks : filteredList}                                  // required, the data that listing in the table
-                    onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
+                    // onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                     onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
-                    onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items
-                    actionIcon={<DriveFileRenameOutlineIcon />}
+                    actionIcon={this.renderTableActionButton()}
                     extraInfo={true}
+                    onSelectRow={this.onSelectItem}
                 />
 
                 <AlertDialog
@@ -744,6 +783,19 @@ class CreateInvoice extends Component {
                             Large Item
                         </Button>
                     </Stack>
+                </AlertDialog>
+
+                <AlertDialog
+                    open={openCancelModal}              // required, pass the boolean whether modal is open or close
+                    handleToggleDialog={this.onCancelModalPop}  // required, pass the toggle function of modal
+                    handleConfirmFunc={this.onDeleteButtonClick}    // required, pass the confirm function 
+                    showAction={true}                           // required, to show the footer of modal display
+                    title={"Cancel this proforma invoice?"}                                  // required, title of the modal
+                    buttonTitle={"Yes"}                         // required, title of button
+                    singleButton={false}                         // required, to decide whether to show a single full width button or 2 buttons
+                    maxWidth={"xs"}
+                    message={`Are you sure want to cancel this invoice? `}
+                >
                 </AlertDialog>
             </div>
         )
