@@ -76,9 +76,9 @@ class Dashboard extends Component {
                                     onMouseDown={(e) => { e.preventDefault(); this.redirectToPage(row.PageDirect) }}
                                 >
                                     <MuiTooltip title={"Click to view " + row.TitleColumn + " details"}>
-                                        <Card sx={{width: 140}}>
+                                        <Card sx={{minWidth: 140}}>
                                             <CardContent>
-                                                <Typography variant={"h6"} className="card-header" color="text.primary" gutterBottom>
+                                                <Typography variant={"h5"} color="text.primary" gutterBottom>
                                                     {row.TitleColumn}
                                                 </Typography>
                                             </CardContent>
