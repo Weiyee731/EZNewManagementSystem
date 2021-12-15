@@ -5,12 +5,13 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
+import MuiTooltip from '@mui/material/Tooltip';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { browserHistory, withRouter } from "react-router";
 import { isArrayNotEmpty, isStringNullOrEmpty, isObjectUndefinedOrNull, getWindowDimensions } from "../../tools/Helpers";
 import { ResponsiveContainer, ComposedChart, Line, Bar, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-
+import "./Dashboard.css"
 function mapStateToProps(state) {
     return {
         dashboard: state.counterReducer["dashboard"],
@@ -50,6 +51,7 @@ class Dashboard extends Component {
                 Sales = JSON.parse(this.props.dashboard[0].Sales)
 
             let obj = { CardView: CardView, Sales: Sales }
+            console.log(obj)
             this.setState({ dashboard_data: obj })
         }
     }
@@ -67,25 +69,26 @@ class Dashboard extends Component {
                         !isObjectUndefinedOrNull(dashboard_data) && isArrayNotEmpty(dashboard_data.CardView) && dashboard_data.CardView.map((row, idx) => {
                             return (
                                 <div
-                                    key={"CardID_" + row.CardID}
-                                    className="col-12 col-md-3"
+                                    key={"CardID_" + idx}
+                                    className="col-6 col-md mb-2"
                                     style={{ cursor: 'pointer' }}
                                     onClick={(e) => { this.redirectToPage(row.PageDirect) }}
                                     onMouseDown={(e) => { e.preventDefault(); this.redirectToPage(row.PageDirect) }}
                                 >
-                                    <Card sx={{ minWidth: 275 }}>
-                                        <CardContent>
-                                            <Typography variant={"h5"} color="text.secondary" gutterBottom>
-                                                {row.TitleColumn}
-                                            </Typography>
-                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                                {row.DataColumn}
-                                            </Typography>
-                                        </CardContent>
-                                        <CardActions>
-                                            <Button size="small">Learn More</Button>
-                                        </CardActions>
-                                    </Card>
+                                    <MuiTooltip title={"Click to view " + row.TitleColumn + " details"}>
+                                        <Card sx={{width: 140}}>
+                                            <CardContent>
+                                                <Typography variant={"h6"} className="card-header" color="text.primary" gutterBottom>
+                                                    {row.TitleColumn}
+                                                </Typography>
+                                            </CardContent>
+                                            <CardActions>
+                                                <div style={{ fontSize: '20pt', marginLeft: 'auto', fontWeight: 600 }}>
+                                                    {row.DataColumn}
+                                                </div>
+                                            </CardActions>
+                                        </Card>
+                                    </MuiTooltip>
                                 </div>
                             )
                         })
