@@ -11,6 +11,8 @@ import IconButton from '@mui/material/IconButton';
 import TableCell from '@mui/material/TableCell';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
 import { connect } from 'react-redux';
@@ -20,6 +22,7 @@ function mapStateToProps(state) {
     return {
         loading: state.counterReducer["loading"],
         userProfile: state.counterReducer["userProfile"],
+        userAreaCode: state.counterReducer["userAreaCode"],
         transactionReturn: state.counterReducer["transactionReturn"],
     };
 }
@@ -28,6 +31,7 @@ function mapDispatchToProps(dispatch) {
     return {
         CallUserProfileByID: (propsData) => dispatch(GitAction.CallUserProfileByID(propsData)),
         CallInsertTransaction: (propsData) => dispatch(GitAction.CallInsertTransaction(propsData)),
+        CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
     };
 }
 
@@ -36,16 +40,17 @@ const ProformaList = (props) => {
     const { userProfile } = props
 
     const [unitPrice, setUnitPrice] = useState(420)
-    const [selfPickupPrice, setSelfPickupPrice] = useState(5)
-    const [minPrice, setMinPrice] = useState((500).toFixed(2))
-    const [firstKg, setFirstKg] = useState(10)
-    const [subsequentKg, setSubsequentKg] = useState(6)
+    const [selfPickupPrice, setSelfPickupPrice] = useState('')
+    const [minPrice, setMinPrice] = useState('')
+    const [firstKg, setFirstKg] = useState('')
+    const [subsequentKg, setSubsequentKg] = useState()
     const [items, setItems] = useState(state)
+    const [area, setArea] = useState({ AreaCode: '' })
     const ref = useRef(false)
 
     useEffect(() => {
         props.CallUserProfileByID({ UserID: userId })
-
+        props.CallUserAreaCode()
         let abc = []
 
         items.map((item) => {
@@ -55,9 +60,18 @@ const ProformaList = (props) => {
                 isFollowStandard: true
             })
         })
-
         setItems(abc)
     }, [])
+
+    useEffect(() => {
+        if (isArrayNotEmpty(userProfile)) {
+            setSelfPickupPrice(userProfile[0].SelfPickOverCubic)
+            setMinPrice(userProfile[0].LargeDeliveryPrice)
+            setFirstKg(userProfile[0].SmallDeliveryFirstPrice)
+            setSubsequentKg(userProfile[0].SmallDeliverySubPrice)
+            setArea({ AreaCode: userProfile[0].AreaCode })
+        }
+    }, [userProfile])
 
     useEffect(() => {
         if (isArrayNotEmpty(props.transactionReturn)) {
@@ -298,6 +312,102 @@ const ProformaList = (props) => {
         )
     }
 
+    const renderTableTopLeft = () => {
+        return (
+            <div className='d-flex'>
+                {selectedType == 1 &&
+                    <TextField
+                        variant="standard"
+                        size="small"
+                        type={'number'}
+                        label="Unit Price (min.)"
+                        name="unitPrice"
+                        value={selfPickupPrice}
+                        onChange={(e) => handleChangeMinSingleUnitPrice(e)}
+                    />
+                }
+                {selectedType != 3 &&
+                    <TextField
+                        className="mx-3"
+                        variant="standard"
+                        size="small"
+                        type={'number'}
+                        label="Unit Price per m3"
+                        name="unitPrice"
+                        value={unitPrice}
+                        onChange={(e) => handleChangeAllUnitPrice(e)}
+                    />
+                }
+                {selectedType == 3 &&
+                    <>
+                        <TextField
+                            className="mx-3"
+                            variant="standard"
+                            size="small"
+                            type={'number'}
+                            label="First KG price"
+                            name="unitPrice"
+                            value={firstKg}
+                            onChange={(e) => setFirstKg(e.target.value)}
+                        />
+
+                        <TextField
+                            className="mx-3"
+                            variant="standard"
+                            size="small"
+                            type={'number'}
+                            label="Subsequent KG price"
+                            name="unitPrice"
+                            value={subsequentKg}
+                            onChange={(e) => setSubsequentKg(e.target.value)}
+                        />
+                    </>
+                }
+                {selectedType == 4 &&
+                    <TextField
+                        className="mx-3"
+                        variant="standard"
+                        size="small"
+                        type={'number'}
+                        label="Minimum price"
+                        name="unitPrice"
+                        value={minPrice}
+                        onChange={(e) => setMinPrice(e.target.value)}
+                    />
+                }
+            </div>
+        )
+    }
+
+    const renderTableTopRight = () => {
+        console.log(area.AreaCode)
+        return (
+            <>
+                {selectedType == 4 &&
+                    <Select
+                        labelId="search-filter-category"
+                        id="search-filter-category"
+                        value={area.AreaCode}
+                        onChange={(e) => handleAreaOnChange(e)}
+                        size="small"
+                    >
+                        {props.userAreaCode.map((data, index) => {
+                            return (
+                                <MenuItem key={`area_${index}`} value={data}>{data.AreaCode}</MenuItem>
+                            )
+                        })}
+                    </Select>
+                }
+            </>
+        )
+    }
+
+    const handleAreaOnChange = (e) => {
+        let data = e.target.value
+        console.log(data)
+        setArea(data.AreaCode)
+    }
+
     console.log(userProfile)
 
     return (
@@ -334,70 +444,8 @@ const ProformaList = (props) => {
                 </div>
                 <TableComponents
                     // table settings 
-                    tableTopLeft={
-                        <>
-                            {selectedType == 1 &&
-                                <TextField
-                                    variant="standard"
-                                    size="small"
-                                    type={'number'}
-                                    label="Unit Price (min.)"
-                                    name="unitPrice"
-                                    value={selfPickupPrice}
-                                    onChange={(e) => handleChangeMinSingleUnitPrice(e)}
-                                />
-                            }
-                            {selectedType != 3 &&
-                                <TextField
-                                    className="mx-3"
-                                    variant="standard"
-                                    size="small"
-                                    type={'number'}
-                                    label="Unit Price per m3"
-                                    name="unitPrice"
-                                    value={unitPrice}
-                                    onChange={(e) => handleChangeAllUnitPrice(e)}
-                                />
-                            }
-                            {selectedType == 3 &&
-                                <>
-                                    <TextField
-                                        className="mx-3"
-                                        variant="standard"
-                                        size="small"
-                                        type={'number'}
-                                        label="First KG price"
-                                        name="unitPrice"
-                                        value={firstKg}
-                                        onChange={(e) => setFirstKg(e.target.value)}
-                                    />
-
-                                    <TextField
-                                        className="mx-3"
-                                        variant="standard"
-                                        size="small"
-                                        type={'number'}
-                                        label="Subsequent KG price"
-                                        name="unitPrice"
-                                        value={subsequentKg}
-                                        onChange={(e) => setSubsequentKg(e.target.value)}
-                                    />
-                                </>
-                            }
-                            {selectedType == 4 &&
-                                <TextField
-                                    className="mx-3"
-                                    variant="standard"
-                                    size="small"
-                                    type={'number'}
-                                    label="Minimum price"
-                                    name="unitPrice"
-                                    value={minPrice}
-                                    onChange={(e) => setMinPrice(e.target.value)}
-                                />
-                            }
-                        </>
-                    }
+                    tableTopLeft={renderTableTopLeft()}
+                    tableTopRight={renderTableTopRight()}
                     tableOptions={{
                         dense: false,                // optional, default is false
                         tableOrderBy: 'asc',        // optional, default is asc
@@ -440,13 +488,13 @@ const ProformaList = (props) => {
                     <div className='col-2'>
                         RM {totalPrice()}
                     </div>
-                    {selectedType === 4 && totalPrice() < minPrice / 2 &&
+                    {selectedType === 4 && (totalVolume / 1000000) < 0.5 &&
                         <>
                             <div className='col-10'>
-                                * Does not meet minimum requirement:
+                                * Extra add-on:
                             </div>
                             <div className='col-2'>
-                                {(minPrice - totalPrice()).toFixed(2)}
+                                {(minPrice / 2 - totalPrice()).toFixed(2)}
                             </div>
                         </>
                     }
@@ -456,7 +504,7 @@ const ProformaList = (props) => {
                     <div className='col-2'>
                         {selectedType === 4 && totalPrice() < minPrice / 2 ?
                             <>
-                                RM {minPrice}
+                                RM {minPrice / 2}
                             </>
                             :
                             <>
