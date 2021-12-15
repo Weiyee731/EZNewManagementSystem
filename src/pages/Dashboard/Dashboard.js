@@ -5,12 +5,13 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
+import MuiTooltip from '@mui/material/Tooltip';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { browserHistory, withRouter } from "react-router";
 import { isArrayNotEmpty, isStringNullOrEmpty, isObjectUndefinedOrNull, getWindowDimensions } from "../../tools/Helpers";
 import { ResponsiveContainer, ComposedChart, Line, Bar, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-
+import "./Dashboard.css"
 function mapStateToProps(state) {
     return {
         dashboard: state.counterReducer["dashboard"],
@@ -42,14 +43,19 @@ class Dashboard extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (isArrayNotEmpty(this.props.dashboard) && this.state.dashboard_data === null) {
-            let CardView = [], Sales = [];
+            let CardView = [], Sales = [], SalesByContainer = [];
             if (!isStringNullOrEmpty(this.props.dashboard[0].CardView))
                 CardView = JSON.parse(this.props.dashboard[0].CardView)
 
             if (!isStringNullOrEmpty(this.props.dashboard[0].Sales))
                 Sales = JSON.parse(this.props.dashboard[0].Sales)
 
-            let obj = { CardView: CardView, Sales: Sales }
+            if (!isStringNullOrEmpty(this.props.dashboard[0].SalesByContainer))
+                SalesByContainer = JSON.parse(this.props.dashboard[0].SalesByContainer)
+
+
+            let obj = { CardView: CardView, Sales: Sales, SalesByContainer: SalesByContainer }
+            console.log(obj)
             this.setState({ dashboard_data: obj })
         }
     }
@@ -67,25 +73,26 @@ class Dashboard extends Component {
                         !isObjectUndefinedOrNull(dashboard_data) && isArrayNotEmpty(dashboard_data.CardView) && dashboard_data.CardView.map((row, idx) => {
                             return (
                                 <div
-                                    key={"CardID_" + row.CardID}
-                                    className="col-12 col-md-3"
+                                    key={"CardID_" + idx}
+                                    className="col-6 col-md mb-2"
                                     style={{ cursor: 'pointer' }}
                                     onClick={(e) => { this.redirectToPage(row.PageDirect) }}
                                     onMouseDown={(e) => { e.preventDefault(); this.redirectToPage(row.PageDirect) }}
                                 >
-                                    <Card sx={{ minWidth: 275 }}>
-                                        <CardContent>
-                                            <Typography variant={"h5"} color="text.secondary" gutterBottom>
-                                                {row.TitleColumn}
-                                            </Typography>
-                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                                {row.DataColumn}
-                                            </Typography>
-                                        </CardContent>
-                                        <CardActions>
-                                            <Button size="small">Learn More</Button>
-                                        </CardActions>
-                                    </Card>
+                                    <MuiTooltip title={"Click to view " + row.TitleColumn + " details"}>
+                                        <Card sx={{minWidth: 140}}>
+                                            <CardContent>
+                                                <Typography variant={"h5"} color="text.primary" gutterBottom>
+                                                    {row.TitleColumn}
+                                                </Typography>
+                                            </CardContent>
+                                            <CardActions>
+                                                <div style={{ fontSize: '20pt', marginLeft: 'auto', fontWeight: 600 }}>
+                                                    {row.DataColumn}
+                                                </div>
+                                            </CardActions>
+                                        </Card>
+                                    </MuiTooltip>
                                 </div>
                             )
                         })
@@ -111,6 +118,29 @@ class Dashboard extends Component {
                             <Legend />
                             <Bar dataKey="ActualSaleCollected" stackId="Sales" barSize={20} fill="#2a9d8f" />
                             <Bar dataKey="ActualSaleNoCollected" stackId="Sales" barSize={20} fill="#e76f51" />
+                            <Line type="monotone" dataKey="TotalSales" stroke="#9b2226" />
+                        </ComposedChart>
+                    </ResponsiveContainer>
+                </div>
+                <div className="row mt-2">
+                    <ResponsiveContainer width={getWindowDimensions().screenWidth * .8} height={getWindowDimensions().screenHeight * 0.4}>
+                        <ComposedChart
+                            width={500}
+                            height={400}
+                            data={!isObjectUndefinedOrNull(dashboard_data) && isArrayNotEmpty(dashboard_data.SalesByContainer) ? dashboard_data.SalesByContainer : []}
+                            margin={{
+                                top: 20,
+                                right: 20,
+                                bottom: 20,
+                                left: 20,
+                            }}
+                        >
+                            <CartesianGrid stroke="#f5f5f5" />
+                            <XAxis dataKey="ContainerName" scale="band" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="ActualSaleCollected" stackId="TotalItem" barSize={20} fill="#2a9d8f" />
                             <Line type="monotone" dataKey="TotalSales" stroke="#9b2226" />
                         </ComposedChart>
                     </ResponsiveContainer>
