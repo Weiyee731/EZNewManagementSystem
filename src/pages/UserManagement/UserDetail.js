@@ -419,46 +419,6 @@ class UserDetail extends Component {
                       autoFocus
                     />
                   </Grid>
-                  {/* <Grid item xs={12} sm={6}>
-                    <TextField
-                      required
-                      fullWidth
-                      id="UserCode"
-                      label="User Code"
-                      name="UserCode"
-                      autoComplete="family-name"
-                    />
-                  </Grid> */}
-                  {/* <Grid item xs={12} sm={6}>
-                    <TextField
-                      required
-                      fullWidth
-                      id="email"
-                      label="Email Address"
-                      name="email"
-                      autoComplete="email"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="Contact"
-                      label="Contact"
-                      id="contact"
-                      autoComplete="contact"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="Address"
-                      label="Address"
-                      id="address"
-                      autoComplete="address"
-                    />
-                  </Grid> */}
                 </Grid>
                 <Button
                   type="submit"
