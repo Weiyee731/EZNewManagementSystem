@@ -96,11 +96,12 @@ export function ModalPopOut(props) {
     <Dialog
       fullScreen={props.fullScreen ? props.fullScreen : false}    //fullscreen modal
       hideBackdrop={props.hideBackdrop ? props.hideBackdrop : false}   //hide back
-      // BackDropProps={props.BackDropProps ? props.BackDropProps : false}
-      // onBackdropClick={this.onClose= 'open'}
-      onBackdropClick={props.onBackdropClick}
+      onClose={(event, reason) => {
+        if (reason !== 'backdropClick') {
+          props.handleToggleDialog()
+        }
+      }}
       open={props.open}
-      onClose={() => props.handleToggleDialog()}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       PaperComponent={props.fullScreen ? null : PaperComponent}
@@ -133,7 +134,8 @@ export function ModalPopOut(props) {
         {/* </DialogContentText> */}
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => props.handleToggleDialog()}>Cancel</Button>
+        {props.showCancel?  <Button onClick={() => props.handleToggleDialog()}>Cancel</Button>:""}
+      
         <Button onClick={() => props.handleConfirmFunc()} variant='contained'>
           Confirm
         </Button>

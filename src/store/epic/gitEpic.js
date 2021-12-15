@@ -392,7 +392,7 @@ export class GitEpic {
 
   Inventory_UpdateStockDetailByPost = action$ =>
     action$.ofType(GitAction.UpdateStockDetailByPost).switchMap(async ({ payload }) => {
-
+    
       return fetch(
         postUrl + "Inventory_UpdateStockDetailByPost"
         , {
@@ -402,21 +402,21 @@ export class GitEpic {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            STOCKID: payload.STOCKID,
-            USERCODE: payload.USERCODE,
-            TRACKINGNUMBER: payload.TRACKINGNUMBER,
-            PRODUCTWEIGHT: payload.PRODUCTWEIGHT,
-            PRODUCTHEIGHT: payload.PRODUCTHEIGHT,
-            PRODUCTWIDTH: payload.PRODUCTWIDTH,
-            PRODUCTDEEP: payload.PRODUCTDEEP,
-            AREACODE: payload.AREACODE,
-            ITEM: payload.ITEM,
+            STOCKID: payload.StockID,
+            USERCODE: payload.UserCode,
+            TRACKINGNUMBER: payload.TrackingNumber,
+            PRODUCTWEIGHT: payload.ProductWeight,
+            PRODUCTHEIGHT: payload.ProductDimensionHeight,
+            PRODUCTWIDTH: payload.ProductDimensionWidth,
+            PRODUCTDEEP: payload.ProductDimensionDeep,
+            AREACODE: payload.AreaCode,
+            ITEM: payload.Item,
             TRACKINGSTATUSID: payload.TRACKINGSTATUSID,
-            CONTAINERNAME: payload.CONTAINERNAME,
+            CONTAINERNAME: payload.ContainerName,
 
-            CONTAINERDATE: payload.CONTAINERDATE,
-            REMARK: payload.REMARK,
-            EXTRACHARGE: payload.EXTRACHARGE
+            CONTAINERDATE: payload.ContainerDate,
+            REMARK: payload.Remark,
+            EXTRACHARGE: payload.AdditionalCharges
           })
         }
       )
@@ -741,6 +741,96 @@ export class GitEpic {
       }
     });
   ///////////////////////////////////////////////////   Dashboard  ///////////////////////////////////////////////////
+
+
+  ///////////////////////////////////////////////////   Archived Data  ///////////////////////////////////////////////////
+  Inventory_ViewArchiveStockListByDate = action$ =>
+    action$.ofType(GitAction.FetchArchivedStocks).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Inventory_ViewArchiveStockListByDate?" +
+        "&STARTDATE=" + payload.STARTDATE +
+        "&ENDDATE=" + payload.ENDDATE)
+      try {
+        const response = await fetch(url +
+          "Inventory_ViewArchiveStockListByDate?" +
+          "&STARTDATE=" + payload.STARTDATE +
+          "&ENDDATE=" + payload.ENDDATE
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.ArchivedStocksFetched,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_ViewArchiveStockListByDate")
+        return {
+          type: GitAction.ArchivedStocksFetched,
+          payload: [],
+        };
+      }
+    });
+
+  Inventory_ViewArchiveStockListByDate = action$ =>
+    action$.ofType(GitAction.FetchArchivedStocks).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Inventory_ViewArchiveStockListByDate?" +
+        "STARTDATE=" + payload.STARTDATE +
+        "&ENDDATE=" + payload.ENDDATE)
+      try {
+        const response = await fetch(url +
+          "Inventory_ViewArchiveStockListByDate?" +
+          "STARTDATE=" + payload.STARTDATE +
+          "&ENDDATE=" + payload.ENDDATE
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.ArchivedStocksFetched,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_ViewArchiveStockListByDate")
+        return {
+          type: GitAction.ArchivedStocksFetched,
+          payload: [],
+        };
+      }
+    });
+
+  Transaction_ViewArchiveTransaction = action$ =>
+    action$.ofType(GitAction.FetchArchivedTransaction).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Transaction_ViewArchiveTransaction?" +
+        "STARTDATE=" + payload.STARTDATE +
+        "&ENDDATE=" + payload.ENDDATE)
+      try {
+        const response = await fetch(url +
+          "Transaction_ViewArchiveTransaction?" +
+          "STARTDATE=" + payload.STARTDATE +
+          "&ENDDATE=" + payload.ENDDATE
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.ArchivedTransactionFetched,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Transaction_ViewArchiveTransaction")
+        return {
+          type: GitAction.ArchivedTransactionFetched,
+          payload: [],
+        };
+      }
+    });
+  ///////////////////////////////////////////////////   Archived Data  ///////////////////////////////////////////////////
 
 }
 export let gitEpic = new GitEpic();

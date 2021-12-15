@@ -8,6 +8,7 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import IconButton from '@mui/material/IconButton';
 import FormControl from '@mui/material/FormControl';
@@ -199,7 +200,6 @@ class EditStockGoods extends Component {
             // this.state.validation = tempFormValue;
             this.setState({ formData: tempFormValue })
         }
-        console.log(tempFormValue)
     }
 
     removeAllAdditionalCost() {
@@ -210,11 +210,19 @@ class EditStockGoods extends Component {
 
     render() {
         const formValue = this.state.formData ? this.state.formData : [];
-        console.log(formValue)
+        const ContainerDate = this.props.ContainerDate ? this.props.ContainerDate : [];
+        const ContainerName = this.props.ContainerName ? this.props.ContainerName : [];
         return (
             <div>
                 <div className="py-md-3 py-1">
                     <div className="row">
+                        <div className="col-12" style={{ fontSize: '9pt' }}>
+                            <div className="clearfix">
+                                <div className="float-start"> <b>Container: </b>{!isStringNullOrEmpty(ContainerName) ? ContainerName : " N/A "}  </div>
+                                <div className="float-end"> <b>Container Date: </b> {!isStringNullOrEmpty(ContainerDate) ? ContainerDate : " N/A "}  </div>
+                            </div>
+                            <hr />
+                        </div>
                         <div className="col-12 col-md-4">
                             <TextField variant="standard" size="small" fullWidth label="Tracking Number" name="TrackingNumber" defaultValue={formValue.TrackingNumber} onChange={(e) => this.onTrigger(e, "TrackingNumber")} error={!this.state.TrackingNumberVerified} />
                             {!this.state.TrackingNumberVerified && <FormHelperText sx={{ color: 'red' }} id="TrackingNumber-error-text">Invalid</FormHelperText>}
@@ -312,7 +320,6 @@ class EditStockGoods extends Component {
                     </div>
                     {
                         isArrayNotEmpty(formValue.AdditionalCost) && formValue.AdditionalCost.map((el, idx) => {
-                            console.log(formValue.AdditionalCost)
                             return (
                                 <div className="row" key={idx}>
                                     <div className="col-6 col-sm-8">
@@ -359,6 +366,21 @@ class EditStockGoods extends Component {
                             <Button className="my-1 w-100" color="error" variant="contained" size="small" onClick={() => { this.removeAllAdditionalCost() }} startIcon={<DeleteIcon />}>Clear Additional Costs</Button>
                         </div>
                     }
+                       <div className="row mt-2">
+                            <div className="col-12">
+                                <Box sx={{ width: '100%' }}>
+                                    <TextField
+                                        variant="outlined"
+                                        size="large"
+                                        name="Remark"
+                                        label="Remark"
+                                        value={formValue.Remark}
+                                        onChange={(e) => this.onTrigger(e, "Remark")}
+                                        fullWidth
+                                    />
+                                </Box>
+                            </div>
+                        </div>
                 </div>
             </div>
         )

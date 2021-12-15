@@ -16,6 +16,7 @@ const INITIAL_STATE = {
   transaction: [],
   transactionReturn: [],
   dashboard: [],
+  archivedData: [],
 };
 
 export function counterReducer(state = INITIAL_STATE, action) {
@@ -217,6 +218,29 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, {
         loading: false,
         dashboard: action.payload
+      });
+
+    /////////////////////////////////////////////////// Archived Data Management ///////////////////////////////////////////////////
+    case GitAction.FetchArchivedStocks:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.ArchivedStocksFetched:
+      return Object.assign({}, state, {
+        loading: false,
+        archivedData: action.payload
+      });
+
+    case GitAction.FetchArchivedTransaction:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.ArchivedTransactionFetched:
+      return Object.assign({}, state, {
+        loading: false,
+        archivedData: action.payload
+      });
+
+    case GitAction.ResetArchivedData:
+      return Object.assign({}, state, {
+        loading: false,
+        archivedData: []
       });
 
     /////////////////////////////////////////////////// Default ///////////////////////////////////////////////////
