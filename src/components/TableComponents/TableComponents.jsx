@@ -122,7 +122,7 @@ EnhancedTableHead.propTypes = {
 };
 
 const EnhancedTableToolbar = (props) => {
-    const { selectedRows, tableTopLeft, OnActionButtonClick, OnDeleteButtonClick, tableTopRight, actionIcon, extraInfo } = props;
+    const { selectedRows, tableTopLeft, OnActionButtonClick, tableTopRight, actionIcon, extraInfo } = props;
     const numSelected = selectedRows.length
     let mCube = 0
     let weight = 0
@@ -167,9 +167,9 @@ const EnhancedTableToolbar = (props) => {
             }
             {
                 numSelected > 0 ? (
-                    <IconButton onClick={() => { OnDeleteButtonClick(selectedRows) }} >
+                    <div>
                         {actionIcon}
-                    </IconButton>
+                    </div>
                 ) : (
                     tableTopRight === null ?
                         typeof OnActionButtonClick === "function" &&
@@ -278,6 +278,7 @@ export default function TableComponents(props) {
             );
         }
         setSelected(newSelected);
+        props.onSelectRow && props.onSelectRow(newSelected)
     }
 
     const handleRowClick = (event, row) => {
@@ -306,7 +307,6 @@ export default function TableComponents(props) {
                         tableTopLeft={props.tableTopLeft}
                         tableTopRight={tableTopRight}
                         OnActionButtonClick={props.onActionButtonClick}
-                        OnDeleteButtonClick={props.onDeleteButtonClick}
                         actionIcon={props.actionIcon}
                         extraInfo={props.extraInfo}
                     />

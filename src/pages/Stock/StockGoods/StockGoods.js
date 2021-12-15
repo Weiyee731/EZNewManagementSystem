@@ -180,9 +180,6 @@ function onAddButtonClick() {
     this.setState({ openAddModal: true })
 }
 
-function onDeleteButtonClick(items) {
-}
-
 class StockGoods extends Component {
     constructor(props) {
         super(props);
@@ -578,7 +575,6 @@ class StockGoods extends Component {
                             Data={this.state.stockFiltered ? this.state.stockFiltered : []}
                             onTableRowClick={this.onTableRowClick}
                             onActionButtonClick={onAddButtonClick}
-                            onDeleteButtonClick={onDeleteButtonClick}
                         />
                     </div>
                 </div>

@@ -280,15 +280,6 @@ class InvoicerDetail extends Component {
     this.setState({ AddModalOpen2: false });
   }
 
-  onAddButtonClick = () => {
-    this.setState({ AddModalOpen: true });
-  }
-
-  onDeleteButtonClick = (items) => {
-    console.log('delete button')
-
-  }
-
   onClickConfirmInvoice = (items) => {
     var isDeliveryExist = false
     this.props.CallUpdateTransaction(this.state);
@@ -420,10 +411,10 @@ class InvoicerDetail extends Component {
                   <span className="col-1">Date</span>
                   <span className="col-4">: {OrderDate}</span>
                 </div>
-                <div className="row" style={companyDetail}>
+                {/* <div className="row" style={companyDetail}>
                   <span className="col-1 offset-7">Page</span>
                   <span className="col-4">: 1 of 2</span>
-                </div>
+                </div> */}
               </div>
               <div
                 style={{
@@ -492,7 +483,7 @@ class InvoicerDetail extends Component {
                     <div>SDN BHD</div>
                   </div>
                 </div>
-                <div style={{textAlign: 'left', ...tncDiv}} className="col-4 offset-4">
+                <div style={{ textAlign: 'left', ...tncDiv }} className="col-4 offset-4">
                   __________________________________
                   <div>Name  : </div>
                   <div>IC NO : </div>

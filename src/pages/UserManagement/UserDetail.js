@@ -250,11 +250,6 @@ class UserDetail extends Component {
     this.setState({ AddModalOpen: true, selectedRow: row, selectedindex: index });
   }
 
-  onDeleteButtonClick = (items) => {
-    console.log('delete button')
-
-  }
-
   changeTab = (key) => {
     switch (key) {
       case "All":
@@ -390,8 +385,6 @@ class UserDetail extends Component {
             }}
             selectedIndexKey={"pid"}
             Data={this.state.filteredList}
-          // onTableRowClick={this.onTableRowClick}
-
           />
         </div>
         <div>

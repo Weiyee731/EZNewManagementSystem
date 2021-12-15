@@ -22,6 +22,7 @@ const rootEpic = combineEpics(
   gitEpic.Transaction_UpdateTransactionPayment,
   gitEpic.Transaction_ViewTransaction,
   gitEpic.Transaction_ViewTransactionByID,
+  gitEpic.Transaction_DeleteTransaction,
   gitEpic.Inventory_InsertStockByPost,
   gitEpic.Inventory_GetFilteredStockList,
   gitEpic.Dashboard_View,

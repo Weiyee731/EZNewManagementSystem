@@ -60,12 +60,13 @@ const ProformaList = (props) => {
     }, [])
 
     useEffect(() => {
-        console.log(props.transactionReturn)
-        if(props.transactionReturn[0].ReturnVal == 1) {
-            toast.success(props.transactionReturn[0].ReturnMsg)
-            props.history.push(`/InvoiceDetail/${props.transactionReturn[0].TransactionID}`)
-        } else {
-            toast.error("Something went wrong. Please try again")
+        if (isArrayNotEmpty(props.transactionReturn)) {
+            if (props.transactionReturn[0].ReturnVal == 1) {
+                toast.success(props.transactionReturn[0].ReturnMsg)
+                props.history.push(`/InvoiceDetail/${props.transactionReturn[0].TransactionID}`)
+            } else {
+                toast.error("Something went wrong. Please try again")
+            }
         }
     }, [props.transactionReturn])
 
@@ -211,7 +212,7 @@ const ProformaList = (props) => {
             let volume = volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
             if (volume < 0.013 && selectedType == 1) {
                 if (item.isFollowStandard && selfPickupPrice != "") {
-                    productPrices.push(Number(selfPickupPrice).toFixed(2)) 
+                    productPrices.push(Number(selfPickupPrice).toFixed(2))
                 } else if (!item.isFollowStandard) {
                     productPrices.push(Number(item.unitPrice).toFixed(2))
                 }
