@@ -17,7 +17,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Backdrop from '@mui/material/Backdrop';
 import CsvDownloader from 'react-csv-downloader';
-import { getWindowDimensions, isArrayNotEmpty } from "../../../tools/Helpers";
+import { getWindowDimensions, isArrayNotEmpty, isStringNullOrEmpty, convertDateTimeToString112Format } from "../../../tools/Helpers";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -27,6 +27,9 @@ import ResponsiveDatePickers from '../../../components/datePicker/datePicker';
 import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents";
 import TableComponents from "../../../components/TableComponents/TableComponents"
 import SearchBar from "../../../components/SearchBar/SearchBar"
+import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
+import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
+import "./ArchivedTransaction.css";
 
 function mapStateToProps(state) {
     return {
@@ -112,44 +115,59 @@ class ArchivedTransaction extends Component {
         this.state = {
             AddModalOpen: false,
             TransactionListing: [],
-            TransactionListingFiltered: [],
+            TransactionListingFiltered: null,
             TrackingStatusID: 4,
-            filteredList: [],
             selectedRow: [],
             TransactionID: 0,
             searchCategory: "Cash",
             Payment: "",
             Datetime: "",
-            ReferenceNo: ""
+            ReferenceNo: "",
+            searchDates: [],
+            isDataFetching: false,
+
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.handleInputChange = this.handleInputChange.bind(this)
         this.handleSearchCategory = this.handleSearchCategory.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
+        this.onFilterDateChange = this.onFilterDateChange.bind(this)
+        this.onDatabaseSearch = this.onDatabaseSearch.bind(this)
 
         this.props.CallFetchArchivedTransactions({ STARTDATE: new Date().getFullYear() + '/1/1', ENDDATE: new Date().getFullYear() + '/12/31', })
     }
 
     componentDidMount() {
-        if (this.props.archivedData.length !== this.state.TransactionListing.length) {
-            if (this.props.archivedData !== undefined && this.props.archivedData[0] !== undefined) {
-                this.setState({ TransactionListing: this.props.archivedData, TransactionListingFiltered: this.props.archivedData });
-            }
-        }
+        // if (this.props.archivedData.length !== this.state.TransactionListing.length) {
+        //     if (this.props.archivedData !== undefined && this.props.archivedData[0] !== undefined) {
+        //         this.setState({ TransactionListing: this.props.archivedData, TransactionListingFiltered: this.props.archivedData });
+        //     }
+        // }
     }
 
     componentDidUpdate(prevProps, prevState) {
         console.log(this.props.archivedData)
-        if (prevProps.archivedData.length !== this.props.archivedData.length) {
-            console.log(this.props.archivedData !== undefined && this.props.archivedData[0] !== undefined)
-            if (this.props.archivedData !== undefined && this.props.archivedData[0] !== undefined) {
-                this.setState({ TransactionListing: this.props.archivedData, TransactionListingFiltered: this.props.archivedData });
-            }
-        } else {
-            if (prevProps.archivedData.length !== this.state.TransactionListing.length) {
-                this.setState({ TransactionListing: prevProps.archivedData, TransactionListingFiltered: prevProps.archivedData });
+        if (this.state.TransactionListingFiltered === null && isArrayNotEmpty(this.props.archivedData)) {
+            const { archivedData } = this.props
+            this.setState({
+                TransactionListingFiltered: (!isStringNullOrEmpty(archivedData[0].ReturnVal) && archivedData[0].ReturnVal == 0) ? [] : archivedData,
+                isDataFetching: false
+            })
+            toast.dismiss();
+
+            if ((!isStringNullOrEmpty(archivedData[0].ReturnVal) && archivedData[0].ReturnVal == 0)) {
+                toast.warning("Fetched data is empty. ", { autoClose: 3000, theme: "dark" });
             }
         }
+        // if (prevProps.archivedData.length !== this.props.archivedData.length) {
+        //     if (this.props.archivedData !== undefined && this.props.archivedData[0] !== undefined) {
+        //         this.setState({ TransactionListing: this.props.archivedData, TransactionListingFiltered: this.props.archivedData });
+        //     }
+        // } else {
+        //     if (prevProps.archivedData.length !== this.state.TransactionListing.length) {
+        //         this.setState({ TransactionListing: prevProps.archivedData, TransactionListingFiltered: prevProps.archivedData });
+        //     }
+        // }
     }
 
     renderTableRows = (data, index) => {
@@ -223,6 +241,31 @@ class ArchivedTransaction extends Component {
         this.setState({ Datetime: e })
     }
 
+    onFilterDateChange(e) {
+        this.setState({ searchDates: e })
+    }
+
+    onDatabaseSearch() {
+        const { searchDates } = this.state
+        let date_range = (typeof searchDates === "string" && !Array.isArray(searchDates)) ? JSON.parse(searchDates) : searchDates
+        // 
+        if (!date_range.includes(null)) {
+            this.props.CallResetArchivedData()
+            const object = { STARTDATE: convertDateTimeToString112Format(date_range[0], false), ENDDATE: convertDateTimeToString112Format(date_range[1], false) }
+            this.props.CallFetchArchivedTransactions(object)
+            toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
+            this.setState({ isDataFetching: true, TransactionListingFiltered: null })
+            this.forceUpdate()
+        }
+        else {
+            if (date_range[0] === null)
+                toast.error("Require valid begin dates", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
+
+            if (date_range[1] === null)
+                toast.error("Require valid end dates", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
+        }
+    }
+
     handleSearchCategory(e) {
         this.setState({ PaymentMethod: e.target.value })
     }
@@ -264,6 +307,32 @@ class ArchivedTransaction extends Component {
             <>
                 <div className="w-100 container-fluid">
                     <div className="row d-flex">
+                        <div className="row">
+                            <div className="col-md-12 col-12 mb-2 stock-date-range-picker d-flex">
+                                <label className="my-auto" style={{ marginRight: '15px' }}>Filter by Date: </label>
+                                <ResponsiveDatePickers
+                                    rangePicker
+                                    openTo="day"
+                                    title="FromDate"
+                                    value={this.state.datevalue ? this.state.datevalue : ""}
+                                    onChange={(e) => this.onFilterDateChange(e)}
+                                    variant="outlined"
+                                    startPickerPropsOptions={{ placeholder: "From", className: "start-date-picker" }}
+                                    endPickerPropsOptions={{ placeholder: "To", className: "end-date-picker" }}
+                                />
+                                <Tooltip title="Search Date">
+                                    <IconButton
+                                        aria-label="Search Date"
+                                        size="small"
+                                        onClick={() => { this.onDatabaseSearch() }}
+                                        sx={{ marginTop: 'auto', marginBottom: 'auto', marginLeft: '5px', border: '1px solid rgba(33, 33, 33, 0.6)' }}
+                                        disabled={this.state.isDataFetching}
+                                    >
+                                        <ManageSearchOutlinedIcon fontSize="medium" />
+                                    </IconButton>
+                                </Tooltip>
+                            </div>
+                        </div>
                         <div className="col-md-11 col-11 m-auto">
                             <SearchBar onChange={onChange} />
                         </div>

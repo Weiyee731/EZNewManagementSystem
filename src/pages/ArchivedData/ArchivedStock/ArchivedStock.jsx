@@ -487,7 +487,7 @@ class ArchivedStock extends Component {
             <div className="container-fluid my-2">
                 <div className="row">
                     <div className="col-md-12 col-12 mb-2 stock-date-range-picker d-flex">
-                        <label className="my-auto" style={{ marginRight: '15px' }}>Packaging Date: </label>
+                        <label className="my-auto" style={{ marginRight: '15px' }}>Filter By Date: </label>
                         <ResponsiveDatePickers
                             rangePicker
                             openTo="day"
