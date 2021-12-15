@@ -21,6 +21,9 @@ import SaveIcon from '@mui/icons-material/Save';
 import ToggleTabsComponent from "../../components/ToggleTabsComponent/ToggleTabComponents";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
+import { isArrayNotEmpty, getWindowDimensions, isStringNullOrEmpty } from '../../tools/Helpers';
+import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
+import './UserDetail.css'
 function mapStateToProps(state) {
   return {
     userProfile: state.counterReducer["userProfile"],
@@ -105,6 +108,9 @@ const headCells = [
   },
 ];
 
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+const RADIAN = Math.PI / 180;
+
 class UserDetail extends Component {
   constructor(props) {
     super(props);
@@ -122,6 +128,8 @@ class UserDetail extends Component {
       payment: "",
       selectedindex: "",
       isOnEditMode: false,
+      AddModalOpen: false,
+      PieChartData: [],
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.toggleEditMode = this.toggleEditMode.bind(this)
@@ -129,27 +137,37 @@ class UserDetail extends Component {
     this.props.CallUserProfileByID(this.state)
   }
 
-  componentDidMount() {
-    if (this.props.userProfile.length !== this.state.UserProfile.length) {
-      if (this.props.userProfile !== undefined && this.props.userProfile[0] !== undefined) {
-        console.log(this.props.userProfile)
-        this.setState({
-          UserProfile: this.props.userProfile,
-          FullName: this.props.userProfile[0].Fullname,
-          UserCode: this.props.userProfile[0].UserCode,
-          Email: this.props.userProfile[0].UserEmailAddress,
-          Contact: this.props.userProfile[0].UserContactNo,
-          Address: this.props.userProfile[0].UserAddress,
-          Transaction: JSON.parse(this.props.userProfile[0].Transaction),
-          filteredList: JSON.parse(this.props.userProfile[0].Transaction),
-        });
-      }
-    }
-  }
+  // componentDidMount() {
+  //   if (this.props.userProfile.length !== this.state.UserProfile.length) {
+  //     if (typeof this.props.userProfile !== "undefined" && typeof this.props.userProfile[0] !== "undefined") {
+  //       const piechart_data = (isArrayNotEmpty(this.props.UserProfile)) ? [
+  //         { name: "Total Unpaid", value: (!isStringNullOrEmpty(this.props.UserProfile[0].TotalUnpaid)) ? Number(this.props.UserProfile[0].TotalUnpaid) : 0 },
+  //         { name: "Total Paid", value: (!isStringNullOrEmpty(this.props.UserProfile[0].TotalPaid)) ? Number(this.props.UserProfile[0].TotalPaid) : 0 },
+  //       ] : []
+
+  //       this.setState({
+  //         UserProfile: this.props.userProfile,
+  //         FullName: this.props.userProfile[0].Fullname,
+  //         UserCode: this.props.userProfile[0].UserCode,
+  //         Email: this.props.userProfile[0].UserEmailAddress,
+  //         Contact: this.props.userProfile[0].UserContactNo,
+  //         Address: this.props.userProfile[0].UserAddress,
+  //         Transaction: JSON.parse(this.props.userProfile[0].Transaction),
+  //         filteredList: JSON.parse(this.props.userProfile[0].Transaction),
+  //         PieChartData: piechart_data,
+  //       });
+  //     }
+  //   }
+  // }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.userProfile.length !== this.props.userProfile.length) {
-      if (this.props.userProfile !== undefined && this.props.userProfile[0] !== undefined) {
+      if (typeof this.props.userProfile !== "undefined" && typeof this.props.userProfile[0] !== "undefined") {
+        let piechart_data = (isArrayNotEmpty(this.props.userProfile)) ? [
+          { name: "Total Unpaid", value: (!isStringNullOrEmpty(this.props.userProfile[0].TotalUnpaid)) ? Number(this.props.userProfile[0].TotalUnpaid) : 0 },
+          { name: "Total Paid", value: (!isStringNullOrEmpty(this.props.userProfile[0].TotalPaid)) ? Number(this.props.userProfile[0].TotalPaid) : 0 },
+        ] : [{ name: "Total Unpaid", value: 0 }, { name: "Total Paid", value: 0 }]
+        
         this.setState({
           UserProfile: this.props.userProfile,
           FullName: this.props.userProfile[0].Fullname,
@@ -159,10 +177,16 @@ class UserDetail extends Component {
           Address: this.props.userProfile[0].UserAddress,
           Transaction: JSON.parse(this.props.userProfile[0].Transaction),
           filteredList: JSON.parse(this.props.userProfile[0].Transaction),
+          PieChartData: piechart_data,
         });
+
       }
     } else {
       if (prevProps.userProfile.length !== this.state.UserProfile.length) {
+        let piechart_data = (isArrayNotEmpty(this.props.userProfile)) ? [
+          { name: "Total Unpaid", value: (!isStringNullOrEmpty(this.props.userProfile[0].TotalUnpaid)) ? Number(this.props.userProfile[0].TotalUnpaid) : 0 },
+          { name: "Total Paid", value: (!isStringNullOrEmpty(this.props.userProfile[0].TotalPaid)) ? Number(this.props.userProfile[0].TotalPaid) : 0 },
+        ] : [{ name: "Total Unpaid", value: 0 }, { name: "Total Paid", value: 0 }]
         this.setState({
           UserProfile: prevProps.userProfile,
           FullName: prevProps.userProfile[0].Fullname,
@@ -172,6 +196,8 @@ class UserDetail extends Component {
           Address: prevProps.userProfile[0].UserAddress,
           Transaction: JSON.parse(prevProps.userProfile[0].Transaction),
           filteredList: JSON.parse(prevProps.userProfile[0].Transaction),
+          PieChartData: piechart_data,
+
         });
       }
     }
@@ -283,6 +309,7 @@ class UserDetail extends Component {
     }
   }
 
+
   render() {
     const { isOnEditMode } = this.state
     const ToggleTabs = [
@@ -290,6 +317,20 @@ class UserDetail extends Component {
       { children: "Unpaid", key: "Unpaid" },
       { children: "Paid", key: "Paid" }
     ]
+
+    const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+      const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+      const x = cx + radius * Math.cos(-midAngle * RADIAN);
+      const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  
+      return (
+        <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+          {this.state.PieChartData[index].name} {`${(percent * 100).toFixed(0)}%`}
+        </text>
+      );
+    };
+
+    console.log(this.state.UserProfile)
     return (
       <div>
         <Card>
@@ -306,7 +347,7 @@ class UserDetail extends Component {
               <Typography variant="h5" component="div"> Edit Profile </Typography>
               <div style={{ textAlign: 'end', flex: 1 }}>
                 {
-                  this.state.isOnEditMode ?
+                  isOnEditMode ?
                     <LoadingButton
                       loading={this.props.loading}
                       loadingPosition="end"
@@ -329,59 +370,158 @@ class UserDetail extends Component {
 
               </div>
             </div>
-            <div className="row">
-              <div className="col-lg-6 col-md-6 col-sm-12">
-                <TextField
-                  className="w-100 my-3"
-                  required
-                  value={this.state.FullName}
-                  onChange={(e) => this.handleInputChange(e)}
-                  id="fullname"
-                  label="Full Name"
-                  defaultValue={this.state.FullName}
-                />
-              </div>
-              <div className="col-lg-6 col-md-6 col-sm-12">
-                <TextField
-                  className="w-100 my-3"
-                  required
-                  value={this.state.UserCode}
-                  onChange={(e) => this.handleInputChange(e)}
-                  id="usercode"
-                  label="User Code"
-                  defaultValue={this.state.UserCode}
-                />
-              </div>
-            </div>
-            <TextField
-              className="w-100 my-3"
-              required
-              value={this.state.Email}
-              onChange={(e) => this.handleInputChange(e)}
-              id="email"
-              label="Email Address"
-              defaultValue={this.state.Email}
-            />
-            <TextField
-              className="w-100 my-3"
-              required
-              value={this.state.Contact}
-              onChange={(e) => this.handleInputChange(e)}
-              id="contact"
-              label="Contact No."
-              defaultValue={this.state.Contact}
-            />
-            <TextField
-              className="w-100 my-3"
-              required
-              value={this.state.Address}
-              onChange={(e) => this.handleInputChange(e)}
-              id="address"
-              label="Address"
-              defaultValue={this.state.Address}
-            />
+
+            {
+              isOnEditMode ?
+                <div className="row">
+                  <div className="col-lg-6 col-md-6 col-sm-12">
+                    <TextField
+                      className="w-100 my-3"
+                      required
+                      value={this.state.FullName}
+                      onChange={(e) => this.handleInputChange(e)}
+                      id="fullname"
+                      label="Full Name"
+                      defaultValue={this.state.FullName}
+                    />
+                  </div>
+                  <div className="col-lg-6 col-md-6 col-sm-12">
+                    <TextField
+                      className="w-100 my-3"
+                      required
+                      value={this.state.UserCode}
+                      onChange={(e) => this.handleInputChange(e)}
+                      id="usercode"
+                      label="User Code"
+                      defaultValue={this.state.UserCode}
+                    />
+                  </div>
+                  <div className="col-lg-12 col-md-12 col-12">
+                    <TextField
+                      className="w-100 my-3"
+                      required
+                      value={this.state.Email}
+                      onChange={(e) => this.handleInputChange(e)}
+                      id="email"
+                      label="Email Address"
+                      defaultValue={this.state.Email}
+                    />
+                  </div>
+                  <div className="col-lg-12 col-md-12 col-12">
+                    <TextField
+                      className="w-100 my-3"
+                      required
+                      value={this.state.Contact}
+                      onChange={(e) => this.handleInputChange(e)}
+                      id="contact"
+                      label="Contact No."
+                      defaultValue={this.state.Contact}
+                    />
+                  </div>
+                  <div className="col-lg-12 col-md-12 col-12">
+                    <TextField
+                      className="w-100 my-3"
+                      required
+                      value={this.state.Address}
+                      onChange={(e) => this.handleInputChange(e)}
+                      id="address"
+                      label="Address"
+                      defaultValue={this.state.Address}
+                    />
+                  </div>
+                </div>
+                :
+                <div className="row">
+                  <div className="col-12 col-md-3 my-3  d-flex">
+                    {
+                      isArrayNotEmpty(this.state.UserProfile) ?
+                        <div className="user-profile-image">
+                          <img src={this.state.UserProfile[0].UserProfileImage} alt="User Profile" width="100%" height="100%" />
+                        </div>
+                        :
+                        <div className="user-profile-image">
+
+                        </div>
+                    }
+
+                  </div>
+                  <div className="col-12 col-md-9">
+                    {
+                      isArrayNotEmpty(this.state.UserProfile) &&
+                      <div className="row">
+                        <div className="mb-2 col-12 col-md-3 information-label">Member No </div>
+                        <div className="mb-2 col-12 col-md-3">{this.state.UserProfile[0].UserCode}</div>
+                        <div className="mb-2 col-12 col-md-3 information-label">Status </div>
+                        <div className="mb-2 col-12 col-md-3">{this.state.UserProfile[0].UserStatus}</div>
+                        <div className="mb-2 col-12 col-md-3 information-label">Name</div>
+                        <div className="mb-2 col-12 col-md-3">{this.state.UserProfile[0].Fullname}</div>
+                        <div className="mb-2 col-12 col-md-3 information-label">Username </div>
+                        <div className="mb-2 col-12 col-md-3">{this.state.UserProfile[0].Username}</div>
+                        <div className="mb-2 col-12 col-md-3 information-label">Email</div>
+                        <div className="mb-2 col-12 col-md-3">{this.state.UserProfile[0].UserEmailAddress}</div>
+                        <div className="mb-2 col-12 col-md-3 information-label">Contact</div>
+                        <div className="mb-2 col-12 col-md-3 ">{this.state.UserProfile[0].UserContactNo}</div>
+                        <div className="mb-2 col-12 col-md-3 information-label">Description</div>
+                        <div className="mb-2 col-12 col-md-9">{this.state.UserProfile[0].UserDescription}</div>
+                      </div>
+                    }
+                  </div>
+                </div>
+            }
           </CardContent>
         </Card>
+
+        <div className="mt-4 ">
+          <Card>
+            <CardContent>
+              <div className="row ">
+                <div className="col-12 col-md-6">
+                  <ResponsiveContainer height={getWindowDimensions().screenHeight * .3} width="100%">
+                    <PieChart>
+                      <Pie
+                        data={this.state.PieChartData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={renderCustomizedLabel}
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {isArrayNotEmpty(this.state.PieChartData) && this.state.PieChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="col-12 col-md-6">
+                  <TableComponents
+                    tableTopRight={this.renderTableActionButton}
+                    tableOptions={{
+                      dense: false,
+                      tableOrderBy: 'asc',
+                      sortingIndex: "fat",
+                      stickyTableHeader: true,
+                      stickyTableHeight: 300,
+                    }}
+                    paginationOptions={[20, 50, 100, { label: 'All', value: -1 }]}
+                    tableHeaders={headCells}
+                    tableRows={{
+                      renderTableRows: this.renderTableRows,
+                      checkbox: false,
+                      checkboxColor: "primary",
+                      onRowClickSelect: false
+                    }}
+                    selectedIndexKey={"pid"}
+                    Data={this.state.filteredList}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
 
         <div className="mt-4">
           <ToggleTabsComponent Tabs={ToggleTabs} size="small" onChange={this.changeTab} />
