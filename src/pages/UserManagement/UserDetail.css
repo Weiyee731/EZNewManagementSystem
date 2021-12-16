@@ -1,0 +1,16 @@
+.information-label {
+    font-weight: 600;
+    font-size: 12pt;
+}
+
+.user-profile-image {
+    width: 125px;
+    height: 125px;
+    border: 1px solid rgba(0, 0, 0, .6);
+    border-radius: 50%;
+    margin: auto;
+}
+
+.profile-lease {
+    border: 1px solid rgba(0, 0, 0, 0.7);
+}
