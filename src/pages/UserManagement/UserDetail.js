@@ -130,6 +130,7 @@ class UserDetail extends Component {
       isOnEditMode: false,
       AddModalOpen: false,
       PieChartData: [],
+      isPieChartNoData: false,
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.toggleEditMode = this.toggleEditMode.bind(this)
@@ -167,7 +168,7 @@ class UserDetail extends Component {
           { name: "Total Unpaid", value: (!isStringNullOrEmpty(this.props.userProfile[0].TotalUnpaid)) ? Number(this.props.userProfile[0].TotalUnpaid) : 0 },
           { name: "Total Paid", value: (!isStringNullOrEmpty(this.props.userProfile[0].TotalPaid)) ? Number(this.props.userProfile[0].TotalPaid) : 0 },
         ] : [{ name: "Total Unpaid", value: 0 }, { name: "Total Paid", value: 0 }]
-        
+
         this.setState({
           UserProfile: this.props.userProfile,
           FullName: this.props.userProfile[0].Fullname,
@@ -178,6 +179,7 @@ class UserDetail extends Component {
           Transaction: JSON.parse(this.props.userProfile[0].Transaction),
           filteredList: JSON.parse(this.props.userProfile[0].Transaction),
           PieChartData: piechart_data,
+          isPieChartNoData: (piechart_data[0].value === 0 && piechart_data[0].value === 0)
         });
 
       }
@@ -197,6 +199,8 @@ class UserDetail extends Component {
           Transaction: JSON.parse(prevProps.userProfile[0].Transaction),
           filteredList: JSON.parse(prevProps.userProfile[0].Transaction),
           PieChartData: piechart_data,
+          isPieChartNoData: (piechart_data[0].value === 0 && piechart_data[0].value === 0)
+
 
         });
       }
@@ -322,7 +326,7 @@ class UserDetail extends Component {
       const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
       const x = cx + radius * Math.cos(-midAngle * RADIAN);
       const y = cy + radius * Math.sin(-midAngle * RADIAN);
-  
+
       return (
         <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
           {this.state.PieChartData[index].name} {`${(percent * 100).toFixed(0)}%`}
@@ -330,7 +334,6 @@ class UserDetail extends Component {
       );
     };
 
-    console.log(this.state.UserProfile)
     return (
       <div>
         <Card>
@@ -483,17 +486,21 @@ class UserDetail extends Component {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={renderCustomizedLabel}
+                        // label={renderCustomizedLabel}
                         outerRadius={100}
                         fill="#8884d8"
                         dataKey="value"
+                        label
                       >
-                        {isArrayNotEmpty(this.state.PieChartData) && this.state.PieChartData.map((entry, index) => (
+                        {/* {isArrayNotEmpty(this.state.PieChartData) && this.state.PieChartData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
+                        ))} */}
                       </Pie>
                     </PieChart>
                   </ResponsiveContainer>
+                  {
+                    this.state.isPieChartNoData && <p className="text-center text-secondary"><i>There are no paid or unpaid amount.</i></p>
+                  }
                 </div>
                 <div className="col-12 col-md-6">
                   <TableComponents
@@ -521,7 +528,6 @@ class UserDetail extends Component {
             </CardContent>
           </Card>
         </div>
-
 
         <div className="mt-4">
           <ToggleTabsComponent Tabs={ToggleTabs} size="small" onChange={this.changeTab} />
