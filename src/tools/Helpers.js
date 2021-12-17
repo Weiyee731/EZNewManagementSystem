@@ -30,7 +30,7 @@ export const convertDateTimeToString112Format = (date, fetchTime) => {
         let MM = (date112.getMinutes().toString().length <= 1) ? "0" + date112.getMinutes() : date112.getMinutes().toString()
         let ss = (date112.getSeconds().toString().length <= 1) ? "0" + date112.getSeconds() : date112.getSeconds().toString()
 
-        return (fetchTime === true) ? (yyyy.toString() + "/" + mm + "/" + dd  + " " + HH  + ":" + MM  + ":" + ss) : (yyyy.toString() + "/" + mm + "/" + dd )
+        return (fetchTime === true) ? (yyyy.toString() + "/" + mm + "/" + dd + " " + HH + ":" + MM + ":" + ss) : (yyyy.toString() + "/" + mm + "/" + dd)
     }
     catch (e) {
         let date112 = new Date();
@@ -41,7 +41,7 @@ export const convertDateTimeToString112Format = (date, fetchTime) => {
         let MM = (date112.getMinutes().toString().length <= 1) ? "0" + date112.getMinutes() : date112.getMinutes().toString()
         let ss = (date112.getSeconds().toString().length <= 1) ? "0" + date112.getSeconds() : date112.getSeconds().toString()
 
-        return (fetchTime === true) ? (yyyy.toString() + "/" + mm + "/" + dd  + " " + HH  + ":" + MM  + ":" + ss) : (yyyy.toString() + "/" + mm + "/" + dd )
+        return (fetchTime === true) ? (yyyy.toString() + "/" + mm + "/" + dd + " " + HH + ":" + MM + ":" + ss) : (yyyy.toString() + "/" + mm + "/" + dd)
     }
 }
 
@@ -235,9 +235,9 @@ export const round = (num, places) => {
 }
 
 export const volumeCalc = (depth, width, height) => {
-    let volume = (depth * width * height) / 1000000 
+    let volume = (depth * width * height) / 1000000
     volume = round(volume, 3)
-    return volume
+    return Number(volume)
 }
 
 // localStorage
@@ -250,4 +250,13 @@ const leftPad = (number, targetLength) => {
         output = '0' + output;
     }
     return output;
+}
+
+// split array
+export const splitArray = (arr, len) => {
+    var chunks = [], i = 0, n = arr.length;
+    while (i < n) {
+        chunks.push(arr.slice(i, i += len));
+    }
+    return chunks;
 }

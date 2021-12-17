@@ -37,15 +37,17 @@ function mapDispatchToProps(dispatch) {
 
 const ProformaList = (props) => {
     const { selectedType, state, userId, totalVolume, totalWeight } = props.location
-    const { userProfile } = props
+    const { userProfile, userAreaCode } = props
 
-    const [unitPrice, setUnitPrice] = useState(420)
-    const [selfPickupPrice, setSelfPickupPrice] = useState('')
-    const [minPrice, setMinPrice] = useState('')
-    const [firstKg, setFirstKg] = useState('')
-    const [subsequentKg, setSubsequentKg] = useState()
+    const [unitPrice, setUnitPrice] = useState(0)
+    const [consolidatePrice, setConsolidatePrice] = useState(0)
+    const [selfPickupPrice, setSelfPickupPrice] = useState(0)
+    const [LargeItemMinPrice, setLargeItemMinPrice] = useState(0)
+    const [firstKg, setFirstKg] = useState(0)
+    const [subsequentKg, setSubsequentKg] = useState(0)
     const [items, setItems] = useState(state)
-    const [area, setArea] = useState({ AreaCode: '' })
+    const [area, setArea] = useState('')
+    const [minCubic, setMinCubic] = useState(0.5)
     const ref = useRef(false)
 
     useEffect(() => {
@@ -65,11 +67,15 @@ const ProformaList = (props) => {
 
     useEffect(() => {
         if (isArrayNotEmpty(userProfile)) {
-            setSelfPickupPrice(userProfile[0].SelfPickOverCubic)
-            setMinPrice(userProfile[0].LargeDeliveryPrice)
+            setSelfPickupPrice(userProfile[0].MinimumPrice)
+            setLargeItemMinPrice(userProfile[0].LargeDeliveryPrice)
+            setConsolidatePrice(userProfile[0].ConsolidatedPrice)
+            setUnitPrice(userProfile[0].SelfPickOverCubic)
             setFirstKg(userProfile[0].SmallDeliveryFirstPrice)
             setSubsequentKg(userProfile[0].SmallDeliverySubPrice)
-            setArea({ AreaCode: userProfile[0].AreaCode })
+            setArea(userProfile[0].AreaCode)
+            let area = userAreaCode.filter((el) => el.UserAreaID == userProfile[0].UserAreaID)
+            setMinCubic(area[0].MinimumCubic)
         }
     }, [userProfile])
 
@@ -213,8 +219,10 @@ const ProformaList = (props) => {
                     return unitPrice
                 }
             }
-        } else {
-            return unitPrice
+        } else if (selectedType == 2) {
+            return consolidatePrice
+        } else if (selectedType == 4) {
+            return LargeItemMinPrice
         }
     }
 
@@ -254,7 +262,7 @@ const ProformaList = (props) => {
         if (volumeWeight() > totalWeight) {
             return volumeWeight()
         } else {
-            return totalWeight
+            return Math.ceil(totalWeight)
         }
     }
 
@@ -263,21 +271,38 @@ const ProformaList = (props) => {
         let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
 
         const subTotal = () => {
-            let price = data.isFollowStandard ? volume * unitPrice : volume * data.unitPrice
-            if (volume < 0.013 && selectedType == 1) {
-                if (data.isFollowStandard && selfPickupPrice != "") {
-                    return Number(selfPickupPrice).toFixed(2)
-                } else if (!data.isFollowStandard) {
-                    return Number(data.unitPrice).toFixed(2)
+            let price = 0
+            if (selectedType == 1) {
+                if (volume < 0.013) {
+                    if (data.isFollowStandard && selfPickupPrice != "") {
+                        return Number(selfPickupPrice).toFixed(2)
+                    } else if (!data.isFollowStandard) {
+                        return Number(data.unitPrice).toFixed(2)
+                    } else {
+                        return 0
+                    }
                 } else {
-                    return 0
+                    price = volume * unitPrice
+                    return price
+                }
+            } else if (selectedType == 2) {
+                if (data.isFollowStandard) {
+                    price = volume * consolidatePrice
+                    return price
+                } else {
+                    price = volume * data.unitPrice
+                    return price
+                }
+            } else if (selectedType == 4) {
+                if (data.isFollowStandard) {
+                    price = volume * LargeItemMinPrice
+                    return price
+                } else {
+                    price = volume * data.unitPrice
+                    return price
                 }
             } else {
-                if (price != "") {
-                    return price.toFixed(2)
-                } else {
-                    return 0
-                }
+                return 0
             }
         }
 
@@ -305,7 +330,7 @@ const ProformaList = (props) => {
                                 onChange={(e) => handleChangeSingleUnitPrice(index, e.target.value)}
                             />
                         </TableCell>
-                        <TableCell align="left" sx={{ fontSize: fontsize }}>{subTotal()}</TableCell>
+                        <TableCell align="left" sx={{ fontSize: fontsize }}>{subTotal().toFixed(2)}</TableCell>
                     </>
                 }
             </>
@@ -326,7 +351,7 @@ const ProformaList = (props) => {
                         onChange={(e) => handleChangeMinSingleUnitPrice(e)}
                     />
                 }
-                {selectedType != 3 &&
+                {selectedType != 3 && selectedType != 4 &&
                     <TextField
                         className="mx-3"
                         variant="standard"
@@ -334,7 +359,7 @@ const ProformaList = (props) => {
                         type={'number'}
                         label="Unit Price per m3"
                         name="unitPrice"
-                        value={unitPrice}
+                        value={selectedType == 2 ? consolidatePrice : unitPrice}
                         onChange={(e) => handleChangeAllUnitPrice(e)}
                     />
                 }
@@ -371,8 +396,8 @@ const ProformaList = (props) => {
                         type={'number'}
                         label="Minimum price"
                         name="unitPrice"
-                        value={minPrice}
-                        onChange={(e) => setMinPrice(e.target.value)}
+                        value={LargeItemMinPrice}
+                        onChange={(e) => setLargeItemMinPrice(e.target.value)}
                     />
                 }
             </div>
@@ -380,20 +405,28 @@ const ProformaList = (props) => {
     }
 
     const renderTableTopRight = () => {
-        console.log(area.AreaCode)
+        const renderValue = (value) => {
+            return (
+                <div>
+                    {value}
+                </div>
+            )
+        }
+
         return (
             <>
                 {selectedType == 4 &&
                     <Select
                         labelId="search-filter-category"
                         id="search-filter-category"
-                        value={area.AreaCode}
+                        value={area}
                         onChange={(e) => handleAreaOnChange(e)}
                         size="small"
+                        renderValue={() => renderValue(area)}
                     >
                         {props.userAreaCode.map((data, index) => {
                             return (
-                                <MenuItem key={`area_${index}`} value={data}>{data.AreaCode}</MenuItem>
+                                <MenuItem key={`area_${index}`} value={index}>{data.AreaCode}</MenuItem>
                             )
                         })}
                     </Select>
@@ -403,9 +436,9 @@ const ProformaList = (props) => {
     }
 
     const handleAreaOnChange = (e) => {
-        let data = e.target.value
-        console.log(data)
-        setArea(data.AreaCode)
+        let index = e.target.value
+        setArea(userAreaCode[index].AreaCode)
+        setLargeItemMinPrice(userAreaCode[index].AreaCharges)
     }
 
     console.log(userProfile)
@@ -488,23 +521,24 @@ const ProformaList = (props) => {
                     <div className='col-2'>
                         RM {totalPrice()}
                     </div>
-                    {selectedType === 4 && (totalVolume / 1000000) < 0.5 &&
+                    {selectedType === 4 && (totalVolume) < minCubic &&
                         <>
                             <div className='col-10'>
                                 * Extra add-on:
                             </div>
                             <div className='col-2'>
-                                {(minPrice / 2 - totalPrice()).toFixed(2)}
+                                {(LargeItemMinPrice / 2 - totalPrice()).toFixed(2)}
                             </div>
                         </>
                     }
                     <div className='col-10'>
                         Total:
                     </div>
+                    {console.log(minCubic)}
                     <div className='col-2'>
-                        {selectedType === 4 && totalPrice() < minPrice / 2 ?
+                        {selectedType === 4 && (totalVolume) < minCubic ?
                             <>
-                                RM {minPrice / 2}
+                                RM {(LargeItemMinPrice / 2).toFixed(2)}
                             </>
                             :
                             <>

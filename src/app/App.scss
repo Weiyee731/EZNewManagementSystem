@@ -184,3 +184,22 @@ body {
         background: #ffd331;
     }
 }
+
+
+/* Handle print invoice */
+
+.letter-page-size {
+    width: 22cm;
+    height: 27.9cm;
+    position: relative;
+}
+
+.invoice-footer {
+    position: absolute;
+    bottom: 15px;
+    left: 50px;
+    right: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    /* text-align: center; */
+}
