@@ -62,7 +62,7 @@ const headCells = [
     id: 'index',
     align: 'left',
     disablePadding: false,
-    label: 'item',
+    label: 'No.',
   },
   {
     id: 'TrackingNumber',
@@ -88,12 +88,12 @@ const headCells = [
     disablePadding: false,
     label: 'M³',
   },
-  // {
-  //   id: 'HandlingPrice',
-  //   align: 'left',
-  //   disablePadding: false,
-  //   label: 'Handling Price',
-  // },
+  {
+    id: 'HandlingPrice',
+    align: 'left',
+    disablePadding: false,
+    label: 'Handling Price',
+  },
   {
     id: 'ProductPrice',
     align: 'left',
@@ -249,12 +249,12 @@ class InvoicerDetail extends Component {
         <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductQuantity}</TableCell>
         {/* <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ContainerName}</TableCell> */}
         <TableCell align="left" sx={{ fontSize: fontsize }}>{volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{roundOffTotal(1.05)}</TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductPrice}
           {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
             return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{additionalCharges.ProductPrice}</TableCell></TableRow>
           })}
         </TableCell>
-        {/* <TableCell align="left" sx={{ fontSize: fontsize }}>{roundOffTotal(1.05)}</TableCell> */}
         <TableCell align="right" sx={{ fontSize: fontsize }}>{roundOffTotal(data.ProductPrice * data.ProductQuantity)}
           {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
             return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{(additionalCharges.ProductPrice * additionalCharges.ProductQuantity)}</TableCell></TableRow>
@@ -388,9 +388,12 @@ class InvoicerDetail extends Component {
         </div>
         <div
           style={{
-            marginTop: "-40px"
+            // marginTop: "10px"
           }}
         >
+          <div style={companyDetail}>
+            {TransactionDetail[0].ContainerName !== null ? TransactionDetail[0].ContainerName : "ABCD123456"}
+          </div>
           <TableComponents
             style={{
               boxShadow: "0px",
