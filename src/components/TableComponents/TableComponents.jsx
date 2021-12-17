@@ -302,6 +302,7 @@ export default function TableComponents(props) {
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }} elevation={elevation} >
                 {
+                    (typeof props.tableTopRight !== "undefined" || typeof props.tableTopLeft !== "undefined") &&
                     <EnhancedTableToolbar
                         selectedRows={selected}
                         tableTopLeft={props.tableTopLeft}

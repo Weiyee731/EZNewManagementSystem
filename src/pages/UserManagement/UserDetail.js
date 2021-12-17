@@ -108,6 +108,39 @@ const headCells = [
   },
 ];
 
+const PaymentHeadCells = [
+  {
+    id: 'ReferenceNo',
+    align: 'left',
+    disablePadding: false,
+    label: 'Ref.',
+  },
+  {
+    id: 'Type',
+    align: 'left',
+    disablePadding: false,
+    label: 'Type',
+  },
+  {
+    id: 'PaymentMethod',
+    align: 'left',
+    disablePadding: false,
+    label: 'Method',
+  },
+  {
+    id: 'PaymentAmount',
+    align: 'left',
+    disablePadding: false,
+    label: 'Amount',
+  },
+  {
+    id: 'PaymentDatetime',
+    align: 'left',
+    disablePadding: false,
+    label: 'Date',
+  },
+];
+
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 const RADIAN = Math.PI / 180;
 
@@ -130,6 +163,7 @@ class UserDetail extends Component {
       isOnEditMode: false,
       AddModalOpen: false,
       PieChartData: [],
+      isPieChartNoData: false,
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.toggleEditMode = this.toggleEditMode.bind(this)
@@ -137,37 +171,14 @@ class UserDetail extends Component {
     this.props.CallUserProfileByID(this.state)
   }
 
-  // componentDidMount() {
-  //   if (this.props.userProfile.length !== this.state.UserProfile.length) {
-  //     if (typeof this.props.userProfile !== "undefined" && typeof this.props.userProfile[0] !== "undefined") {
-  //       const piechart_data = (isArrayNotEmpty(this.props.UserProfile)) ? [
-  //         { name: "Total Unpaid", value: (!isStringNullOrEmpty(this.props.UserProfile[0].TotalUnpaid)) ? Number(this.props.UserProfile[0].TotalUnpaid) : 0 },
-  //         { name: "Total Paid", value: (!isStringNullOrEmpty(this.props.UserProfile[0].TotalPaid)) ? Number(this.props.UserProfile[0].TotalPaid) : 0 },
-  //       ] : []
-
-  //       this.setState({
-  //         UserProfile: this.props.userProfile,
-  //         FullName: this.props.userProfile[0].Fullname,
-  //         UserCode: this.props.userProfile[0].UserCode,
-  //         Email: this.props.userProfile[0].UserEmailAddress,
-  //         Contact: this.props.userProfile[0].UserContactNo,
-  //         Address: this.props.userProfile[0].UserAddress,
-  //         Transaction: JSON.parse(this.props.userProfile[0].Transaction),
-  //         filteredList: JSON.parse(this.props.userProfile[0].Transaction),
-  //         PieChartData: piechart_data,
-  //       });
-  //     }
-  //   }
-  // }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.userProfile.length !== this.props.userProfile.length) {
+  componentDidMount() {
+    if (this.props.userProfile.length !== this.state.UserProfile.length) {
       if (typeof this.props.userProfile !== "undefined" && typeof this.props.userProfile[0] !== "undefined") {
         let piechart_data = (isArrayNotEmpty(this.props.userProfile)) ? [
           { name: "Total Unpaid", value: (!isStringNullOrEmpty(this.props.userProfile[0].TotalUnpaid)) ? Number(this.props.userProfile[0].TotalUnpaid) : 0 },
           { name: "Total Paid", value: (!isStringNullOrEmpty(this.props.userProfile[0].TotalPaid)) ? Number(this.props.userProfile[0].TotalPaid) : 0 },
         ] : [{ name: "Total Unpaid", value: 0 }, { name: "Total Paid", value: 0 }]
-        
+
         this.setState({
           UserProfile: this.props.userProfile,
           FullName: this.props.userProfile[0].Fullname,
@@ -178,6 +189,34 @@ class UserDetail extends Component {
           Transaction: JSON.parse(this.props.userProfile[0].Transaction),
           filteredList: JSON.parse(this.props.userProfile[0].Transaction),
           PieChartData: piechart_data,
+          isPieChartNoData: (piechart_data[0].value === 0 && piechart_data[0].value === 0),
+          Payment: (isStringNullOrEmpty(this.props.userProfile[0].Payment)) ? [] : JSON.parse(this.props.userProfile[0].Payment)
+        });
+      }
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.userProfile.length !== this.props.userProfile.length) {
+      if (typeof this.props.userProfile !== "undefined" && typeof this.props.userProfile[0] !== "undefined") {
+        let piechart_data = (isArrayNotEmpty(this.props.userProfile)) ? [
+          { name: "Total Unpaid", value: (!isStringNullOrEmpty(this.props.userProfile[0].TotalUnpaid)) ? Number(this.props.userProfile[0].TotalUnpaid) : 0 },
+          { name: "Total Paid", value: (!isStringNullOrEmpty(this.props.userProfile[0].TotalPaid)) ? Number(this.props.userProfile[0].TotalPaid) : 0 },
+        ] : [{ name: "Total Unpaid", value: 0 }, { name: "Total Paid", value: 0 }]
+
+        this.setState({
+          UserProfile: this.props.userProfile,
+          FullName: this.props.userProfile[0].Fullname,
+          UserCode: this.props.userProfile[0].UserCode,
+          Email: this.props.userProfile[0].UserEmailAddress,
+          Contact: this.props.userProfile[0].UserContactNo,
+          Address: this.props.userProfile[0].UserAddress,
+          Transaction: JSON.parse(this.props.userProfile[0].Transaction),
+          filteredList: JSON.parse(this.props.userProfile[0].Transaction),
+          PieChartData: piechart_data,
+          isPieChartNoData: (piechart_data[0].value === 0 && piechart_data[0].value === 0),
+          Payment: (isStringNullOrEmpty(this.props.userProfile[0].Payment)) ? [] : JSON.parse(this.props.userProfile[0].Payment)
+
         });
 
       }
@@ -197,6 +236,8 @@ class UserDetail extends Component {
           Transaction: JSON.parse(prevProps.userProfile[0].Transaction),
           filteredList: JSON.parse(prevProps.userProfile[0].Transaction),
           PieChartData: piechart_data,
+          isPieChartNoData: (piechart_data[0].value === 0 && piechart_data[0].value === 0),
+          Payment: (isStringNullOrEmpty(prevProps.userProfile[0].Payment)) ? [] : JSON.parse(prevProps.userProfile[0].Payment)
 
         });
       }
@@ -262,8 +303,19 @@ class UserDetail extends Component {
         <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
         {
-          data.OrderStatus === "Unpaid" ? <TableCell onClick={(event) => this.onAddButtonClick(event, data, index)} align="center"><CheckCircleIcon color="grey" sx={{ fontSize: 30 }}></CheckCircleIcon></TableCell> : ""
+          data.OrderStatus === "Unpaid" && <TableCell onClick={(event) => this.onAddButtonClick(event, data, index)} align="center"><CheckCircleIcon color="grey" sx={{ fontSize: 30 }}></CheckCircleIcon></TableCell> 
         }
+      </>
+    )
+  }
+  renderPaymentTableRows = (data, index) => {
+    return (
+      <>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)} component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{data.ReferenceNo}</TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.Type}</TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.PaymentMethod}</TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.PaymentAmount}</TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.PaymentDatetime}</TableCell>
       </>
     )
   }
@@ -322,15 +374,14 @@ class UserDetail extends Component {
       const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
       const x = cx + radius * Math.cos(-midAngle * RADIAN);
       const y = cy + radius * Math.sin(-midAngle * RADIAN);
-  
+
       return (
-        <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
-          {this.state.PieChartData[index].name} {`${(percent * 100).toFixed(0)}%`}
+        <text x={x} y={y} fill="black" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" style={{fontWeight: 600}}>
+          {this.state.PieChartData[index].name } {" RM " + this.state.PieChartData[index].value }
         </text>
       );
     };
 
-    console.log(this.state.UserProfile)
     return (
       <div>
         <Card>
@@ -476,14 +527,14 @@ class UserDetail extends Component {
             <CardContent>
               <div className="row ">
                 <div className="col-12 col-md-6">
-                  <ResponsiveContainer height={getWindowDimensions().screenHeight * .3} width="100%">
+                  <ResponsiveContainer height={getWindowDimensions().screenHeight * .5} width="100%">
                     <PieChart>
                       <Pie
                         data={this.state.PieChartData}
                         cx="50%"
                         cy="50%"
-                        labelLine={false}
-                        label={renderCustomizedLabel}
+                        labelLine={true}
+                        label={this.renderCustomizedLabel}
                         outerRadius={100}
                         fill="#8884d8"
                         dataKey="value"
@@ -494,27 +545,28 @@ class UserDetail extends Component {
                       </Pie>
                     </PieChart>
                   </ResponsiveContainer>
+                  {
+                    this.state.isPieChartNoData && <p className="text-center text-secondary"><i>There are no paid or unpaid amount.</i></p>
+                  }
                 </div>
                 <div className="col-12 col-md-6">
                   <TableComponents
-                    tableTopRight={this.renderTableActionButton}
                     tableOptions={{
-                      dense: false,
+                      dense: true,
                       tableOrderBy: 'asc',
-                      sortingIndex: "fat",
-                      stickyTableHeader: true,
-                      stickyTableHeight: 300,
+                      sortingIndex: "ReferenceNo",
+                      stickyTableHeader: false,
+                      stickyTableHeight: 400,
                     }}
                     paginationOptions={[20, 50, 100, { label: 'All', value: -1 }]}
-                    tableHeaders={headCells}
+                    tableHeaders={PaymentHeadCells}
                     tableRows={{
-                      renderTableRows: this.renderTableRows,
+                      renderTableRows: this.renderPaymentTableRows,
                       checkbox: false,
-                      checkboxColor: "primary",
                       onRowClickSelect: false
                     }}
-                    selectedIndexKey={"pid"}
-                    Data={this.state.filteredList}
+                    selectedIndexKey={"PaymentID"}
+                    Data={isArrayNotEmpty(this.state.Payment) ? this.state.Payment : []}
                   />
                 </div>
               </div>
@@ -522,6 +574,7 @@ class UserDetail extends Component {
           </Card>
         </div>
 
+        {console.log(this.state.filteredList)}
 
         <div className="mt-4">
           <ToggleTabsComponent Tabs={ToggleTabs} size="small" onChange={this.changeTab} />
@@ -531,7 +584,7 @@ class UserDetail extends Component {
             tableOptions={{
               dense: false,
               tableOrderBy: 'asc',
-              sortingIndex: "fat",
+              sortingIndex: "OrderDate",
               stickyTableHeader: true,
               stickyTableHeight: 300,
             }}

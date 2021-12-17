@@ -80,15 +80,15 @@ class Dashboard extends Component {
                                     onMouseDown={(e) => { e.preventDefault(); this.redirectToPage(row.PageDirect) }}
                                 >
                                     <MuiTooltip title={"Click to view " + row.TitleColumn + " details"}>
-                                        <Card sx={{minWidth: 140}}>
+                                        <Card sx={{ minWidth: 140 }}>
                                             <CardContent>
                                                 <Typography variant={"h5"} color="text.primary" gutterBottom>
-                                                    {row.TitleColumn}
+                                                    <div dangerouslySetInnerHTML={{ __html: row.TitleColumn }}></div>
                                                 </Typography>
                                             </CardContent>
                                             <CardActions>
-                                                <div style={{ fontSize: '20pt', marginLeft: 'auto', fontWeight: 600 }}>
-                                                    {row.DataColumn}
+                                                <div style={{ fontSize: '18pt', marginLeft: 'auto', fontWeight: 600 }}>
+                                                    <div dangerouslySetInnerHTML={{ __html: row.DataColumn }}></div>
                                                 </div>
                                             </CardActions>
                                         </Card>

@@ -162,7 +162,7 @@ class DataManagement extends Component {
                 Division += (isStringNullOrEmpty(DataRows[index]["Division"])) ? "-" : DataRows[index]["Division"].trim();
                 StockDate += (isStringNullOrEmpty(DataRows[index]["Stock Date"])) ? "-" : convertDateTimeToString112Format(DataRows[index]["Stock Date"].trim(), true)
                 PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : convertDateTimeToString112Format(DataRows[index]["Packaging Date"].trim(), true)
-                AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "0" : DataRows[index]["Additional Cost"].trim();
+                AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "-" : DataRows[index]["Additional Cost"].trim();
                 Remarks += (isStringNullOrEmpty(DataRows[index]["Remarks"])) ? "-" : DataRows[index]["Remarks"];
 
                 if (index !== DataRows.length - 1) {
