@@ -240,9 +240,9 @@ class ArchivedStock extends Component {
                     {data.TrackingNumber}
                 </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductWeight) ? data.ProductWeight.toFixed(2) : 0} </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionDeep) ? data.ProductDimensionDeep.toFixed(2) : 0} </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionWidth) ? data.ProductDimensionWidth.toFixed(2) : 0} </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionHeight) ? data.ProductDimensionHeight.toFixed(2) : 0} </TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionDeep) ? data.ProductDimensionDeep.toFixed(1) : 0} </TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionWidth) ? data.ProductDimensionWidth.toFixed(1) : 0} </TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionHeight) ? data.ProductDimensionHeight.toFixed(1) : 0} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight / 1000000).toFixed(3)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
