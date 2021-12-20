@@ -146,7 +146,6 @@ class ArchivedTransaction extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(this.props.archivedData)
         if (this.state.TransactionListingFiltered === null && isArrayNotEmpty(this.props.archivedData)) {
             const { archivedData } = this.props
             this.setState({
@@ -251,18 +250,31 @@ class ArchivedTransaction extends Component {
         // 
         if (!date_range.includes(null)) {
             this.props.CallResetArchivedData()
-            const object = { STARTDATE: convertDateTimeToString112Format(date_range[0], false), ENDDATE: convertDateTimeToString112Format(date_range[1], false) }
+            const object = (date_range.length > 0)
+                ? { STARTDATE: convertDateTimeToString112Format(date_range[0], false), ENDDATE: convertDateTimeToString112Format(date_range[1], false) }
+                : { STARTDATE: new Date().getFullYear() + "/1/1", ENDDATE: new Date().getFullYear() + "/12/31" }
             this.props.CallFetchArchivedTransactions(object)
             toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
             this.setState({ isDataFetching: true, TransactionListingFiltered: null })
             this.forceUpdate()
         }
         else {
-            if (date_range[0] === null)
-                toast.error("Require valid begin dates", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
+            if (date_range[0] === null && date_range[1] === null) {
+                this.props.CallResetArchivedData()
+                const object = { STARTDATE: new Date().getFullYear() + "/1/1", ENDDATE: new Date().getFullYear() + "/12/31" }
+                this.props.CallFetchArchivedTransactions(object)
+                toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
+                this.setState({ isDataFetching: true, TransactionListingFiltered: null })
+                this.forceUpdate()
+            }
+            else {
+                if (date_range[0] === null)
+                    toast.error("Require valid begin dates", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
 
-            if (date_range[1] === null)
-                toast.error("Require valid end dates", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
+                if (date_range[1] === null)
+                    toast.error("Require valid end dates", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
+            }
+
         }
     }
 
@@ -293,10 +305,18 @@ class ArchivedTransaction extends Component {
     }
 
     render() {
-        const onChange = (e) => {
-            const FilterArr = this.state.TransactionListing.filter((searchedItem) => searchedItem.UserCode.toLowerCase().includes(e.target.value))
-            this.setState({ TransactionListingFiltered: FilterArr });
+        const onLocalSearch = (e) => {
+            let searchKeywords = isStringNullOrEmpty(e.target.value) ? "" : e.target.value.toLowerCase()
+            console.log(this.props.archivedData)
+            let FilterArr = this.props.archivedData.filter((searchedItem) => 
+                searchedItem.Fullname.toLowerCase().includes(searchKeywords) || searchedItem.UserCode.toLowerCase().includes(searchKeywords) ||
+                searchedItem.TransactionName.toLowerCase().includes(searchKeywords) || searchedItem.UserContactNo.toLowerCase().includes(searchKeywords) 
+            )
+            console.log(this.props.FilterArr)
+
+            this.setState({ TransactionListingFiltered: isStringNullOrEmpty(searchKeywords) ? this.props.archivedData : FilterArr });
         }
+
         const ToggleTabs = [
             { children: "All", key: "All" },
             { children: "Unpaid", key: "Unpaid" },
@@ -334,7 +354,7 @@ class ArchivedTransaction extends Component {
                             </div>
                         </div>
                         <div className="col-md-11 col-11 m-auto">
-                            <SearchBar onChange={onChange} />
+                            <SearchBar onChange={onLocalSearch} />
                         </div>
                         <div className="col-md-1 col-1 m-auto">
                             <CsvDownloader
