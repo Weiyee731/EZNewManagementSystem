@@ -21,7 +21,7 @@ import Stack from '@mui/material/Stack';
 import AlertDialog from "../../../components/modal/Modal";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import CsvDownloader from 'react-csv-downloader';
-import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull, round, testRounding } from "../../../tools/Helpers";
+import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull, volumeCalc } from "../../../tools/Helpers";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import { toast } from "react-toastify";
 
@@ -128,7 +128,6 @@ const INITIAL_STATE = {
     openRemarkModal: false,
     openProformaModal: false,
     openDeliveryModal: false,
-    openCancelModal: false,
     selectedRows: [],
     selectedItems: [],
     selectedProductPrice: [],
@@ -262,21 +261,6 @@ class CreateInvoice extends Component {
         console.log('add button')
     }
 
-    onCancelModalPop = () => {
-        this.setState({
-            openCancelModal: !this.state.openCancelModal
-        })
-    }
-
-    onDeleteButtonClick = () => {
-        const { selectedRows } = this.state
-        let selectedRowId = []
-        selectedRows.map((row) => {
-            selectedRowId.push(row.StockID)
-        })
-        this.props.CallCancelTransaction(selectedRowId)
-    }
-
     handleCreateInvoice = () => {
         const { selectedRows } = this.state
         let arr = []
@@ -290,7 +274,7 @@ class CreateInvoice extends Component {
             })
             this.handleDeliveryModal()
         } else {
-            alert("Please select the tracking records with the same user")
+            toast.error("Please select the tracking records with the same user")
         }
     }
 
@@ -300,8 +284,8 @@ class CreateInvoice extends Component {
         let mCube = 0
         let weight = 0
         this.state.selectedItems.map((item) => {
-            weight = weight + item.ProductWeight
-            mCube = mCube + ((item.ProductDimensionDeep * item.ProductDimensionWidth * item.ProductDimensionHeight)) / 1000000
+            weight += item.ProductWeight
+            mCube += volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
         })
         this.handleDeliveryModal()
         this.props.history.push({
@@ -325,9 +309,7 @@ class CreateInvoice extends Component {
     }
 
     handleUpdateRemark = () => {
-        const { formValue } = this.state
         console.log('update remark')
-        console.log(formValue)
     }
 
     handleFormInput = (e) => {
@@ -494,9 +476,6 @@ class CreateInvoice extends Component {
             <div className="d-flex">
                 <IconButton onClick={(event) => { this.handleCreateInvoice() }}>
                     <DriveFileRenameOutlineIcon />
-                </IconButton>
-                <IconButton onClick={(event) => { this.onCancelModalPop() }}>
-                    <DeleteIcon color="error" />
                 </IconButton>
             </div>
         )
@@ -783,19 +762,6 @@ class CreateInvoice extends Component {
                             Large Item
                         </Button>
                     </Stack>
-                </AlertDialog>
-
-                <AlertDialog
-                    open={openCancelModal}              // required, pass the boolean whether modal is open or close
-                    handleToggleDialog={this.onCancelModalPop}  // required, pass the toggle function of modal
-                    handleConfirmFunc={this.onDeleteButtonClick}    // required, pass the confirm function 
-                    showAction={true}                           // required, to show the footer of modal display
-                    title={"Cancel this proforma invoice?"}                                  // required, title of the modal
-                    buttonTitle={"Yes"}                         // required, title of button
-                    singleButton={false}                         // required, to decide whether to show a single full width button or 2 buttons
-                    maxWidth={"xs"}
-                    message={`Are you sure want to cancel this invoice? `}
-                >
                 </AlertDialog>
             </div>
         )
