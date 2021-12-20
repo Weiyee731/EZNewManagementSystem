@@ -274,7 +274,7 @@ class CreateInvoice extends Component {
             })
             this.handleDeliveryModal()
         } else {
-            alert("Please select the tracking records with the same user")
+            toast.error("Please select the tracking records with the same user")
         }
     }
 
@@ -309,9 +309,7 @@ class CreateInvoice extends Component {
     }
 
     handleUpdateRemark = () => {
-        const { formValue } = this.state
         console.log('update remark')
-        console.log(formValue)
     }
 
     handleFormInput = (e) => {

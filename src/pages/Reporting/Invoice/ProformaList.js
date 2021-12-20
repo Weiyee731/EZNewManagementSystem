@@ -275,9 +275,9 @@ const ProformaList = (props) => {
             if (selectedType == 1) {
                 if (volume < 0.013) {
                     if (data.isFollowStandard && selfPickupPrice != "") {
-                        return Number(selfPickupPrice).toFixed(2)
+                        return Number(selfPickupPrice)
                     } else if (!data.isFollowStandard) {
-                        return Number(data.unitPrice).toFixed(2)
+                        return Number(data.unitPrice)
                     } else {
                         return 0
                     }
@@ -441,8 +441,6 @@ const ProformaList = (props) => {
         setLargeItemMinPrice(userAreaCode[index].AreaCharges)
     }
 
-    console.log(userProfile)
-
     return (
         <Card>
             <CardContent>
@@ -534,7 +532,6 @@ const ProformaList = (props) => {
                     <div className='col-10'>
                         Total:
                     </div>
-                    {console.log(minCubic)}
                     <div className='col-2'>
                         {selectedType === 4 && (totalVolume) < minCubic ?
                             <>
