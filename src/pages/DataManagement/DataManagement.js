@@ -13,7 +13,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Button from '@mui/material/Button';
 import PublishIcon from '@mui/icons-material/Publish';
 import ReportIcon from '@mui/icons-material/Report';
-import { toast } from 'react-toastify';
+import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
 import { ModalPopOut } from "../../components/modal/Modal";
 
 function mapStateToProps(state) {
@@ -52,12 +52,14 @@ class DataManagement extends Component {
     }
 
     componentDidMount() {
+        
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (isArrayNotEmpty(this.props.stockApproval)) {
-            console.log("Yes")
             this.props.CallResetUpdatedStockDetail()
+            toast.success("Data is uploaded successfully", { autoClose: 3000, position: "top-center", transition: Flip, theme: "dark" })
+            this.setState(INITIAL_STATE) 
         }
     }
 

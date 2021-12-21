@@ -493,7 +493,6 @@ export class GitEpic {
           console.log("json", json)
           if (json !== "fail") {
             json = json;
-            toast.success("Successfully update stock. Fetching the latest data..", { autoClose: 3000 })
           } else {
             json = [];
           }
