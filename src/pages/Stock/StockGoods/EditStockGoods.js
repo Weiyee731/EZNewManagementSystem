@@ -116,7 +116,7 @@ class EditStockGoods extends Component {
             event.preventDefault();
         }
         if (statement === "UserAreaID") {
-            this.props.parentCallback({ "UserAreaID": value });
+            this.props.parentCallback({ "AreaCode": value });
             event.preventDefault();
         }
         if (statement === "Item") {
@@ -244,7 +244,7 @@ class EditStockGoods extends Component {
                                 >
                                     {
                                         isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
-                                            return <MenuItem value={el.UserAreaID} key={idx}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
+                                            return <MenuItem value={el.AreaCode} key={idx}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
                                         })
                                     }
                                 </Select>
@@ -366,21 +366,21 @@ class EditStockGoods extends Component {
                             <Button className="my-1 w-100" color="error" variant="contained" size="small" onClick={() => { this.removeAllAdditionalCost() }} startIcon={<DeleteIcon />}>Clear Additional Costs</Button>
                         </div>
                     }
-                       <div className="row mt-2">
-                            <div className="col-12">
-                                <Box sx={{ width: '100%' }}>
-                                    <TextField
-                                        variant="outlined"
-                                        size="large"
-                                        name="Remark"
-                                        label="Remark"
-                                        value={formValue.Remark}
-                                        onChange={(e) => this.onTrigger(e, "Remark")}
-                                        fullWidth
-                                    />
-                                </Box>
-                            </div>
+                    <div className="row mt-2">
+                        <div className="col-12">
+                            <Box sx={{ width: '100%' }}>
+                                <TextField
+                                    variant="outlined"
+                                    size="large"
+                                    name="Remark"
+                                    label="Remark"
+                                    value={formValue.Remark}
+                                    onChange={(e) => this.onTrigger(e, "Remark")}
+                                    fullWidth
+                                />
+                            </Box>
                         </div>
+                    </div>
                 </div>
             </div>
         )

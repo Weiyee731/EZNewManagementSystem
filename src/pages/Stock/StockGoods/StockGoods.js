@@ -28,7 +28,6 @@ function mapStateToProps(state) {
         Stocks: state.counterReducer["stocks"],
         stockApproval: state.counterReducer["stockApproval"],
         AllContainer: state.counterReducer["AllContainer"],
-
     };
 }
 
@@ -39,6 +38,8 @@ function mapDispatchToProps(dispatch) {
         CallViewContainer: (props) => dispatch(GitAction.CallViewContainer(props)),
         CallUpdateStockDetailByPost: (props) => dispatch(GitAction.CallUpdateStockDetailByPost(props)),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
+        CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
+        CallResetStocks: () => dispatch(GitAction.CallResetStocks()),
     };
 }
 
@@ -187,7 +188,7 @@ class StockGoods extends Component {
         this.state = INITIAL_STATE
 
         // this.props.CallFetchAllStock({USERID:JSON.parse(localStorage.getItem("loginUser"))[0].UserID});
-        this.props.CallFetchAllStock({ USERID: "1" });
+        this.props.CallFetchAllStock({ TRACKINGSTATUSID: "1" });
         this.props.CallViewContainer();  //view container
         this.state.stockListing = this.props.Stocks;
 
@@ -225,11 +226,22 @@ class StockGoods extends Component {
             } else { console.log("match wo") }
         }
 
-        if (this.state.stockFiltered === [] && isArrayNotEmpty(this.props.Stocks)) {
+        if (isArrayNotEmpty(this.props.stockApproval)) {
+            this.props.CallResetUpdatedStockDetail()
+            this.props.CallResetStocks()
+            this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
+        }
+
+        if (this.state.stockFiltered === null && isArrayNotEmpty(this.props.Stocks)) {
             const { Stocks } = this.props
             this.setState({
                 stockFiltered: (isStringNullOrEmpty(Stocks.ReturnVal) && Stocks.ReturnVal === 0) ? [] : Stocks
             })
+
+            if ((!isStringNullOrEmpty(Stocks[0].ReturnVal) && Stocks[0].ReturnVal === 0)) {
+                toast.warning("Fetched data is empty. ", { autoClose: 3000, theme: "dark" });
+
+            }
         }
 
         if (prevProps.Stocks.length !== this.props.Stocks.length) {
@@ -310,7 +322,7 @@ class StockGoods extends Component {
                 ContainerDate: ContainerDate.join(","),
                 Remark: Remark.join(","),
                 AdditionalCharges: AdditionalCharges.join(",")
-            }, () => this.props.CallFetchAllStock({ USERID: "1" }))
+            })
     }
 
     renderTableRows(data, index) {
@@ -345,7 +357,6 @@ class StockGoods extends Component {
                 <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{dimension}</TableCell>
-                {/* <TableCell sx={{ fontSize: fontsize }}>{data.Category_Name}</TableCell> */}
                 <TableCell sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>
@@ -397,9 +408,8 @@ class StockGoods extends Component {
                     ContainerDate: this.state.ContainerDate,
                     Remark: this.state.Remark,
                     AdditionalCharges: this.state.AdditionalCharges
-                }, () => this.props.CallFetchAllStock({ USERID: "1" }))
+                })
                 break;
-
             case "openAddModal":
                 this.setState({ openAddModal: !this.state.openAddModal });
                 break;
@@ -412,17 +422,25 @@ class StockGoods extends Component {
     changeTab = (key) => {
         switch (key) {
             case "All":
+                this.props.CallResetStocks()
+                this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
                 this.setState({ stockFiltered: this.props.Stocks ? this.props.Stocks : "" });
                 break;
 
             case "Unchecked":
-
-                const FilterArr = this.props.Stocks.filter((searchedItem) => searchedItem.TrackingStatusID === 1 || searchedItem.TrackingStatusID === 2 )
+                console.log(this.state.stockFiltered)
+                this.props.CallResetStocks()
+                this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
+                const FilterArr = this.props.Stocks.filter((searchedItem) => searchedItem.TrackingStatusID === 1)
                 this.setState({ stockFiltered: FilterArr });
                 break;
 
             case "Checked":
-                const FilterArr2 = this.props.Stocks.filter((searchedItem) => searchedItem.TrackingStatusID === 3)
+                this.props.CallResetStocks()
+                this.props.CallFetchAllStock({ TRACKINGSTATUSID: 2 })
+
+                const FilterArr2 = this.props.Stocks.filter((searchedItem) => searchedItem.TrackingStatusID === 2)
+
                 this.setState({ stockFiltered: FilterArr2 });
                 break;
 
@@ -439,8 +457,8 @@ class StockGoods extends Component {
 
     //depreciated
     onContainerChange = (e, type) => {
-        if (e.target.value !== "") { 
-            this.setState({ stockFiltered: this.props.Stocks, ContainerName: e.target.value }); 
+        if (e.target.value !== "") {
+            this.setState({ stockFiltered: this.props.Stocks, ContainerName: e.target.value });
         }
         else {
             this.setState({ stockFiltered: this.props.Stocks, ContainerName: e.target.value })

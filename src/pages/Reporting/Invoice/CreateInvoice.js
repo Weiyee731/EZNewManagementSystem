@@ -168,7 +168,7 @@ class CreateInvoice extends Component {
         super(props);
         this.state = INITIAL_STATE
 
-        this.props.CallFetchAllStock({ USERID: 2 })
+        this.props.CallFetchAllStock({ TRACKINGSTATUSID: 2 })
         this.props.CallUserAreaCode()
         this.onAddButtonClick = this.onAddButtonClick.bind(this)
         this.handleRemarkModal = this.handleRemarkModal.bind(this)
