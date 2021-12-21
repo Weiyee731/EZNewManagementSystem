@@ -299,7 +299,7 @@ export default function TableComponents(props) {
     const emptyRowColSpan = renderCheckbox ? tableHeaders.length + 1 : tableHeaders.length
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box className="my-1" sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }} elevation={elevation} >
                 {
                     (typeof props.tableTopRight !== "undefined" || typeof props.tableTopLeft !== "undefined") &&

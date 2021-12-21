@@ -25,6 +25,7 @@ export default function ToggleTabComponents(props) {
             fullWidth={isStringNullOrEmpty(fullWidth) ? true : fullWidth}
             size={isStringNullOrEmpty(size) ? "medium" : size}
             orientation={isStringNullOrEmpty(orientation) ? "horizontal" : orientation}
+            className="my-1"
         >
             {isArrayNotEmpty(Tabs) && Tabs.map((tab, index) => { return <ToggleButton style={{ fontWeight: 'bold' }} key={"tab" + tab.key} value={tab.key}>{tab.children}</ToggleButton> })}
         </ToggleButtonGroup>

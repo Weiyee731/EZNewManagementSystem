@@ -417,12 +417,12 @@ class StockGoods extends Component {
 
             case "Unchecked":
 
-                const FilterArr = this.props.Stocks.filter((searchedItem) => searchedItem.TrackingStatusID === 1)
+                const FilterArr = this.props.Stocks.filter((searchedItem) => searchedItem.TrackingStatusID === 1 || searchedItem.TrackingStatusID === 2 )
                 this.setState({ stockFiltered: FilterArr });
                 break;
 
             case "Checked":
-                const FilterArr2 = this.props.Stocks.filter((searchedItem) => searchedItem.TrackingStatusID === 2)
+                const FilterArr2 = this.props.Stocks.filter((searchedItem) => searchedItem.TrackingStatusID === 3)
                 this.setState({ stockFiltered: FilterArr2 });
                 break;
 
@@ -437,8 +437,11 @@ class StockGoods extends Component {
         } else this.setState({ open: !this.state.open })
     }
 
+    //depreciated
     onContainerChange = (e, type) => {
-        if (e.target.value !== "") { this.setState({ stockFiltered: this.props.Stocks, ContainerName: e.target.value }); }
+        if (e.target.value !== "") { 
+            this.setState({ stockFiltered: this.props.Stocks, ContainerName: e.target.value }); 
+        }
         else {
             this.setState({ stockFiltered: this.props.Stocks, ContainerName: e.target.value })
         }
@@ -454,17 +457,17 @@ class StockGoods extends Component {
     }
 
     onSearchChange = (e, type) => {
-
-        if (e.target.value !== ""
+        let searchKeywords = isStringNullOrEmpty(e.target.value) ? "" : e.target.value.toLowerCase()
+        if (searchKeywords !== ""
             //  &&
             // this.state.stockListing[0].ReturnVal !== undefined &&
             // this.state.stockListing[0].ReturnVal !== "0"
         ) {
 
-            const FilterArr = this.state.stockListing.filter((searchedItem) =>
-                searchedItem.TrackingNumber.toLowerCase().includes(e.target.value.toLowerCase()) ||
-                searchedItem.UserCode.includes(e.target.value.toLowerCase()))
-            // isStringNullOrEmpty(searchedItem.AreaCode) ? "" : (searchedItem.AreaCode.toLowerCase().includes(e.target.value.toLowerCase())
+            const FilterArr = this.props.Stocks.filter((searchedItem) =>
+                searchedItem.TrackingNumber.toLowerCase().includes(searchKeywords) ||
+                searchedItem.UserCode.includes(searchKeywords)
+            )
 
             this.setState({ stockFiltered: FilterArr })
             if (FilterArr.length === 1 && FilterArr[0].TrackingNumber === e.target.value) {
@@ -618,12 +621,11 @@ class StockGoods extends Component {
                     </div>
 
                     <div className='w-100'>
-                        <ToggleTabsComponent Tabs={ToggleTabs} onChange={(e) => this.changeTab(e)} size="small" />
+                        <ToggleTabsComponent className="" Tabs={ToggleTabs} onChange={(e) => this.changeTab(e)} size="small" />
                         <SearchBar placeholder={"Search anything"} autoFocus={true} onChange={(e) => this.onSearchChange(e)} />
                         <TableComponents
                             tableTopLeft={<h3 style={{ fontWeight: 700 }}>Stocks</h3>}
                             actionIcon={this.renderTableActionButton()}
-
                             tableOptions={{
                                 dense: true,
                                 tableOrderBy: 'asc',
