@@ -252,7 +252,7 @@ export class GitEpic {
       try {
         const response = await fetch(url +
           "Inventory_ViewStockList?" +
-          "TRACKINGSTATUSID=" + payload.USERID
+          "TRACKINGSTATUSID=" + payload.TRACKINGSTATUSID
         );
 
         let json = await response.json();

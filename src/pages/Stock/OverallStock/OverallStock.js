@@ -229,7 +229,7 @@ class OverallStock extends Component {
         if (isArrayNotEmpty(this.props.stockApproval)) {
             this.props.CallResetUpdatedStockDetail()
             this.props.CallResetStocks()
-            this.props.CallFetchAllStock({ USERID: 1 })
+            this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
             this.setState({ openAddChrgModal: false, isDataFetching: true, filteredList: null })
         }
     }
@@ -330,7 +330,7 @@ class OverallStock extends Component {
 
     onFetchLatestData() {
         this.props.CallResetStocks()
-        this.props.CallFetchAllStock({ USERID: 1 })
+        this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
         toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
         this.setState({ filteredList: null, isDataFetching: true })
     }
@@ -346,7 +346,7 @@ class OverallStock extends Component {
         if (formValue.AdditionalCost.length > 0) {
             for (var i = 0; i < formValue.AdditionalCost.length; i++) {
                 extraChangesValue += formValue.AdditionalCost[i].Charges + "=" + formValue.AdditionalCost[i].Value
-                if(i !== formValue.AdditionalCost.length -1)
+                if (i !== formValue.AdditionalCost.length - 1)
                     extraChangesValue += ';'
 
                 //check extra charge
@@ -579,7 +579,7 @@ class OverallStock extends Component {
         // CallFilterInventory
         if (areaSearchKeys === "All" && searchCategory === "All" && isStringNullOrEmpty(searchKeys)) {
             this.props.CallResetStocks()
-            this.props.CallFetchAllStock({ USERID: 1 })
+            this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
             toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
             this.setState({ isDataFetching: true, filteredList: null })
         }
@@ -592,7 +592,7 @@ class OverallStock extends Component {
                         console.log(areaSearchKeys)
 
                         // if area is not empty
-                        tempList = archivedData.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) && (x.TrackingNumber.includes(searchKeys) || x.UserCode.includes(searchKeys) ))
+                        tempList = archivedData.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) && (x.TrackingNumber.includes(searchKeys) || x.UserCode.includes(searchKeys)))
                     }
                     else if (areaSearchKeys === "All" && searchCategory !== "All") {
                         // if category is not empty
