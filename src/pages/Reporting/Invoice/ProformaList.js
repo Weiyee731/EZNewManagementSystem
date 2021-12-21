@@ -201,7 +201,12 @@ const ProformaList = (props) => {
             item.isFollowStandard = true
         })
         setItems(newItems)
-        setUnitPrice(e.target.value)
+
+        if(selectedType == 2 )
+            setConsolidatePrice(e.target.value)
+        else
+            setUnitPrice(e.target.value)
+
     }
 
     const singleUnitPrice = (volume) => {
