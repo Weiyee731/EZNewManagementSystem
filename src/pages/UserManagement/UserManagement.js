@@ -307,7 +307,7 @@ class UserManagement extends Component {
                     <TableComponents
                         // table settings 
                         tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}  // optional, it can pass as string or as children elements
-                       // tableTopRight={renderButtonOnTableTopRight()}                 // optional, it will brings the elements to the table's top right corner
+                        tableTopRight={renderButtonOnTableTopRight()}                 // optional, it will brings the elements to the table's top right corner
 
                         tableOptions={{
                             dense: false,                // optional, default is false
@@ -464,6 +464,9 @@ class UserManagement extends Component {
                         title={"Add new user with csv"}             // required, title of the modal
                         fullScreen={true}                         // required, to decide whether to show a single full width button or 2 buttons
                     >
+                        <div>
+                            
+                        </div>
                     </ModalPopOut>
                 </div>
             </>

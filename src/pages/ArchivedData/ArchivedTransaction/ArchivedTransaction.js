@@ -307,7 +307,6 @@ class ArchivedTransaction extends Component {
     render() {
         const onLocalSearch = (e) => {
             let searchKeywords = isStringNullOrEmpty(e.target.value) ? "" : e.target.value.toLowerCase()
-            console.log(this.props.archivedData)
             let FilterArr = this.props.archivedData.filter((searchedItem) => 
                 searchedItem.Fullname.toLowerCase().includes(searchKeywords) || searchedItem.UserCode.toLowerCase().includes(searchKeywords) ||
                 searchedItem.TransactionName.toLowerCase().includes(searchKeywords) || searchedItem.UserContactNo.toLowerCase().includes(searchKeywords) 
