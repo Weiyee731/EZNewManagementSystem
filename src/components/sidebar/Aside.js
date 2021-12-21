@@ -52,6 +52,7 @@ const Aside = ({ rtl, toggled, handleToggleSidebar, sidebar }) => {
       onToggle={handleToggleSidebar}
       onMouseEnter={() => { isCollapsed && setCollapsed(false) }}
       onMouseLeave={() => { isCollapsed && setCollapsed(true) }}
+      style={{zIndex: 3000}}
     >
       <SidebarHeader>
         <SidebarButtons handleCollapseSidebar={handleCollapseSidebar} isCollapsed={isCollapsed} />
