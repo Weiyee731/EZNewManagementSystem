@@ -213,7 +213,7 @@ class StockGoods extends Component {
         if (!isArrayNotEmpty(this.state.stockFiltered === null) && isArrayNotEmpty(this.props.Stocks)) {
             const { Stocks } = this.props
             this.setState({
-                stockFiltered: (isStringNullOrEmpty(Stocks.ReturnVal) && Stocks.ReturnVal == 0) ? [] : Stocks
+                stockFiltered: (isStringNullOrEmpty(Stocks.ReturnVal) && Stocks.ReturnVal === 0) ? [] : Stocks
             })
         }
     }
@@ -228,7 +228,7 @@ class StockGoods extends Component {
         if (this.state.stockFiltered === [] && isArrayNotEmpty(this.props.Stocks)) {
             const { Stocks } = this.props
             this.setState({
-                stockFiltered: (isStringNullOrEmpty(Stocks.ReturnVal) && Stocks.ReturnVal == 0) ? [] : Stocks
+                stockFiltered: (isStringNullOrEmpty(Stocks.ReturnVal) && Stocks.ReturnVal === 0) ? [] : Stocks
             })
         }
 
@@ -310,7 +310,7 @@ class StockGoods extends Component {
                 ContainerDate: ContainerDate.join(","),
                 Remark: Remark.join(","),
                 AdditionalCharges: AdditionalCharges.join(",")
-            })
+            }, () => this.props.CallFetchAllStock({ USERID: "1" }))
     }
 
     renderTableRows(data, index) {
@@ -392,12 +392,12 @@ class StockGoods extends Component {
                     AreaCode: this.state.AreaCode,
                     UserCode: this.state.UserCode,
                     Item: this.state.Item,
-                    TRACKINGSTATUSID: 1,
+                    TRACKINGSTATUSID: 2,
                     ContainerName: this.state.ContainerName,
                     ContainerDate: this.state.ContainerDate,
                     Remark: this.state.Remark,
                     AdditionalCharges: this.state.AdditionalCharges
-                })
+                }, () => this.props.CallFetchAllStock({ USERID: "1" }))
                 break;
 
             case "openAddModal":
