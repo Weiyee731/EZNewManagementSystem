@@ -125,9 +125,6 @@ export function ModalPopOut(props) {
         </AppBar>
       }
 
-      <DialogTitle id="alert-dialog-title">
-        {props.title}
-      </DialogTitle>
       <DialogContent>
         {/* <DialogContentText id="alert-dialog-description"> */}
         {typeof props.children !== "undefined" ? props.children : props.message}
@@ -135,7 +132,6 @@ export function ModalPopOut(props) {
       </DialogContent>
       <DialogActions>
         {props.showCancel?  <Button onClick={() => props.handleToggleDialog()}>Cancel</Button>:""}
-      
         <Button onClick={() => props.handleConfirmFunc()} variant='contained'>
           Confirm
         </Button>

@@ -610,14 +610,11 @@ class StockGoods extends Component {
                 }
                 <div>
                     <div className="row" onClick={() => this.setState({ open: !this.state.open })}>
-
                         <div className="col-6 mt-2 mb-md-2">
                             <ResponsiveDatePickers title="Date" value={this.state.datevalue ? this.state.datevalue : ""} disabled readOnly onChange={(e) => this.onDateChange(e)} />
                         </div>
                         <div className="col-6 mt-2">
-
                             <TextField id="outlined-basic" value={this.state.ContainerName ? this.state.ContainerName : ""} fullWidth label="Container Number" variant="standard" />
-
                         </div>
                     </div>
 
@@ -636,8 +633,6 @@ class StockGoods extends Component {
                                 stickyTableHeight: (getWindowDimensions().screenHeight * 0.7),
                             }}
                             paginationOptions={[20, 50, 100, { label: 'All', value: -1 }]}
-
-
                             tableHeaders={headCells}
                             tableRows={{
                                 renderTableRows: this.renderTableRows,

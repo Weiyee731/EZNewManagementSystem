@@ -190,7 +190,6 @@ class ArchivedStock extends Component {
 
             if ((!isStringNullOrEmpty(archivedData[0].ReturnVal) && archivedData[0].ReturnVal == 0)) {
                 toast.warning("Fetched data is empty. ", { autoClose: 3000, theme: "dark" });
-
             }
         }
     }
