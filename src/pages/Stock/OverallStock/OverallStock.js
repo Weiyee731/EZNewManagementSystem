@@ -345,7 +345,9 @@ class OverallStock extends Component {
 
         if (formValue.AdditionalCost.length > 0) {
             for (var i = 0; i < formValue.AdditionalCost.length; i++) {
-                extraChangesValue += formValue.AdditionalCost[i].Charges + "=" + formValue.AdditionalCost[i].Value + ";"
+                extraChangesValue += formValue.AdditionalCost[i].Charges + "=" + formValue.AdditionalCost[i].Value
+                if(i !== formValue.AdditionalCost.length -1)
+                    extraChangesValue += ';'
 
                 //check extra charge
                 if (formValue.AdditionalCost[i].validated === false)
