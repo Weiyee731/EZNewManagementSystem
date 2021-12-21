@@ -105,6 +105,7 @@ export function ModalPopOut(props) {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       PaperComponent={props.fullScreen ? null : PaperComponent}
+      sx={{ zIndex: 5000}}
     >
       {
         props.fullScreen &&
@@ -125,9 +126,6 @@ export function ModalPopOut(props) {
         </AppBar>
       }
 
-      <DialogTitle id="alert-dialog-title">
-        {props.title}
-      </DialogTitle>
       <DialogContent>
         {/* <DialogContentText id="alert-dialog-description"> */}
         {typeof props.children !== "undefined" ? props.children : props.message}
@@ -135,7 +133,6 @@ export function ModalPopOut(props) {
       </DialogContent>
       <DialogActions>
         {props.showCancel?  <Button onClick={() => props.handleToggleDialog()}>Cancel</Button>:""}
-      
         <Button onClick={() => props.handleConfirmFunc()} variant='contained'>
           Confirm
         </Button>

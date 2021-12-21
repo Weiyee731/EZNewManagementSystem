@@ -22,9 +22,13 @@ import MenuItem from '@mui/material/MenuItem';
 import { getWindowDimensions, isArrayNotEmpty } from "../../tools/Helpers";
 import SearchBar from "../../components/SearchBar/SearchBar"
 import AlertDialog from "../../components/modal/Modal";
+import { ModalPopOut } from "../../components/modal/Modal";
 import { toast } from "react-toastify";
 import CsvDownloader from 'react-csv-downloader';
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import Dropzone from "../../components/Dropzone/Dropzone"
+import * as XLSX from 'xlsx';
 
 const style = {
     position: 'absolute',
@@ -104,7 +108,8 @@ class UserManagement extends Component {
             contact: "",
             address: "",
             lat: 0.00,
-            long: 0.00
+            long: 0.00,
+            addWithCSVModalOpen: false
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
@@ -261,6 +266,17 @@ class UserManagement extends Component {
     }
 
     render() {
+        const renderButtonOnTableTopRight = () => {
+            return (
+                <div>
+                    <Tooltip title="Add new user via csv">
+                        <IconButton size="medium" sx={{ border: "1px solid #3399ff", color: "#3399ff" }} onClick={() => this.setState({ addWithCSVModalOpen: true })}>
+                            <GroupAddIcon />
+                        </IconButton>
+                    </Tooltip>
+                </div>
+            )
+        }
 
         const onChange = (e) => {
             const FilterArr = this.state.UserListing.filter((searchedItem) => searchedItem.UserCode.toLowerCase().includes(e.target.value))
@@ -275,21 +291,23 @@ class UserManagement extends Component {
                             <SearchBar onChange={onChange} />
                         </div>
                         <div className="col-md-2 col-2 m-auto">
-                            <CsvDownloader
-                                filename="user-list"
-                                extension=".xls"
-                                separator=","
-                                columns={headCells}
-                                datas={isArrayNotEmpty(this.state.UserListingfiltered) ? this.state.UserListingfiltered : []}>
-                                <DownloadForOfflineIcon color="primary" sx={{ fontSize: 45 }}></DownloadForOfflineIcon>
-                            </CsvDownloader>
+                            <div className="d-flex w-100">
+                                <CsvDownloader
+                                    filename="user-list"
+                                    extension=".xls"
+                                    separator=","
+                                    columns={headCells}
+                                    datas={isArrayNotEmpty(this.state.UserListingfiltered) ? this.state.UserListingfiltered : []}>
+                                    <DownloadForOfflineIcon color="primary" sx={{ fontSize: 45 }}></DownloadForOfflineIcon>
+                                </CsvDownloader>
+                            </div>
                         </div>
                     </div>
                     <hr />
                     <TableComponents
                         // table settings 
                         tableTopLeft={<h3 style={{ fontWeight: 700 }}>Users</h3>}  // optional, it can pass as string or as children elements
-                        // tableTopRight={this.renderTableActionButton}                 // optional, it will brings the elements to the table's top right corner
+                       // tableTopRight={renderButtonOnTableTopRight()}                 // optional, it will brings the elements to the table's top right corner
 
                         tableOptions={{
                             dense: false,                // optional, default is false
@@ -436,6 +454,17 @@ class UserManagement extends Component {
                             </Grid>
                         </Box>
                     </AlertDialog>
+                </div>
+                <div>
+                    <ModalPopOut
+                        open={this.state.addWithCSVModalOpen}        // required, pass the boolean whether modal is open or close
+                        handleToggleDialog={() => { this.setState({ addWithCSVModalOpen: false}) }}                // required, pass the toggle function of modal
+                        handleConfirmFunc={() => { }}               // required, pass the confirm function 
+                        showAction={true}                           // required, to show the footer of modal display
+                        title={"Add new user with csv"}             // required, title of the modal
+                        fullScreen={true}                         // required, to decide whether to show a single full width button or 2 buttons
+                    >
+                    </ModalPopOut>
                 </div>
             </>
         )
