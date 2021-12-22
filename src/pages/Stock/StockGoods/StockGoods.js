@@ -177,6 +177,7 @@ const INITIAL_STATE = {
     Item: "null",
     AdditionalCharges: "0",
     Remark: "no",
+    CallResetSelected: false,
 }
 
 function onAddButtonClick() {
@@ -232,6 +233,9 @@ class StockGoods extends Component {
             this.props.CallResetStocks()
             this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
 
+            this.setState({ CallResetSelected: true })
+            setTimeout(() => { this.setState({ CallResetSelected: false }) }, 300)
+
         }
 
         if (this.state.stockFiltered === null && isArrayNotEmpty(this.props.Stocks)) {
@@ -242,7 +246,6 @@ class StockGoods extends Component {
 
             if ((!isStringNullOrEmpty(Stocks[0].ReturnVal) && Stocks[0].ReturnVal === 0)) {
                 toast.warning("Fetched data is empty. ", { autoClose: 3000, theme: "dark" });
-
             }
         }
 
@@ -308,23 +311,22 @@ class StockGoods extends Component {
             AdditionalCharges.push(row.AdditionalCharges)
         })
 
-        this.props.CallUpdateStockDetailByPost(
-            {
-                StockID: StockID.join(","),
-                TrackingNumber: TrackingNumber.join(","),
-                ProductWeight: ProductWeight.join(","),
-                ProductDimensionHeight: ProductDimensionHeight.join(","),
-                ProductDimensionWidth: ProductDimensionWidth.join(","),
-                ProductDimensionDeep: ProductDimensionDeep.join(","),
-                AreaCode: AreaCode.join(","),
-                UserCode: UserCode.join(","),
-                Item: Item.join(","),
-                TRACKINGSTATUSID: TRACKINGSTATUSID.join(","),
-                ContainerName: ContainerName.join(","),
-                ContainerDate: ContainerDate.join(","),
-                Remark: Remark.join(","),
-                AdditionalCharges: AdditionalCharges.join(",")
-            })
+        this.props.CallUpdateStockDetailByPost({
+            StockID: StockID.join(","),
+            TrackingNumber: TrackingNumber.join(","),
+            ProductWeight: ProductWeight.join(","),
+            ProductDimensionHeight: ProductDimensionHeight.join(","),
+            ProductDimensionWidth: ProductDimensionWidth.join(","),
+            ProductDimensionDeep: ProductDimensionDeep.join(","),
+            AreaCode: AreaCode.join(","),
+            UserCode: UserCode.join(","),
+            Item: Item.join(","),
+            TRACKINGSTATUSID: TRACKINGSTATUSID.join(","),
+            ContainerName: ContainerName.join(","),
+            ContainerDate: ContainerDate.join(","),
+            Remark: Remark.join(","),
+            AdditionalCharges: AdditionalCharges.join(",")
+        })
     }
 
     renderTableRows(data, index) {
@@ -586,9 +588,7 @@ class StockGoods extends Component {
                     title={"Please select the container number and date desired"}
                     message={<div className="row ">
                         <div className="col-sm-6 col-12">
-
                             <ResponsiveDatePickers title="Date" value={this.state.datevalue ? this.state.datevalue : ""} onChange={(e) => this.onDateChange(e)} />
-
                         </div>
 
                         <div className="col-sm-6 col-12">
@@ -686,6 +686,7 @@ class StockGoods extends Component {
                             onTableRowClick={this.onTableRowClick}
                             onActionButtonClick={onAddButtonClick}
                             onSelectRow={this.onSelectRow}
+                            CallResetSelected={this.state.CallResetSelected}
                         />
                     </div>
                 </div>

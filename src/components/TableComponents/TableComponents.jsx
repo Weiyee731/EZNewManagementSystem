@@ -211,11 +211,11 @@ export default function TableComponents(props) {
     const [rowsPerPage, setRowsPerPage] = React.useState((isArrayNotEmpty(props.paginationOptions) ? props.paginationOptions[0] : 25));
     const [pagePaginationOptions, setPagePaginationOptions] = React.useState((isArrayNotEmpty(props.paginationOptions)) ? props.paginationOptions : []);
 
-    //table and table data settings
+    //table and table data settings 
     const [order, setOrder] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.tableOrderBy === null ? 'asc' : props.tableOptions.tableOrderBy);
     const [orderBy, setOrderBy] = React.useState(isObjectUndefinedOrNull(props.tableOptions) && props.tableOptions.sortingIndex === null ? "" : props.tableOptions.sortingIndex);
     const [objectKey, setObjectKey] = React.useState(!isStringNullOrEmpty(props.selectedIndexKey) ? props.selectedIndexKey : "id")
-    const [rows, setRows] = React.useState(props.Data);
+    const [rows, setRows] = React.useState(props.Data);         
     const [tableHeaders, setTableHeaders] = React.useState((isArrayNotEmpty(props.tableHeaders) ? props.tableHeaders : []));
     const [renderCheckbox, setRenderCheckbox] = React.useState(!isObjectUndefinedOrNull(props.tableRows.checkbox) ? props.tableRows.checkbox : true);
     const [onRowSelect, setOnRowSelect] = React.useState(!isObjectUndefinedOrNull(props.tableRows.onRowClickSelect) ? props.tableRows.onRowClickSelect : false);
@@ -225,13 +225,13 @@ export default function TableComponents(props) {
 
     useEffect(() => {
         let isMounted = true
-        if(isMounted) {
+        if (isMounted) {
             setTableHeaders(props.tableHeaders)
             setRows(props.Data)
             setTableTopRight(props.tableTopRight)
             setObjectKey(props.selectedIndexKey)
         }
-        return() => {
+        return () => {
             setTableHeaders([])
             setRows([])
             setTableTopRight(null)
@@ -239,6 +239,12 @@ export default function TableComponents(props) {
             isMounted = false
         }
     }, [props]);
+
+    useEffect(() => {
+        if(props.CallResetSelected === true ){
+            setSelected([])
+        }
+    }, [props.CallResetSelected])
 
     // useEffect(() => {
     //     setRows(props)
