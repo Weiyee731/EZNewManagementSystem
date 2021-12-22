@@ -393,6 +393,20 @@ class StockGoods extends Component {
 
             case "openEditModal":
                 this.setState({ openEditModal: !this.state.openEditModal });
+                let extraChangesValue = "", isNotVerified = 0;
+                if (this.state.AdditionalCost.length > 0) {
+                    for (var i = 0; i < this.state.AdditionalCost.length; i++) {
+                        extraChangesValue += this.state.AdditionalCost[i].Charges + "=" + this.state.AdditionalCost[i].Value
+                        if (i !== this.state.AdditionalCost.length - 1)
+                            extraChangesValue += ';'
+
+                        //check extra charge
+                        if (this.state.AdditionalCost[i].validated === false)
+                            isNotVerified++;
+                    }
+                }
+                else
+                    extraChangesValue = "-"
                 this.props.CallUpdateStockDetailByPost({
                     StockID: this.state.selectedRows.StockID,
                     TrackingNumber: this.state.TrackingNumber,
@@ -407,7 +421,7 @@ class StockGoods extends Component {
                     ContainerName: this.state.ContainerName,
                     ContainerDate: this.state.ContainerDate,
                     Remark: this.state.Remark,
-                    AdditionalCharges: this.state.AdditionalCharges
+                    AdditionalCharges: extraChangesValue
                 })
                 break;
             case "openAddModal":
