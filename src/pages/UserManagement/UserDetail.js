@@ -18,6 +18,7 @@ import Box from '@mui/material/Box';
 import TableComponents from "../../components/TableComponents/TableComponents"
 import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
+import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import ToggleTabsComponent from "../../components/ToggleTabsComponent/ToggleTabComponents";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
@@ -289,8 +290,11 @@ class UserDetail extends Component {
   handleOnSave = () => {
     console.log("Save")
     this.setState({ isOnEditMode: false })
-
   }
+  handleOnCancel = () => {
+    this.setState({ isOnEditMode: false })
+  }
+
   renderTableRows = (data, index) => {
     return (
       <>
@@ -303,7 +307,7 @@ class UserDetail extends Component {
         <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
         {
-          data.OrderStatus === "Unpaid" && <TableCell onClick={(event) => this.onAddButtonClick(event, data, index)} align="center"><CheckCircleIcon color="grey" sx={{ fontSize: 30 }}></CheckCircleIcon></TableCell> 
+          data.OrderStatus === "Unpaid" && <TableCell onClick={(event) => this.onAddButtonClick(event, data, index)} align="center"><CheckCircleIcon color="grey" sx={{ fontSize: 30 }}></CheckCircleIcon></TableCell>
         }
       </>
     )
@@ -376,8 +380,8 @@ class UserDetail extends Component {
       const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
       return (
-        <text x={x} y={y} fill="black" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" style={{fontWeight: 600}}>
-          {this.state.PieChartData[index].name } {" RM " + this.state.PieChartData[index].value }
+        <text x={x} y={y} fill="black" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" style={{ fontWeight: 600 }}>
+          {this.state.PieChartData[index].name} {" RM " + this.state.PieChartData[index].value}
         </text>
       );
     };
@@ -399,15 +403,27 @@ class UserDetail extends Component {
               <div style={{ textAlign: 'end', flex: 1 }}>
                 {
                   isOnEditMode ?
-                    <LoadingButton
-                      loading={this.props.loading}
-                      loadingPosition="end"
-                      endIcon={<SaveIcon />}
-                      variant="contained"
-                      onClick={() => this.handleOnSave()}
-                    >
-                      Save
-                    </LoadingButton>
+                    <div>
+                      <LoadingButton
+                        loading={this.props.loading}
+                        loadingPosition="end"
+                        endIcon={<DoDisturbIcon />}
+                        variant="contained"
+                        onClick={() => this.handleOnCancel()}
+                      >
+                        Cancel
+                      </LoadingButton>
+                      <LoadingButton
+                        style={{ marginLeft: "4px" }}
+                        loading={this.props.loading}
+                        loadingPosition="end"
+                        endIcon={<SaveIcon />}
+                        variant="contained"
+                        onClick={() => this.handleOnSave()}
+                      >
+                        Save
+                      </LoadingButton>
+                    </div>
                     :
                     <Button
                       variant="outlined"
