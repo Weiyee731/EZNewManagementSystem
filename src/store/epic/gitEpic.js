@@ -422,8 +422,6 @@ export class GitEpic {
 
   Container_ViewContainer = action$ =>
     action$.ofType(GitAction.ViewContainer).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Container_ViewContainer")
       try {
         const response = await fetch(url +
           "Container_ViewContainer"
