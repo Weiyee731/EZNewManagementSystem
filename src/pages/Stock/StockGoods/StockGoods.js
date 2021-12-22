@@ -193,7 +193,7 @@ class StockGoods extends Component {
         this.state.stockListing = this.props.Stocks;
 
         this.onTableRowClick = this.onTableRowClick.bind(this);
-        onAddButtonClick = onAddButtonClick.bind(this);
+        this.onAddButtonClick = onAddButtonClick.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.changeTab = this.changeTab.bind(this);
         this.onContainerChange = this.onContainerChange.bind(this);
@@ -227,10 +227,11 @@ class StockGoods extends Component {
         }
 
         if (isArrayNotEmpty(this.props.stockApproval)) {
+            this.setState({ selectedStocks: "", selectedRows: "" }) //may not function as desired
             this.props.CallResetUpdatedStockDetail()
             this.props.CallResetStocks()
             this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
-            this.setState({ selectedRows: "" })
+
         }
 
         if (this.state.stockFiltered === null && isArrayNotEmpty(this.props.Stocks)) {
@@ -409,8 +410,7 @@ class StockGoods extends Component {
                 else
                     extraChangesValue = "-"
 
-                if (isStringNullOrEmpty(this.state.selectedRows.AreaCode)) { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
-                else {
+                if (!isStringNullOrEmpty(this.state.selectedRows.AreaCode) || !isStringNullOrEmpty(this.state.AreaCode)) {
                     this.setState({ openEditModal: !this.state.openEditModal });
                     this.props.CallUpdateStockDetailByPost({
                         StockID: this.state.selectedRows.StockID,
@@ -429,6 +429,7 @@ class StockGoods extends Component {
                         AdditionalCharges: extraChangesValue
                     })
                 }
+                else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
 
                 break;
             case "openAddModal":

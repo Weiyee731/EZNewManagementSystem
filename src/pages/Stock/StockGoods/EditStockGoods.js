@@ -374,7 +374,7 @@ class EditStockGoods extends Component {
                                     size="large"
                                     name="Remark"
                                     label="Remark"
-                                    value={formValue.Remark}
+                                    defaultValue={formValue.Remark}
                                     onChange={(e) => this.onTrigger(e, "Remark")}
                                     fullWidth
                                 />
