@@ -394,14 +394,14 @@ class StockGoods extends Component {
             case "openEditModal":
                 this.setState({ openEditModal: !this.state.openEditModal });
                 let extraChangesValue = "", isNotVerified = 0;
-                if (this.state.AdditionalCost.length > 0) {
-                    for (var i = 0; i < this.state.AdditionalCost.length; i++) {
-                        extraChangesValue += this.state.AdditionalCost[i].Charges + "=" + this.state.AdditionalCost[i].Value
-                        if (i !== this.state.AdditionalCost.length - 1)
+                if (this.state.AdditionalCharges.length > 0) {
+                    for (var i = 0; i < this.state.AdditionalCharges.length; i++) {
+                        extraChangesValue += this.state.AdditionalCharges[i].Charges + "=" + this.state.AdditionalCharges[i].Value
+                        if (i !== this.state.AdditionalCharges.length - 1)
                             extraChangesValue += ';'
 
                         //check extra charge
-                        if (this.state.AdditionalCost[i].validated === false)
+                        if (this.state.AdditionalCharges[i].validated === false)
                             isNotVerified++;
                     }
                 }
