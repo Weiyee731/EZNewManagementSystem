@@ -287,15 +287,21 @@ class CreateInvoice extends Component {
             weight += item.ProductWeight
             mCube += volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
         })
-        this.handleDeliveryModal()
-        this.props.history.push({
-            pathname: '/ProformaList',
-            selectedType: i,
-            state: selectedItems,
-            userId: selectedUserID,
-            totalVolume: mCube,
-            totalWeight: weight
-        })
+        if (!isStringNullOrEmpty(selectedUserID)) {
+            this.handleDeliveryModal()
+            this.props.history.push({
+                pathname: '/ProformaList',
+                selectedType: i,
+                state: selectedItems,
+                userId: selectedUserID,
+                totalVolume: mCube,
+                totalWeight: weight
+            })
+        }
+        else {
+            toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 })
+        }
+
     }
 
     handleDeliveryModal = () => {
@@ -548,7 +554,7 @@ class CreateInvoice extends Component {
                         renderTableRows: this.renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
                         checkbox: true,                          // optional, by default is true
                         checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
-                        onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
+                        onRowClickSelect: true                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                     }}
                     selectedIndexKey={"StockID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
                     Data={searchCategory == "All" && onSearchText == "" ? stocks : filteredList}                                  // required, the data that listing in the table
@@ -567,7 +573,7 @@ class CreateInvoice extends Component {
                     title={formValue.TrackingNumber}                                  // required, title of the modal
                     buttonTitle={"Update"}                         // required, title of button
                     singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
-                    maxWidth={"md"}
+                    maxWidth={"lg"}
                 >
                     <div className="py-md-3 py-1">
                         <div className="row">
@@ -726,7 +732,8 @@ class CreateInvoice extends Component {
                     title={"Delivery Type"}                                  // required, title of the modal
                     buttonTitle={"Select"}                         // required, title of button
                     singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
-                    maxWidth={"xs"}
+                    maxWidth={"md"}
+                    fullWidth={false}
                 >
                     <Stack
                         spacing={2}
