@@ -67,15 +67,22 @@ const ProformaList = (props) => {
 
     useEffect(() => {
         if (isArrayNotEmpty(userProfile)) {
-            setSelfPickupPrice(userProfile[0].MinimumPrice)
-            setLargeItemMinPrice(userProfile[0].LargeDeliveryPrice)
-            setConsolidatePrice(userProfile[0].ConsolidatedPrice)
-            setUnitPrice(userProfile[0].SelfPickOverCubic)
-            setFirstKg(userProfile[0].SmallDeliveryFirstPrice)
-            setSubsequentKg(userProfile[0].SmallDeliverySubPrice)
-            setArea(userProfile[0].AreaCode)
-            let area = userAreaCode.filter((el) => el.UserAreaID == userProfile[0].UserAreaID)
-            setMinCubic(area[0].MinimumCubic)
+            if (userProfile[0].ReturnVal && userProfile[0].ReturnVal == "0") {
+                toast.error("Invalid user information. Please try again")
+                setTimeout(() => {
+                    props.history.goBack()
+                }, 2000);
+            } else {
+                setSelfPickupPrice(userProfile[0].MinimumPrice)
+                setLargeItemMinPrice(userProfile[0].LargeDeliveryPrice)
+                setConsolidatePrice(userProfile[0].ConsolidatedPrice)
+                setUnitPrice(userProfile[0].SelfPickOverCubic)
+                setFirstKg(userProfile[0].SmallDeliveryFirstPrice)
+                setSubsequentKg(userProfile[0].SmallDeliverySubPrice)
+                setArea(userProfile[0].AreaCode)
+                let area = userAreaCode.filter((el) => el.UserAreaID == userProfile[0].UserAreaID)
+                setMinCubic(area[0].MinimumCubic)
+            }
         }
     }, [userProfile])
 
@@ -161,7 +168,12 @@ const ProformaList = (props) => {
             let total = []
             items.map((item) => {
                 let volume = volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
-                let price = item.isFollowStandard ? unitPrice * volume : item.unitPrice * volume
+                let price = 0
+                if (item.isFollowStandard) {
+                    price = selectedType == 2 ? consolidatePrice * volume : unitPrice * volume
+                } else {
+                    price = item.unitPrice * volume
+                }
                 if (volume < 0.013) {
                     if (selectedType == 1) {
                         total.push(item.isFollowStandard ? Number(selfPickupPrice) : Number(item.unitPrice))
@@ -202,7 +214,7 @@ const ProformaList = (props) => {
         })
         setItems(newItems)
 
-        if(selectedType == 2 )
+        if (selectedType == 2)
             setConsolidatePrice(e.target.value)
         else
             setUnitPrice(e.target.value)

@@ -230,6 +230,7 @@ class StockGoods extends Component {
             this.props.CallResetUpdatedStockDetail()
             this.props.CallResetStocks()
             this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
+            this.setState({ selectedRows: "" })
         }
 
         if (this.state.stockFiltered === null && isArrayNotEmpty(this.props.Stocks)) {
@@ -392,23 +393,43 @@ class StockGoods extends Component {
                 break;
 
             case "openEditModal":
-                this.setState({ openEditModal: !this.state.openEditModal });
-                this.props.CallUpdateStockDetailByPost({
-                    StockID: this.state.selectedRows.StockID,
-                    TrackingNumber: this.state.TrackingNumber,
-                    ProductWeight: this.state.ProductWeight,
-                    ProductDimensionHeight: this.state.ProductDimensionHeight,
-                    ProductDimensionWidth: this.state.ProductDimensionWidth,
-                    ProductDimensionDeep: this.state.ProductDimensionDeep,
-                    AreaCode: this.state.AreaCode,
-                    UserCode: this.state.UserCode,
-                    Item: this.state.Item,
-                    TRACKINGSTATUSID: 2,
-                    ContainerName: this.state.ContainerName,
-                    ContainerDate: this.state.ContainerDate,
-                    Remark: this.state.Remark,
-                    AdditionalCharges: this.state.AdditionalCharges
-                })
+
+                let extraChangesValue = "", isNotVerified = 0;
+                if (this.state.AdditionalCharges.length > 0) {
+                    for (var i = 0; i < this.state.AdditionalCharges.length; i++) {
+                        extraChangesValue += this.state.AdditionalCharges[i].Charges + "=" + this.state.AdditionalCharges[i].Value
+                        if (i !== this.state.AdditionalCharges.length - 1)
+                            extraChangesValue += ';'
+
+                        //check extra charge
+                        if (this.state.AdditionalCharges[i].validated === false)
+                            isNotVerified++;
+                    }
+                }
+                else
+                    extraChangesValue = "-"
+
+                if (isStringNullOrEmpty(this.state.selectedRows.AreaCode)) { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
+                else {
+                    this.setState({ openEditModal: !this.state.openEditModal });
+                    this.props.CallUpdateStockDetailByPost({
+                        StockID: this.state.selectedRows.StockID,
+                        TrackingNumber: this.state.TrackingNumber,
+                        ProductWeight: this.state.ProductWeight,
+                        ProductDimensionHeight: this.state.ProductDimensionHeight,
+                        ProductDimensionWidth: this.state.ProductDimensionWidth,
+                        ProductDimensionDeep: this.state.ProductDimensionDeep,
+                        AreaCode: this.state.AreaCode,
+                        UserCode: this.state.UserCode,
+                        Item: this.state.Item,
+                        TRACKINGSTATUSID: 2,
+                        ContainerName: this.state.ContainerName,
+                        ContainerDate: this.state.ContainerDate,
+                        Remark: this.state.Remark,
+                        AdditionalCharges: extraChangesValue
+                    })
+                }
+
                 break;
             case "openAddModal":
                 this.setState({ openAddModal: !this.state.openAddModal });
