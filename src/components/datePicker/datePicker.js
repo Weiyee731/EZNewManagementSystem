@@ -12,15 +12,15 @@ import Box from '@mui/material/Box';
 export default function ResponsiveDatePickers(props) {
   const [value, setValue] = React.useState(props.rangePicker ? [null, null] : new Date())
   const formats = {
-    normalDate: "d/MM/yyyy",
-    keyboardDate: "d/MM/yyyy",
+    normalDate: "dd/MM/yyyy",
+    keyboardDate: "dd/MM/yyyy",
   };
   const { startPickerPropsOptions, endPickerPropsOptions } = props
 
   const updateDateValue = (newValue) => {
     if (isObjectUndefinedOrNull(props.onChange) && typeof props.onChange !== "function")
       setValue(newValue)
-    else{
+    else {
       props.onChange(newValue)
       setValue(newValue)
     }
