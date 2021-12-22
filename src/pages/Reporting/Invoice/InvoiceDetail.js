@@ -50,7 +50,6 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: '65%',
-  height: '30%',
   bgcolor: 'background.paper',
   border: '0px solid #000',
   boxShadow: 24,
@@ -164,7 +163,9 @@ class InvoicerDetail extends Component {
       DeliveryFee: 0.00,
       Remark: "",
       TransactionDetail: [],
-      page: []
+      page: [],
+      isRemarkValidated: false,
+      isDeliveryFeeValidated: false,
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.handleChange = this.handleChange.bind(this)
@@ -294,13 +295,15 @@ class InvoicerDetail extends Component {
 
   handleInputChange = (e) => {
     const elementId = e.target.id
+    const value = (isStringNullOrEmpty( e.target.value ) ? "" : e.target.value)
+
     switch (elementId) {
       case "remark":
-        this.setState({ Remark: e.target.value.trim() })
+        this.setState({ Remark:value, isRemarkValidated: !(isStringNullOrEmpty(value))  })
         break;
 
       case "deliveryfee":
-        this.setState({ DeliveryFee: e.target.value })
+        this.setState({ DeliveryFee: value, isDeliveryFeeValidated: (!(isStringNullOrEmpty(value)) && !isNaN(value) && (Number(value) > 0)) })
         break;
 
       default:
@@ -392,7 +395,7 @@ class InvoicerDetail extends Component {
           }}
         >
           <div style={companyDetail}>
-            {TransactionDetail[0].ContainerName !== null ? TransactionDetail[0].ContainerName : "ABCD123456"}
+            <b>Container:</b> {TransactionDetail[0].ContainerName !== null ? TransactionDetail[0].ContainerName : " - "}
           </div>
           <TableComponents
             style={{
@@ -518,12 +521,12 @@ class InvoicerDetail extends Component {
             BackdropProps={{ timeout: 500 }}
           >
             <Box sx={style} component="main" maxWidth="xs">
-              <Typography component="h1" variant="h4" style={{ textAlign: "center" }}>Additional Charges</Typography>
+              <Typography component="h1" variant="h5" style={{ textAlign: "center" }}>Additional Charges</Typography>
               <Box component="form" noValidate sx={{ mt: 3 }}>
                 <div className="row">
-                  <h4 style={{ textAlign: "center" }}>
+                  <h5 style={{ textAlign: "center" }}>
                     Before Print, please select the delivery method
-                  </h4>
+                  </h5>
                   <div className="row" style={{ textAlign: "center", margin: "auto" }}>
                     <div style={{ display: "inline", width: "100%" }}>
                       <Grid component="label" container alignItems="center" spacing={1} style={{ width: "100%", display: "inline" }}>
@@ -553,9 +556,9 @@ class InvoicerDetail extends Component {
                           name="AdditionalChargedRemark"
                           value={Remark}
                           onChange={(e) => { this.handleInputChange(e) }}
-                          error={false}
+                          error={ !this.state.isRemarkValidated }
                         />
-                        {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
+                        { !this.state.isRemarkValidated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
                       </div>
                       <div className="col-4 col-sm-3">
                         <FormControl variant="standard" size="small" fullWidth>
@@ -568,9 +571,9 @@ class InvoicerDetail extends Component {
                             id="deliveryfee"
                             onChange={(e) => { this.handleInputChange(e) }}
                             startAdornment={<InputAdornment position="start">RM</InputAdornment>}
-                            error={false}
+                            error={ !this.state.isDeliveryFeeValidated }
                           />
-                          {false && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
+                          { !this.state.isDeliveryFeeValidated  && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
                         </FormControl>
                       </div>
                     </div>
@@ -582,6 +585,7 @@ class InvoicerDetail extends Component {
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
                   onClick={(e1) => this.onClickConfirmInvoice(e1)}
+                  disabled={(TransportationBool && (!this.state.isDeliveryFeeValidated || !this.state.isRemarkValidated))}
                 >
                   {TransportationBool ? "Add Additional Charge" : "Submit"}
                 </Button>
