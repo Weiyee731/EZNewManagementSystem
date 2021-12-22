@@ -18,7 +18,7 @@ export const isEmailValid = (email) => { return (typeof email === 'undefined' ||
 export const isLongitude = (longitude) => { return isFinite(longitude) && Math.abs(longitude) <= 180; }
 export const isLatitude = (latitude) => { return isFinite(latitude) && Math.abs(latitude) <= 90; }
 export const isDecimalValid = (number) => { return (typeof number === 'undefined' || number == '' || !/^[0-9]\d*(\.\d+)?$/.test(number)) ? true : false }
-
+export const isNumber = (number) => { return (!isStringNullOrEmpty(number) && !isNaN(number)) }
 //time functions
 export const convertDateTimeToString112Format = (date, fetchTime) => {
     try {

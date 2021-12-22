@@ -3,7 +3,7 @@ import { GitAction } from "../../../store/action/gitAction";
 import { withRouter } from 'react-router'
 import TableComponents from '../../../components/TableComponents/TableComponents';
 import Button from '@mui/material/Button';
-import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull, roundOffTotal, round, volumeCalc } from "../../../tools/Helpers";
+import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull, roundOffTotal, round, volumeCalc, isNumber } from "../../../tools/Helpers";
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -17,6 +17,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
+import { FormHelperText } from '@mui/material';
 
 function mapStateToProps(state) {
     return {
@@ -48,6 +49,14 @@ const ProformaList = (props) => {
     const [items, setItems] = useState(state)
     const [area, setArea] = useState('')
     const [minCubic, setMinCubic] = useState(0.5)
+
+    const [selfPickupPriceValidated, setSelfPickupPriceValidated] = useState(true)
+    const [consolidatePriceValidated, setConsolidatePriceValidated] = useState(true)
+    const [unitPriceValidated, setUnitPriceValidated] = useState(true)
+    const [firstKgValidated, setFirstKgValidated] = useState(true)
+    const [subsequentKgValidated, setSubsequentKgValidated] = useState(true)
+    const [LargeItemMinPriceValidated, setLargeItemMinPriceValidated] = useState(true)
+
     const ref = useRef(false)
 
     useEffect(() => {
@@ -205,6 +214,7 @@ const ProformaList = (props) => {
         })
         setItems(newItems)
         setSelfPickupPrice(e.target.value)
+        setSelfPickupPriceValidated(isNumber(e.target.value))
     }
 
     const handleChangeAllUnitPrice = (e) => {
@@ -214,11 +224,14 @@ const ProformaList = (props) => {
         })
         setItems(newItems)
 
-        if (selectedType == 2)
+        if (selectedType == 2) {
+            setConsolidatePriceValidated(isNumber(e.target.value))
             setConsolidatePrice(e.target.value)
-        else
+        }
+        else {
             setUnitPrice(e.target.value)
-
+            setUnitPriceValidated(isNumber(e.target.value))
+        }
     }
 
     const singleUnitPrice = (volume) => {
@@ -358,17 +371,22 @@ const ProformaList = (props) => {
         return (
             <div className='d-flex'>
                 {selectedType == 1 &&
-                    <TextField
-                        variant="standard"
-                        size="small"
-                        type={'number'}
-                        label="Unit Price (min.)"
-                        name="unitPrice"
-                        value={selfPickupPrice}
-                        onChange={(e) => handleChangeMinSingleUnitPrice(e)}
-                    />
+                    <>
+                        <TextField
+                            variant="standard"
+                            size="small"
+                            type={'number'}
+                            label="Unit Price (min.)"
+                            name="unitPrice"
+                            value={selfPickupPrice}
+                            onChange={(e) => handleChangeMinSingleUnitPrice(e)}
+                            error={!selfPickupPriceValidated}
+                            helperText={(!selfPickupPriceValidated) ? "It should be a valid digit" : ""}
+                        />
+                    </>
+
                 }
-                {selectedType != 3 && selectedType != 4 &&
+                {selectedType != 3 && selectedType != 4 && (isArrayNotEmpty(items) && items.filter(x => volumeCalc(x.ProductDimensionDeep, x.ProductDimensionWidth, x.ProductDimensionHeight) > 0.013).length > 0) &&
                     <TextField
                         className="mx-3"
                         variant="standard"
@@ -378,6 +396,8 @@ const ProformaList = (props) => {
                         name="unitPrice"
                         value={selectedType == 2 ? consolidatePrice : unitPrice}
                         onChange={(e) => handleChangeAllUnitPrice(e)}
+                        error={selectedType == 2 ? !consolidatePriceValidated : !unitPriceValidated}
+                        helperText={selectedType == 2 ? !consolidatePriceValidated ? "It should be a valid digit" : "" : !unitPriceValidated ? "It should be a valid digit" : ""}
                     />
                 }
                 {selectedType == 3 &&
@@ -390,7 +410,9 @@ const ProformaList = (props) => {
                             label="First KG price"
                             name="unitPrice"
                             value={firstKg}
-                            onChange={(e) => setFirstKg(e.target.value)}
+                            onChange={(e) => { setFirstKg(e.target.value); setFirstKgValidated(isNumber(e.target.value)) }}
+                            error={!firstKgValidated}
+                            helperText={(!firstKgValidated) ? "It should be a valid digit" : ""}
                         />
 
                         <TextField
@@ -401,7 +423,9 @@ const ProformaList = (props) => {
                             label="Subsequent KG price"
                             name="unitPrice"
                             value={subsequentKg}
-                            onChange={(e) => setSubsequentKg(e.target.value)}
+                            onChange={(e) => { setSubsequentKg(e.target.value); setSubsequentKgValidated(isNumber(e.target.value)) }}
+                            error={!subsequentKgValidated}
+                            helperText={(!subsequentKgValidated) ? "It should be a valid digit" : ""}
                         />
                     </>
                 }
@@ -414,7 +438,9 @@ const ProformaList = (props) => {
                         label="Minimum price"
                         name="unitPrice"
                         value={LargeItemMinPrice}
-                        onChange={(e) => setLargeItemMinPrice(e.target.value)}
+                        onChange={(e) => { setLargeItemMinPrice(e.target.value); setLargeItemMinPriceValidated(isNumber(e.target.value)) }}
+                        error={!LargeItemMinPriceValidated}
+                        helperText={(!LargeItemMinPriceValidated) ? "It should be a valid digit" : ""}
                     />
                 }
             </div>
@@ -458,6 +484,17 @@ const ProformaList = (props) => {
         setLargeItemMinPrice(userAreaCode[index].AreaCharges)
     }
 
+    const checkValidation = () => {
+        switch (selectedType) {
+            case 1: return !selfPickupPriceValidated || !unitPriceValidated
+            case 2: return !consolidatePriceValidated
+            case 3: return !firstKgValidated
+            case 4: return !LargeItemMinPriceValidated
+            default: return false
+        }
+    }
+
+    console.log()
     return (
         <Card>
             <CardContent>
@@ -485,6 +522,7 @@ const ProformaList = (props) => {
                             startIcon={<SaveIcon />}
                             variant="contained"
                             onClick={() => handleCreateProformaInvoice()}
+                            disabled={checkValidation()}
                         >
                             Create
                         </LoadingButton>
