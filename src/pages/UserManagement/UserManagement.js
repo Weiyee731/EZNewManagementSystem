@@ -345,14 +345,31 @@ class UserManagement extends Component {
 
         if (rows.length > 0) {
             rows.map(row => {
-                row["isInvalid"] = (isStringNullOrEmpty(row["Tracking No"]) || isStringNullOrEmpty(row["Member"]) || isStringNullOrEmpty(row["Division"]))
+                row["isInvalid"] = (
+                    isStringNullOrEmpty(row["UserCode"]) ||
+                    isStringNullOrEmpty(row["UserAreaID"]) ||
+                    isStringNullOrEmpty(row["Fullname"]) ||
+                    isStringNullOrEmpty(row["UserContactNo"]) ||
+                    isStringNullOrEmpty(row["UserAddress"]) ||
+                    isStringNullOrEmpty(row["Min Self Pick Up"]) ||
+                    isStringNullOrEmpty(row["Cubic Self Pick Up"]) ||
+                    isStringNullOrEmpty(row["Consolidate"]) ||
+                    isStringNullOrEmpty(row["Delivery Cargo"]) ||
+                    isStringNullOrEmpty(row["Delivery 1stKg"]) ||
+                    isStringNullOrEmpty(row["Delivery SubKg"])
+                )
             })
         }
+
         this.setState({ DataHeaders: columns.filter(x => x.name !== ""), DataRows: rows.filter(x => x[columns[0].name] !== ""), loadingData: false })
     }
 
     onRemoveAttachment(item) {
         this.setState({ DataHeaders: [], DataRows: [] })
+    }
+
+    onViewErrorReport() {
+        this.setState({ errorReportData: this.state.DataRows.filter(x => x.isInvalid === true), openErrorReport: !this.state.openErrorReport })
     }
 
     renderDropzoneTableHeaders = () => {
@@ -388,70 +405,93 @@ class UserManagement extends Component {
     publishData() {
         const { DataRows } = this.state
         if (isArrayNotEmpty(DataRows)) {
-            let Courier = ""
-            let TrackingNo = ""
-            let Weight = ""
-            let Depth = ""
-            let Width = ""
-            let Height = ""
-            let Item = ""
-            let Member = ""
-            let Division = ""
-            let StockDate = ""
-            let PackagingDate = ""
-            let AdditionalCost = ""
-            let Remarks = ""
+            let UserCode = ""
+            let UserAreaCode = ""
+            let Username = ""
+            let Fullname = ""
+            let UserTypeID = ""
+            let UserContactNo = ""
+            let UserEmailAddress = ""
+            let UserAddress = ""
+            let UserDescription = ""
+            let UserStatus = ""
+            let UserLat = ""
+            let Userlong = ""
+            let MinSelfPickup = ""
+            let CubicSelfPickup = ""
+            let Conslidate = ""
+            let DeliveryCargo = ""
+            let DeliveryOn1stKG = ""
+            let DeliveryOnSubKG = ""
+
             for (let index = 0; index < DataRows.length; index++) {
-                Courier += (isStringNullOrEmpty(DataRows[index]["Courier"])) ? "-" : DataRows[index]["Courier"].trim();
-                TrackingNo += (isStringNullOrEmpty(DataRows[index]["Tracking No"])) ? "-" : DataRows[index]["Tracking No"].trim();
-                Weight += (isStringNullOrEmpty(DataRows[index]["Weight"])) ? "0" : DataRows[index]["Weight"];
-                Depth += (isStringNullOrEmpty(DataRows[index]["Depth"])) ? "0" : DataRows[index]["Depth"];
-                Height += (isStringNullOrEmpty(DataRows[index]["Height"])) ? "0" : DataRows[index]["Height"];
-                Width += (isStringNullOrEmpty(DataRows[index]["Width"])) ? "0" : DataRows[index]["Width"];
-                Item += (isStringNullOrEmpty(DataRows[index]["Item"])) ? "-" : DataRows[index]["Item"].trim();
-                Member += (isStringNullOrEmpty(DataRows[index]["Member"])) ? "-" : DataRows[index]["Member"].trim();
-                Division += (isStringNullOrEmpty(DataRows[index]["Division"])) ? "-" : DataRows[index]["Division"].trim();
-                StockDate += (isStringNullOrEmpty(DataRows[index]["Stock Date"])) ? "-" : convertDateTimeToString112Format(DataRows[index]["Stock Date"].trim(), true)
-                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : convertDateTimeToString112Format(DataRows[index]["Packaging Date"].trim(), true)
-                AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "-" : DataRows[index]["Additional Cost"].trim();
-                Remarks += (isStringNullOrEmpty(DataRows[index]["Remarks"])) ? "-" : DataRows[index]["Remarks"];
+                UserCode += (isStringNullOrEmpty(DataRows[index]["UserCode"])) ? "-" : DataRows[index]["UserCode"].trim();
+                UserAreaCode += (isStringNullOrEmpty(DataRows[index]["UserAreaID"])) ? "-" : DataRows[index]["UserAreaID"].trim();
+                Username += (isStringNullOrEmpty(DataRows[index]["Username"])) ? "-" : DataRows[index]["Username"];
+                Fullname += (isStringNullOrEmpty(DataRows[index]["Fullname"])) ? "-" : DataRows[index]["Fullname"];
+                UserTypeID += (isStringNullOrEmpty(DataRows[index]["UserTypeID"])) ? "0" : DataRows[index]["UserTypeID"];
+                UserContactNo += (isStringNullOrEmpty(DataRows[index]["UserContactNo"])) ? "-" : DataRows[index]["UserContactNo"];
+                UserEmailAddress += (isStringNullOrEmpty(DataRows[index]["UserEmailAddress"])) ? "-" : DataRows[index]["UserEmailAddress"].trim();
+                UserAddress += (isStringNullOrEmpty(DataRows[index]["UserAddress"])) ? "-" : DataRows[index]["UserAddress"].trim();
+                UserDescription += (isStringNullOrEmpty(DataRows[index]["UserDescription"])) ? "-" : DataRows[index]["UserDescription"].trim();
+                UserStatus += (isStringNullOrEmpty(DataRows[index]["UserStatus"])) ? "Pending" : DataRows[index]["UserStatus"].trim();
+                UserLat += (isStringNullOrEmpty(DataRows[index]["UserLat"])) ? "1.5535" : DataRows[index]["UserLat"].trim();
+                Userlong += (isStringNullOrEmpty(DataRows[index]["Userlong"])) ? "110.3593" : DataRows[index]["Userlong"].trim();
+                MinSelfPickup += (isStringNullOrEmpty(DataRows[index]["MinSelfPickup"])) ? "0" : DataRows[index]["MinSelfPickup"];
+                CubicSelfPickup += (isStringNullOrEmpty(DataRows[index]["CubicSelfPickup"])) ? "0" : DataRows[index]["CubicSelfPickup"];
+                Conslidate += (isStringNullOrEmpty(DataRows[index]["Conslidate"])) ? "0" : DataRows[index]["Conslidate"];
+                DeliveryCargo += (isStringNullOrEmpty(DataRows[index]["Delivery Cargo"])) ? "0" : DataRows[index]["Delivery Cargo"];
+                DeliveryOn1stKG += (isStringNullOrEmpty(DataRows[index]["Delivery 1stKg"])) ? "0" : DataRows[index]["Delivery 1stKg"];
+                DeliveryOnSubKG += (isStringNullOrEmpty(DataRows[index]["Delivery SubKg"])) ? "0" : DataRows[index]["Delivery SubKg"];
 
                 if (index !== DataRows.length - 1) {
-                    Courier += ",";
-                    TrackingNo += ",";
-                    Weight += ",";
-                    Depth += ",";
-                    Width += ",";
-                    Height += ",";
-                    Item += ",";
-                    Member += ",";
-                    Division += ",";
-                    StockDate += ",";
-                    PackagingDate += ",";
-                    AdditionalCost += ",";
-                    Remarks += ",";
+                    UserCode += ","
+                    UserAreaCode += ","
+                    Username += ","
+                    Fullname += ","
+                    UserTypeID += ","
+                    UserContactNo += ","
+                    UserEmailAddress += ","
+                    UserAddress += ","
+                    UserDescription += ","
+                    UserStatus += ","
+                    UserLat += ","
+                    Userlong += ","
+                    MinSelfPickup += ","
+                    CubicSelfPickup += ","
+                    Conslidate += ","
+                    DeliveryCargo += ","
+                    DeliveryOn1stKG += ","
+                    DeliveryOnSubKG += ","
                 }
             }
 
             let object = {
-                USERCODE: Member,
-                TRACKINGNUMBER: TrackingNo,
-                PRODUCTWEIGHT: Weight,
-                PRODUCTHEIGHT: Height,
-                PRODUCTWIDTH: Width,
-                PRODUCTDEEP: Depth,
-                AREACODE: Division,
-                ITEM: Item,
-                STOCKDATE: StockDate,
-                PACKAGINGDATE: PackagingDate,
-                REMARK: Remarks,
-                EXTRACHARGE: AdditionalCost,
+                UserCode: UserCode,
+                UserAreaCode: UserAreaCode,
+                Username: Username,
+                Fullname: Fullname,
+                UserTypeID: UserTypeID,
+                UserContactNo: UserContactNo,
+                UserEmailAddress: UserEmailAddress,
+                UserAddress: UserAddress,
+                UserDescription: UserDescription,
+                UserStatus: UserStatus,
+                UserLat: UserLat,
+                Userlong: Userlong,
+                MinSelfPickup: MinSelfPickup,
+                CubicSelfPickup: CubicSelfPickup,
+                Conslidate: Conslidate,
+                DeliveryCargo: DeliveryCargo,
+                DeliveryOn1stKG: DeliveryOn1stKG,
+                DeliveryOnSubKG: DeliveryOnSubKG
             }
 
             toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
             this.setState({ isSubmit: true })
+            console.log(object)
         }
-        else{
+        else {
             toast.error("Please attach a CSV file for submission.", { autoClose: 2000, position: "top-center", theme: "dark" })
         }
     }
@@ -667,6 +707,7 @@ class UserManagement extends Component {
                     >
                         <div className="container-fluid">
                             <div className="container">
+                                <p className="text-danger"><i>Disclaimer: The required values for registering users are: UserCode, UserAreaID, Fullname, UserContactNo, Min Self Pick Up, Cubic Self Pick Up, Consolidate, Delivery Cargo, Delivery 1stKg and Delivery SubKg   </i></p>
                                 <Dropzone
                                     placeholder={{
                                         text: "Drag and Drop Excel here, or click to select file",
@@ -727,12 +768,35 @@ class UserManagement extends Component {
                                             checkboxColor: "primary",
                                             onRowClickSelect: false
                                         }}
-                                        selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].name : ""}
+                                        selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].UserCode : ""}
                                         Data={DataRows}
                                     />
                                 </div>
                             }
                         </div>
+                    </ModalPopOut>
+
+                    <ModalPopOut fullScreen={true} open={this.state.openErrorReport} handleToggleDialog={() => this.onViewErrorReport()} title="Error Report" showAction={false}>
+                        <TableComponents
+                            tableOptions={{
+                                dense: true,
+                                tableOrderBy: 'asc',
+                                sortingIndex: "Error",
+                                stickyTableHeader: true,
+                                stickyTableHeight: (getWindowDimensions().screenHeight * 0.6),
+                            }}
+                            paginationOptions={[50, 100, 250, { label: 'All', value: -1 }]}
+                            tableHeaders={this.renderDropzoneTableHeaders()}
+                            tableRows={{
+                                renderTableRows: this.renderDropzoneTableRows,
+                                checkbox: false,
+                                checkboxColor: "primary",
+                                onRowClickSelect: false
+                            }}
+                            selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].UserCode : ""}
+                            Data={this.state.errorReportData}
+                            fullScreen={true}
+                        />
                     </ModalPopOut>
                 </div>
                 {/* Dropzone - FINISH */}
