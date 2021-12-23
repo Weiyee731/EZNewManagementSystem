@@ -19,7 +19,7 @@ import Typography from '@mui/material/Typography';
 import Backdrop from '@mui/material/Backdrop';
 import SearchBar from "../../components/SearchBar/SearchBar"
 import CsvDownloader from 'react-csv-downloader';
-import { getWindowDimensions, isArrayNotEmpty } from "../../tools/Helpers";
+import { convertDateTimeToString112Format, getWindowDimensions, isArrayNotEmpty } from "../../tools/Helpers";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import ToggleTabsComponent from "../../components/ToggleTabsComponent/ToggleTabComponents";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -47,12 +47,11 @@ const style = {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '40%',
-    height: '45%',
     bgcolor: 'background.paper',
     border: '0px solid #000',
     boxShadow: 24,
     p: 4,
-  };
+};
 
 const headCells = [
     {
@@ -120,11 +119,13 @@ class TransactionHistory extends Component {
             TrackingStatusID: 4,
             filteredList: [],
             selectedRow: [],
-            TransactionID:0,
+            TransactionID: 0,
             searchCategory: "Cash",
             Payment: "",
             Datetime: "",
-            ReferenceNo: ""
+            ReferenceNo: "",
+            PaymentMethod: "Cash",
+
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.handleInputChange = this.handleInputChange.bind(this)
@@ -168,7 +169,12 @@ class TransactionHistory extends Component {
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
                 {
-                    data.OrderStatus === "Unpaid" ? <TableCell onClick={(event) => this.onAddButtonClick(event, data)} align="center"><CheckCircleIcon color="grey" sx={{ fontSize: 30 }}></CheckCircleIcon></TableCell> : ""
+                    data.OrderStatus === "Unpaid" ?
+                        <TableCell align="center">
+                            <IconButton onClick={(event) => this.onAddButtonClick(event, data)}>
+                                <CheckCircleIcon color="dark" sx={{ fontSize: 30 }}></CheckCircleIcon>
+                            </IconButton>
+                        </TableCell> : ""
                 }
             </>
         )
@@ -195,6 +201,7 @@ class TransactionHistory extends Component {
     }
 
     onAddButtonClick = (event, row) => {
+        console.log(row)
         this.setState({ AddModalOpen: true, selectedRow: row, TransactionID: row.TransactionID });
     }
 
@@ -204,7 +211,14 @@ class TransactionHistory extends Component {
     }
 
     onUpdateTransactionPayment = (event, row) => {
-        this.props.CallUpdateTransactionPayment(this.state)
+        let object = {
+            TransactionID: this.state.TransactionID,
+            PaymentAmmount: this.state.Payment,
+            PaymentMethod: this.state.searchCategory,
+            ReferenceNo: this.state.ReferenceNo,
+            Datetime: convertDateTimeToString112Format(this.state.Datetime),
+        }
+        this.props.CallUpdateTransactionPayment(object)
     }
 
     handleInputChange = (e) => {
@@ -266,7 +280,7 @@ class TransactionHistory extends Component {
             { children: "Unpaid", key: "Unpaid" },
             { children: "Paid", key: "Paid" }
         ]
-
+        const { selectedRow } = this.state
         return (
             <>
                 <div className="w-100 container-fluid">
@@ -320,10 +334,26 @@ class TransactionHistory extends Component {
                         aria-describedby="modal-modal-description"
                         closeAfterTransition
                         BackdropComponent={Backdrop}
-                        BackdropProps={{ timeout: 500 }}>
+                        BackdropProps={{ timeout: 500 }}
+                    >
                         <Box sx={style} component="main" maxWidth="xs">
                             <Typography component="h1" variant="h5">Update Payment</Typography>
+
                             <Box noValidate sx={{ mt: 3 }}>
+                                <div className="row my-2">
+                                    <Box className="col-12">
+                                        <div class="clearfix">
+                                            <div className="float-start">
+                                                Trans. No: <b>{selectedRow.TransactionName}</b>
+                                            </div>
+                                            <div className="float-end">
+                                                Unpaid(RM): <b className="text-danger" style={{fontSize: '14pt', marginRight: 15}}>{selectedRow.OrderTotalAmount}</b> 
+                                                Paid(RM): <b className="text-success" style={{fontSize: '14pt'}}>{selectedRow.OrderPaidAmount}</b>
+                                            </div>
+                                        </div>
+                                    </Box>
+                                    <hr />
+                                </div>
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={12}>
                                         <label className="my-auto col-3">Payment Method:</label>
@@ -334,7 +364,6 @@ class TransactionHistory extends Component {
                                             label="Search By"
                                             onChange={this.handleSearchCategory}
                                             size="large"
-                                            IconComponent={FilterListOutlinedIcon}
                                             className="col-9"
                                             placeholder="filter by"
                                         >
