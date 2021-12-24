@@ -674,13 +674,13 @@ export class GitEpic {
         json = JSON.parse(json)
         return {
           type: GitAction.UpdatedTransactionPayment,
-          // payload: json,
+          payload: json,
         };
       }
       catch (error) {
         toast.error("Error Code: Transaction_UpdateTransactionPayment")
         return {
-          type: GitAction.UpdatedTransaction,
+          type: GitAction.UpdatedTransactionPayment,
           payload: [],
         };
       }
