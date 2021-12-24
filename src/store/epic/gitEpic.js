@@ -661,6 +661,14 @@ export class GitEpic {
   Transaction_UpdateTransactionPayment = action$ =>
     action$.ofType(GitAction.UpdateTransactionPayment).switchMap(async ({ payload }) => {
       try {
+        console.log(url +
+          "Transaction_UpdateTransactionPayment?" +
+          "TRANSACTIONID=" + payload.TransactionID +
+          "&PAYMENTAMMOUNT=" + payload.PaymentAmmount +
+          "&PAYMENTMETHOD=" + payload.PaymentMethod +
+          "&REFERENCENO=" + payload.ReferenceNo +
+          "&DATETIME=" + payload.Datetime
+        );
         const response = await fetch(url +
           "Transaction_UpdateTransactionPayment?" +
           "TRANSACTIONID=" + payload.TransactionID +

@@ -342,7 +342,7 @@ class TransactionHistory extends Component {
                             <Box noValidate sx={{ mt: 3 }}>
                                 <div className="row my-2">
                                     <Box className="col-12">
-                                        <div class="clearfix">
+                                        <div className="clearfix">
                                             <div className="float-start">
                                                 Trans. No: <b>{selectedRow.TransactionName}</b>
                                             </div>
