@@ -22,7 +22,7 @@ import MenuItem from '@mui/material/MenuItem';
 import SearchBar from "../../components/SearchBar/SearchBar"
 import AlertDialog from "../../components/modal/Modal";
 import { ModalPopOut } from "../../components/modal/Modal";
-import { toast } from "react-toastify";
+import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
 import CsvDownloader from 'react-csv-downloader';
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
@@ -49,8 +49,8 @@ const style = {
 function mapStateToProps(state) {
     return {
         user: state.counterReducer["user"],
-        registrationReturn: state.counterReducer["registrationReturn"],
         userAreaCode: state.counterReducer["userAreaCode"],
+        userRegistrationApproval: state.counterReducer["userRegistrationApproval"],
     };
 }
 
@@ -58,7 +58,9 @@ function mapDispatchToProps(dispatch) {
     return {
         CallUserProfile: () => dispatch(GitAction.CallUserProfile()),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
-        CallUserRegistration: (propData) => dispatch(GitAction.CallUserRegistration(propData))
+        CallUserRegistration: (propData) => dispatch(GitAction.CallUserRegistration(propData)),
+        CallInsertUserDataByPost: (propData) => dispatch(GitAction.CallInsertUserDataByPost(propData)),
+        CallResetUserApprovalReturn: () => dispatch(GitAction.CallResetUserApprovalReturn()),
     };
 }
 
@@ -164,6 +166,22 @@ class UserManagement extends Component {
                 toast.success(`${this.props.registrationReturn[0].ReturnMsg}`)
             }
         }
+
+        if (isArrayNotEmpty(this.props.userApproval)) {
+            this.props.CallResetUserApprovalReturn()
+            toast.success("Data is uploaded successfully", { autoClose: 3000, position: "top-center", transition: Flip, theme: "dark" })
+            this.props.CallUserProfile();
+            this.props.CallUserAreaCode();
+            this.setState({
+                DataHeaders: [],
+                DataRows: [],
+                loadingData: false,
+                isSubmit: false,
+                errorReportData: [],
+                openErrorReport: false,
+                addWithCSVModalOpen: false,
+            })
+        }
     }
 
     renderTableRows = (data, index) => {
@@ -266,7 +284,7 @@ class UserManagement extends Component {
     }
 
     onSubmitNewUser = () => {
-        this.props.CallUserRegistration(this.state)
+        // this.props.CallUserRegistration(this.state)
     }
 
     onSelectItem = (item) => {
@@ -349,8 +367,6 @@ class UserManagement extends Component {
                     isStringNullOrEmpty(row["UserCode"]) ||
                     isStringNullOrEmpty(row["UserAreaID"]) ||
                     isStringNullOrEmpty(row["Fullname"]) ||
-                    isStringNullOrEmpty(row["UserContactNo"]) ||
-                    isStringNullOrEmpty(row["UserAddress"]) ||
                     isStringNullOrEmpty(row["Min Self Pick Up"]) ||
                     isStringNullOrEmpty(row["Cubic Self Pick Up"]) ||
                     isStringNullOrEmpty(row["Consolidate"]) ||
@@ -407,16 +423,10 @@ class UserManagement extends Component {
         if (isArrayNotEmpty(DataRows)) {
             let UserCode = ""
             let UserAreaCode = ""
-            let Username = ""
             let Fullname = ""
-            let UserTypeID = ""
             let UserContactNo = ""
             let UserEmailAddress = ""
             let UserAddress = ""
-            let UserDescription = ""
-            let UserStatus = ""
-            let UserLat = ""
-            let Userlong = ""
             let MinSelfPickup = ""
             let CubicSelfPickup = ""
             let Conslidate = ""
@@ -427,16 +437,10 @@ class UserManagement extends Component {
             for (let index = 0; index < DataRows.length; index++) {
                 UserCode += (isStringNullOrEmpty(DataRows[index]["UserCode"])) ? "-" : DataRows[index]["UserCode"].trim();
                 UserAreaCode += (isStringNullOrEmpty(DataRows[index]["UserAreaID"])) ? "-" : DataRows[index]["UserAreaID"].trim();
-                Username += (isStringNullOrEmpty(DataRows[index]["Username"])) ? "-" : DataRows[index]["Username"];
                 Fullname += (isStringNullOrEmpty(DataRows[index]["Fullname"])) ? "-" : DataRows[index]["Fullname"];
-                UserTypeID += (isStringNullOrEmpty(DataRows[index]["UserTypeID"])) ? "0" : DataRows[index]["UserTypeID"];
-                UserContactNo += (isStringNullOrEmpty(DataRows[index]["UserContactNo"])) ? "-" : DataRows[index]["UserContactNo"];
+                UserContactNo += (isStringNullOrEmpty(DataRows[index]["UserContactNo"])) ? "-" : DataRows[index]["UserContactNo"].toString();
                 UserEmailAddress += (isStringNullOrEmpty(DataRows[index]["UserEmailAddress"])) ? "-" : DataRows[index]["UserEmailAddress"].trim();
                 UserAddress += (isStringNullOrEmpty(DataRows[index]["UserAddress"])) ? "-" : DataRows[index]["UserAddress"].trim();
-                UserDescription += (isStringNullOrEmpty(DataRows[index]["UserDescription"])) ? "-" : DataRows[index]["UserDescription"].trim();
-                UserStatus += (isStringNullOrEmpty(DataRows[index]["UserStatus"])) ? "Pending" : DataRows[index]["UserStatus"].trim();
-                UserLat += (isStringNullOrEmpty(DataRows[index]["UserLat"])) ? "1.5535" : DataRows[index]["UserLat"].trim();
-                Userlong += (isStringNullOrEmpty(DataRows[index]["Userlong"])) ? "110.3593" : DataRows[index]["Userlong"].trim();
                 MinSelfPickup += (isStringNullOrEmpty(DataRows[index]["MinSelfPickup"])) ? "0" : DataRows[index]["MinSelfPickup"];
                 CubicSelfPickup += (isStringNullOrEmpty(DataRows[index]["CubicSelfPickup"])) ? "0" : DataRows[index]["CubicSelfPickup"];
                 Conslidate += (isStringNullOrEmpty(DataRows[index]["Conslidate"])) ? "0" : DataRows[index]["Conslidate"];
@@ -445,51 +449,40 @@ class UserManagement extends Component {
                 DeliveryOnSubKG += (isStringNullOrEmpty(DataRows[index]["Delivery SubKg"])) ? "0" : DataRows[index]["Delivery SubKg"];
 
                 if (index !== DataRows.length - 1) {
-                    UserCode += ","
-                    UserAreaCode += ","
-                    Username += ","
-                    Fullname += ","
-                    UserTypeID += ","
-                    UserContactNo += ","
-                    UserEmailAddress += ","
-                    UserAddress += ","
-                    UserDescription += ","
-                    UserStatus += ","
-                    UserLat += ","
-                    Userlong += ","
-                    MinSelfPickup += ","
-                    CubicSelfPickup += ","
-                    Conslidate += ","
-                    DeliveryCargo += ","
-                    DeliveryOn1stKG += ","
-                    DeliveryOnSubKG += ","
+                    UserCode += ";"
+                    UserAreaCode += ";"
+                    Fullname += ";"
+                    UserContactNo += ";"
+                    UserEmailAddress += ";"
+                    UserAddress += ";"
+                    MinSelfPickup += ";"
+                    CubicSelfPickup += ";"
+                    Conslidate += ";"
+                    DeliveryCargo += ";"
+                    DeliveryOn1stKG += ";"
+                    DeliveryOnSubKG += ";"
                 }
             }
 
             let object = {
-                UserCode: UserCode,
-                UserAreaCode: UserAreaCode,
-                Username: Username,
-                Fullname: Fullname,
-                UserTypeID: UserTypeID,
-                UserContactNo: UserContactNo,
-                UserEmailAddress: UserEmailAddress,
-                UserAddress: UserAddress,
-                UserDescription: UserDescription,
-                UserStatus: UserStatus,
-                UserLat: UserLat,
-                Userlong: Userlong,
-                MinSelfPickup: MinSelfPickup,
-                CubicSelfPickup: CubicSelfPickup,
-                Conslidate: Conslidate,
-                DeliveryCargo: DeliveryCargo,
-                DeliveryOn1stKG: DeliveryOn1stKG,
-                DeliveryOnSubKG: DeliveryOnSubKG
+                USERCODE: UserCode,
+                AREACODE: UserAreaCode,
+                FULLNAME: Fullname,
+                USERCONTACTNO: UserContactNo,
+                USEREMAILADDRESS: UserEmailAddress,
+                USERADDRESS: UserAddress,
+                MINSELFPICKUPPRICE: MinSelfPickup,
+                CUBICSELFPICKUPPRICE: CubicSelfPickup,
+                CONSOLIDATEPRICE: Conslidate,
+                DELIVERYCARGO: DeliveryCargo,
+                DELIVERYFIRSTPRICE: DeliveryOn1stKG,
+                DELIVERYSUBPRICE: DeliveryOnSubKG,
             }
 
             toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
             this.setState({ isSubmit: true })
             console.log(object)
+            this.props.CallInsertUserDataByPost(object)
         }
         else {
             toast.error("Please attach a CSV file for submission.", { autoClose: 2000, position: "top-center", theme: "dark" })
@@ -507,7 +500,12 @@ class UserManagement extends Component {
 
         const renderButtonOnTableTopRight = () => {
             return (
-                <div>
+                <div className="d-flex">
+                    <Tooltip title="Add New User">
+                        <IconButton size="medium" sx={{ border: "2px solid #0074ea", color: "#0074ea", marginRight: 1 }} onClick={() => this.setState({ AddModalOpen: true })}>
+                            <GroupAddIcon />
+                        </IconButton>
+                    </Tooltip>
                     <Tooltip title="Add new user via csv">
                         <IconButton size="medium" sx={{ border: "2px solid #818181", color: "#797979" }} onClick={() => this.setState({ addWithCSVModalOpen: true })}>
                             <UploadFileIcon />
@@ -573,7 +571,7 @@ class UserManagement extends Component {
                 </div>
                 <div>
                     <AlertDialog
-                        open={this.state.AddModalOpen}              // required, pass the boolean whether modal is open or close
+                        open={this.state.AddModalOpen || true}              // required, pass the boolean whether modal is open or close
                         handleToggleDialog={this.onAddButtonClick}  // required, pass the toggle function of modal
                         handleConfirmFunc={this.onSubmitNewUser}   // required, pass the confirm function 
                         showAction={true}                           // required, to show the footer of modal display
@@ -583,74 +581,18 @@ class UserManagement extends Component {
                     >
                         <Box component="form" noValidate sx={{ mt: 3 }}>
                             <Grid container spacing={2}>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        autoComplete="given-name"
-                                        name="name"
-                                        required
-                                        fullWidth
-                                        id="name"
-                                        label="Full Name"
-                                        autoFocus
-                                        onChange={this.onTextFieldOnChange}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
+                                <Grid item xs={12} md={6}>
                                     <TextField
                                         required
                                         fullWidth
-                                        id="code"
+                                        id="usercode"
                                         label="User Code"
-                                        name="code"
-                                        autoComplete="family-name"
+                                        name="usercode"
                                         onChange={this.onTextFieldOnChange}
+                                        size="small"
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        id="username"
-                                        label="Username"
-                                        name="username"
-                                        type={'text'}
-                                        onChange={this.onTextFieldOnChange}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        id="password"
-                                        label="Password"
-                                        name="password"
-                                        type={'password'}
-                                        onChange={this.onTextFieldOnChange}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        id="email"
-                                        label="Email Address"
-                                        name="email"
-                                        autoComplete="email"
-                                        onChange={this.onTextFieldOnChange}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        name="contact"
-                                        label="Contact"
-                                        id="contact"
-                                        autoComplete="contact"
-                                        onChange={this.onTextFieldOnChange}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} md={6}>
                                     <FormControl fullWidth>
                                         <InputLabel id="areaCode">Area Code</InputLabel>
                                         <Select
@@ -661,6 +603,7 @@ class UserManagement extends Component {
                                             required
                                             placeholder="Select an area code"
                                             onChange={this.onTextFieldOnChange}
+                                            size="small"
                                         >
                                             <MenuItem disabled value={0}>Select an area code</MenuItem>
                                             {this.props.userAreaCode.length > 0 &&
@@ -679,15 +622,121 @@ class UserManagement extends Component {
                                         </Select>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} md={12}>
+                                    <TextField
+                                        name="Fullname"
+                                        required
+                                        fullWidth
+                                        id="Fullname"
+                                        label="Fullname"
+                                        autoFocus
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        name="Contact"
+                                        fullWidth
+                                        id="Contact"
+                                        label="Contact"
+                                        autoFocus
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
+                                        id="Email"
+                                        label="Email"
+                                        name="Email"
+                                        type={'text'}
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={12}>
                                     <TextField
                                         required
                                         fullWidth
                                         name="address"
                                         label="Address"
                                         id="address"
-                                        autoComplete="address"
                                         onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="MinSelfPickup"
+                                        label="Min Self-Pickup"
+                                        name="MinSelfPickup"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        name="CubicSelfPickup"
+                                        label="Cubic Self-Pickup"
+                                        id="CubicSelfPickup"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        name="Conslidate"
+                                        label="Conslidate"
+                                        id="CubicSelfPickup"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="DeliveryCargo"
+                                        label="Delivery Cargo"
+                                        name="DeliveryCargo"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="DeliveryOn1stKG"
+                                        label="Delivery On 1st KG"
+                                        name="DeliveryOn1stKG"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        name="DeliveryOnSubKG"
+                                        label="Delivery On Sub KG"
+                                        id="DeliveryOnSubKG"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
                                     />
                                 </Grid>
                             </Grid>

@@ -89,53 +89,6 @@ export class GitEpic {
       }
     });
 
-  User_Register = action$ =>
-    action$.ofType(GitAction.RegisterUser).switchMap(async ({ payload }) => {
-      console.log(
-        url +
-        "User_Register?" +
-        "USERCODE=" + payload.code +
-        "&USERAREAID=" + payload.areaId +
-        "&USERNAME=" + payload.username +
-        "&FULLNAME=" + payload.name +
-        "&PASSWORD=" + payload.password +
-        "&CONTACTNO=" + payload.contact +
-        "&USEREMAIL=" + payload.email +
-        "&USERADDRESS=" + payload.address +
-        "&USERLAT=" + payload.lat +
-        "&USERLONG=" + payload.long
-      )
-      try {
-        const response = await fetch(url +
-          "User_Register?" +
-          "USERCODE=" + payload.code +
-          "&USERAREAID=" + payload.areaId +
-          "&USERNAME=" + payload.username +
-          "&FULLNAME=" + payload.name +
-          "&PASSWORD=" + payload.password +
-          "&CONTACTNO=" + payload.contact +
-          "&USEREMAIL=" + payload.email +
-          "&USERADDRESS=" + payload.address +
-          "&USERLAT=" + payload.lat +
-          "&USERLONG=" + payload.long
-        );
-
-        let json = await response.json();
-        json = JSON.parse(json)
-        return {
-          type: GitAction.UserRegistered,
-          payload: json,
-        };
-      }
-      catch (error) {
-        toast.error("Error Code: RegisterUser")
-        return {
-          type: GitAction.UserRegistered,
-          payload: [],
-        };
-      }
-    });
-
   User_Profile = action$ =>
     action$.ofType(GitAction.GetUserProfile).switchMap(async ({ payload }) => {
       console.log(url + "User_ViewProfile"
@@ -661,6 +614,14 @@ export class GitEpic {
   Transaction_UpdateTransactionPayment = action$ =>
     action$.ofType(GitAction.UpdateTransactionPayment).switchMap(async ({ payload }) => {
       try {
+        console.log(url +
+          "Transaction_UpdateTransactionPayment?" +
+          "TRANSACTIONID=" + payload.TransactionID +
+          "&PAYMENTAMMOUNT=" + payload.PaymentAmmount +
+          "&PAYMENTMETHOD=" + payload.PaymentMethod +
+          "&REFERENCENO=" + payload.ReferenceNo +
+          "&DATETIME=" + payload.Datetime
+        );
         const response = await fetch(url +
           "Transaction_UpdateTransactionPayment?" +
           "TRANSACTIONID=" + payload.TransactionID +
@@ -827,6 +788,52 @@ export class GitEpic {
       }
     });
   ///////////////////////////////////////////////////   Archived Data  ///////////////////////////////////////////////////
+
+
+  ///////////////////////////////////////////////////   User Management  ///////////////////////////////////////////////////
+  User_RegisterUsersByPost = action$ =>
+    action$.ofType(GitAction.InsertUserDataByPost).switchMap(async ({ payload }) => {
+      return fetch(
+        url + "User_RegisterUsersByPost"
+        , {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            USERCODE : payload.USERCODE ,
+            AREACODE : payload.AREACODE ,
+            FULLNAME : payload.FULLNAME ,
+            USERCONTACTNO : payload.USERCONTACTNO ,
+            USEREMAILADDRESS : payload.USEREMAILADDRESS ,
+            USERADDRESS : payload.USERADDRESS ,
+            MINSELFPICKUPPRICE: payload.MINSELFPICKUPPRICE,
+            CUBICSELFPICKUPPRICE : payload.CUBICSELFPICKUPPRICE ,
+            CONSOLIDATEPRICE : payload.CONSOLIDATEPRICE ,
+            DELIVERYCARGO : payload.DELIVERYCARGO ,
+            DELIVERYFIRSTPRICE : payload.DELIVERYFIRSTPRICE ,
+            DELIVERYSUBPRICE : payload.DELIVERYSUBPRICE 
+          })
+        }
+      )
+        .then(response => response.json())
+        .then(json => {
+          console.log("json", json)
+          if (json !== "fail") {
+            json = json;
+          } else {
+            json = [];
+          }
+          return {
+            type: GitAction.InsertedUserDataByPost,
+            payload: json,
+          };
+        })
+        .catch(error => toast.error("Error code: 8003"));
+    });
+
+  ///////////////////////////////////////////////////   User Management  ///////////////////////////////////////////////////
 
 }
 export let gitEpic = new GitEpic();
