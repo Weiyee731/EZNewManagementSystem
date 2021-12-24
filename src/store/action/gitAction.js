@@ -13,28 +13,13 @@ export class GitAction {
   static Logout = "USER_LOGOUT";
   static LoggedOutSuccess = "USER_LOGGED_OUT_SUCCESS";
   static CallUserLogout(propsData) {
-    
+
     return {
       type: GitAction.Logout,
       payload: propsData
     };
   }
 
-  static RegisterUser = "REGISTER_USER";
-  static UserRegistered = "USER_REGISTERED";
-  static ResetRegistrationReturn = "RESET-REGISTRATION_RETURN";
-  static CallUserRegistration(propsData) {
-    return {
-      type: GitAction.RegisterUser,
-      payload: propsData
-    };
-  }
-  static CallResetUserRegistrationReturn() {
-    return {
-      type: GitAction.ResetRegistrationReturn,
-    };
-  }
-  
   static GetUserProfileByID = "GET_USER_PROFILEBYID";
   static GotUserProfileByID = "GOT_USER_PROFILEBYID";
   static ResetUserProfileByID = "RESET-USER_PROFILEBYID";
@@ -283,7 +268,7 @@ export class GitAction {
       payload: propsData
     };
   }
-  
+
   static FetchArchivedTransaction = "FETCH-ARCHIVED-TRANSACTIONS";
   static ArchivedTransactionFetched = "ARCHIVED-TRANSACTIONS-FETCHED";
   static CallFetchArchivedTransactions(propsData) {
@@ -300,6 +285,23 @@ export class GitAction {
     };
   }
 
+  ///////////////////////////////////////////////////   User Management   ///////////////////////////////////////////////////
+
+  static InsertUserDataByPost = "INSERT-USER-DATA-BY-POST";
+  static InsertedUserDataByPost = "INSERTED-USER-DATA-BY-POST";
+  static CallInsertUserDataByPost(propsData) {
+    return {
+      type: GitAction.InsertUserDataByPost,
+      payload: propsData
+    };
+  }
+
+  static ResetUserApprovalReturn = "RESET-USER-DATA-APPROVAL-RETURN";
+  static CallResetUserApprovalReturn() {
+    return {
+      type: GitAction.ResetUserApprovalReturn,
+    };
+  }
 
 }
 
