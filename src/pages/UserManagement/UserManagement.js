@@ -571,7 +571,7 @@ class UserManagement extends Component {
                 </div>
                 <div>
                     <AlertDialog
-                        open={this.state.AddModalOpen || true}              // required, pass the boolean whether modal is open or close
+                        open={this.state.AddModalOpen}              // required, pass the boolean whether modal is open or close
                         handleToggleDialog={this.onAddButtonClick}  // required, pass the toggle function of modal
                         handleConfirmFunc={this.onSubmitNewUser}   // required, pass the confirm function 
                         showAction={true}                           // required, to show the footer of modal display
@@ -658,7 +658,6 @@ class UserManagement extends Component {
                                 </Grid>
                                 <Grid item xs={12} md={12}>
                                     <TextField
-                                        required
                                         fullWidth
                                         name="address"
                                         label="Address"
