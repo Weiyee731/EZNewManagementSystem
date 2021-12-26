@@ -342,6 +342,7 @@ class UserManagement extends Component {
     }
 
     onSubmitNewUser = () => {
+        const { userAreaCode }= this.props
         const {
             userCode,
             userCodeValidated,
@@ -366,9 +367,10 @@ class UserManagement extends Component {
             userDeliveryOnSubKGValidated,
         } = this.state
 
+        let selectedAreaCode = userAreaCode.filter(x => x.UserAreaID === userAreaId)
         let object = {
             USERCODE: userCode,
-            AREACODE: userAreaId,
+            AREACODE: (selectedAreaCode.length > 0 ) ? selectedAreaCode[0].UserAreaID : "1",
             FULLNAME: userFullname,
             USERCONTACTNO: userContact,
             USEREMAILADDRESS: userEmail,
@@ -693,6 +695,7 @@ class UserManagement extends Component {
                         title={"Add new user"}                      // required, title of the modal
                         buttonTitle={"Add"}                         // required, title of button
                         singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
+                        maxWidth={"md"}
                     >
                         <Box component="form" noValidate sx={{ mt: 3 }}>
                             <Grid container spacing={2}>
@@ -790,6 +793,7 @@ class UserManagement extends Component {
                                         id="MinSelfPickup"
                                         label="Min Self-Pickup"
                                         name="MinSelfPickup"
+                                        variant="standard"
                                         onChange={this.onTextFieldOnChange}
                                         size="small"
                                         value={this.state.userMinSelfPickup}
@@ -805,6 +809,7 @@ class UserManagement extends Component {
                                         name="CubicSelfPickup"
                                         label="Cubic Self-Pickup"
                                         id="CubicSelfPickup"
+                                        variant="standard"
                                         onChange={this.onTextFieldOnChange}
                                         size="small"
                                         value={this.state.userCubicSelfPickup}
@@ -820,6 +825,7 @@ class UserManagement extends Component {
                                         name="Conslidate"
                                         label="Conslidate"
                                         id="Conslidate"
+                                        variant="standard"
                                         onChange={this.onTextFieldOnChange}
                                         size="small"
                                         value={this.state.userConslidate}
@@ -835,11 +841,12 @@ class UserManagement extends Component {
                                         id="DeliveryCargo"
                                         label="Delivery Cargo"
                                         name="DeliveryCargo"
+                                        variant="standard"
                                         onChange={this.onTextFieldOnChange}
                                         size="small"
                                         value={this.state.userDeliveryCargo}
                                         error={this.state.userDeliveryCargoValidated !== null && !this.state.userDeliveryCargoValidated}
-                                        helperText={this.state.userDeliveryCargoValidated !== null && !this.state.userDeliveryCargoValidated ? "Required" : ""}
+                                        helperText={this.state.userDeliveryCargoValidated !== null && !this.state.userDeliveryCargoValidated ? "Required" : "Delivery Cargo"}
                                     />
                                 </Grid>
                                 <Grid item xs={4} md={2}>
@@ -850,11 +857,12 @@ class UserManagement extends Component {
                                         id="DeliveryOn1stKG"
                                         label="Delivery On 1st KG"
                                         name="DeliveryOn1stKG"
+                                        variant="standard"
                                         onChange={this.onTextFieldOnChange}
                                         size="small"
                                         value={this.state.userDeliveryOn1stKG}
                                         error={this.state.userDeliveryOn1stKGValidated !== null && !this.state.userDeliveryOn1stKGValidated}
-                                        helperText={this.state.userDeliveryOn1stKGValidated !== null && !this.state.userDeliveryOn1stKGValidated ? "Required" : ""}
+                                        helperText={this.state.userDeliveryOn1stKGValidated !== null && !this.state.userDeliveryOn1stKGValidated ? "Required" : "Delivery On 1st KG"}
                                     />
                                 </Grid>
                                 <Grid item xs={4} md={2}>
@@ -865,11 +873,12 @@ class UserManagement extends Component {
                                         name="DeliveryOnSubKG"
                                         label="Delivery On Sub KG"
                                         id="DeliveryOnSubKG"
+                                        variant="standard"
                                         onChange={this.onTextFieldOnChange}
                                         size="small"
                                         value={this.state.userDeliveryOnSubKG}
                                         error={this.state.userDeliveryOnSubKGValidated !== null && !this.state.userDeliveryOnSubKGValidated}
-                                        helperText={this.state.userDeliveryOnSubKGValidated !== null && !this.state.userDeliveryOnSubKGValidated ? "Required" : ""}
+                                        helperText={this.state.userDeliveryOnSubKGValidated !== null && !this.state.userDeliveryOnSubKGValidated ? "Required" : "Delivery On Sub KG"}
                                     />
                                 </Grid>
                             </Grid>
