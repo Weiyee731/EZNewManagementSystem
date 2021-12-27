@@ -590,7 +590,7 @@ class OverallStock extends Component {
                 // if search keywords is exists
                 if (isArrayNotEmpty(stocks)) {
 
-                  if (areaSearchKeys !== "All" && searchCategory === "All") {
+                    if (areaSearchKeys !== "All" && searchCategory === "All") {
                         console.log(areaSearchKeys)
 
                         // if area is not empty
@@ -687,7 +687,7 @@ class OverallStock extends Component {
             { children: "Unchecked", key: "Unchecked" },
             { children: "Checked", key: "Checked" },
         ]
-
+        console.log(this.props)
         const { filteredList, formValue, searchCategory, searchArea } = this.state
         const renderTableTopRightButtons = () => {
             return (
