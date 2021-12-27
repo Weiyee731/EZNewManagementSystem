@@ -405,9 +405,7 @@ class UserManagement extends Component {
     }
 
     onSelectItem = (item) => {
-        this.setState({
-            selectedRows: item
-        })
+        this.setState({ selectedRows: item })
     }
 
     renderTableActionButton = () => {
@@ -607,7 +605,6 @@ class UserManagement extends Component {
     }
 
     // dropzone -- FINISH
-
     render() {
         // dropzone
         const { DataHeaders, DataRows, loadingData, isSubmit } = this.state
