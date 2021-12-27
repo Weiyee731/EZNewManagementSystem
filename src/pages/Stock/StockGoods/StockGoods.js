@@ -400,13 +400,19 @@ class StockGoods extends Component {
                 let extraChangesValue = "", isNotVerified = 0;
                 if (this.state.AdditionalCharges.length > 0) {
                     for (var i = 0; i < this.state.AdditionalCharges.length; i++) {
-                        extraChangesValue += this.state.AdditionalCharges[i].Charges + "=" + this.state.AdditionalCharges[i].Value
-                        if (i !== this.state.AdditionalCharges.length - 1)
-                            extraChangesValue += ';'
 
-                        //check extra charge
-                        if (this.state.AdditionalCharges[i].validated === false)
-                            isNotVerified++;
+                        if (this.state.AdditionalCharges[i].Charges === undefined || this.state.AdditionalCharges[i].Value === undefined) {
+                            this.setState({ AdditionalCharges: "" })
+                            extraChangesValue = "-"
+                        } else {
+                            extraChangesValue += this.state.AdditionalCharges[i].Charges + "=" + this.state.AdditionalCharges[i].Value
+                            if (i !== this.state.AdditionalCharges.length - 1)
+                                extraChangesValue += ';'
+
+                            //check extra charge
+                            if (this.state.AdditionalCharges[i].validated === false)
+                                isNotVerified++;
+                        }
                     }
                 }
                 else

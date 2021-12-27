@@ -571,7 +571,8 @@ class OverallStock extends Component {
 
     onSearch(keywords, area) {
         const { filteredList, searchKeywords, searchCategory, searchArea, searchDates, isDataFetching } = this.state
-        const { archivedData } = this.props
+        const { archivedData } = this.props.stocks
+        console.log(archivedData)
         let searchKeys = ((!isStringNullOrEmpty(keywords))) ? keywords : searchKeywords
         searchKeys = (!isStringNullOrEmpty(searchKeys)) ? searchKeys.toUpperCase() : searchKeys
 
@@ -684,7 +685,7 @@ class OverallStock extends Component {
             { children: "Unchecked", key: "Unchecked" },
             { children: "Checked", key: "Checked" },
         ]
-
+        console.log(this.props)
         const { filteredList, formValue, searchCategory, searchArea } = this.state
         const renderTableTopRightButtons = () => {
             return (
