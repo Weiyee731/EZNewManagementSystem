@@ -38,6 +38,7 @@ function mapStateToProps(state) {
     userProfile: state.counterReducer["userProfile"],
     loading: state.counterReducer["loading"],
     userAreaCode: state.counterReducer["userAreaCode"],
+    userManagementApproval: state.counterReducer["userManagementApproval"],
   };
 }
 
@@ -46,6 +47,10 @@ function mapDispatchToProps(dispatch) {
     CallUserProfileByID: (data) => dispatch(GitAction.CallUserProfileByID(data)),
     CallUpdateTransactionPayment: (data) => dispatch(GitAction.CallUpdateTransactionPayment(data)),
     CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
+    CallUpdateUserData: (data) => dispatch(GitAction.CallUpdateUserData(data)),
+    CallResetUserApprovalReturn: () => dispatch(GitAction.CallResetUserApprovalReturn()),
+    CallResetUserProfile: () => dispatch(GitAction.CallResetUserProfile()),
+    CallUserProfile: () => dispatch(GitAction.CallUserProfile()),
   };
 }
 
@@ -193,6 +198,13 @@ class UserDetail extends Component {
       userDeliveryOn1stKGValidated: null,
       userDeliveryOnSubKG: "",
       userDeliveryOnSubKGValidated: null,
+      userDeliveryOnSubKG: "",
+      userDeliveryOnSubKGValidated: null,
+
+      // comment below used for future used, as the member may able to login to view their details
+      // userDescription: "",
+      // userAccountName: "",
+      // userAccountNameValidated: null,
 
       passwordManagerOpen: false,
       newPassword: "",
@@ -215,7 +227,6 @@ class UserDetail extends Component {
         ] : [{ name: "Total Unpaid", value: 0 }, { name: "Total Paid", value: 0 }]
 
         const { userProfile } = this.props
-
         this.setState({
           UserProfile: this.props.userProfile,
 
@@ -242,9 +253,10 @@ class UserDetail extends Component {
           userDeliveryOnSubKG: (userProfile.length > 0) ? userProfile[0].SmallDeliverySubPrice : 0,
           userDeliveryOnSubKGValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].SmallDeliverySubPrice)) ? true : false,
 
-          userDescription: (userProfile.length > 0) ? userProfile[0].UserDescription : "",
-          userAccountName: (userProfile.length > 0) ? userProfile[0].Username : "",
-          userAccountNameValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].Username)) ? true : false,
+          // comment below used for future used, as the member may able to login to view their details
+          // userDescription: (userProfile.length > 0) ? userProfile[0].UserDescription : "",
+          // userAccountName: (userProfile.length > 0) ? userProfile[0].Username : "",
+          // userAccountNameValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].Username)) ? true : false,
 
           Transaction: JSON.parse(this.props.userProfile[0].Transaction),
           filteredList: JSON.parse(this.props.userProfile[0].Transaction),
@@ -262,6 +274,58 @@ class UserDetail extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.props.CallResetUserProfile()
+    this.setState({
+      UserProfile: [],
+      UserID: this.props.match.params.userid,
+      Transaction: [],
+      filteredList: [],
+      selectedRow: [],
+      payment: "",
+      selectedindex: "",
+      isOnEditMode: false,
+      AddModalOpen: false,
+      PieChartData: [],
+      isPieChartNoData: false,
+
+      //form data
+      userCode: "",
+      userCodeValidated: null,
+      userAreaId: 1,
+      userAreaIdValidated: true,
+      userFullname: "",
+      userFullnameValidated: null,
+      userContact: "",
+      userEmail: "",
+      userAddress: "",
+      userMinSelfPickup: "",
+      userMinSelfPickupValidated: null,
+      userCubicSelfPickup: "",
+      userCubicSelfPickupValidated: null,
+      userConslidate: "",
+      userConslidateValidated: null,
+      userDeliveryCargo: "",
+      userDeliveryCargoValidated: null,
+      userDeliveryOn1stKG: "",
+      userDeliveryOn1stKGValidated: null,
+      userDeliveryOnSubKG: "",
+      userDeliveryOnSubKGValidated: null,
+      userDeliveryOnSubKG: "",
+      userDeliveryOnSubKGValidated: null,
+
+      // comment below used for future used, as the member may able to login to view their details
+      // userDescription: "",
+      // userAccountName: "",
+      // userAccountNameValidated: null,
+
+      passwordManagerOpen: false,
+      newPassword: "",
+      confirmationPassword: "",
+      passwordValidated: null,
+    })
+  }
+
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.userProfile.length !== this.props.userProfile.length) {
       if (typeof this.props.userProfile !== "undefined" && typeof this.props.userProfile[0] !== "undefined") {
@@ -270,13 +334,30 @@ class UserDetail extends Component {
           { name: "Total Paid", value: (!isStringNullOrEmpty(this.props.userProfile[0].TotalPaid)) ? Number(this.props.userProfile[0].TotalPaid) : 0 },
         ] : [{ name: "Total Unpaid", value: 0 }, { name: "Total Paid", value: 0 }]
 
+        const { userProfile } = this.props
         this.setState({
           UserProfile: this.props.userProfile,
-          FullName: this.props.userProfile[0].Fullname,
-          UserCode: this.props.userProfile[0].UserCode,
-          Email: this.props.userProfile[0].UserEmailAddress,
-          Contact: this.props.userProfile[0].UserContactNo,
-          Address: this.props.userProfile[0].UserAddress,
+          userCode: (userProfile.length > 0) ? userProfile[0].UserCode : "",
+          userCodeValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].UserCode)) ? true : false,
+          userAreaId: (userProfile.length > 0) ? userProfile[0].UserAreaID : 1,
+          userAreaIdValidated: true,
+          userFullname: (userProfile.length > 0) ? userProfile[0].Fullname : "",
+          userFullnameValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].Fullname)) ? true : false,
+          userContact: (userProfile.length > 0) ? userProfile[0].UserContactNo : "",
+          userEmail: (userProfile.length > 0) ? userProfile[0].UserEmailAddress : "",
+          userAddress: (userProfile.length > 0) ? userProfile[0].UserAddress : "",
+          userMinSelfPickup: (userProfile.length > 0) ? userProfile[0].MinimumPrice : 0,
+          userMinSelfPickupValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].MinimumPrice)) ? true : false,
+          userCubicSelfPickup: (userProfile.length > 0) ? userProfile[0].SelfPickOverCubic : 0,
+          userCubicSelfPickupValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].SelfPickOverCubic)) ? true : false,
+          userConslidate: (userProfile.length > 0) ? userProfile[0].ConsolidatedPrice : 0,
+          userConslidateValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].ConsolidatedPrice)) ? true : false,
+          userDeliveryCargo: (userProfile.length > 0) ? userProfile[0].LargeDeliveryPrice : 0,
+          userDeliveryCargoValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].LargeDeliveryPrice)) ? true : false,
+          userDeliveryOn1stKG: (userProfile.length > 0) ? userProfile[0].SmallDeliveryFirstPrice : 0,
+          userDeliveryOn1stKGValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].SmallDeliveryFirstPrice)) ? true : false,
+          userDeliveryOnSubKG: (userProfile.length > 0) ? userProfile[0].SmallDeliverySubPrice : 0,
+          userDeliveryOnSubKGValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].SmallDeliverySubPrice)) ? true : false,
           Transaction: JSON.parse(this.props.userProfile[0].Transaction),
           filteredList: JSON.parse(this.props.userProfile[0].Transaction),
           PieChartData: piechart_data,
@@ -307,6 +388,39 @@ class UserDetail extends Component {
 
         });
       }
+    }
+
+    // successfully update user profile
+    if (isArrayNotEmpty(this.props.userManagementApproval)) {
+      if (this.props.userManagementApproval[0].ReturnVal == 1) {
+        this.props.CallResetUserApprovalReturn()
+        toast.success("Data is updated successfully", { autoClose: 3000, position: "top-center", transition: Flip, theme: "dark" })
+        let userData = this.state.UserProfile
+        if (isArrayNotEmpty(userData)) {
+          userData[0].Fullname = this.state.userFullname;
+          userData[0].UserCode = this.state.userCode;
+          userData[0].UserAreaID = this.state.userAreaId;
+          userData[0].UserContactNo = this.state.userContact;
+          userData[0].UserAddress = this.state.userAddress;
+          userData[0].UserEmailAddress = this.state.userEmail;
+
+          userData[0].MinimumPrice = this.state.userMinSelfPickup;
+          userData[0].SelfPickOverCubic = this.state.userCubicSelfPickup;
+          userData[0].ConsolidatedPrice = this.state.userConslidate;
+          userData[0].LargeDeliveryPrice = this.state.userDeliveryCargo;
+          userData[0].SmallDeliveryFirstPrice = this.state.userDeliveryOn1stKG;
+          userData[0].SmallDeliverySubPrice = this.state.userDeliveryOnSubKG;
+        }
+        this.setState({
+          isOnEditMode: false,
+          UserProfile: userData
+        })
+        this.props.CallUserProfile()
+      }
+      else {
+        toast.error("Error occured while udpating user. Please try again or contact our developer.", { autoClose: 2000, theme: "colored" })
+      }
+
     }
   }
 
@@ -411,8 +525,9 @@ class UserDetail extends Component {
   }
 
   onSubmitUpdateUser = () => {
-    const { userAreaCode } = this.props
+    const { userAreaCode, userProfile } = this.props
     const {
+      UserID,
       userCode,
       userCodeValidated,
       userAreaId,
@@ -435,27 +550,26 @@ class UserDetail extends Component {
       userDeliveryOnSubKG,
       userDeliveryOnSubKGValidated,
 
-      userAccountName,
-      userAccountNameValidated,
-      userDescription,
+      // userAccountName,
+      // userAccountNameValidated,
+      // userDescription,
     } = this.state
 
     let selectedAreaCode = userAreaCode.filter(x => x.UserAreaID === userAreaId)
     let object = {
+      USERID: UserID,
       USERCODE: userCode,
-      AREACODE: (selectedAreaCode.length > 0) ? selectedAreaCode[0].UserAreaID : "1",
-      FULLNAME: userFullname,
-      USERCONTACTNO: userContact,
-      USEREMAILADDRESS: userEmail,
-      USERADDRESS: userAddress,
-      MINSELFPICKUPPRICE: userMinSelfPickup,
-      CUBICSELFPICKUPPRICE: userCubicSelfPickup,
-      CONSOLIDATEPRICE: userConslidate,
-      DELIVERYCARGO: userDeliveryCargo,
-      DELIVERYFIRSTPRICE: userDeliveryOn1stKG,
-      DELIVERYSUBPRICE: userDeliveryOnSubKG,
-      USERNAME: userAccountName,
-      DESCRIPTION: userDescription,
+      USERAREAID: (selectedAreaCode.length > 0) ? selectedAreaCode[0].UserAreaID : "1",
+      FULLNAME: (!isStringNullOrEmpty(userFullname) ? userFullname : "-"),
+      CONTACTNO: (!isStringNullOrEmpty(userContact) ? userContact : "-"),
+      USEREMAIL: (!isStringNullOrEmpty(userEmail) ? userEmail : "-"),
+      USERADDRESS: (!isStringNullOrEmpty(userAddress) ? userAddress : "-"),
+      MINSELFPICKUPPRICE: (!isStringNullOrEmpty(userMinSelfPickup) ? userMinSelfPickup : "0"),
+      CUBICSELFPICKUPPRICE: (!isStringNullOrEmpty(userCubicSelfPickup) ? userCubicSelfPickup : "0"),
+      CONSOLIDATEPRICE: (!isStringNullOrEmpty(userConslidate) ? userConslidate : "0"),
+      DELIVERYCARGO: (!isStringNullOrEmpty(userDeliveryCargo) ? userDeliveryCargo : "0"),
+      DELIVERYFIRSTPRICE: (!isStringNullOrEmpty(userDeliveryOn1stKG) ? userDeliveryOn1stKG : "0"),
+      DELIVERYSUBPRICE: (!isStringNullOrEmpty(userDeliveryOnSubKG) ? userDeliveryOnSubKG : "0"),
     }
 
     const isValidated = (
@@ -467,12 +581,11 @@ class UserDetail extends Component {
       userConslidateValidated &&
       userDeliveryCargoValidated &&
       userDeliveryOn1stKGValidated &&
-      userDeliveryOnSubKGValidated &&
-      userAccountNameValidated
+      userDeliveryOnSubKGValidated
     )
 
     if (isValidated) {
-      // this.props.CallInsertUserDataByPost(object)
+      this.props.CallUpdateUserData(object)
       console.log(object)
     }
     else
@@ -604,6 +717,15 @@ class UserDetail extends Component {
         </text>
       );
     };
+
+    const renderAreaCodeName = (areaId) => {
+      if (isArrayNotEmpty(this.props.userAreaCode)) {
+        let selectedArea = this.props.userAreaCode.filter(x => x.UserAreaID == areaId)
+        return selectedArea.length > 0 ? selectedArea[0].AreaCode + " - " + selectedArea[0].AreaName : "Nil"
+      }
+      else
+        return "Nil"
+    }
 
     return (
       <div>
@@ -842,7 +964,9 @@ class UserDetail extends Component {
                       helperText={this.state.userDeliveryOnSubKGValidated !== null && !this.state.userDeliveryOnSubKGValidated ? "Required" : "Delivery On Sub KG"}
                     />
                   </Grid>
-                  <Grid item xs={12} md={12}>
+
+                  {/* The comment below is prepared for the future used, as if the members are allow to manage their own dashboard */}
+                  {/* <Grid item xs={12} md={12}>
                     <hr />
                     <h4>User Account Information</h4>
                   </Grid>
@@ -894,11 +1018,14 @@ class UserDetail extends Component {
                       helperText={(200 - ((!isStringNullOrEmpty(this.state.userDescription)) ? this.state.userDescription.length : 0)) + " words left"}
                       length={200}
                     />
-                  </Grid>
+                  </Grid> */}
+                  {/* The comment above is prepared for the future used, as if the members are allow to manage their own dashboard */}
+
+
                 </Grid>
                 :
                 <div className="row">
-                  <div className="col-12 col-md-3 my-3  d-flex">
+                  {/* <div className="col-12 col-md-3 my-3  d-flex">
                     {
                       isArrayNotEmpty(this.state.UserProfile) ?
                         <div className="user-profile-image">
@@ -909,26 +1036,42 @@ class UserDetail extends Component {
 
                         </div>
                     }
-
-                  </div>
-                  <div className="col-12 col-md-9">
+                  </div> */}
+                  <div className="col-12 col-md-12 p-5">
                     {
                       isArrayNotEmpty(this.state.UserProfile) &&
                       <div className="row">
-                        <div className="mb-2 col-12 col-md-3 information-label">Member No </div>
-                        <div className="mb-2 col-12 col-md-3">{this.state.UserProfile[0].UserCode}</div>
-                        <div className="mb-2 col-12 col-md-3 information-label">Status </div>
-                        <div className="mb-2 col-12 col-md-3">{this.state.UserProfile[0].UserStatus}</div>
-                        <div className="mb-2 col-12 col-md-3 information-label">Name</div>
-                        <div className="mb-2 col-12 col-md-3">{this.state.UserProfile[0].Fullname}</div>
-                        <div className="mb-2 col-12 col-md-3 information-label">Username </div>
-                        <div className="mb-2 col-12 col-md-3">{this.state.UserProfile[0].Username}</div>
-                        <div className="mb-2 col-12 col-md-3 information-label">Email</div>
-                        <div className="mb-2 col-12 col-md-3">{this.state.UserProfile[0].UserEmailAddress}</div>
-                        <div className="mb-2 col-12 col-md-3 information-label">Contact</div>
-                        <div className="mb-2 col-12 col-md-3 ">{this.state.UserProfile[0].UserContactNo}</div>
-                        <div className="mb-2 col-12 col-md-3 information-label">Description</div>
-                        <div className="mb-2 col-12 col-md-9">{this.state.UserProfile[0].UserDescription}</div>
+                        <div className="mb-2 col-4 col-md-3 information-label">MemberID </div>
+                        <div className="mb-2 col-8 col-md-3">{this.state.UserProfile[0].UserCode}</div>
+                        <div className="mb-2 col-4 col-md-3 information-label">Status </div>
+                        <div className="mb-2 col-8 col-md-3 text-uppercase"><b className={this.state.UserProfile[0].UserStatus === "Pending" ? "text-danger" : "text-normal"}>{this.state.UserProfile[0].UserStatus}</b></div>
+                        <div className="mb-2 col-4 col-md-3 information-label">Name</div>
+                        <div className="mb-2 col-8 col-md-3">{this.state.UserProfile[0].Fullname}</div>
+                        <div className="mb-2 col-4 col-md-3 information-label">AreaCode </div>
+                        <div className="mb-2 col-8 col-md-3"><b>{renderAreaCodeName(this.state.UserProfile[0].UserAreaID)}</b></div>
+                        <div className="mb-2 col-4 col-md-3 information-label">Email</div>
+                        <div className="mb-2 col-8 col-md-3">{this.state.UserProfile[0].UserEmailAddress}</div>
+                        <div className="mb-2 col-4 col-md-3 information-label">Contact</div>
+                        <div className="mb-2 col-8 col-md-3 ">{this.state.UserProfile[0].UserContactNo}</div>
+                        <div className="mb-2 col-4 col-md-3 information-label">Address</div>
+                        <div className="mb-2 col-8 col-md-3 ">{this.state.UserProfile[0].UserAddress}</div>
+                        <div className="col-12">
+                          <hr />
+                        </div>
+                        <div className="row">
+                          <div className="col-md-2 col-8 information-label">Self-Pickup (Min.)</div>
+                          <div className="col-md-2 col-4"><b>RM</b> {this.state.UserProfile[0].MinimumPrice}</div>
+                          <div className="col-md-2 col-8 information-label">Self-Pickup (Cubic)</div>
+                          <div className="col-md-2 col-4"><b>RM</b> {this.state.UserProfile[0].SelfPickOverCubic}</div>
+                          <div className="col-md-2 col-8 information-label">Conslidate</div>
+                          <div className="col-md-2 col-4"><b>RM</b> {this.state.UserProfile[0].ConsolidatedPrice}</div>
+                          <div className="col-md-2 col-8 information-label">Delivery Cargo</div>
+                          <div className="col-md-2 col-4"><b>RM</b> {this.state.UserProfile[0].LargeDeliveryPrice}</div>
+                          <div className="col-md-2 col-8 information-label">Delivery (1st KG)</div>
+                          <div className="col-md-2 col-4"><b>RM</b> {this.state.UserProfile[0].SmallDeliveryFirstPrice}</div>
+                          <div className="col-md-2 col-8 information-label">Delivery (sub-KG)</div>
+                          <div className="col-md-2 col-4"><b>RM</b> {this.state.UserProfile[0].SmallDeliverySubPrice}</div>
+                        </div>
                       </div>
                     }
                   </div>

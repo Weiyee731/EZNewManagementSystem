@@ -16,7 +16,7 @@ const INITIAL_STATE = {
   transactionReturn: [],
   dashboard: [],
   archivedData: [],
-  userRegistrationApproval: [],
+  userManagementApproval: [],
 };
 
 export function counterReducer(state = INITIAL_STATE, action) {
@@ -247,13 +247,21 @@ export function counterReducer(state = INITIAL_STATE, action) {
     case GitAction.InsertedUserDataByPost:
       return Object.assign({}, state, {
         loading: false,
-        userRegistrationApproval: action.payload
+        userManagementApproval: action.payload
+      });
+
+    case GitAction.UpdateUserData:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.UserDataUpdated:
+      return Object.assign({}, state, {
+        loading: false,
+        userManagementApproval: action.payload
       });
 
     case GitAction.ResetUserApprovalReturn:
       return Object.assign({}, state, {
         loading: false,
-        userRegistrationApproval: []
+        userManagementApproval: []
       });
 
     /////////////////////////////////////////////////// Default ///////////////////////////////////////////////////

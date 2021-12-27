@@ -29,6 +29,7 @@ const rootEpic = combineEpics(
   gitEpic.Inventory_ViewArchiveStockListByDate,
   gitEpic.Transaction_ViewArchiveTransaction,
   gitEpic.User_RegisterUsersByPost,
+  gitEpic.User_UpdateUserProfile,
 );
 
 const rootReducer = combineReducers({ counterReducer });

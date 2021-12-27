@@ -50,7 +50,7 @@ function mapStateToProps(state) {
     return {
         user: state.counterReducer["user"],
         userAreaCode: state.counterReducer["userAreaCode"],
-        userRegistrationApproval: state.counterReducer["userRegistrationApproval"],
+        userManagementApproval: state.counterReducer["userManagementApproval"],
     };
 }
 
@@ -172,8 +172,8 @@ class UserManagement extends Component {
             }
         }
 
-        if (isArrayNotEmpty(this.props.userRegistrationApproval)) {
-            if (this.props.userRegistrationApproval[0].ReturnVal == 1) {
+        if (isArrayNotEmpty(this.props.userManagementApproval)) {
+            if (this.props.userManagementApproval[0].ReturnVal == 1) {
                 this.props.CallResetUserApprovalReturn()
                 toast.success("Data is uploaded successfully", { autoClose: 3000, position: "top-center", transition: Flip, theme: "dark" })
                 this.props.CallUserProfile();

@@ -37,7 +37,6 @@ export class GitAction {
 
   static GetUserProfile = "GET_USER_PROFILE";
   static GotUserProfile = "GOT_USER_PROFILE";
-  static ResetUserProfile = "RESET-USER_PROFILE";
   static CallUserProfile() {
     return {
       type: GitAction.GetUserProfile
@@ -49,6 +48,14 @@ export class GitAction {
   static CallUserAreaCode() {
     return {
       type: GitAction.GetUserAreaCode
+    };
+  }
+
+  static UpdateUserAccountPassword = "UPDATE_USER_ACCOUNT_PASSWORD";
+  static UserAccountPasswordUpdated = "USER_ACCOUNT_PASSWORD_UPDATED";
+  static CallUpdateUserAccountPassword() {
+    return {
+      type: GitAction.UpdateUserAccountPassword
     };
   }
 
@@ -292,6 +299,15 @@ export class GitAction {
   static CallInsertUserDataByPost(propsData) {
     return {
       type: GitAction.InsertUserDataByPost,
+      payload: propsData
+    };
+  }
+
+  static UpdateUserData = "UPDATE-USER-DATA";
+  static UserDataUpdated = "USER-DATA-UPDATED";
+  static CallUpdateUserData(propsData) {
+    return {
+      type: GitAction.UpdateUserData,
       payload: propsData
     };
   }

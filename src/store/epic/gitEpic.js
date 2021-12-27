@@ -802,18 +802,18 @@ export class GitEpic {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            USERCODE : payload.USERCODE ,
-            AREACODE : payload.AREACODE ,
-            FULLNAME : payload.FULLNAME ,
-            USERCONTACTNO : payload.USERCONTACTNO ,
-            USEREMAILADDRESS : payload.USEREMAILADDRESS ,
-            USERADDRESS : payload.USERADDRESS ,
+            USERCODE: payload.USERCODE,
+            AREACODE: payload.AREACODE,
+            FULLNAME: payload.FULLNAME,
+            USERCONTACTNO: payload.USERCONTACTNO,
+            USEREMAILADDRESS: payload.USEREMAILADDRESS,
+            USERADDRESS: payload.USERADDRESS,
             MINSELFPICKUPPRICE: payload.MINSELFPICKUPPRICE,
-            CUBICSELFPICKUPPRICE : payload.CUBICSELFPICKUPPRICE ,
-            CONSOLIDATEPRICE : payload.CONSOLIDATEPRICE ,
-            DELIVERYCARGO : payload.DELIVERYCARGO ,
-            DELIVERYFIRSTPRICE : payload.DELIVERYFIRSTPRICE ,
-            DELIVERYSUBPRICE : payload.DELIVERYSUBPRICE 
+            CUBICSELFPICKUPPRICE: payload.CUBICSELFPICKUPPRICE,
+            CONSOLIDATEPRICE: payload.CONSOLIDATEPRICE,
+            DELIVERYCARGO: payload.DELIVERYCARGO,
+            DELIVERYFIRSTPRICE: payload.DELIVERYFIRSTPRICE,
+            DELIVERYSUBPRICE: payload.DELIVERYSUBPRICE
           })
         }
       )
@@ -831,6 +831,59 @@ export class GitEpic {
           };
         })
         .catch(error => toast.error("Error code: 8003"));
+    });
+
+  User_UpdateUserProfile = action$ =>
+    action$.ofType(GitAction.UpdateUserData).switchMap(async ({ payload }) => {
+      console.log(url +
+        "User_UpdateUserProfile?" +
+        "USERID=" + payload.USERID +
+        "USERCODE=" + payload.USERCODE +
+        "USERAREAID=" + payload.USERAREAID +
+        "FULLNAME=" + payload.FULLNAME +
+        "CONTACTNO=" + payload.CONTACTNO +
+        "USEREMAIL=" + payload.USEREMAIL +
+        "USERADDRESS=" + payload.USERADDRESS +
+        "MINSELFPICKUPPRICE=" + payload.MINSELFPICKUPPRICE +
+        "CUBICSELFPICKUPPRICE=" + payload.CUBICSELFPICKUPPRICE +
+        "CONSOLIDATEPRICE=" + payload.CONSOLIDATEPRICE +
+        "DELIVERYCARGO=" + payload.DELIVERYCARGO +
+        "DELIVERYFIRSTPRICE=" + payload.DELIVERYFIRSTPRICE +
+        "DELIVERYSUBPRICE=" + payload.DELIVERYSUBPRICE
+      )
+
+      try {
+        const response = await fetch(url +
+          "User_UpdateUserProfile?" +
+          "USERID=" + payload.USERID +
+          "&USERCODE=" + payload.USERCODE +
+          "&USERAREAID=" + payload.USERAREAID +
+          "&FULLNAME=" + payload.FULLNAME +
+          "&CONTACTNO=" + payload.CONTACTNO +
+          "&USEREMAIL=" + payload.USEREMAIL +
+          "&USERADDRESS=" + payload.USERADDRESS +
+          "&MINSELFPICKUPPRICE=" + payload.MINSELFPICKUPPRICE +
+          "&CUBICSELFPICKUPPRICE=" + payload.CUBICSELFPICKUPPRICE +
+          "&CONSOLIDATEPRICE=" + payload.CONSOLIDATEPRICE +
+          "&DELIVERYCARGO=" + payload.DELIVERYCARGO +
+          "&DELIVERYFIRSTPRICE=" + payload.DELIVERYFIRSTPRICE +
+          "&DELIVERYSUBPRICE=" + payload.DELIVERYSUBPRICE
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UserDataUpdated,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: User_UpdateUserProfile")
+        return {
+          type: GitAction.UserDataUpdated,
+          payload: [],
+        };
+      }
     });
 
   ///////////////////////////////////////////////////   User Management  ///////////////////////////////////////////////////
