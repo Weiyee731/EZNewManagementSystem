@@ -556,9 +556,9 @@ class UserManagement extends Component {
                 UserContactNo += (isStringNullOrEmpty(DataRows[index]["UserContactNo"])) ? "-" : DataRows[index]["UserContactNo"].toString();
                 UserEmailAddress += (isStringNullOrEmpty(DataRows[index]["UserEmailAddress"])) ? "-" : DataRows[index]["UserEmailAddress"].trim();
                 UserAddress += (isStringNullOrEmpty(DataRows[index]["UserAddress"])) ? "-" : DataRows[index]["UserAddress"].trim();
-                MinSelfPickup += (isStringNullOrEmpty(DataRows[index]["MinSelfPickup"])) ? "0" : DataRows[index]["MinSelfPickup"];
-                CubicSelfPickup += (isStringNullOrEmpty(DataRows[index]["CubicSelfPickup"])) ? "0" : DataRows[index]["CubicSelfPickup"];
-                Conslidate += (isStringNullOrEmpty(DataRows[index]["Conslidate"])) ? "0" : DataRows[index]["Conslidate"];
+                MinSelfPickup += (isStringNullOrEmpty(DataRows[index]["Min Self Pick Up"])) ? "0" : DataRows[index]["Min Self Pick Up"];
+                CubicSelfPickup += (isStringNullOrEmpty(DataRows[index]["Cubic Self Pick Up"])) ? "0" : DataRows[index]["Cubic Self Pick Up"];
+                Conslidate += (isStringNullOrEmpty(DataRows[index]["Consolidate"])) ? "0" : DataRows[index]["Consolidate"];
                 DeliveryCargo += (isStringNullOrEmpty(DataRows[index]["Delivery Cargo"])) ? "0" : DataRows[index]["Delivery Cargo"];
                 DeliveryOn1stKG += (isStringNullOrEmpty(DataRows[index]["Delivery 1stKg"])) ? "0" : DataRows[index]["Delivery 1stKg"];
                 DeliveryOnSubKG += (isStringNullOrEmpty(DataRows[index]["Delivery SubKg"])) ? "0" : DataRows[index]["Delivery SubKg"];
