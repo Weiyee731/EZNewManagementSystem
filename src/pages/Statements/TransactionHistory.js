@@ -19,7 +19,7 @@ import Typography from '@mui/material/Typography';
 import Backdrop from '@mui/material/Backdrop';
 import SearchBar from "../../components/SearchBar/SearchBar"
 import CsvDownloader from 'react-csv-downloader';
-import { getWindowDimensions, isArrayNotEmpty } from "../../tools/Helpers";
+import { convertDateTimeToString112Format, getWindowDimensions, isArrayNotEmpty } from "../../tools/Helpers";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import ToggleTabsComponent from "../../components/ToggleTabsComponent/ToggleTabComponents";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -27,10 +27,12 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import ResponsiveDatePickers from '../../components/datePicker/datePicker';
+import { toast } from "react-toastify";
 
 function mapStateToProps(state) {
     return {
         transactions: state.counterReducer["transactions"],
+        transactionReturn: state.counterReducer["transactionReturn"]
     };
 }
 
@@ -47,12 +49,11 @@ const style = {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '40%',
-    height: '45%',
     bgcolor: 'background.paper',
     border: '0px solid #000',
     boxShadow: 24,
     p: 4,
-  };
+};
 
 const headCells = [
     {
@@ -120,11 +121,15 @@ class TransactionHistory extends Component {
             TrackingStatusID: 4,
             filteredList: [],
             selectedRow: [],
-            TransactionID:0,
+            TransactionID: 0,
             searchCategory: "Cash",
             Payment: "",
             Datetime: "",
-            ReferenceNo: ""
+            ReferenceNo: "",
+            PaymentMethod: "Cash",
+            isPayAmountValid: false,
+            isDateValid: false,
+            isReferenceValid: false
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.handleInputChange = this.handleInputChange.bind(this)
@@ -133,10 +138,8 @@ class TransactionHistory extends Component {
         this.props.CallFetchAllTransaction(this.state);
     }
 
-
-
     componentDidMount() {
-        if (this.props.transactions.length !== this.state.TransactionListing.length) {
+        if (this.props.transactions !== this.state.TransactionListing) {
             if (this.props.transactions !== undefined && this.props.transactions[0] !== undefined) {
                 this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
             }
@@ -144,14 +147,23 @@ class TransactionHistory extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps.transactions.length !== this.props.transactions.length) {
-            console.log(this.props.transactions !== undefined && this.props.transactions[0] !== undefined)
+        if (prevProps.transactions !== this.props.transactions) {
             if (this.props.transactions !== undefined && this.props.transactions[0] !== undefined) {
                 this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
             }
         } else {
-            if (prevProps.transactions.length !== this.state.TransactionListing.length) {
+            if (prevProps.transactions !== this.state.TransactionListing) {
                 this.setState({ TransactionListing: prevProps.transactions, TransactionListingFiltered: prevProps.transactions });
+            }
+        }
+
+        if (prevProps.transactionReturn !== this.props.transactionReturn) {
+            if (this.props.transactionReturn[0].ReturnVal && this.props.transactionReturn[0].ReturnVal == 1) {
+                toast.success(this.props.transactionReturn[0].ReturnMsg)
+                this.props.CallFetchAllTransaction(this.state);
+                this.setState({
+                    AddModalOpen: false
+                })
             }
         }
     }
@@ -168,7 +180,12 @@ class TransactionHistory extends Component {
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
                 {
-                    data.OrderStatus === "Unpaid" ? <TableCell onClick={(event) => this.onAddButtonClick(event, data)} align="center"><CheckCircleIcon color="grey" sx={{ fontSize: 30 }}></CheckCircleIcon></TableCell> : ""
+                    data.OrderStatus === "Unpaid" ?
+                        <TableCell align="center">
+                            <IconButton onClick={(event) => this.onAddButtonClick(event, data)}>
+                                <CheckCircleIcon color="dark" sx={{ fontSize: 30 }}></CheckCircleIcon>
+                            </IconButton>
+                        </TableCell> : ""
                 }
             </>
         )
@@ -195,6 +212,7 @@ class TransactionHistory extends Component {
     }
 
     onAddButtonClick = (event, row) => {
+        console.log(row)
         this.setState({ AddModalOpen: true, selectedRow: row, TransactionID: row.TransactionID });
     }
 
@@ -203,8 +221,16 @@ class TransactionHistory extends Component {
 
     }
 
-    onUpdateTransactionPayment = (event, row) => {
-        this.props.CallUpdateTransactionPayment(this.state)
+    onUpdateTransactionPayment = () => {
+        const { TransactionID, Payment, searchCategory, ReferenceNo, Datetime } = this.state
+        let object = {
+            TransactionID: TransactionID,
+            PaymentAmmount: Payment,
+            PaymentMethod: searchCategory,
+            ReferenceNo: ReferenceNo,
+            Datetime: convertDateTimeToString112Format(Datetime),
+        }
+        this.props.CallUpdateTransactionPayment(object)
     }
 
     handleInputChange = (e) => {
@@ -212,14 +238,34 @@ class TransactionHistory extends Component {
         switch (elementId) {
             case "payment":
                 this.setState({ Payment: e.target.value.trim() })
+                if (e.target.value == "") {
+                    this.setState({
+                        isPayAmountValid: true
+                    })
+                } else {
+                    this.setState({
+                        isPayAmountValid: false
+                    })
+                }
                 break;
 
             case "date":
                 this.setState({ Datetime: e.target.value })
                 break;
+
             case "reference":
                 this.setState({ ReferenceNo: e.target.value })
+                if (e.target.value == "") {
+                    this.setState({
+                        isReferenceValid: true
+                    })
+                } else {
+                    this.setState({
+                        isReferenceValid: false
+                    })
+                }
                 break;
+
             default:
                 break;
         }
@@ -266,7 +312,7 @@ class TransactionHistory extends Component {
             { children: "Unpaid", key: "Unpaid" },
             { children: "Paid", key: "Paid" }
         ]
-
+        const { selectedRow } = this.state
         return (
             <>
                 <div className="w-100 container-fluid">
@@ -296,7 +342,7 @@ class TransactionHistory extends Component {
                             tableOrderBy: 'asc',        // optional, default is asc
                             sortingIndex: "fat",        // require, it must the same as the desired table header
                             stickyTableHeader: true,    // optional, default is true
-                            stickyTableHeight: 300,     // optional, default is 300px
+                            // stickyTableHeight: 300,     // optional, default is 300px
                         }}
                         paginationOptions={[20, 50, 100, { label: 'All', value: -1 }]} // optional, by default it will hide the table pagination. You should set settings for pagination options as in array, eg.: [5, 100, 250, { label: 'All', value: -1 }]
                         tableHeaders={headCells}        //required
@@ -320,10 +366,26 @@ class TransactionHistory extends Component {
                         aria-describedby="modal-modal-description"
                         closeAfterTransition
                         BackdropComponent={Backdrop}
-                        BackdropProps={{ timeout: 500 }}>
+                        BackdropProps={{ timeout: 500 }}
+                    >
                         <Box sx={style} component="main" maxWidth="xs">
                             <Typography component="h1" variant="h5">Update Payment</Typography>
+
                             <Box noValidate sx={{ mt: 3 }}>
+                                <div className="row my-2">
+                                    <Box className="col-12">
+                                        <div className="clearfix">
+                                            <div className="float-start">
+                                                Trans. No: <b>{selectedRow.TransactionName}</b>
+                                            </div>
+                                            <div className="float-end">
+                                                Unpaid(RM): <b className="text-danger" style={{ fontSize: '14pt', marginRight: 15 }}>{selectedRow.OrderTotalAmount}</b>
+                                                Paid(RM): <b className="text-success" style={{ fontSize: '14pt' }}>{selectedRow.OrderPaidAmount}</b>
+                                            </div>
+                                        </div>
+                                    </Box>
+                                    <hr />
+                                </div>
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={12}>
                                         <label className="my-auto col-3">Payment Method:</label>
@@ -334,7 +396,6 @@ class TransactionHistory extends Component {
                                             label="Search By"
                                             onChange={this.handleSearchCategory}
                                             size="large"
-                                            IconComponent={FilterListOutlinedIcon}
                                             className="col-9"
                                             placeholder="filter by"
                                         >
@@ -352,8 +413,10 @@ class TransactionHistory extends Component {
                                             fullWidth
                                             onChange={(e) => this.handleInputChange(e)}
                                             id="payment"
-                                            label="Pay ammount"
+                                            label="Pay Ammount"
                                             autoFocus
+                                            error={this.state.isPayAmountValid}
+                                            helperText={this.state.isPayAmountValid ? "Invalid ammount" : ""}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -361,6 +424,7 @@ class TransactionHistory extends Component {
                                             // rangePicker
                                             openTo="day"
                                             title="Date"
+                                            required
                                             value={this.state.Datetime ? this.state.Datetime : ""}
                                             onChange={(e) => this.onDateChange(e)}
                                             variant="outlined"
@@ -371,10 +435,12 @@ class TransactionHistory extends Component {
                                             required
                                             fullWidth
                                             name="reference"
-                                            label="reference"
+                                            label="Reference"
                                             id="reference"
                                             onChange={(e) => this.handleInputChange(e)}
                                             autoComplete="reference"
+                                            error={this.state.isReferenceValid}
+                                            helperText={this.state.isReferenceValid ? "Invalid reference" : ""}
                                         />
                                     </Grid>
                                     {/*<Grid item xs={12}>
@@ -393,7 +459,8 @@ class TransactionHistory extends Component {
                                     fullWidth
                                     variant="contained"
                                     sx={{ mt: 3, mb: 2 }}
-                                    onClick={(e) => { this.onUpdateTransactionPayment(e, this.state.selectedRow) }}
+                                    onClick={() => this.onUpdateTransactionPayment()}
+                                    disabled={this.state.Payment == "" || this.state.ReferenceNo == ""}
                                 >
                                     Update Payment
                                 </Button>

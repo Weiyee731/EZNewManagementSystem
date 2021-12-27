@@ -22,7 +22,7 @@ import MenuItem from '@mui/material/MenuItem';
 import SearchBar from "../../components/SearchBar/SearchBar"
 import AlertDialog from "../../components/modal/Modal";
 import { ModalPopOut } from "../../components/modal/Modal";
-import { toast } from "react-toastify";
+import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
 import CsvDownloader from 'react-csv-downloader';
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
@@ -49,8 +49,8 @@ const style = {
 function mapStateToProps(state) {
     return {
         user: state.counterReducer["user"],
-        registrationReturn: state.counterReducer["registrationReturn"],
         userAreaCode: state.counterReducer["userAreaCode"],
+        userManagementApproval: state.counterReducer["userManagementApproval"],
     };
 }
 
@@ -58,7 +58,9 @@ function mapDispatchToProps(dispatch) {
     return {
         CallUserProfile: () => dispatch(GitAction.CallUserProfile()),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
-        CallUserRegistration: (propData) => dispatch(GitAction.CallUserRegistration(propData))
+        CallUserRegistration: (propData) => dispatch(GitAction.CallUserRegistration(propData)),
+        CallInsertUserDataByPost: (propData) => dispatch(GitAction.CallInsertUserDataByPost(propData)),
+        CallResetUserApprovalReturn: () => dispatch(GitAction.CallResetUserApprovalReturn()),
     };
 }
 
@@ -102,17 +104,30 @@ class UserManagement extends Component {
             UserListing: [],
             selectedRows: [],
             UserListingfiltered: [],
-            name: "",
-            username: "",
-            password: "",
-            areaId: 0,
-            code: "",
-            email: "",
-            contact: "",
-            address: "",
-            lat: 0.00,
-            long: 0.00,
             addWithCSVModalOpen: false,
+
+            //form data
+            userCode: "",
+            userCodeValidated: null,
+            userAreaId: 1,
+            userAreaIdValidated: true,
+            userFullname: "",
+            userFullnameValidated: null,
+            userContact: "",
+            userEmail: "",
+            userAddress: "",
+            userMinSelfPickup: "",
+            userMinSelfPickupValidated: null,
+            userCubicSelfPickup: "",
+            userCubicSelfPickupValidated: null,
+            userConslidate: "",
+            userConslidateValidated: null,
+            userDeliveryCargo: "",
+            userDeliveryCargoValidated: null,
+            userDeliveryOn1stKG: "",
+            userDeliveryOn1stKGValidated: null,
+            userDeliveryOnSubKG: "",
+            userDeliveryOnSubKGValidated: null,
 
             // dropzone
             DataHeaders: [],
@@ -157,12 +172,51 @@ class UserManagement extends Component {
             }
         }
 
-        if (prevProps.registrationReturn !== this.props.registrationReturn) {
-            if (this.props.registrationReturn[0].ReturnVal == 1) {
-                this.onAddButtonClick()
-                alert(`${this.props.registrationReturn[0].ReturnMsg}`)
-                toast.success(`${this.props.registrationReturn[0].ReturnMsg}`)
+        if (isArrayNotEmpty(this.props.userManagementApproval)) {
+            if (this.props.userManagementApproval[0].ReturnVal == 1) {
+                this.props.CallResetUserApprovalReturn()
+                toast.success("Data is uploaded successfully", { autoClose: 3000, position: "top-center", transition: Flip, theme: "dark" })
+                this.props.CallUserProfile();
+                this.props.CallUserAreaCode();
+                this.setState({
+                    // csv form
+                    DataHeaders: [],
+                    DataRows: [],
+                    loadingData: false,
+                    isSubmit: false,
+                    errorReportData: [],
+                    openErrorReport: false,
+                    addWithCSVModalOpen: false,
+
+                    // add new user form
+                    userCode: "",
+                    userCodeValidated: null,
+                    userAreaId: 1,
+                    userAreaIdValidated: true,
+                    userFullname: "",
+                    userFullnameValidated: null,
+                    userContact: "",
+                    userEmail: "",
+                    userAddress: "",
+                    userMinSelfPickup: "",
+                    userMinSelfPickupValidated: null,
+                    userCubicSelfPickup: "",
+                    userCubicSelfPickupValidated: null,
+                    userConslidate: "",
+                    userConslidateValidated: null,
+                    userDeliveryCargo: "",
+                    userDeliveryCargoValidated: null,
+                    userDeliveryOn1stKG: "",
+                    userDeliveryOn1stKGValidated: null,
+                    userDeliveryOnSubKG: "",
+                    userDeliveryOnSubKGValidated: null,
+                    AddModalOpen: false,
+                })
             }
+            else {
+                toast.error("Error occured while registering new user. Please try again or contact our developer.", { autoClose: 2000, theme: "colored" })
+            }
+
         }
     }
 
@@ -202,7 +256,7 @@ class UserManagement extends Component {
     }
 
     onAddButtonClick = () => {
-        this.setState({ AddModalOpen: !this.state.AddModalOpen });
+        this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen });
     }
 
     onDeleteButtonClick = () => {
@@ -211,68 +265,147 @@ class UserManagement extends Component {
     }
 
     onTextFieldOnChange = (e) => {
-        switch (e.target.name) {
-            case "name":
+        const { name, value } = e.target
+        switch (name) {
+            case "usercode":
                 this.setState({
-                    name: e.target.value
+                    userCode: value,
+                    userCodeValidated: !isStringNullOrEmpty(value)
                 })
                 break;
-
-            case "code":
-                this.setState({
-                    code: e.target.value
-                })
-                break;
-
-            case "username":
-                this.setState({
-                    username: e.target.value
-                })
-                break;
-
-            case "password":
-                this.setState({
-                    password: e.target.value
-                })
-                break;
-
-            case "email":
-                this.setState({
-                    email: e.target.value
-                })
-                break;
-
-            case "contact":
-                this.setState({
-                    contact: e.target.value
-                })
-                break;
-
             case "areaCode":
                 this.setState({
-                    areaId: e.target.value
+                    userAreaId: value,
+                    userAreaIdValidated: !isStringNullOrEmpty(value)
                 })
                 break;
-
-            case "address":
+            case "Fullname":
                 this.setState({
-                    address: e.target.value
+                    userFullname: value,
+                    userFullnameValidated: !isStringNullOrEmpty(value)
                 })
                 break;
-
+            case "Contact":
+                this.setState({
+                    userContact: value,
+                })
+                break;
+            case "Email":
+                this.setState({
+                    userEmail: value,
+                })
+                break;
+            case "Address":
+                this.setState({
+                    userAddress: value,
+                })
+                break;
+            case "MinSelfPickup":
+                this.setState({
+                    userMinSelfPickup: value,
+                    userMinSelfPickupValidated: !isStringNullOrEmpty(value)
+                })
+                break;
+            case "CubicSelfPickup":
+                this.setState({
+                    userCubicSelfPickup: value,
+                    userCubicSelfPickupValidated: !isStringNullOrEmpty(value)
+                })
+                break;
+            case "Conslidate":
+                this.setState({
+                    userConslidate: value,
+                    userConslidateValidated: !isStringNullOrEmpty(value)
+                })
+                break;
+            case "DeliveryCargo":
+                this.setState({
+                    userDeliveryCargo: value,
+                    userDeliveryCargoValidated: !isStringNullOrEmpty(value)
+                })
+                break;
+            case "DeliveryOn1stKG":
+                this.setState({
+                    userDeliveryOn1stKG: value,
+                    userDeliveryOn1stKGValidated: !isStringNullOrEmpty(value)
+                })
+                break;
+            case "DeliveryOnSubKG":
+                this.setState({
+                    userDeliveryOnSubKG: value,
+                    userDeliveryOnSubKGValidated: !isStringNullOrEmpty(value)
+                })
+                break;
             default:
                 break;
         }
     }
 
     onSubmitNewUser = () => {
-        this.props.CallUserRegistration(this.state)
+        const { userAreaCode }= this.props
+        const {
+            userCode,
+            userCodeValidated,
+            userAreaId,
+            userAreaIdValidated,
+            userFullname,
+            userFullnameValidated,
+            userContact,
+            userEmail,
+            userAddress,
+            userMinSelfPickup,
+            userMinSelfPickupValidated,
+            userCubicSelfPickup,
+            userCubicSelfPickupValidated,
+            userConslidate,
+            userConslidateValidated,
+            userDeliveryCargo,
+            userDeliveryCargoValidated,
+            userDeliveryOn1stKG,
+            userDeliveryOn1stKGValidated,
+            userDeliveryOnSubKG,
+            userDeliveryOnSubKGValidated,
+        } = this.state
+
+        let selectedAreaCode = userAreaCode.filter(x => x.UserAreaID === userAreaId)
+        let object = {
+            USERCODE: userCode,
+            AREACODE: (selectedAreaCode.length > 0 ) ? selectedAreaCode[0].UserAreaID : "1",
+            FULLNAME: userFullname,
+            USERCONTACTNO: userContact,
+            USEREMAILADDRESS: userEmail,
+            USERADDRESS: userAddress,
+            MINSELFPICKUPPRICE: userMinSelfPickup,
+            CUBICSELFPICKUPPRICE: userCubicSelfPickup,
+            CONSOLIDATEPRICE: userConslidate,
+            DELIVERYCARGO: userDeliveryCargo,
+            DELIVERYFIRSTPRICE: userDeliveryOn1stKG,
+            DELIVERYSUBPRICE: userDeliveryOnSubKG,
+        }
+
+        const isValidated = (
+            userCodeValidated &&
+            userAreaIdValidated &&
+            userFullnameValidated &&
+            userMinSelfPickupValidated &&
+            userCubicSelfPickupValidated &&
+            userConslidateValidated &&
+            userDeliveryCargoValidated &&
+            userDeliveryOn1stKGValidated &&
+            userDeliveryOnSubKGValidated
+        )
+        console.log(isValidated)
+
+        if (isValidated) {
+            this.props.CallInsertUserDataByPost(object)
+        }
+        else
+            toast.error("Some of the field is invalid. Please check and resubmit again.", { autoClose: 3000, position: "top-center", theme: 'colored' })
+        // this.props.CallInsertUserDataByPost(object)
     }
 
     onSelectItem = (item) => {
-        this.setState({
-            selectedRows: item
-        })
+        this.setState({ selectedRows: item })
     }
 
     renderTableActionButton = () => {
@@ -349,8 +482,6 @@ class UserManagement extends Component {
                     isStringNullOrEmpty(row["UserCode"]) ||
                     isStringNullOrEmpty(row["UserAreaID"]) ||
                     isStringNullOrEmpty(row["Fullname"]) ||
-                    isStringNullOrEmpty(row["UserContactNo"]) ||
-                    isStringNullOrEmpty(row["UserAddress"]) ||
                     isStringNullOrEmpty(row["Min Self Pick Up"]) ||
                     isStringNullOrEmpty(row["Cubic Self Pick Up"]) ||
                     isStringNullOrEmpty(row["Consolidate"]) ||
@@ -369,7 +500,7 @@ class UserManagement extends Component {
     }
 
     onViewErrorReport() {
-        this.setState({ errorReportData: this.state.DataRows.filter(x => x.isInvalid === true), openErrorReport: !this.state.openErrorReport })
+        this.setState({ errorReportData: this.state.DataRows.filter(x => x.isInvalid === true), openErrorReport: this.state.user !== null && !this.state.openErrorReport })
     }
 
     renderDropzoneTableHeaders = () => {
@@ -407,16 +538,10 @@ class UserManagement extends Component {
         if (isArrayNotEmpty(DataRows)) {
             let UserCode = ""
             let UserAreaCode = ""
-            let Username = ""
             let Fullname = ""
-            let UserTypeID = ""
             let UserContactNo = ""
             let UserEmailAddress = ""
             let UserAddress = ""
-            let UserDescription = ""
-            let UserStatus = ""
-            let UserLat = ""
-            let Userlong = ""
             let MinSelfPickup = ""
             let CubicSelfPickup = ""
             let Conslidate = ""
@@ -427,16 +552,10 @@ class UserManagement extends Component {
             for (let index = 0; index < DataRows.length; index++) {
                 UserCode += (isStringNullOrEmpty(DataRows[index]["UserCode"])) ? "-" : DataRows[index]["UserCode"].trim();
                 UserAreaCode += (isStringNullOrEmpty(DataRows[index]["UserAreaID"])) ? "-" : DataRows[index]["UserAreaID"].trim();
-                Username += (isStringNullOrEmpty(DataRows[index]["Username"])) ? "-" : DataRows[index]["Username"];
                 Fullname += (isStringNullOrEmpty(DataRows[index]["Fullname"])) ? "-" : DataRows[index]["Fullname"];
-                UserTypeID += (isStringNullOrEmpty(DataRows[index]["UserTypeID"])) ? "0" : DataRows[index]["UserTypeID"];
-                UserContactNo += (isStringNullOrEmpty(DataRows[index]["UserContactNo"])) ? "-" : DataRows[index]["UserContactNo"];
+                UserContactNo += (isStringNullOrEmpty(DataRows[index]["UserContactNo"])) ? "-" : DataRows[index]["UserContactNo"].toString();
                 UserEmailAddress += (isStringNullOrEmpty(DataRows[index]["UserEmailAddress"])) ? "-" : DataRows[index]["UserEmailAddress"].trim();
                 UserAddress += (isStringNullOrEmpty(DataRows[index]["UserAddress"])) ? "-" : DataRows[index]["UserAddress"].trim();
-                UserDescription += (isStringNullOrEmpty(DataRows[index]["UserDescription"])) ? "-" : DataRows[index]["UserDescription"].trim();
-                UserStatus += (isStringNullOrEmpty(DataRows[index]["UserStatus"])) ? "Pending" : DataRows[index]["UserStatus"].trim();
-                UserLat += (isStringNullOrEmpty(DataRows[index]["UserLat"])) ? "1.5535" : DataRows[index]["UserLat"].trim();
-                Userlong += (isStringNullOrEmpty(DataRows[index]["Userlong"])) ? "110.3593" : DataRows[index]["Userlong"].trim();
                 MinSelfPickup += (isStringNullOrEmpty(DataRows[index]["MinSelfPickup"])) ? "0" : DataRows[index]["MinSelfPickup"];
                 CubicSelfPickup += (isStringNullOrEmpty(DataRows[index]["CubicSelfPickup"])) ? "0" : DataRows[index]["CubicSelfPickup"];
                 Conslidate += (isStringNullOrEmpty(DataRows[index]["Conslidate"])) ? "0" : DataRows[index]["Conslidate"];
@@ -445,51 +564,40 @@ class UserManagement extends Component {
                 DeliveryOnSubKG += (isStringNullOrEmpty(DataRows[index]["Delivery SubKg"])) ? "0" : DataRows[index]["Delivery SubKg"];
 
                 if (index !== DataRows.length - 1) {
-                    UserCode += ","
-                    UserAreaCode += ","
-                    Username += ","
-                    Fullname += ","
-                    UserTypeID += ","
-                    UserContactNo += ","
-                    UserEmailAddress += ","
-                    UserAddress += ","
-                    UserDescription += ","
-                    UserStatus += ","
-                    UserLat += ","
-                    Userlong += ","
-                    MinSelfPickup += ","
-                    CubicSelfPickup += ","
-                    Conslidate += ","
-                    DeliveryCargo += ","
-                    DeliveryOn1stKG += ","
-                    DeliveryOnSubKG += ","
+                    UserCode += ";"
+                    UserAreaCode += ";"
+                    Fullname += ";"
+                    UserContactNo += ";"
+                    UserEmailAddress += ";"
+                    UserAddress += ";"
+                    MinSelfPickup += ";"
+                    CubicSelfPickup += ";"
+                    Conslidate += ";"
+                    DeliveryCargo += ";"
+                    DeliveryOn1stKG += ";"
+                    DeliveryOnSubKG += ";"
                 }
             }
 
             let object = {
-                UserCode: UserCode,
-                UserAreaCode: UserAreaCode,
-                Username: Username,
-                Fullname: Fullname,
-                UserTypeID: UserTypeID,
-                UserContactNo: UserContactNo,
-                UserEmailAddress: UserEmailAddress,
-                UserAddress: UserAddress,
-                UserDescription: UserDescription,
-                UserStatus: UserStatus,
-                UserLat: UserLat,
-                Userlong: Userlong,
-                MinSelfPickup: MinSelfPickup,
-                CubicSelfPickup: CubicSelfPickup,
-                Conslidate: Conslidate,
-                DeliveryCargo: DeliveryCargo,
-                DeliveryOn1stKG: DeliveryOn1stKG,
-                DeliveryOnSubKG: DeliveryOnSubKG
+                USERCODE: UserCode,
+                AREACODE: UserAreaCode,
+                FULLNAME: Fullname,
+                USERCONTACTNO: UserContactNo,
+                USEREMAILADDRESS: UserEmailAddress,
+                USERADDRESS: UserAddress,
+                MINSELFPICKUPPRICE: MinSelfPickup,
+                CUBICSELFPICKUPPRICE: CubicSelfPickup,
+                CONSOLIDATEPRICE: Conslidate,
+                DELIVERYCARGO: DeliveryCargo,
+                DELIVERYFIRSTPRICE: DeliveryOn1stKG,
+                DELIVERYSUBPRICE: DeliveryOnSubKG,
             }
 
             toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
             this.setState({ isSubmit: true })
             console.log(object)
+            this.props.CallInsertUserDataByPost(object)
         }
         else {
             toast.error("Please attach a CSV file for submission.", { autoClose: 2000, position: "top-center", theme: "dark" })
@@ -497,7 +605,6 @@ class UserManagement extends Component {
     }
 
     // dropzone -- FINISH
-
     render() {
         // dropzone
         const { DataHeaders, DataRows, loadingData, isSubmit } = this.state
@@ -507,7 +614,12 @@ class UserManagement extends Component {
 
         const renderButtonOnTableTopRight = () => {
             return (
-                <div>
+                <div className="d-flex">
+                    <Tooltip title="Add New User">
+                        <IconButton size="medium" sx={{ border: "2px solid #0074ea", color: "#0074ea", marginRight: 1 }} onClick={() => this.setState({ AddModalOpen: true })}>
+                            <GroupAddIcon />
+                        </IconButton>
+                    </Tooltip>
                     <Tooltip title="Add new user via csv">
                         <IconButton size="medium" sx={{ border: "2px solid #818181", color: "#797979" }} onClick={() => this.setState({ addWithCSVModalOpen: true })}>
                             <UploadFileIcon />
@@ -574,103 +686,47 @@ class UserManagement extends Component {
                 <div>
                     <AlertDialog
                         open={this.state.AddModalOpen}              // required, pass the boolean whether modal is open or close
-                        handleToggleDialog={this.onAddButtonClick}  // required, pass the toggle function of modal
-                        handleConfirmFunc={this.onSubmitNewUser}   // required, pass the confirm function 
+                        handleToggleDialog={() => this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen })}  // required, pass the toggle function of modal
+                        handleConfirmFunc={this.onSubmitNewUser}    // required, pass the confirm function 
                         showAction={true}                           // required, to show the footer of modal display
                         title={"Add new user"}                      // required, title of the modal
                         buttonTitle={"Add"}                         // required, title of button
                         singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
+                        maxWidth={"md"}
                     >
                         <Box component="form" noValidate sx={{ mt: 3 }}>
                             <Grid container spacing={2}>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        autoComplete="given-name"
-                                        name="name"
-                                        required
-                                        fullWidth
-                                        id="name"
-                                        label="Full Name"
-                                        autoFocus
-                                        onChange={this.onTextFieldOnChange}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
+                                <Grid item xs={12} md={6}>
                                     <TextField
                                         required
                                         fullWidth
-                                        id="code"
+                                        id="usercode"
                                         label="User Code"
-                                        name="code"
-                                        autoComplete="family-name"
+                                        name="usercode"
                                         onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userCode}
+                                        error={this.state.userCodeValidated !== null && !this.state.userCodeValidated}
+                                        helperText={this.state.userCodeValidated !== null && !this.state.userCodeValidated ? "Required" : ""}
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        id="username"
-                                        label="Username"
-                                        name="username"
-                                        type={'text'}
-                                        onChange={this.onTextFieldOnChange}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        id="password"
-                                        label="Password"
-                                        name="password"
-                                        type={'password'}
-                                        onChange={this.onTextFieldOnChange}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        id="email"
-                                        label="Email Address"
-                                        name="email"
-                                        autoComplete="email"
-                                        onChange={this.onTextFieldOnChange}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        name="contact"
-                                        label="Contact"
-                                        id="contact"
-                                        autoComplete="contact"
-                                        onChange={this.onTextFieldOnChange}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} md={6}>
                                     <FormControl fullWidth>
                                         <InputLabel id="areaCode">Area Code</InputLabel>
                                         <Select
                                             id="areaCode"
-                                            value={this.state.areaId}
+                                            value={this.state.userAreaId}
                                             label="Area Code"
                                             name="areaCode"
                                             required
                                             placeholder="Select an area code"
                                             onChange={this.onTextFieldOnChange}
+                                            size="small"
                                         >
-                                            <MenuItem disabled value={0}>Select an area code</MenuItem>
-                                            {this.props.userAreaCode.length > 0 &&
-                                                this.props.userAreaCode.map((i, id) => {
+                                            {
+                                                this.props.userAreaCode.length > 0 && this.props.userAreaCode.map((i, id) => {
                                                     return (
-                                                        <MenuItem
-                                                            id="areaCode"
-                                                            key={id}
-                                                            value={i.UserAreaID}
-                                                        >
+                                                        <MenuItem key={id} value={i.UserAreaID} >
                                                             {i.AreaName} ({i.AreaCode})
                                                         </MenuItem>
                                                     )
@@ -679,15 +735,147 @@ class UserManagement extends Component {
                                         </Select>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} md={12}>
+                                    <TextField
+                                        name="Fullname"
+                                        required
+                                        fullWidth
+                                        id="Fullname"
+                                        label="Fullname"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userFullname}
+                                        error={this.state.userFullnameValidated !== null && !this.state.userFullnameValidated}
+                                        helperText={this.state.userFullnameValidated !== null && !this.state.userFullnameValidated ? "Required" : ""}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        name="Contact"
+                                        fullWidth
+                                        id="Contact"
+                                        label="Contact"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userContact}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
+                                        id="Email"
+                                        label="Email"
+                                        name="Email"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userEmail}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={12}>
+                                    <TextField
+                                        fullWidth
+                                        name="Address"
+                                        label="Address"
+                                        id="Address"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userAddress}
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
                                     <TextField
                                         required
                                         fullWidth
-                                        name="address"
-                                        label="Address"
-                                        id="address"
-                                        autoComplete="address"
+                                        type="number"
+                                        id="MinSelfPickup"
+                                        label="Min Self-Pickup"
+                                        name="MinSelfPickup"
+                                        variant="standard"
                                         onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userMinSelfPickup}
+                                        error={this.state.userMinSelfPickupValidated !== null && !this.state.userMinSelfPickupValidated}
+                                        helperText={this.state.userMinSelfPickupValidated !== null && !this.state.userMinSelfPickupValidated ? "Required" : ""}
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        name="CubicSelfPickup"
+                                        label="Cubic Self-Pickup"
+                                        id="CubicSelfPickup"
+                                        variant="standard"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userCubicSelfPickup}
+                                        error={this.state.userCubicSelfPickupValidated !== null && !this.state.userCubicSelfPickupValidated}
+                                        helperText={this.state.userCubicSelfPickupValidated !== null && !this.state.userCubicSelfPickupValidated ? "Required" : ""}
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        name="Conslidate"
+                                        label="Conslidate"
+                                        id="Conslidate"
+                                        variant="standard"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userConslidate}
+                                        error={this.state.userConslidateValidated !== null && !this.state.userConslidateValidated}
+                                        helperText={this.state.userConslidateValidated !== null && !this.state.userConslidateValidated ? "Required" : ""}
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="DeliveryCargo"
+                                        label="Delivery Cargo"
+                                        name="DeliveryCargo"
+                                        variant="standard"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userDeliveryCargo}
+                                        error={this.state.userDeliveryCargoValidated !== null && !this.state.userDeliveryCargoValidated}
+                                        helperText={this.state.userDeliveryCargoValidated !== null && !this.state.userDeliveryCargoValidated ? "Required" : "Delivery Cargo"}
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="DeliveryOn1stKG"
+                                        label="Delivery On 1st KG"
+                                        name="DeliveryOn1stKG"
+                                        variant="standard"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userDeliveryOn1stKG}
+                                        error={this.state.userDeliveryOn1stKGValidated !== null && !this.state.userDeliveryOn1stKGValidated}
+                                        helperText={this.state.userDeliveryOn1stKGValidated !== null && !this.state.userDeliveryOn1stKGValidated ? "Required" : "Delivery On 1st KG"}
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        name="DeliveryOnSubKG"
+                                        label="Delivery On Sub KG"
+                                        id="DeliveryOnSubKG"
+                                        variant="standard"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userDeliveryOnSubKG}
+                                        error={this.state.userDeliveryOnSubKGValidated !== null && !this.state.userDeliveryOnSubKGValidated}
+                                        helperText={this.state.userDeliveryOnSubKGValidated !== null && !this.state.userDeliveryOnSubKGValidated ? "Required" : "Delivery On Sub KG"}
                                     />
                                 </Grid>
                             </Grid>

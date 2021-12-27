@@ -6,7 +6,6 @@ import { gitEpic } from "./epic/gitEpic"; //epics
 const rootEpic = combineEpics(
   gitEpic.User_Login,
   gitEpic.User_Logout,
-  gitEpic.User_Register,
   gitEpic.User_Profile,
   gitEpic.User_ProfileByID,
   gitEpic.User_ViewAreaCode,
@@ -29,6 +28,8 @@ const rootEpic = combineEpics(
   gitEpic.Inventory_ViewStockListByDate,
   gitEpic.Inventory_ViewArchiveStockListByDate,
   gitEpic.Transaction_ViewArchiveTransaction,
+  gitEpic.User_RegisterUsersByPost,
+  gitEpic.User_UpdateUserProfile,
 );
 
 const rootReducer = combineReducers({ counterReducer });

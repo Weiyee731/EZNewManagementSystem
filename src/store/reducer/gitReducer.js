@@ -5,7 +5,6 @@ const INITIAL_STATE = {
   logonUser: [],
   user: [],
   userProfile: [],
-  registrationReturn: [],
   userAreaCode: [],
   sidebars: [],
   stocks: [],
@@ -17,6 +16,7 @@ const INITIAL_STATE = {
   transactionReturn: [],
   dashboard: [],
   archivedData: [],
+  userManagementApproval: [],
 };
 
 export function counterReducer(state = INITIAL_STATE, action) {
@@ -38,16 +38,6 @@ export function counterReducer(state = INITIAL_STATE, action) {
         loading: false,
         logonUser: action.payload
       });
-
-    case GitAction.RegisterUser:
-      return Object.assign({}, state, { loading: true });
-    case GitAction.UserRegistered:
-      return Object.assign({}, state, {
-        loading: false,
-        registrationReturn: action.payload
-      });
-    case GitAction.ResetRegistrationReturn:
-      return Object.assign({}, state, { registrationReturn: [] });
 
     case GitAction.GetUserProfile:
       return Object.assign({}, state, { loading: true });
@@ -199,7 +189,8 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, { loading: true });
     case GitAction.UpdatedTransactionPayment:
       return Object.assign({}, state, {
-        loading: false
+        loading: false,
+        transactionReturn: action.payload
       });
     case GitAction.ResetTransactionReturn:
       return Object.assign({}, state, { transactionReturn: [] });
@@ -248,6 +239,29 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, {
         loading: false,
         archivedData: []
+      });
+
+    /////////////////////////////////////////////////// User Management ///////////////////////////////////////////////////
+    case GitAction.InsertUserDataByPost:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.InsertedUserDataByPost:
+      return Object.assign({}, state, {
+        loading: false,
+        userManagementApproval: action.payload
+      });
+
+    case GitAction.UpdateUserData:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.UserDataUpdated:
+      return Object.assign({}, state, {
+        loading: false,
+        userManagementApproval: action.payload
+      });
+
+    case GitAction.ResetUserApprovalReturn:
+      return Object.assign({}, state, {
+        loading: false,
+        userManagementApproval: []
       });
 
     /////////////////////////////////////////////////// Default ///////////////////////////////////////////////////

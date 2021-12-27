@@ -571,8 +571,7 @@ class OverallStock extends Component {
 
     onSearch(keywords, area) {
         const { filteredList, searchKeywords, searchCategory, searchArea, searchDates, isDataFetching } = this.state
-        const { archivedData } = this.props.stocks
-        console.log(archivedData)
+        const { stocks } = this.props
         let searchKeys = ((!isStringNullOrEmpty(keywords))) ? keywords : searchKeywords
         searchKeys = (!isStringNullOrEmpty(searchKeys)) ? searchKeys.toUpperCase() : searchKeys
 
@@ -589,27 +588,30 @@ class OverallStock extends Component {
             let tempList;
             if (!isStringNullOrEmpty(searchKeys)) {
                 // if search keywords is exists
-                if (isArrayNotEmpty(archivedData)) {
+                if (isArrayNotEmpty(stocks)) {
+
                     if (areaSearchKeys !== "All" && searchCategory === "All") {
                         console.log(areaSearchKeys)
 
                         // if area is not empty
-                        tempList = archivedData.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) && (x.TrackingNumber.includes(searchKeys) || x.UserCode.includes(searchKeys)))
+                        tempList = stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) && (x.TrackingNumber.includes(searchKeys) || x.UserCode.includes(searchKeys)))
                     }
                     else if (areaSearchKeys === "All" && searchCategory !== "All") {
+
                         // if category is not empty
-                        tempList = this.onCategoryFilter(archivedData, searchCategory, searchKeys)
+                        tempList = this.onCategoryFilter(stocks, searchCategory, searchKeys)
                     }
                     else if (areaSearchKeys !== "All" && searchCategory !== "All") {
+
                         console.log(areaSearchKeys)
                         // if area and category is in the list of filtering options
-                        tempList = this.onCategoryAndAreaFilter(archivedData, searchCategory, areaSearchKeys, searchKeys)
+                        tempList = this.onCategoryAndAreaFilter(stocks, searchCategory, areaSearchKeys, searchKeys)
                     }
                     else {
                         console.log(areaSearchKeys)
 
                         // if want to search with all options
-                        tempList = archivedData.filter(x =>
+                        tempList = stocks.filter(x =>
                             (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
                             (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) ||
                             (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
@@ -622,16 +624,16 @@ class OverallStock extends Component {
             else {
                 if (searchCategory === "All" && areaSearchKeys !== "All") {
                     // if area is not empty but search string is empty
-                    this.setState({ searchCategory: "All", searchDates: [], filteredList: archivedData.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) })
+                    this.setState({ searchCategory: "All", searchDates: [], filteredList: stocks.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) })
                 }
                 else if (searchCategory !== "All" && areaSearchKeys === "All") {
                     // if category is not empty but search string is empty
                     // no point to search with category if there are no searching keywords
-                    this.setState({ areaSearchKeys: "All", searchDates: [], filteredList: archivedData })
+                    this.setState({ areaSearchKeys: "All", searchDates: [], filteredList: stocks })
                     toast.warning("Please enter searching keywords", { autoClose: 1500, position: "top-center", transition: Flip, theme: "dark" })
                 }
                 else {
-                    this.setState({ searchCategory: "All", areaSearchKeys: "All", searchDates: [], filteredList: archivedData })
+                    this.setState({ searchCategory: "All", areaSearchKeys: "All", searchDates: [], filteredList: stocks })
                     toast.warning("Please enter searching keywords", { autoClose: 1500, position: "top-center", transition: Flip, theme: "dark" })
                 }
             }

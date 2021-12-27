@@ -14,7 +14,7 @@ import Statements from "../../../pages/Statements/Statements";
 import TransactionHistory from "../../../pages/Statements/TransactionHistory";
 import TransactionHistoryDetail from "../../../pages/Statements/TransactionHistoryDetail";
 import UserDetail from "../../../pages/UserManagement/UserDetail"
-import AddUser from "../../../pages/UserManagement/AddUser";
+// import AddUser from "../../../pages/UserManagement/AddUser";
 import EditStockGoods from "../../../pages/Stock/StockGoods/EditStockGoods";
 import ProformaList from "../../../pages/Reporting/Invoice/ProformaList";
 import ArchivedStock from "../../../pages/ArchivedData/ArchivedStock/ArchivedStock.jsx";
@@ -111,11 +111,11 @@ const routes = [
         exact: true,
         element: <UserDetail />,
     },
-    {
-        path: "/AddUser",
-        exact: true,
-        element: <AddUser />,
-    },
+    // {
+    //     path: "/AddUser",
+    //     exact: true,
+    //     element: <AddUser />,
+    // },
     {
         path: "/ProformaList",
         exact: true,
