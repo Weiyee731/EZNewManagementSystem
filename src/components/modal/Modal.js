@@ -101,11 +101,12 @@ export function ModalPopOut(props) {
           props.handleToggleDialog()
         }
       }}
+      maxWidth="xl"
       open={props.open}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       PaperComponent={props.fullScreen ? null : PaperComponent}
-      style={{zIndex: (props.fullScreen ? 1350 : 1300 )}}
+      style={{ zIndex: (props.fullScreen ? 1350 : 1300) }}
     >
       {
         props.fullScreen &&
@@ -132,7 +133,7 @@ export function ModalPopOut(props) {
         {/* </DialogContentText> */}
       </DialogContent>
       <DialogActions>
-        {props.showCancel?  <Button onClick={() => props.handleToggleDialog()}>Cancel</Button>:""}
+        {props.showCancel ? <Button onClick={() => props.handleToggleDialog()}>Cancel</Button> : ""}
         <Button onClick={() => props.handleConfirmFunc()} variant='contained'>
           Confirm
         </Button>

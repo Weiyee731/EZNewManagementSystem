@@ -140,13 +140,13 @@ const headCells = [
         disablePadding: false,
         label: 'Remarks',
     },
-    {
-        id: 'Approve',
-        numeric: true,
-        disablePadding: false,
-        label: 'Approve',
-        className: "sticky"
-    },
+    // {
+    //     id: 'Approve',
+    //     numeric: true,
+    //     disablePadding: false,
+    //     label: 'Approve',
+    //     className: "sticky"
+    // },
 ];
 
 const INITIAL_STATE = {
@@ -212,7 +212,7 @@ class StockGoods extends Component {
             } else { console.log(("no")) }
         } else { console.log(("no")) }
 
-        if (!isArrayNotEmpty(this.state.stockFiltered === null) && isArrayNotEmpty(this.props.Stocks)) {
+        if (!isArrayNotEmpty(this.state.stockFiltered) && isArrayNotEmpty(this.props.Stocks)) {
             const { Stocks } = this.props
             this.setState({
                 stockFiltered: (isStringNullOrEmpty(Stocks.ReturnVal) && Stocks.ReturnVal === 0) ? [] : Stocks
@@ -330,8 +330,11 @@ class StockGoods extends Component {
     }
 
     renderTableRows(data, index) {
+
         const fontsize = '9pt'
-        var dimension = data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight;
+        var dimension = data.ProductDimensionDeep && data.ProductDimensionWidth && data.ProductDimensionHeight ?
+            data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight : "";
+
         const renderAdditionalCost = (charges) => {
             let renderStrings = ""
             try {
@@ -347,15 +350,15 @@ class StockGoods extends Component {
         return (
             <>
                 {/* <TableCell
-                    component="th"
-                    id={`enhanced-table-checkbox-${index}`}
-                    scope="row"
-                    padding="normal"
-                    sx={{ fontSize: fontsize }}
-                >
-                    {data.Courier}
-                </TableCell> */}
-                <TableCell sx={{ fontSize: fontsize }}>{data.TrackingNumber}</TableCell>
+                //     component="th"
+                //     id={`enhanced-table-checkbox-${index}`}
+                //     scope="row"
+                //     padding="normal"
+                //     sx={{ fontSize: fontsize }}
+                // >
+                //     {data.Courier}
+                // </TableCell> */}
+                < TableCell sx={{ fontSize: fontsize }}> {data.TrackingNumber}</ TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.ProductWeight}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth}</TableCell>
@@ -363,17 +366,18 @@ class StockGoods extends Component {
                 <TableCell sx={{ fontSize: fontsize }}>{dimension}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
-                <TableCell sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>
+                <TableCell sx={{ fontSize: fontsize }}>{data.AreaCode && data.AreaName ? data.AreaCode + " - " + data.AreaName : ""}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.PackagingDate}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>
                 <TableCell sx={{ fontSize: fontsize }}>{data.ContainerName}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isStringNullOrEmpty(data.AdditionalCharges) && renderAdditionalCost(data.AdditionalCharges)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Remark}</TableCell>
-                <TableCell className="sticky" key={data.Tracking_No} sx={{ fontSize: fontsize }}>
-                    <Tooltip title="Approve">
-                        <IconButton style={{ backgroundColor: "#f2f2f3 " }}><CheckIcon /></IconButton>
-                    </Tooltip>
-                </TableCell>
+                {/* <TableCell className="sticky" key={data.Tracking_No} sx={{ fontSize: fontsize }}>
+                    //     <Tooltip title="Approve">
+                    //         <IconButton style={{ backgroundColor: "#f2f2f3 " }}><CheckIcon /></IconButton>
+                    //     </Tooltip>
+                    // </TableCell> */}
+
             </>
         )
     }
@@ -458,7 +462,6 @@ class StockGoods extends Component {
                 break;
 
             case "Unchecked":
-                console.log(this.state.stockFiltered)
                 this.props.CallResetStocks()
                 this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
                 const FilterArr = this.props.Stocks.filter((searchedItem) => searchedItem.TrackingStatusID === 1)
@@ -511,11 +514,10 @@ class StockGoods extends Component {
             // this.state.stockListing[0].ReturnVal !== undefined &&
             // this.state.stockListing[0].ReturnVal !== "0"
         ) {
-
-            const FilterArr = this.props.Stocks.filter((searchedItem) =>
+            const FilterArr = this.props.Stocks && this.props.Stocks[0].ReturnVal !== "0" ? this.props.Stocks.filter((searchedItem) =>
                 searchedItem.TrackingNumber.toLowerCase().includes(searchKeywords) ||
                 searchedItem.UserCode.includes(searchKeywords)
-            )
+            ) : toast.warning("No data is found")
 
             this.setState({ stockFiltered: FilterArr })
             if (FilterArr.length === 1 && FilterArr[0].TrackingNumber === e.target.value) {
@@ -592,24 +594,26 @@ class StockGoods extends Component {
                     handleToggleDialog={() => this.handleCancel("filter")}
                     handleConfirmFunc={() => this.handleSearchfilter("open")}
                     title={"Please select the container number and date desired"}
-                    message={<div className="row ">
-                        <div className="col-sm-6 col-12">
-                            <ResponsiveDatePickers title="Date" value={this.state.datevalue ? this.state.datevalue : ""} onChange={(e) => this.onDateChange(e)} />
+                    message={<div className="row " style={{ minWidth: "45vw" }}>
+                        <div className="col-xl-6 col-12">
+                            <ResponsiveDatePickers title="Stock In Date" value={this.state.datevalue ? this.state.datevalue : ""} onChange={(e) => this.onDateChange(e)} />
                         </div>
 
-                        <div className="col-sm-6 col-12">
+                        <div className="col-xl-6 col-12">
                             <Autocomplete
                                 key={options.ContainerID}
                                 options={options}
                                 noOptionsText="Enter to create a new option"
                                 getOptionLabel={(option) => option.ContainerName ? option.ContainerName : option.ReturnMsg}
                                 onInputChange={(e, newValue) => {
-                                    this.setState({ ContainerName: newValue });
+                                    if (newValue !== "Sorry, there is no datas found!")
+                                        this.setState({ ContainerName: newValue });
+                                    else toast.error("Please key in *NEW* container name")
                                 }}
                                 renderInput={(params, idx) => (
                                     <TextField
                                         {...params}
-                                        label="Select"
+                                        label="Stock in Container Name"
                                         variant="standard"
                                         key={idx}
                                         onKeyDown={(e) => {
@@ -620,7 +624,6 @@ class StockGoods extends Component {
                                                 &&
                                                 options.findIndex((o) => o.ContainerName === e.target.value) === -1
                                             ) {
-
                                                 this.setState({
                                                     options: this.state.options.concat({ ContainerName: e.target.value, ContainerDate: this.state.ContainerDate })
                                                 }, () => { console.log(this.state.options) })
