@@ -19,6 +19,8 @@ import ResponsiveDatePickers from '../../components/datePicker/datePicker';
 import TextField from '@mui/material/TextField';
 import FormHelperText from '@mui/material/FormHelperText';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import moment from 'moment';
+
 function mapStateToProps(state) {
     return {
         stockApproval: state.counterReducer["stockApproval"],
@@ -171,8 +173,8 @@ class DataManagement extends Component {
                 Item += (isStringNullOrEmpty(DataRows[index]["Item"])) ? "-" : DataRows[index]["Item"].trim();
                 Member += (isStringNullOrEmpty(DataRows[index]["Member"])) ? "-" : DataRows[index]["Member"].trim();
                 Division += (isStringNullOrEmpty(DataRows[index]["Division"])) ? "-" : DataRows[index]["Division"].trim();
-                StockDate += (isStringNullOrEmpty(DataRows[index]["Stock Date"])) ? "-" : convertDateTimeToString112Format(DataRows[index]["Stock Date"].trim(), true)
-                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : convertDateTimeToString112Format(DataRows[index]["Packaging Date"].trim(), true)
+                StockDate += (isStringNullOrEmpty(DataRows[index]["Stock Date"])) ? "-" : moment(DataRows[index]["Packaging Date"].trim(), 'DD/MM/YYYY HH:mm:ss', false).format('YYYY/MM/DD HH:mm:ss')
+                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : moment(DataRows[index]["Packaging Date"].trim(), 'DD/MM/YYYY HH:mm:ss', false).format('YYYY/MM/DD HH:mm:ss')
                 AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "-" : DataRows[index]["Additional Cost"].trim();
                 Remarks += (isStringNullOrEmpty(DataRows[index]["Remarks"])) ? "-" : DataRows[index]["Remarks"];
 
@@ -285,7 +287,6 @@ class DataManagement extends Component {
                                 <ResponsiveDatePickers variant="standard" title="Stock In Date" value={this.state.ContainerDate} onChange={(e) => this.onDateChange(e)} />
                                 {!this.state.ContainerDateValidated && <FormHelperText className='text-danger' >Invalid Date</FormHelperText>}
                             </div>
-                            <Button variant="standard" style={{ width: '200px', marginLeft: 5 }} onClick={() => this.props.history.push('/UserManagement') } startIcon={<GroupAddIcon />}>Add Member</Button>
                         </div>
                     </div>
                     <Dropzone
