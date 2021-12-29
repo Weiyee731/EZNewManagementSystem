@@ -141,6 +141,11 @@ const tncDiv = {
   fontSize: "11px",
 };
 
+const img = {
+  width: 'auto',
+  height: '150px',
+};
+
 class InvoiceDetail extends Component {
   constructor(props) {
     super(props);
@@ -232,7 +237,8 @@ class InvoiceDetail extends Component {
 
   goBack() {
     this.props.history.push({
-      pathname: '/CreateInvoice'})
+      pathname: '/CreateInvoice'
+    })
   }
 
   renderTableRows = (data, index) => {
@@ -429,7 +435,7 @@ class InvoiceDetail extends Component {
           <div className="invoice-footer">
             <hr />
             <div className="row">
-              <div style={tncDiv} className="col-7 mt-4">
+              <div style={tncDiv} className="col-5 mt-4">
                 <div style={tncTitle}>Terms and Conditions</div>
                 <br />
                 <div>
@@ -447,6 +453,10 @@ class InvoiceDetail extends Component {
                   </p>
                 </div>
               </div>
+              <div style={tncDiv} className="col-2 mt-4">
+                <div >Payment can be make through S Pay Global</div>
+                <img style={img} src="https://tourism.denoo.my/Ez/spay.jpeg"></img>
+              </div>
               <div style={tncDiv} className="col-4 offset-1">
                 Total Item :
                 <span style={total}>{TransactionDetail.length}</span>
@@ -458,15 +468,18 @@ class InvoiceDetail extends Component {
                 <span style={total}>{roundOffTotal(parseFloat(OrderTotalAmount) + parseFloat(DeliveryFee))}</span>
               </div>
             </div>
-            <div className="row mt-5 text-center">
-              <div style={tncDiv} className="col-4">
+            <div className="row mt-5 ">
+              <div style={tncDiv} className="col-5 mt-4">
                 __________________________________
                 <div className="text-center">
                   <div>EZ TRANSIT AND LOGISTICS</div>
                   <div>SDN BHD</div>
                 </div>
               </div>
-              <div style={{ textAlign: 'left', ...tncDiv }} className="col-4 offset-4">
+              <div style={tncDiv} className="col-2 mt-4">
+                
+              </div>
+              <div style={{ textAlign: 'left', ...tncDiv }} className="col-4 offset-1">
                 __________________________________
                 <div>Name  : </div>
                 <div>IC NO : </div>
