@@ -723,6 +723,7 @@ class StockGoods extends Component {
                             onSelectRow={this.onSelectRow}
                             onSelectAllClick={this.onSelectAllRow}
                             CallResetSelected={this.state.CallResetSelected}
+                            headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                         />
                     </div>
                 </div>

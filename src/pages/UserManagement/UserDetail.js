@@ -1149,6 +1149,7 @@ class UserDetail extends Component {
                     }}
                     selectedIndexKey={"PaymentID"}
                     Data={isArrayNotEmpty(this.state.Payment) ? this.state.Payment : []}
+                    headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                   />
                 </div>
               </div>
@@ -1178,6 +1179,7 @@ class UserDetail extends Component {
             }}
             selectedIndexKey={"pid"}
             Data={this.state.filteredList}
+            headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
           />
         </div>
         <div>

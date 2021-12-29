@@ -24,469 +24,466 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import AddIcon from "@mui/icons-material/Add";
-import SearchBar from "../SearchBar/SearchBar";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
 import {
-  isObjectUndefinedOrNull,
-  isArrayNotEmpty,
-  isStringNullOrEmpty,
-  round,
+    isObjectUndefinedOrNull,
+    isArrayNotEmpty,
+    isStringNullOrEmpty,
+    round,
 } from "../../tools/Helpers";
 
 function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) return -1;
-  if (b[orderBy] > a[orderBy]) return 1;
-  return 0;
+    if (b[orderBy] < a[orderBy]) return -1;
+    if (b[orderBy] > a[orderBy]) return 1;
+    return 0;
 }
 
 function getComparator(order, orderBy) {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+    return order === "desc"
+        ? (a, b) => descendingComparator(a, b, orderBy)
+        : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
 // This method is created for cross-browser compatibility, if you don't
 // need to support IE11, you can use Array.prototype.sort() directly
 function stableSort(array, comparator) {
-  if (isArrayNotEmpty(array)) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-      const order = comparator(a[0], b[0]);
-      if (order !== 0) {
-        return order;
-      }
-      return a[1] - b[1];
-    });
-    return stabilizedThis.map((el) => el[0]);
-  } else return [];
+    if (isArrayNotEmpty(array)) {
+        const stabilizedThis = array.map((el, index) => [el, index]);
+        stabilizedThis.sort((a, b) => {
+            const order = comparator(a[0], b[0]);
+            if (order !== 0) {
+                return order;
+            }
+            return a[1] - b[1];
+        });
+        return stabilizedThis.map((el) => el[0]);
+    } else return [];
 }
 
 function EnhancedTableHead(props) {
-  const {
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-    tableHeaders,
-    renderCheckbox,
-    checkboxColor,
-  } = props;
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
-  };
-  return (
-    <TableHead>
-      <TableRow>
-        {renderCheckbox === true && (
-          <TableCell padding="checkbox" sx={{ bgcolor: "rgb(200, 200, 200)" }}>
-            <Checkbox
-              color={checkboxColor}
-              indeterminate={numSelected > 0 && numSelected < rowCount}
-              checked={rowCount > 0 && numSelected === rowCount}
-              onChange={onSelectAllClick}
-              inputProps={{ "aria-label": "select all desserts" }}
-            />
-          </TableCell>
-        )}
-        {isArrayNotEmpty(tableHeaders) &&
-          tableHeaders.map((headCell) => (
-            <TableCell
-              key={headCell.id}
-              align={
-                isStringNullOrEmpty(headCell.align) ? "left" : headCell.align
-              }
-              padding={headCell.disablePadding ? "none" : "normal"}
-              // //cheetat
-              // className={headCell.className ? headCell.className : {}}
-              // //
-              sortDirection={orderBy === headCell.id ? order : false}
-              sx={{
-                fontWeight: "medium",
-                bgcolor: "rgb(200, 200, 200)",
-                fontSize: "10pt",
-              }} // change table header bg color
-            >
-              <TableSortLabel
-                className="fw-bold"
-                active={orderBy === headCell.id}
-                direction={orderBy === headCell.id ? order : "asc"}
-                onClick={createSortHandler(headCell.id)}
-              >
-                {headCell.label}
-                {orderBy === headCell.id ? (
-                  <Box component="span" sx={visuallyHidden}>
-                    {order === "desc"
-                      ? "sorted descending"
-                      : "sorted ascending"}
-                  </Box>
-                ) : null}
-              </TableSortLabel>
-            </TableCell>
-          ))}
-      </TableRow>
-    </TableHead>
-  );
+    const {
+        onSelectAllClick,
+        order,
+        orderBy,
+        numSelected,
+        rowCount,
+        onRequestSort,
+        tableHeaders,
+        renderCheckbox,
+        checkboxColor,
+    } = props;
+    const createSortHandler = (property) => (event) => {
+        onRequestSort(event, property);
+    };
+    return (
+        <TableHead>
+            <TableRow>
+                {renderCheckbox === true && (
+                    <TableCell padding="checkbox" sx={{ bgcolor: "rgb(200, 200, 200)" }}>
+                        <Checkbox
+                            color={checkboxColor}
+                            indeterminate={numSelected > 0 && numSelected < rowCount}
+                            checked={rowCount > 0 && numSelected === rowCount}
+                            onChange={onSelectAllClick}
+                            inputProps={{ "aria-label": "select all desserts" }}
+                        />
+                    </TableCell>
+                )}
+                {isArrayNotEmpty(tableHeaders) &&
+                    tableHeaders.map((headCell) => (
+                        <TableCell
+                            key={headCell.id}
+                            align={
+                                isStringNullOrEmpty(headCell.align) ? "left" : headCell.align
+                            }
+                            padding={headCell.disablePadding ? "none" : "normal"}
+                            // //cheetat
+                            // className={headCell.className ? headCell.className : {}}
+                            // //
+                            sortDirection={orderBy === headCell.id ? order : false}
+                            sx={{
+                                fontWeight: "medium",
+                                bgcolor: "rgb(200, 200, 200)",
+                                fontSize: "10pt",
+                            }} // change table header bg color
+                        >
+                            <TableSortLabel
+                                className="fw-bold"
+                                active={orderBy === headCell.id}
+                                direction={orderBy === headCell.id ? order : "asc"}
+                                onClick={createSortHandler(headCell.id)}
+                            >
+                                {headCell.label}
+                                {orderBy === headCell.id ? (
+                                    <Box component="span" sx={visuallyHidden}>
+                                        {order === "desc"
+                                            ? "sorted descending"
+                                            : "sorted ascending"}
+                                    </Box>
+                                ) : null}
+                            </TableSortLabel>
+                        </TableCell>
+                    ))}
+            </TableRow>
+        </TableHead>
+    );
 }
 
 EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-  onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
-  order: PropTypes.oneOf(["asc", "desc"]).isRequired,
-  orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
+    numSelected: PropTypes.number.isRequired,
+    onRequestSort: PropTypes.func.isRequired,
+    onSelectAllClick: PropTypes.func.isRequired,
+    order: PropTypes.oneOf(["asc", "desc"]).isRequired,
+    orderBy: PropTypes.string.isRequired,
+    rowCount: PropTypes.number.isRequired,
 };
 
 const EnhancedTableToolbar = (props) => {
-  const {
-    selectedRows,
-    tableTopLeft,
-    OnActionButtonClick,
-    tableTopRight,
-    actionIcon,
-    extraInfo,
-  } = props;
-  const numSelected = selectedRows.length;
-  let mCube = 0;
-  let weight = 0;
+    const {
+        selectedRows,
+        tableTopLeft,
+        OnActionButtonClick,
+        tableTopRight,
+        actionIcon,
+        extraInfo,
+    } = props;
+    const numSelected = selectedRows.length;
+    let mCube = 0;
+    let weight = 0;
 
-  if (extraInfo) {
-    selectedRows.map((item) => {
-      weight = weight + item.ProductWeight;
-      mCube =
-        mCube +
-        (item.ProductDimensionDeep *
-          item.ProductDimensionWidth *
-          item.ProductDimensionHeight) /
-          1000000;
-    });
-  }
+    if (extraInfo) {
+        selectedRows.map((item) => {
+            weight = weight + item.ProductWeight;
+            mCube =
+                mCube +
+                (item.ProductDimensionDeep *
+                    item.ProductDimensionWidth *
+                    item.ProductDimensionHeight) /
+                1000000;
+        });
+    }
 
-  return (
-    <Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(
-              theme.palette.primary.main,
-              theme.palette.action.activatedOpacity
-            ),
-        }),
-      }}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected{" "}
-          {extraInfo && ` | ${round(mCube, 3)} m3 | ${round(weight, 3)} kg`}
-        </Typography>
-      ) : (
-        <Typography sx={{ flex: "1 1 100%" }} id="tableTitle" component="div">
-          {tableTopLeft}
-        </Typography>
-      )}
-      {numSelected > 0 ? (
-        <div>{actionIcon}</div>
-      ) : tableTopRight === null ? (
-        typeof OnActionButtonClick === "function" && (
-          <IconButton
-            onClick={() => {
-              OnActionButtonClick(selectedRows);
+    return (
+        <Toolbar
+            sx={{
+                pl: { sm: 2 },
+                pr: { xs: 1, sm: 1 },
+                ...(numSelected > 0 && {
+                    bgcolor: (theme) =>
+                        alpha(
+                            theme.palette.primary.main,
+                            theme.palette.action.activatedOpacity
+                        ),
+                }),
             }}
-          >
-            <AddIcon />
-          </IconButton>
-        )
-      ) : (
-        tableTopRight
-      )}
-    </Toolbar>
-  );
+        >
+            {numSelected > 0 ? (
+                <Typography
+                    sx={{ flex: "1 1 100%" }}
+                    color="inherit"
+                    variant="subtitle1"
+                    component="div"
+                >
+                    {numSelected} selected{" "}
+                    {extraInfo && ` | ${round(mCube, 3)} m3 | ${round(weight, 3)} kg`}
+                </Typography>
+            ) : (
+                <Typography sx={{ flex: "1 1 100%" }} id="tableTitle" component="div">
+                    {tableTopLeft}
+                </Typography>
+            )}
+            {numSelected > 0 ? (
+                <div>{actionIcon}</div>
+            ) : tableTopRight === null ? (
+                typeof OnActionButtonClick === "function" && (
+                    <IconButton
+                        onClick={() => {
+                            OnActionButtonClick(selectedRows);
+                        }}
+                    >
+                        <AddIcon />
+                    </IconButton>
+                )
+            ) : (
+                tableTopRight
+            )}
+        </Toolbar>
+    );
 };
 
 EnhancedTableToolbar.propTypes = {
-  selectedRows: PropTypes.array.isRequired,
+    selectedRows: PropTypes.array.isRequired,
 };
 
 TableComponents.propTypes = {
-  tableOptions: PropTypes.object.isRequired,
-  paginationOptions: PropTypes.array,
-  tableHeaders: PropTypes.array.isRequired,
-  tableRows: PropTypes.object.isRequired,
-  Data: PropTypes.array.isRequired,
-  selectedIndexKey: PropTypes.string.isRequired,
+    tableOptions: PropTypes.object.isRequired,
+    paginationOptions: PropTypes.array,
+    tableHeaders: PropTypes.array.isRequired,
+    tableRows: PropTypes.object.isRequired,
+    Data: PropTypes.array.isRequired,
+    selectedIndexKey: PropTypes.string.isRequired,
 };
 
 export default function TableComponents(props) {
-  const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [elevation, setElevation] = React.useState(
-    isStringNullOrEmpty(props.elevation) ? 1 : props.elevation
-  );
-  // render from props
-  // table settings
-  const [stickyTableHeader, setTableHeaderSticky] = React.useState(
-    isObjectUndefinedOrNull(props.tableOptions) &&
-      props.tableOptions.stickyTableHeader === null
-      ? true
-      : props.tableOptions.stickyTableHeader
-  );
-  const [stickyTableHeight, setTableStickyHeight] = React.useState(
-    isObjectUndefinedOrNull(props.tableOptions) &&
-      props.tableOptions.stickyTableHeight === null
-      ? 300
-      : props.tableOptions.stickyTableHeight
-  );
-  const [dense, setDense] = React.useState(
-    isObjectUndefinedOrNull(props.tableOptions) &&
-      props.tableOptions.dense === null
-      ? false
-      : props.tableOptions.dense
-  );
-  const [tableTopRight, setTableTopRight] = React.useState(
-    isObjectUndefinedOrNull(props.tableTopRight) || props.tableTopRight === null
-      ? null
-      : props.tableTopRight
-  );
+    const [selected, setSelected] = React.useState([]);
+    const [page, setPage] = React.useState(0);
+    const [elevation, setElevation] = React.useState(
+        isStringNullOrEmpty(props.elevation) ? 1 : props.elevation
+    );
+    // render from props
+    // table settings
+    const [stickyTableHeader, setTableHeaderSticky] = React.useState(
+        isObjectUndefinedOrNull(props.tableOptions) &&
+            props.tableOptions.stickyTableHeader === null
+            ? true
+            : props.tableOptions.stickyTableHeader
+    );
+    const [stickyTableHeight, setTableStickyHeight] = React.useState(
+        isObjectUndefinedOrNull(props.tableOptions) &&
+            props.tableOptions.stickyTableHeight === null
+            ? 300
+            : props.tableOptions.stickyTableHeight
+    );
+    const [dense, setDense] = React.useState(
+        isObjectUndefinedOrNull(props.tableOptions) &&
+            props.tableOptions.dense === null
+            ? false
+            : props.tableOptions.dense
+    );
+    const [tableTopRight, setTableTopRight] = React.useState(
+        isObjectUndefinedOrNull(props.tableTopRight) || props.tableTopRight === null
+            ? null
+            : props.tableTopRight
+    );
 
-  //pagination settings
-  const [rowsPerPage, setRowsPerPage] = React.useState(
-    isArrayNotEmpty(props.paginationOptions) ? props.paginationOptions[0] : 25
-  );
-  const [pagePaginationOptions, setPagePaginationOptions] = React.useState(
-    isArrayNotEmpty(props.paginationOptions) ? props.paginationOptions : []
-  );
+    //pagination settings
+    const [rowsPerPage, setRowsPerPage] = React.useState(
+        isArrayNotEmpty(props.paginationOptions) ? props.paginationOptions[0] : 25
+    );
+    const [pagePaginationOptions, setPagePaginationOptions] = React.useState(
+        isArrayNotEmpty(props.paginationOptions) ? props.paginationOptions : []
+    );
 
-  //table and table data settings
-  const [order, setOrder] = React.useState(
-    isObjectUndefinedOrNull(props.tableOptions) &&
-      props.tableOptions.tableOrderBy === null
-      ? "asc"
-      : props.tableOptions.tableOrderBy
-  );
-  const [orderBy, setOrderBy] = React.useState(
-    isObjectUndefinedOrNull(props.tableOptions) &&
-      props.tableOptions.sortingIndex === null
-      ? ""
-      : props.tableOptions.sortingIndex
-  );
-  const [objectKey, setObjectKey] = React.useState(
-    !isStringNullOrEmpty(props.selectedIndexKey) ? props.selectedIndexKey : "id"
-  );
-  const [rows, setRows] = React.useState(props.Data);
-  const [tableHeaders, setTableHeaders] = React.useState(
-    isArrayNotEmpty(props.tableHeaders) ? props.tableHeaders : []
-  );
-  const [renderCheckbox, setRenderCheckbox] = React.useState(
-    !isObjectUndefinedOrNull(props.tableRows.checkbox)
-      ? props.tableRows.checkbox
-      : true
-  );
-  const [onRowSelect, setOnRowSelect] = React.useState(
-    !isObjectUndefinedOrNull(props.tableRows.onRowClickSelect)
-      ? props.tableRows.onRowClickSelect
-      : false
-  );
+    //table and table data settings
+    const [order, setOrder] = React.useState(
+        isObjectUndefinedOrNull(props.tableOptions) &&
+            props.tableOptions.tableOrderBy === null
+            ? "asc"
+            : props.tableOptions.tableOrderBy
+    );
+    const [orderBy, setOrderBy] = React.useState(
+        isObjectUndefinedOrNull(props.tableOptions) &&
+            props.tableOptions.sortingIndex === null
+            ? ""
+            : props.tableOptions.sortingIndex
+    );
+    const [objectKey, setObjectKey] = React.useState(
+        !isStringNullOrEmpty(props.selectedIndexKey) ? props.selectedIndexKey : "id"
+    );
+    const [rows, setRows] = React.useState(props.Data);
+    const [tableHeaders, setTableHeaders] = React.useState(
+        isArrayNotEmpty(props.tableHeaders) ? props.tableHeaders : []
+    );
+    const [renderCheckbox, setRenderCheckbox] = React.useState(
+        !isObjectUndefinedOrNull(props.tableRows.checkbox)
+            ? props.tableRows.checkbox
+            : true
+    );
+    const [onRowSelect, setOnRowSelect] = React.useState(
+        !isObjectUndefinedOrNull(props.tableRows.onRowClickSelect)
+            ? props.tableRows.onRowClickSelect
+            : false
+    );
 
-  // useEffect(() => {
-  // }, [props.Data]);
+    // useEffect(() => {
+    // }, [props.Data]);
 
-  useEffect(() => {
-    let isMounted = true;
-    if (isMounted) {
-      setTableHeaders(props.tableHeaders);
-      setRows(props.Data);
-      setTableTopRight(props.tableTopRight);
-      setObjectKey(props.selectedIndexKey);
-    }
-    return () => {
-      setTableHeaders([]);
-      setRows([]);
-      setTableTopRight(null);
-      setObjectKey("id");
-      isMounted = false;
+    useEffect(() => {
+        let isMounted = true;
+        if (isMounted) {
+            setTableHeaders(props.tableHeaders);
+            setRows(props.Data);
+            setTableTopRight(props.tableTopRight);
+            setObjectKey(props.selectedIndexKey);
+        }
+        return () => {
+            setTableHeaders([]);
+            setRows([]);
+            setTableTopRight(null);
+            setObjectKey("id");
+            isMounted = false;
+        };
+    }, [props]);
+
+    useEffect(() => {
+        if (props.CallResetSelected === true) {
+            setSelected([]);
+        }
+    }, [props.CallResetSelected]);
+
+    useEffect(() => {
+        setRenderCheckbox(props.tableRows.checkbox);
+    }, [props.tableRows]);
+
+    const handleRequestSort = (event, property) => {
+        const isAsc = orderBy === property && order === "asc";
+        setOrder(isAsc ? "desc" : "asc");
+        setOrderBy(property);
     };
-  }, [props]);
 
-  useEffect(() => {
-    if (props.CallResetSelected === true) {
-      setSelected([]);
-    }
-  }, [props.CallResetSelected]);
+    const handleSelectAllClick = (event) => {
+        if (event.target.checked) {
+            const newSelecteds = rows.map((n) => n);
+            setSelected(newSelecteds);
+            return;
+        } else {
+            setSelected([]);
+        }
+    };
 
-  useEffect(() => {
-    setRenderCheckbox(props.tableRows.checkbox);
-  }, [props.tableRows]);
+    const handleSelectItem = (event, key) => {
+        event.stopPropagation();
 
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
+        const selectedIndex = selected.indexOf(key);
+        let newSelected = [];
+        if (selectedIndex === -1) {
+            newSelected = newSelected.concat(selected, key);
+        } else if (selectedIndex === 0) {
+            newSelected = newSelected.concat(selected.slice(1));
+        } else if (selectedIndex === selected.length - 1) {
+            newSelected = newSelected.concat(selected.slice(0, -1));
+        } else if (selectedIndex > 0) {
+            newSelected = newSelected.concat(
+                selected.slice(0, selectedIndex),
+                selected.slice(selectedIndex + 1)
+            );
+        }
+        setSelected(newSelected);
+        props.onSelectRow && props.onSelectRow(newSelected);
+    };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = rows.map((n) => n);
-      setSelected(newSelecteds);
-      return;
-    } else {
-      setSelected([]);
-    }
-  };
+    const handleRowClick = (event, row) => {
+        if (!onRowSelect) {
+            if (typeof props.onTableRowClick !== "undefined")
+                props.onTableRowClick(event, row);
+        } else {
+            handleSelectItem(event, row);
+        }
+    };
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+    const isSelected = (name) => selected.indexOf(name) !== -1;
+    // Avoid a layout jump when reaching the last page with empty rows.
+    const emptyRows =
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    const TableData =
+        rowsPerPage !== -1
+            ? stableSort(rows, getComparator(order, orderBy)).slice(
+                page * rowsPerPage,
+                page * rowsPerPage + rowsPerPage
+            )
+            : stableSort(rows, getComparator(order, orderBy));
+    const checkboxColor = !isObjectUndefinedOrNull(props.tableRows.checkboxColor)
+        ? props.tableRows.checkboxColor
+        : "primary";
+    const emptyRowColSpan = renderCheckbox
+        ? tableHeaders.length + 1
+        : tableHeaders.length;
 
-  const handleSelectItem = (event, key) => {
-    event.stopPropagation();
+    return (
+        <Box className="my-1" sx={{ width: "100%" }}>
+            <Paper sx={{ width: "100%", mb: 2 }} elevation={elevation}>
+                {(typeof props.tableTopRight !== "undefined" ||
+                    typeof props.tableTopLeft !== "undefined") && (
+                        <EnhancedTableToolbar
+                            selectedRows={selected}
+                            tableTopLeft={props.tableTopLeft}
+                            tableTopRight={tableTopRight}
+                            OnActionButtonClick={props.onActionButtonClick}
+                            actionIcon={props.actionIcon}
+                            extraInfo={props.extraInfo}
+                        />
+                    )}
 
-    const selectedIndex = selected.indexOf(key);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, key);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
-    props.onSelectRow && props.onSelectRow(newSelected);
-  };
-
-  const handleRowClick = (event, row) => {
-    if (!onRowSelect) {
-      if (typeof props.onTableRowClick !== "undefined")
-        props.onTableRowClick(event, row);
-    } else {
-      handleSelectItem(event, row);
-    }
-  };
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-  const isSelected = (name) => selected.indexOf(name) !== -1;
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-  const TableData =
-    rowsPerPage !== -1
-      ? stableSort(rows, getComparator(order, orderBy)).slice(
-          page * rowsPerPage,
-          page * rowsPerPage + rowsPerPage
-        )
-      : stableSort(rows, getComparator(order, orderBy));
-  const checkboxColor = !isObjectUndefinedOrNull(props.tableRows.checkboxColor)
-    ? props.tableRows.checkboxColor
-    : "primary";
-  const emptyRowColSpan = renderCheckbox
-    ? tableHeaders.length + 1
-    : tableHeaders.length;
-
-  return (
-    <Box className="my-1" sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2 }} elevation={elevation}>
-        {(typeof props.tableTopRight !== "undefined" ||
-          typeof props.tableTopLeft !== "undefined") && (
-          <EnhancedTableToolbar
-            selectedRows={selected}
-            tableTopLeft={props.tableTopLeft}
-            tableTopRight={tableTopRight}
-            OnActionButtonClick={props.onActionButtonClick}
-            actionIcon={props.actionIcon}
-            extraInfo={props.extraInfo}
-          />
-        )}
-
-        <TableContainer
-          sx={{ maxHeight: stickyTableHeader ? stickyTableHeight : "100%" }}
-        >
-          <Table
-            stickyHeader={stickyTableHeader}
-            sx={{ width: "100%" }}
-            aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
-          >
-            <EnhancedTableHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              rowCount={isArrayNotEmpty(rows) ? rows.length : 0}
-              tableHeaders={tableHeaders}
-              renderCheckbox={renderCheckbox}
-              checkboxColor={checkboxColor}
-            />
-            <TableBody>
-              {isArrayNotEmpty(TableData) &&
-                TableData.map((row, index) => {
-                  const isItemSelected = isSelected(row);
-                  const labelId = `enhanced-table-checkbox-${index}`;
-
-                  return (
-                    <TableRow
-                      hover
-                      onClick={(event) => handleRowClick(event, row)}
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={"row_" + index}
-                      selected={isItemSelected}
+                <TableContainer
+                    sx={{ maxHeight: stickyTableHeader ? stickyTableHeight : "100%" }}
+                >
+                    <Table
+                        stickyHeader={stickyTableHeader}
+                        sx={{ width: "100%" }}
+                        aria-labelledby="tableTitle"
+                        size={dense ? "small" : "medium"}
                     >
-                      {renderCheckbox && (
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            color={checkboxColor}
-                            checked={isItemSelected}
-                            inputProps={{ "aria-labelledby": labelId }}
-                            onClick={(event) => handleSelectItem(event, row)}
-                          />
-                        </TableCell>
-                      )}
-                      {!isObjectUndefinedOrNull(
-                        props.tableRows.renderTableRows
-                      ) && props.tableRows.renderTableRows(row, index)}
-                    </TableRow>
-                  );
-                })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
-                  <TableCell colSpan={emptyRowColSpan}></TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        {pagePaginationOptions.length !== 0 && (
-          <TablePagination
-            rowsPerPageOptions={pagePaginationOptions}
-            component="div"
-            colSpan={3}
-            count={isArrayNotEmpty(rows) ? rows.length : 0}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            ActionsComponent={TablePaginationActions}
-          />
-        )}
-      </Paper>
-    </Box>
-  );
+                        <EnhancedTableHead
+                            numSelected={selected.length}
+                            order={order}
+                            orderBy={orderBy}
+                            onSelectAllClick={handleSelectAllClick}
+                            onRequestSort={handleRequestSort}
+                            rowCount={isArrayNotEmpty(rows) ? rows.length : 0}
+                            tableHeaders={tableHeaders}
+                            renderCheckbox={renderCheckbox}
+                            checkboxColor={checkboxColor}
+                        />
+                        <TableBody>
+                            {isArrayNotEmpty(TableData) &&
+                                TableData.map((row, index) => {
+                                    const isItemSelected = isSelected(row);
+                                    const labelId = `enhanced-table-checkbox-${index}`;
+
+                                    return (
+                                        <TableRow
+                                            hover
+                                            onClick={(event) => handleRowClick(event, row)}
+                                            aria-checked={isItemSelected}
+                                            tabIndex={-1}
+                                            key={"row_" + index}
+                                            selected={isItemSelected}
+                                        >
+                                            {renderCheckbox && (
+                                                <TableCell padding="checkbox">
+                                                    <Checkbox
+                                                        color={checkboxColor}
+                                                        checked={isItemSelected}
+                                                        inputProps={{ "aria-labelledby": labelId }}
+                                                        onClick={(event) => handleSelectItem(event, row)}
+                                                    />
+                                                </TableCell>
+                                            )}
+                                            {!isObjectUndefinedOrNull(
+                                                props.tableRows.renderTableRows
+                                            ) && props.tableRows.renderTableRows(row, index)}
+                                        </TableRow>
+                                    );
+                                })}
+                            {emptyRows > 0 && (
+                                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
+                                    <TableCell colSpan={emptyRowColSpan}></TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                {pagePaginationOptions.length !== 0 && (
+                    <TablePagination
+                        rowsPerPageOptions={pagePaginationOptions}
+                        component="div"
+                        colSpan={3}
+                        count={isArrayNotEmpty(rows) ? rows.length : 0}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        ActionsComponent={TablePaginationActions}
+                    />
+                )}
+            </Paper>
+        </Box>
+    );
 }
 
 /**
@@ -494,67 +491,67 @@ export default function TableComponents(props) {
  *   DO NOT TOUCH IT UNLESS THE NECESSARARY CHANGES REQUIRED!!
  */
 TablePaginationActions.propTypes = {
-  count: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired,
-  page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
+    count: PropTypes.number.isRequired,
+    onPageChange: PropTypes.func.isRequired,
+    page: PropTypes.number.isRequired,
+    rowsPerPage: PropTypes.number.isRequired,
 };
 
 function TablePaginationActions(props) {
-  const theme = useTheme();
-  const { count, page, rowsPerPage, onPageChange } = props;
-  const handleFirstPageButtonClick = (event) => {
-    onPageChange(event, 0);
-  };
-  const handleBackButtonClick = (event) => {
-    onPageChange(event, page - 1);
-  };
-  const handleNextButtonClick = (event) => {
-    onPageChange(event, page + 1);
-  };
-  const handleLastPageButtonClick = (event) => {
-    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-  };
-  return (
-    <Box sx={{ flexShrink: 0, ml: 1 }}>
-      <IconButton
-        onClick={handleFirstPageButtonClick}
-        disabled={page === 0}
-        aria-label="first page"
-      >
-        {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
-      </IconButton>
-      <IconButton
-        onClick={handleBackButtonClick}
-        disabled={page === 0}
-        aria-label="previous page"
-      >
-        {theme.direction === "rtl" ? (
-          <KeyboardArrowRight />
-        ) : (
-          <KeyboardArrowLeft />
-        )}
-      </IconButton>
-      <IconButton
-        onClick={handleNextButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page"
-      >
-        {theme.direction === "rtl" ? (
-          <KeyboardArrowLeft />
-        ) : (
-          <KeyboardArrowRight />
-        )}
-      </IconButton>
-      <IconButton
-        onClick={handleLastPageButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
-      >
-        {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
-      </IconButton>
-    </Box>
-  );
+    const theme = useTheme();
+    const { count, page, rowsPerPage, onPageChange } = props;
+    const handleFirstPageButtonClick = (event) => {
+        onPageChange(event, 0);
+    };
+    const handleBackButtonClick = (event) => {
+        onPageChange(event, page - 1);
+    };
+    const handleNextButtonClick = (event) => {
+        onPageChange(event, page + 1);
+    };
+    const handleLastPageButtonClick = (event) => {
+        onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+    };
+    return (
+        <Box sx={{ flexShrink: 0, ml: 1 }}>
+            <IconButton
+                onClick={handleFirstPageButtonClick}
+                disabled={page === 0}
+                aria-label="first page"
+            >
+                {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
+            </IconButton>
+            <IconButton
+                onClick={handleBackButtonClick}
+                disabled={page === 0}
+                aria-label="previous page"
+            >
+                {theme.direction === "rtl" ? (
+                    <KeyboardArrowRight />
+                ) : (
+                    <KeyboardArrowLeft />
+                )}
+            </IconButton>
+            <IconButton
+                onClick={handleNextButtonClick}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                aria-label="next page"
+            >
+                {theme.direction === "rtl" ? (
+                    <KeyboardArrowLeft />
+                ) : (
+                    <KeyboardArrowRight />
+                )}
+            </IconButton>
+            <IconButton
+                onClick={handleLastPageButtonClick}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                aria-label="last page"
+            >
+                {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
+            </IconButton>
+        </Box>
+    );
 }
 
 /***************************************

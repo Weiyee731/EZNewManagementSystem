@@ -289,8 +289,8 @@ class TransactionHistoryDetail extends Component {
   onClickConfirmInvoice = (items) => {
     var isDeliveryExist = false
     this.props.CallUpdateTransaction(this.state);
-    this.state.TransactionDetail.map((search)=>{
-      if(search.Description === "Delivery Fee"){
+    this.state.TransactionDetail.map((search) => {
+      if (search.Description === "Delivery Fee") {
         search.ProductPrice = this.state.DeliveryFee
         isDeliveryExist = true
       }
@@ -410,7 +410,8 @@ class TransactionHistoryDetail extends Component {
                 </div>
               </div>
 
-              <TableComponents style={{ boxShadow: "0px" }}
+              <TableComponents
+                style={{ boxShadow: "0px" }}
                 // tableTopLeft={""}
                 // tableTopRight={this.renderTableActionButton}
                 elevation={"0"}
@@ -430,6 +431,7 @@ class TransactionHistoryDetail extends Component {
                 }}
                 selectedIndexKey={"pid"}
                 Data={this.state.TransactionDetail}
+                headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
               />
               <div className="row">
                 <div style={tncDiv} className="col-7">
