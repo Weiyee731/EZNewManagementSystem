@@ -62,6 +62,7 @@ export default function ResponsiveDatePickers(props) {
               readOnly={props.readOnly ? props.readOnly : false}
               onChange={(e) => updateDateValue(e)}
               renderInput={(params) => <TextField {...params} variant={isStringNullOrEmpty(props.variant) ? "standard" : props.variant} />}
+              className={isStringNullOrEmpty(props.className) ? "" : props.className}
             />
           </Stack>
 

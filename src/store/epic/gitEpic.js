@@ -418,7 +418,9 @@ export class GitEpic {
             STOCKDATE: payload.STOCKDATE,
             PACKAGINGDATE: payload.PACKAGINGDATE,
             REMARK: payload.REMARK,
-            EXTRACHARGE: payload.EXTRACHARGE
+            EXTRACHARGE: payload.EXTRACHARGE,
+            CONTAINERNAME: payload.CONTAINERNAME,
+            CONTAINERDATE: payload.CONTAINERDATE
           })
         }
       )
