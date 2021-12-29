@@ -25,6 +25,7 @@ import { toast } from "react-toastify";
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import AddIcon from '@mui/icons-material/Add';
 
 function mapStateToProps(state) {
     return {
@@ -40,6 +41,7 @@ function mapDispatchToProps(dispatch) {
         CallUpdateStockStatus: (props) => dispatch(GitAction.CallUpdateStockStatus(props)),
         CallViewContainer: (props) => dispatch(GitAction.CallViewContainer(props)),
         CallUpdateStockDetailByPost: (props) => dispatch(GitAction.CallUpdateStockDetailByPost(props)),
+        CallInsertStockByPost: (props) => dispatch(GitAction.CallInsertStockByPost(props)),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
         CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
         CallResetStocks: () => dispatch(GitAction.CallResetStocks()),
@@ -181,7 +183,7 @@ const INITIAL_STATE = {
     AdditionalCharges: "0",
     Remark: "no",
     CallResetSelected: false,
-    needCheckBox: true
+    needCheckBox: true,
 }
 
 function onAddButtonClick() {
@@ -429,6 +431,7 @@ class StockGoods extends Component {
                 }
                 else
                     extraChangesValue = "-"
+
                 if (checked === false) {
                     if (!isStringNullOrEmpty(this.state.selectedRows.AreaCode) || !isStringNullOrEmpty(this.state.AreaCode)) {
                         this.setState({ openEditModal: !this.state.openEditModal });
@@ -477,7 +480,59 @@ class StockGoods extends Component {
                 break;
 
             case "openAddModal":
-                this.setState({ openAddModal: !this.state.openAddModal });
+                let ExtraChangesValue = "", IsNotVerified = 0;
+                // let extraChangesValue = "", isNotVerified = 0;
+                if (this.state.AdditionalCharges.length > 0) {
+                    for (var i = 0; i < this.state.AdditionalCharges.length; i++) {
+
+                        if (this.state.AdditionalCharges[i].Charges === undefined || this.state.AdditionalCharges[i].Value === undefined) {
+                            this.setState({ AdditionalCharges: "" })
+                            ExtraChangesValue = "-"
+                        } else {
+                            ExtraChangesValue += this.state.AdditionalCharges[i].Charges + "=" + this.state.AdditionalCharges[i].Value
+                            if (i !== this.state.AdditionalCharges.length - 1)
+                                ExtraChangesValue += ';'
+
+                            //check extra charge
+                            if (this.state.AdditionalCharges[i].validated === false)
+                                IsNotVerified++;
+                        }
+                    }
+                }
+                else
+                    ExtraChangesValue = "-"
+
+                if (!isStringNullOrEmpty(this.state.AreaCode) ||
+                    !isStringNullOrEmpty(this.state.TrackingNumber) ||
+                    !isStringNullOrEmpty(this.state.UserCode) ||
+                    !isStringNullOrEmpty(this.state.ProductDimensionDeep) ||
+                    !isStringNullOrEmpty(this.state.ProductWeight) ||
+                    !isStringNullOrEmpty(this.state.ProductDimensionHeight) ||
+                    !isStringNullOrEmpty(this.state.ProductDimensionWidth)) {
+                    this.setState({ openAddModal: !this.state.openAddModal });
+                    this.props.CallInsertStockByPost({
+                        // StockID: this.state.selectedRows.StockID,
+                        TRACKINGNUMBER: this.state.TrackingNumber,
+                        PRODUCTWEIGHT: this.state.ProductWeight,
+                        PRODUCTHEIGHT: this.state.ProductDimensionHeight,
+                        PRODUCTWIDTH: this.state.ProductDimensionWidth,
+                        PRODUCTDEEP: this.state.ProductDimensionDeep,
+                        AREACODE: this.state.AreaCode,
+                        USERCODE: this.state.UserCode,
+                        ITEM: this.state.Item,
+                        STOCKDATE: "-",
+                        PACKAGINGDATE: "-",
+                        // TRACKINGSTATUSID: 2,
+                        REMARK: this.state.Remark,
+                        EXTRACHARGE: ExtraChangesValue,
+                        CONTAINERNAME: this.state.ContainerName,
+                        CONTAINERDATE: this.state.ContainerDate,
+
+                    })
+
+                }
+                else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
+
                 break;
 
             default:
@@ -546,7 +601,7 @@ class StockGoods extends Component {
             // this.state.stockListing[0].ReturnVal !== undefined &&
             // this.state.stockListing[0].ReturnVal !== "0"
         ) {
-            const FilterArr = this.props.Stocks && this.props.Stocks[0].ReturnVal !== "0" ? this.props.Stocks.filter((searchedItem) =>
+            const FilterArr = this.props.Stocks && !isStringNullOrEmpty(this.props.Stocks[0].ReturnVal) && this.props.Stocks[0].ReturnVal !== "0" ? this.props.Stocks.filter((searchedItem) =>
                 searchedItem.TrackingNumber.toLowerCase().includes(searchKeywords) ||
                 searchedItem.UserCode.includes(searchKeywords)
             ) : toast.warning("No data is found")
@@ -572,7 +627,7 @@ class StockGoods extends Component {
             this.setState({ ProductDimensionWidth: childData.ProductDimensionWidth })
         }
         if (childData.ProductDimensionHeight !== null && childData.ProductDimensionHeight !== undefined) {
-            this.setState({ ProductDimensionWidth: childData.ProductDimensionHeight })
+            this.setState({ ProductDimensionHeight: childData.ProductDimensionHeight })
         }
         if (childData.ProductDimensionDeep !== null && childData.ProductDimensionDeep !== undefined) {
             this.setState({ ProductDimensionDeep: childData.ProductDimensionDeep })
@@ -599,6 +654,14 @@ class StockGoods extends Component {
         return (
             <IconButton onClick={(event) => { this.onDeleteButtonClick() }}>
                 <CheckIcon />
+            </IconButton>
+        )
+    }
+
+    tableTopRight = () => {
+        return (
+            <IconButton onClick={(event) => { this.onAddButtonClick() }}>
+                <AddIcon />
             </IconButton>
         )
     }
@@ -639,7 +702,7 @@ class StockGoods extends Component {
                                 labelId="Division"
                                 id="Division"
                                 name="Division"
-                                defaultValue={this.props.AllContainer.ContainerID}
+                                value={this.props.AllContainer.ContainerID}
                                 onChange={(e) => {
                                     isStringNullOrEmpty(e.target.value)
                                     isArrayNotEmpty(this.props.AllContainer) && this.props.AllContainer.map((container) => {
@@ -683,7 +746,7 @@ class StockGoods extends Component {
                         handleToggleDialog={() => this.handleCancel("form")}
                         handleConfirmFunc={() => this.handleSearchfilter("openAddModal")}
                         message={
-                            <EditStockGoods />
+                            <EditStockGoods addOrder={true} ContainerDate={this.state.ContainerDate ? this.state.ContainerDate : ""} ContainerName={this.state.ContainerName ? this.state.ContainerName : ""} parentCallback={this.handleCallback} />
                         }
                     />
                 }
@@ -720,6 +783,7 @@ class StockGoods extends Component {
                             Data={this.state.stockFiltered ? this.state.stockFiltered : []}
                             onTableRowClick={this.onTableRowClick}
                             onActionButtonClick={onAddButtonClick}
+                            tableTopRight={this.tableTopRight}
                             onSelectRow={this.onSelectRow}
                             onSelectAllClick={this.onSelectAllRow}
                             CallResetSelected={this.state.CallResetSelected}

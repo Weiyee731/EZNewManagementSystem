@@ -131,6 +131,10 @@ class EditStockGoods extends Component {
             this.props.parentCallback({ "Remark": value });
             event.preventDefault();
         }
+        if (statement === "Item") {
+            this.props.parentCallback({ "Item": value });
+            event.preventDefault();
+        }
     }
 
     handleAdditionalCostInputs = (e, index) => {
@@ -212,7 +216,8 @@ class EditStockGoods extends Component {
         const formValue = this.state.formData ? this.state.formData : [];
         const ContainerDate = this.props.ContainerDate ? this.props.ContainerDate : [];
         const ContainerName = this.props.ContainerName ? this.props.ContainerName : [];
-
+        const addOrder = this.props.addOrder;
+        console.log(addOrder)
         return (
             <div>
                 <div className="py-md-3 py-1">
@@ -263,7 +268,7 @@ class EditStockGoods extends Component {
                                     name="Depth"
                                     defaultValue={formValue.ProductDimensionDeep}
                                     onChange={(e) => this.onTrigger(e, "ProductDimensionDeep")}
-                                    endAdornment={<InputAdornment position="start">m</InputAdornment>}
+                                    endAdornment={<InputAdornment position="start">cm</InputAdornment>}
                                     error={!this.state.DepthVerified}
                                 />
                                 {!this.state.DepthVerified && <FormHelperText sx={{ color: 'red' }} id="Depth-error-text">Invalid</FormHelperText>}
@@ -278,7 +283,7 @@ class EditStockGoods extends Component {
                                     name="Width"
                                     defaultValue={formValue.ProductDimensionWidth}
                                     onChange={(e) => this.onTrigger(e, "ProductDimensionWidth")}
-                                    endAdornment={<InputAdornment position="start">m</InputAdornment>}
+                                    endAdornment={<InputAdornment position="start">cm</InputAdornment>}
                                     error={!this.state.WidthVerified}
                                 />
                                 {!this.state.WidthVerified && <FormHelperText sx={{ color: 'red' }} id="Width-error-text">Invalid</FormHelperText>}
@@ -293,7 +298,7 @@ class EditStockGoods extends Component {
                                     name="Height"
                                     defaultValue={formValue.ProductDimensionHeight}
                                     onChange={(e) => this.onTrigger(e, "ProductDimensionHeight")}
-                                    endAdornment={<InputAdornment position="start">m</InputAdornment>}
+                                    endAdornment={<InputAdornment position="start">cm</InputAdornment>}
                                     error={!this.state.HeightVerified}
                                 />
                                 {!this.state.HeightVerified && <FormHelperText sx={{ color: 'red' }} id="Height-error-text">Invalid</FormHelperText>}
@@ -315,6 +320,22 @@ class EditStockGoods extends Component {
                             </FormControl>
                         </div>
                     </div>
+                    {addOrder &&
+                        <div className="row mt-2">
+                            <div className="col-12">
+                                {/* <Box sx={{ width: '100%' }}> */}
+                                <TextField
+                                    variant="standard"
+                                    name="Item"
+                                    label="Item"
+                                    defaultValue={""}
+                                    onChange={(e) => this.onTrigger(e, "Item")}
+                                    fullWidth
+                                />
+                                {/* </Box> */}
+                            </div>
+                        </div>
+                    }
                     <div className="my-1 row">
                         <div className="col-12">
                             <Button className="my-1 w-100" color="success" variant="contained" size="small" onClick={() => { this.RenderAdditionalCost() }}>Add Additional Costs</Button>
