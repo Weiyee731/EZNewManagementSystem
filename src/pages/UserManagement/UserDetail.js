@@ -31,6 +31,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import AlertDialog from "../../components/modal/Modal";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import './UserDetail.css'
 function mapStateToProps(state) {
@@ -51,6 +52,7 @@ function mapDispatchToProps(dispatch) {
     CallResetUserApprovalReturn: () => dispatch(GitAction.CallResetUserApprovalReturn()),
     CallResetUserProfile: () => dispatch(GitAction.CallResetUserProfile()),
     CallUserProfile: () => dispatch(GitAction.CallUserProfile()),
+    CallDeleteUser: (data) => dispatch(GitAction.CallDeleteUser(data)),
   };
 }
 
@@ -210,11 +212,13 @@ class UserDetail extends Component {
       newPassword: "",
       confirmationPassword: "",
       passwordValidated: null,
+      deleteManagerOpen: false,
 
     }
     this.onTextFieldOnChange = this.onTextFieldOnChange.bind(this)
     this.toggleEditMode = this.toggleEditMode.bind(this)
     this.onSubmitUpdateUser = this.onSubmitUpdateUser.bind(this)
+    this.handleOnDelete = this.handleOnDelete.bind(this)
     this.props.CallUserProfileByID(this.state)
   }
 
@@ -393,29 +397,38 @@ class UserDetail extends Component {
     // successfully update user profile
     if (isArrayNotEmpty(this.props.userManagementApproval)) {
       if (this.props.userManagementApproval[0].ReturnVal == 1) {
-        this.props.CallResetUserApprovalReturn()
-        toast.success("Data is updated successfully", { autoClose: 3000, position: "top-center", transition: Flip, theme: "dark" })
-        let userData = this.state.UserProfile
-        if (isArrayNotEmpty(userData)) {
-          userData[0].Fullname = this.state.userFullname;
-          userData[0].UserCode = this.state.userCode;
-          userData[0].UserAreaID = this.state.userAreaId;
-          userData[0].UserContactNo = this.state.userContact;
-          userData[0].UserAddress = this.state.userAddress;
-          userData[0].UserEmailAddress = this.state.userEmail;
-
-          userData[0].MinimumPrice = this.state.userMinSelfPickup;
-          userData[0].SelfPickOverCubic = this.state.userCubicSelfPickup;
-          userData[0].ConsolidatedPrice = this.state.userConslidate;
-          userData[0].LargeDeliveryPrice = this.state.userDeliveryCargo;
-          userData[0].SmallDeliveryFirstPrice = this.state.userDeliveryOn1stKG;
-          userData[0].SmallDeliverySubPrice = this.state.userDeliveryOnSubKG;
+        if (this.state.deleteManagerOpen) {
+          this.props.CallResetUserApprovalReturn()
+          toast.success("This member removed successfully.", { autoClose: 2000, position: 'top-center', theme: 'dark', transition: Flip })
+          this.props.CallUserProfile()
+          this.props.history.goBack()
         }
-        this.setState({
-          isOnEditMode: false,
-          UserProfile: userData
-        })
-        this.props.CallUserProfile()
+        else {
+          this.props.CallResetUserApprovalReturn()
+          toast.success("Data is updated successfully", { autoClose: 3000, position: "top-center", transition: Flip, theme: "dark" })
+          let userData = this.state.UserProfile
+          if (isArrayNotEmpty(userData)) {
+            userData[0].Fullname = this.state.userFullname;
+            userData[0].UserCode = this.state.userCode;
+            userData[0].UserAreaID = this.state.userAreaId;
+            userData[0].UserContactNo = this.state.userContact;
+            userData[0].UserAddress = this.state.userAddress;
+            userData[0].UserEmailAddress = this.state.userEmail;
+
+            userData[0].MinimumPrice = this.state.userMinSelfPickup;
+            userData[0].SelfPickOverCubic = this.state.userCubicSelfPickup;
+            userData[0].ConsolidatedPrice = this.state.userConslidate;
+            userData[0].LargeDeliveryPrice = this.state.userDeliveryCargo;
+            userData[0].SmallDeliveryFirstPrice = this.state.userDeliveryOn1stKG;
+            userData[0].SmallDeliverySubPrice = this.state.userDeliveryOnSubKG;
+          }
+          this.setState({
+            isOnEditMode: false,
+            UserProfile: userData
+          })
+          this.props.CallUserProfile()
+        }
+
       }
       else {
         toast.error("Error occured while udpating user. Please try again or contact our developer.", { autoClose: 2000, theme: "colored" })
@@ -586,7 +599,6 @@ class UserDetail extends Component {
 
     if (isValidated) {
       this.props.CallUpdateUserData(object)
-      console.log(object)
     }
     else
       toast.error("Some of the field is invalid. Please check and resubmit again.", { autoClose: 3000, position: "top-center", theme: 'colored' })
@@ -604,7 +616,6 @@ class UserDetail extends Component {
         USERID: UserProfile[0].UserID,
         password: newPassword
       }
-      console.log(object)
     }
   }
 
@@ -615,7 +626,6 @@ class UserDetail extends Component {
       this.state.filteredList[this.state.selectedindex].OrderStatus = 'Paid'
       this.state.filteredList[this.state.selectedindex].OrderColor = 'green'
     }
-    console.log(this.state.filteredList)
     this.setState({ AddModalOpen: false })
   }
 
@@ -625,6 +635,10 @@ class UserDetail extends Component {
 
   handleOnCancel = () => {
     this.setState({ isOnEditMode: false })
+  }
+
+  handleOnDelete = () => {
+    this.props.CallDeleteUser({ USERID: this.state.UserID })
   }
 
   renderTableRows = (data, index) => {
@@ -754,6 +768,16 @@ class UserDetail extends Component {
                       >
                         Cancel
                       </LoadingButton>
+                      <Button
+                        style={{ marginLeft: "4px" }}
+                        endIcon={<DeleteIcon />}
+                        variant="contained"
+                        sx={{ bgcolor: 'red' }}
+                        color="secondary"
+                        onClick={() => this.setState({ deleteManagerOpen: true })}
+                      >
+                        Delete Member
+                      </Button>
                       <LoadingButton
                         style={{ marginLeft: "4px" }}
                         loading={this.props.loading}
@@ -1240,6 +1264,28 @@ class UserDetail extends Component {
               />
             </Grid>
           </Grid>
+        </AlertDialog>
+
+        {/* Delete Modal */}
+        <AlertDialog
+          open={this.state.deleteManagerOpen}              // required, pass the boolean whether modal is open or close
+          handleToggleDialog={() => this.setState({ deleteManagerOpen: !this.state.deleteManagerOpen })}  // required, pass the toggle function of modal
+          handleConfirmFunc={this.handleOnDelete}    // required, pass the confirm function 
+          showAction={true}                           // required, to show the footer of modal display
+          title={"Delete Member"}                      // required, title of the modal
+          buttonTitle={"Confirm Delete"}                         // required, title of button
+          singleButton={false}                         // required, to decide whether to show a single full width button or 2 buttons
+          maxWidth={"md"}
+        >
+          <div>
+            <p className="text-center" style={{ fontSize: '16pt' }}><b>Are you sure to remove this member?</b></p>
+            <p className="text-center">
+              {isArrayNotEmpty(this.state.UserProfile) && this.state.UserProfile[0].UserCode + " - " + this.state.UserProfile[0].Fullname} <br />
+              {isArrayNotEmpty(this.state.UserProfile) && "Area Code: " + this.state.UserProfile[0].AreaCode} <br />
+              {isArrayNotEmpty(this.state.UserProfile) && "Area Code: " + this.state.UserProfile[0].UserContactNo}
+            </p>
+            <p className="text-center text-danger "><i>**Disclaimer: This action is irrevertible.</i></p>
+          </div>
         </AlertDialog>
       </div>
     )

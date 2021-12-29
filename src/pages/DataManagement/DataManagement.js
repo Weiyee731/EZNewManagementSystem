@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { GitAction } from "../../store/action/gitAction";
-import { browserHistory } from "react-router";
+import { withRouter } from "react-router";
 import Dropzone from "../../components/Dropzone/Dropzone"
 import * as XLSX from 'xlsx';
 import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty, convertDateTimeToString112Format, extractNumberFromStrings } from "../../tools/Helpers";
@@ -15,7 +15,10 @@ import PublishIcon from '@mui/icons-material/Publish';
 import ReportIcon from '@mui/icons-material/Report';
 import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
 import { ModalPopOut } from "../../components/modal/Modal";
-
+import ResponsiveDatePickers from '../../components/datePicker/datePicker';
+import TextField from '@mui/material/TextField';
+import FormHelperText from '@mui/material/FormHelperText';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 function mapStateToProps(state) {
     return {
         stockApproval: state.counterReducer["stockApproval"],
@@ -36,6 +39,10 @@ const INITIAL_STATE = {
     isSubmit: false,
     errorReportData: [],
     openErrorReport: false,
+    ContainerName: "",
+    ContainerNameValidated: null,
+    ContainerDate: convertDateTimeToString112Format(new Date()),
+    ContainerDateValidated: true,
 }
 
 class DataManagement extends Component {
@@ -49,17 +56,19 @@ class DataManagement extends Component {
         this.renderTableRows = this.renderTableRows.bind(this)
         this.onRemoveAttachment = this.onRemoveAttachment.bind(this)
         this.onViewErrorReport = this.onViewErrorReport.bind(this)
+        this.onDateChange = this.onDateChange.bind(this)
+        this.onContainerNameChange = this.onContainerNameChange.bind(this)
     }
 
     componentDidMount() {
-        
+
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (isArrayNotEmpty(this.props.stockApproval)) {
             this.props.CallResetUpdatedStockDetail()
-            toast.success("Data is uploaded successfully", { autoClose: 3000, position: "top-center", transition: Flip, theme: "dark" })
-            this.setState(INITIAL_STATE) 
+            toast.success("Data is uploaded successfully", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark", onClose: () => this.props.history.push('/StockGoods') })
+            this.setState(INITIAL_STATE)
         }
     }
 
@@ -137,7 +146,7 @@ class DataManagement extends Component {
     }
 
     publishData() {
-        const { DataRows } = this.state
+        const { DataRows, ContainerName, ContainerNameValidated, ContainerDate, ContainerDateValidated } = this.state
         if (isArrayNotEmpty(DataRows)) {
             let Courier = ""
             let TrackingNo = ""
@@ -197,12 +206,19 @@ class DataManagement extends Component {
                 PACKAGINGDATE: PackagingDate,
                 REMARK: Remarks,
                 EXTRACHARGE: AdditionalCost,
+                CONTAINERNAME: ContainerName,
+                CONTAINERDATE: convertDateTimeToString112Format(ContainerDate)
             }
 
-            toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
-            this.setState({ isSubmit: true })
-
-            this.props.CallInsertStockByPost(object)
+            if (ContainerNameValidated === false || ContainerNameValidated === null || ContainerDateValidated === false) {
+                this.setState({ ContainerNameValidated: false })
+                toast.warning("Container Name or Container Date is empty or invalid.", { autoClose: 2000, position: "top-center", theme: "dark" })
+            }
+            else {
+                toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
+                this.setState({ isSubmit: true })
+                this.props.CallInsertStockByPost(object)
+            }
         }
     }
 
@@ -236,6 +252,15 @@ class DataManagement extends Component {
         )
     }
 
+    onDateChange = (e, type) => {
+        this.setState({ ContainerDate: isStringNullOrEmpty(e) ? "Invalid Date" : e, ContainerDateValidated: (!isStringNullOrEmpty(e) && e !== "Invalid Date") })
+    }
+
+    onContainerNameChange = (e) => {
+        const { value } = e.target
+        this.setState({ ContainerName: isStringNullOrEmpty(value) ? value : value.toUpperCase(), ContainerNameValidated: !isStringNullOrEmpty(value) })
+    }
+
     render() {
         const { DataHeaders, DataRows, loadingData, isSubmit } = this.state
         const isDataExtracted = DataHeaders.length > 0 || DataRows.length > 0
@@ -243,13 +268,33 @@ class DataManagement extends Component {
         return (
             <div>
                 <div className="container">
+                    <div className="d-flex px-3">
+                        <div className="d-md-flex my-2" style={{ marginLeft: 'auto' }}>
+                            <TextField
+                                label="Container Name"
+                                variant="standard"
+                                name="ContainerName"
+                                value={this.state.ContainerName}
+                                required
+                                sx={{ width: '200px', }}
+                                onChange={this.onContainerNameChange}
+                                helperText={this.state.ContainerNameValidated !== null && !this.state.ContainerNameValidated ? "This is required" : ""}
+                                error={this.state.ContainerNameValidated !== null && !this.state.ContainerNameValidated}
+                            />
+                            <div style={{ width: '200px', marginLeft: 5 }}>
+                                <ResponsiveDatePickers variant="standard" title="Stock In Date" value={this.state.ContainerDate} onChange={(e) => this.onDateChange(e)} />
+                                {!this.state.ContainerDateValidated && <FormHelperText className='text-danger' >Invalid Date</FormHelperText>}
+                            </div>
+                            <Button variant="standard" style={{ width: '200px', marginLeft: 5 }} onClick={() => this.props.history.push('/UserManagement') } startIcon={<GroupAddIcon />}>Add Member</Button>
+                        </div>
+                    </div>
                     <Dropzone
                         placeholder={{
                             text: "Drag and Drop Excel here, or click to select file",
                             fontSize: '16px'
                         }}
                         acceptedFormats={".xls, .xlsx, .csv"}
-                        styles={{ height: isDataExtracted ? '10vh' : loadingData ? '70vh' : '90vh' }}
+                        styles={{ height: isDataExtracted ? '10vh' : loadingData ? '70vh' : '80vh' }}
                         onChange={this.uploadHandler}
                         onRemoveAttachment={this.onRemoveAttachment}
                         maxFiles={1}
@@ -337,9 +382,9 @@ class DataManagement extends Component {
                         fullScreen={true}
                     />
                 </ModalPopOut>
-            </div>
+            </div >
         )
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(DataManagement);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(DataManagement));

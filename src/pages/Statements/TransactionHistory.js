@@ -212,12 +212,10 @@ class TransactionHistory extends Component {
     }
 
     onAddButtonClick = (event, row) => {
-        console.log(row)
         this.setState({ AddModalOpen: true, selectedRow: row, TransactionID: row.TransactionID });
     }
 
     onDeleteButtonClick = (items) => {
-        console.log('delete button')
 
     }
 

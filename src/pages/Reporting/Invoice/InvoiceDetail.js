@@ -141,7 +141,12 @@ const tncDiv = {
   fontSize: "11px",
 };
 
-class InvoicerDetail extends Component {
+const img = {
+  width: 'auto',
+  height: '150px',
+};
+
+class InvoiceDetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -169,7 +174,7 @@ class InvoicerDetail extends Component {
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.handleChange = this.handleChange.bind(this)
-
+    this.goBack = this.goBack.bind(this);
     this.onClickConfirmInvoice = this.onClickConfirmInvoice.bind(this)
     this.props.CallFetchAllTransactionByID(this.state)
   }
@@ -230,7 +235,14 @@ class InvoicerDetail extends Component {
     }
   }
 
+  goBack() {
+    this.props.history.push({
+      pathname: '/CreateInvoice'
+    })
+  }
+
   renderTableRows = (data, index) => {
+    console.log(data)
     const fontsize = '9pt'
     return (
       <>
@@ -251,7 +263,7 @@ class InvoicerDetail extends Component {
         {/* <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ContainerName}</TableCell> */}
         <TableCell align="left" sx={{ fontSize: fontsize }}>{volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)}</TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }}>{roundOffTotal(1.05)}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductPrice}
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{roundOffTotal(data.ProductPrice)}
           {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
             return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{additionalCharges.ProductPrice}</TableCell></TableRow>
           })}
@@ -295,11 +307,11 @@ class InvoicerDetail extends Component {
 
   handleInputChange = (e) => {
     const elementId = e.target.id
-    const value = (isStringNullOrEmpty( e.target.value ) ? "" : e.target.value)
+    const value = (isStringNullOrEmpty(e.target.value) ? "" : e.target.value)
 
     switch (elementId) {
       case "remark":
-        this.setState({ Remark:value, isRemarkValidated: !(isStringNullOrEmpty(value))  })
+        this.setState({ Remark: value, isRemarkValidated: !(isStringNullOrEmpty(value)) })
         break;
 
       case "deliveryfee":
@@ -395,7 +407,7 @@ class InvoicerDetail extends Component {
           }}
         >
           <div style={companyDetail}>
-            <b>Container:</b> {TransactionDetail[0].ContainerName !== null ? TransactionDetail[0].ContainerName : " - "}
+            <b>Container Date:</b> {TransactionDetail[0].ContainerDate !== null ? TransactionDetail[0].ContainerDate : " - "}
           </div>
           <TableComponents
             style={{
@@ -424,7 +436,7 @@ class InvoicerDetail extends Component {
           <div className="invoice-footer">
             <hr />
             <div className="row">
-              <div style={tncDiv} className="col-7 mt-4">
+              <div style={tncDiv} className="col-5 mt-4">
                 <div style={tncTitle}>Terms and Conditions</div>
                 <br />
                 <div>
@@ -442,6 +454,10 @@ class InvoicerDetail extends Component {
                   </p>
                 </div>
               </div>
+              <div style={tncDiv} className="col-2 mt-4">
+                <div >Payment can be make through S Pay Global</div>
+                <img style={img} src="https://tourism.denoo.my/Ez/spay.jpeg"></img>
+              </div>
               <div style={tncDiv} className="col-4 offset-1">
                 Total Item :
                 <span style={total}>{TransactionDetail.length}</span>
@@ -453,15 +469,18 @@ class InvoicerDetail extends Component {
                 <span style={total}>{roundOffTotal(parseFloat(OrderTotalAmount) + parseFloat(DeliveryFee))}</span>
               </div>
             </div>
-            <div className="row mt-5 text-center">
-              <div style={tncDiv} className="col-4">
+            <div className="row mt-5 ">
+              <div style={tncDiv} className="col-5 mt-4">
                 __________________________________
                 <div className="text-center">
                   <div>EZ TRANSIT AND LOGISTICS</div>
                   <div>SDN BHD</div>
                 </div>
               </div>
-              <div style={{ textAlign: 'left', ...tncDiv }} className="col-4 offset-4">
+              <div style={tncDiv} className="col-2 mt-4">
+                
+              </div>
+              <div style={{ textAlign: 'left', ...tncDiv }} className="col-4 offset-1">
                 __________________________________
                 <div>Name  : </div>
                 <div>IC NO : </div>
@@ -493,7 +512,7 @@ class InvoicerDetail extends Component {
               color="primary"
               aria-label="back"
               component="span"
-              onClick={() => this.props.history.goBack()}>
+              onClick={this.goBack}>
               <ArrowBackIcon />
             </IconButton>
             <IconButton
@@ -556,9 +575,9 @@ class InvoicerDetail extends Component {
                           name="AdditionalChargedRemark"
                           value={Remark}
                           onChange={(e) => { this.handleInputChange(e) }}
-                          error={ !this.state.isRemarkValidated }
+                          error={!this.state.isRemarkValidated}
                         />
-                        { !this.state.isRemarkValidated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
+                        {!this.state.isRemarkValidated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
                       </div>
                       <div className="col-4 col-sm-3">
                         <FormControl variant="standard" size="small" fullWidth>
@@ -571,9 +590,9 @@ class InvoicerDetail extends Component {
                             id="deliveryfee"
                             onChange={(e) => { this.handleInputChange(e) }}
                             startAdornment={<InputAdornment position="start">RM</InputAdornment>}
-                            error={ !this.state.isDeliveryFeeValidated }
+                            error={!this.state.isDeliveryFeeValidated}
                           />
-                          { !this.state.isDeliveryFeeValidated  && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
+                          {!this.state.isDeliveryFeeValidated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
                         </FormControl>
                       </div>
                     </div>
@@ -624,4 +643,4 @@ class InvoicerDetail extends Component {
     )
   }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(InvoicerDetail));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(InvoiceDetail));

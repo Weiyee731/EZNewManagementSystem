@@ -148,7 +148,6 @@ class Statements extends Component {
 
     onDeleteButtonClick = (items) => {
         console.log('delete button')
-        console.log(items)
     }
 
     render() {

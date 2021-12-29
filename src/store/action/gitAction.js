@@ -312,6 +312,15 @@ export class GitAction {
     };
   }
 
+  static DeleteUser = "DELETE-USER";
+  static UserDeleted = "USER-DELETED";
+  static CallDeleteUser(propsData) {
+    return {
+      type: GitAction.DeleteUser,
+      payload: propsData
+    };
+  }
+
   static ResetUserApprovalReturn = "RESET-USER-DATA-APPROVAL-RETURN";
   static CallResetUserApprovalReturn() {
     return {

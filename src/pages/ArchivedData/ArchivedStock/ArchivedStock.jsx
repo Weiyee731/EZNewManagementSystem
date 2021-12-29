@@ -179,7 +179,6 @@ class ArchivedStock extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(this.props.archivedData)
         if (this.state.filteredList === null && isArrayNotEmpty(this.props.archivedData)) {
             const { archivedData } = this.props
             this.setState({
@@ -256,7 +255,6 @@ class ArchivedStock extends Component {
     }
 
     onTableRowClick = (event, row) => {
-        console.log(row)
         let additionalCharges = row.AdditionalCharges
         try { additionalCharges = JSON.parse(additionalCharges) } catch (e) { console.log(e); additionalCharges = [] }
         row.AdditionalCost = isObjectUndefinedOrNull(additionalCharges) ? [] : additionalCharges
@@ -362,8 +360,6 @@ class ArchivedStock extends Component {
                 // if search keywords is exists
                 if (isArrayNotEmpty(archivedData)) {
                     if (areaSearchKeys !== "All" && searchCategory === "All") {
-                        console.log(areaSearchKeys)
-
                         // if area is not empty
                         tempList = archivedData.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) && (x.TrackingNumber.includes(searchKeys) || x.UserCode.includes(searchKeys)))
                     }
@@ -372,13 +368,10 @@ class ArchivedStock extends Component {
                         tempList = this.onCategoryFilter(archivedData, searchCategory, searchKeys)
                     }
                     else if (areaSearchKeys !== "All" && searchCategory !== "All") {
-                        console.log(areaSearchKeys)
                         // if area and category is in the list of filtering options
                         tempList = this.onCategoryAndAreaFilter(archivedData, searchCategory, areaSearchKeys, searchKeys)
                     }
                     else {
-                        console.log(areaSearchKeys)
-
                         // if want to search with all options
                         tempList = archivedData.filter(x =>
                             (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||

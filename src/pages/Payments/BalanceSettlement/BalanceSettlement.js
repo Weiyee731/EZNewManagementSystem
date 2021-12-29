@@ -35,7 +35,6 @@ class BalanceSettlement extends Component {
     }
 
     render() {
-        console.log("Etsting")
         return (
             <div>
                 <h1>Balance Settlement</h1>

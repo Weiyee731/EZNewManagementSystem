@@ -261,7 +261,7 @@ class UserManagement extends Component {
 
     onDeleteButtonClick = () => {
         const { selectedRows } = this.state
-        console.log('delete button', selectedRows)
+        console.log(selectedRows)
     }
 
     onTextFieldOnChange = (e) => {
@@ -342,7 +342,7 @@ class UserManagement extends Component {
     }
 
     onSubmitNewUser = () => {
-        const { userAreaCode }= this.props
+        const { userAreaCode } = this.props
         const {
             userCode,
             userCodeValidated,
@@ -370,7 +370,7 @@ class UserManagement extends Component {
         let selectedAreaCode = userAreaCode.filter(x => x.UserAreaID === userAreaId)
         let object = {
             USERCODE: userCode,
-            AREACODE: (selectedAreaCode.length > 0 ) ? selectedAreaCode[0].UserAreaID : "1",
+            AREACODE: (selectedAreaCode.length > 0) ? selectedAreaCode[0].AreaCode : "KU",
             FULLNAME: userFullname,
             USERCONTACTNO: userContact,
             USEREMAILADDRESS: userEmail,
@@ -394,14 +394,11 @@ class UserManagement extends Component {
             userDeliveryOn1stKGValidated &&
             userDeliveryOnSubKGValidated
         )
-        console.log(isValidated)
 
-        if (isValidated) {
+        if (isValidated)
             this.props.CallInsertUserDataByPost(object)
-        }
         else
             toast.error("Some of the field is invalid. Please check and resubmit again.", { autoClose: 3000, position: "top-center", theme: 'colored' })
-        // this.props.CallInsertUserDataByPost(object)
     }
 
     onSelectItem = (item) => {
@@ -411,9 +408,9 @@ class UserManagement extends Component {
     renderTableActionButton = () => {
         return (
             <div className="d-flex">
-                <IconButton onClick={(event) => { this.onDeleteButtonClick() }}>
+                {/* <IconButton onClick={(event) => { this.onDeleteButtonClick() }}>
                     <DeleteIcon color="error" />
-                </IconButton>
+                </IconButton> */}
             </div>
         )
     }
@@ -596,7 +593,6 @@ class UserManagement extends Component {
 
             toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
             this.setState({ isSubmit: true })
-            console.log(object)
             this.props.CallInsertUserDataByPost(object)
         }
         else {
@@ -671,7 +667,7 @@ class UserManagement extends Component {
                         tableHeaders={headCells}        //required
                         tableRows={{
                             renderTableRows: this.renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
-                            checkbox: true,                          // optional, by default is true
+                            checkbox: false,                          // optional, by default is true
                             checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
                             onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                         }}
