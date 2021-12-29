@@ -242,6 +242,7 @@ class InvoiceDetail extends Component {
   }
 
   renderTableRows = (data, index) => {
+    console.log(data)
     const fontsize = '9pt'
     return (
       <>
@@ -262,7 +263,7 @@ class InvoiceDetail extends Component {
         {/* <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ContainerName}</TableCell> */}
         <TableCell align="left" sx={{ fontSize: fontsize }}>{volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)}</TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }}>{roundOffTotal(1.05)}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductPrice}
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{roundOffTotal(data.ProductPrice)}
           {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
             return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{additionalCharges.ProductPrice}</TableCell></TableRow>
           })}
@@ -406,7 +407,7 @@ class InvoiceDetail extends Component {
           }}
         >
           <div style={companyDetail}>
-            <b>Container:</b> {TransactionDetail[0].ContainerName !== null ? TransactionDetail[0].ContainerName : " - "}
+            <b>Container Date:</b> {TransactionDetail[0].ContainerDate !== null ? TransactionDetail[0].ContainerDate : " - "}
           </div>
           <TableComponents
             style={{
