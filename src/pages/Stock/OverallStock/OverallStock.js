@@ -359,7 +359,7 @@ class OverallStock extends Component {
 
         let selectedAreaCode = this.props.userAreaCode.filter(x => x.UserAreaID == formValue.Division)
         selectedAreaCode = (selectedAreaCode.length > 0) ? selectedAreaCode[0].AreaCode : "KU"
-
+        // let selectedAreaCode = formValue.Division
         let object = {
             STOCKID: formValue.StockID,
             USERCODE: formValue.MemberNumber,
@@ -373,7 +373,7 @@ class OverallStock extends Component {
             TRACKINGSTATUSID: formValue.TrackingStatusID,
             CONTAINERNAME: !isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : '-',
             CONTAINERDATE: !isStringNullOrEmpty(formValue.StockDate) ? formValue.StockDate : "-",
-            REMARK: formValue.Remark,
+            REMARK: !isStringNullOrEmpty(formValue.Remark) ? formValue.Remark : "-",
             EXTRACHARGE: extraChangesValue,
         }
 
