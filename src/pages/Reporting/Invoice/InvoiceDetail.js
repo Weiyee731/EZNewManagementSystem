@@ -301,7 +301,10 @@ class InvoiceDetail extends Component {
 
     this.setState({ AddModalOpen: false, AddModalOpen2: true });
     if (!isDeliveryExist) {
-      this.state.TransactionDetail.push({ TrackingNumber: "Delivery Fee", ProductQuantity: 1, ProductDimensionDeep: "", ProductDimensionWidth: "", ProductDimensionHeight: "", ProductPrice: this.state.DeliveryFee })
+      if(this.state.TransportationBool)
+      {
+        this.state.TransactionDetail.push({ TrackingNumber: "Delivery Fee", ProductQuantity: 1, ProductDimensionDeep: "", ProductDimensionWidth: "", ProductDimensionHeight: "", ProductPrice: this.state.DeliveryFee })
+      }
     }
   }
 
