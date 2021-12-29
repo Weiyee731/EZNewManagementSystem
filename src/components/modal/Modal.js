@@ -135,7 +135,8 @@ export function ModalPopOut(props) {
       <DialogActions>
         {props.showCancel ? <Button onClick={() => props.handleToggleDialog()}>Cancel</Button> : ""}
         <Button onClick={() => props.handleConfirmFunc()} variant='contained'>
-          Confirm
+          {props.checked ? "Unchecked" : "Confirm"}
+
         </Button>
       </DialogActions>
     </Dialog>

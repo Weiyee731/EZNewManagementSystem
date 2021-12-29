@@ -212,6 +212,7 @@ class EditStockGoods extends Component {
         const formValue = this.state.formData ? this.state.formData : [];
         const ContainerDate = this.props.ContainerDate ? this.props.ContainerDate : [];
         const ContainerName = this.props.ContainerName ? this.props.ContainerName : [];
+
         return (
             <div>
                 <div className="py-md-3 py-1">
@@ -238,10 +239,11 @@ class EditStockGoods extends Component {
                                     labelId="Division"
                                     id="Division"
                                     name="Division"
-                                    defaultValue={extractNumberFromStrings(formValue.UserAreaID)}
+                                    defaultValue={formValue.AreaCode}
                                     onChange={(e) => this.onTrigger(e, "UserAreaID")}
                                     label="Division"
                                 >
+                                    {console.log(formValue)}
                                     {
                                         isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
                                             return <MenuItem value={el.AreaCode} key={idx}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
