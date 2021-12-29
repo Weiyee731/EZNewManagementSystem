@@ -488,6 +488,7 @@ class CreateInvoice extends Component {
     render() {
         const { filteredList, formValue, openDeliveryModal, openRemarkModal, searchCategory, onSearchText, openCancelModal } = this.state
         const { userAreaCode, stocks } = this.props
+        console.log(stocks)
 
         return (
             <div className="container-fluid">
@@ -561,6 +562,7 @@ class CreateInvoice extends Component {
                     actionIcon={this.renderTableActionButton()}
                     extraInfo={true}
                     onSelectRow={this.onSelectItem}
+                    headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                 />
 
                 <AlertDialog

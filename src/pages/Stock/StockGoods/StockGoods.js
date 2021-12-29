@@ -56,31 +56,31 @@ const headCells = [
     //     label: 'Courier',
     // },
     {
-        id: 'Tracking_No',
+        id: 'TrackingNumber',
         numeric: true,
         disablePadding: false,
         label: 'Tracking No',
     },
     {
-        id: 'Weight',
+        id: 'ProductWeight',
         numeric: true,
         disablePadding: false,
         label: 'Weight(kg)',
     },
     {
-        id: 'Depth',
+        id: 'ProductDimensionDeep',
         numeric: true,
         disablePadding: false,
         label: 'Depth(cm)',
     },
     {
-        id: 'Width',
+        id: 'ProductDimensionWidth',
         numeric: true,
         disablePadding: false,
         label: 'Width(cm)',
     },
     {
-        id: 'Height',
+        id: 'ProductDimensionHeight',
         numeric: true,
         disablePadding: false,
         label: 'Height(cm)',
@@ -91,12 +91,6 @@ const headCells = [
         disablePadding: false,
         label: 'Dimension (m^3)',
     },
-    // {
-    //     id: 'Category_Name',
-    //     numeric: true,
-    //     disablePadding: false,
-    //     label: 'Category Name',
-    // },
     {
         id: 'Item',
         numeric: true,
@@ -104,7 +98,7 @@ const headCells = [
         label: 'Item',
     },
     {
-        id: 'Member_No',
+        id: 'UserCode',
         numeric: true,
         disablePadding: false,
         label: 'Member No',
@@ -787,6 +781,7 @@ class StockGoods extends Component {
                             onSelectRow={this.onSelectRow}
                             onSelectAllClick={this.onSelectAllRow}
                             CallResetSelected={this.state.CallResetSelected}
+                            headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                         />
                     </div>
                 </div>

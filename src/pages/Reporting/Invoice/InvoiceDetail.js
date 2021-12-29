@@ -174,7 +174,6 @@ class InvoiceDetail extends Component {
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.handleChange = this.handleChange.bind(this)
-    this.goBack = this.goBack.bind(this);
     this.onClickConfirmInvoice = this.onClickConfirmInvoice.bind(this)
     this.props.CallFetchAllTransactionByID(this.state)
   }
@@ -233,12 +232,6 @@ class InvoiceDetail extends Component {
         });
       }
     }
-  }
-
-  goBack() {
-    this.props.history.push({
-      pathname: '/CreateInvoice'
-    })
   }
 
   renderTableRows = (data, index) => {
@@ -301,7 +294,10 @@ class InvoiceDetail extends Component {
 
     this.setState({ AddModalOpen: false, AddModalOpen2: true });
     if (!isDeliveryExist) {
-      this.state.TransactionDetail.push({ TrackingNumber: "Delivery Fee", ProductQuantity: 1, ProductDimensionDeep: "", ProductDimensionWidth: "", ProductDimensionHeight: "", ProductPrice: this.state.DeliveryFee })
+      if(this.state.TransportationBool)
+      {
+        this.state.TransactionDetail.push({ TrackingNumber: "Delivery Fee", ProductQuantity: 1, ProductDimensionDeep: "", ProductDimensionWidth: "", ProductDimensionHeight: "", ProductPrice: this.state.DeliveryFee })
+      }
     }
   }
 
@@ -412,6 +408,7 @@ class InvoiceDetail extends Component {
           <TableComponents
             style={{
               boxShadow: "0px",
+              color:"white"
             }}
             elevation={"0"}
             tableOptions={{
@@ -424,11 +421,13 @@ class InvoiceDetail extends Component {
             tableRows={{
               renderTableRows: this.renderTableRows,
               checkbox: false,
+              headerColor:"white",
               checkboxColor: "primary",
               onRowClickSelect: false
             }}
             selectedIndexKey={"TransactionDetailID"}
             Data={arr}
+            headerStyle={{ fontWeight: 'medium', fontSize: '10pt' }}
           />
         </div>
 
@@ -478,7 +477,7 @@ class InvoiceDetail extends Component {
                 </div>
               </div>
               <div style={tncDiv} className="col-2 mt-4">
-                
+
               </div>
               <div style={{ textAlign: 'left', ...tncDiv }} className="col-4 offset-1">
                 __________________________________
@@ -512,7 +511,7 @@ class InvoiceDetail extends Component {
               color="primary"
               aria-label="back"
               component="span"
-              onClick={this.goBack}>
+              onClick={() => this.props.history.push('/CreateInvoice')}>
               <ArrowBackIcon />
             </IconButton>
             <IconButton

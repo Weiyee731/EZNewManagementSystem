@@ -217,6 +217,7 @@ class Invoice extends Component {
                     onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                     actionIcon={this.renderTableActionButton()}
                     onSelectRow={this.onSelectRow}
+                    headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                 />
                 <AlertDialog
                     open={openCancelModal}              // required, pass the boolean whether modal is open or close
