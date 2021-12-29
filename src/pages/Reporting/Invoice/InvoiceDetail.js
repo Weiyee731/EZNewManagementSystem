@@ -141,7 +141,7 @@ const tncDiv = {
   fontSize: "11px",
 };
 
-class InvoicerDetail extends Component {
+class InvoiceDetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -169,7 +169,7 @@ class InvoicerDetail extends Component {
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.handleChange = this.handleChange.bind(this)
-
+    this.goBack = this.goBack.bind(this);
     this.onClickConfirmInvoice = this.onClickConfirmInvoice.bind(this)
     this.props.CallFetchAllTransactionByID(this.state)
   }
@@ -228,6 +228,11 @@ class InvoicerDetail extends Component {
         });
       }
     }
+  }
+
+  goBack() {
+    this.props.history.push({
+      pathname: '/CreateInvoice'})
   }
 
   renderTableRows = (data, index) => {
@@ -295,11 +300,11 @@ class InvoicerDetail extends Component {
 
   handleInputChange = (e) => {
     const elementId = e.target.id
-    const value = (isStringNullOrEmpty( e.target.value ) ? "" : e.target.value)
+    const value = (isStringNullOrEmpty(e.target.value) ? "" : e.target.value)
 
     switch (elementId) {
       case "remark":
-        this.setState({ Remark:value, isRemarkValidated: !(isStringNullOrEmpty(value))  })
+        this.setState({ Remark: value, isRemarkValidated: !(isStringNullOrEmpty(value)) })
         break;
 
       case "deliveryfee":
@@ -493,7 +498,7 @@ class InvoicerDetail extends Component {
               color="primary"
               aria-label="back"
               component="span"
-              onClick={() => this.props.history.goBack()}>
+              onClick={this.goBack}>
               <ArrowBackIcon />
             </IconButton>
             <IconButton
@@ -556,9 +561,9 @@ class InvoicerDetail extends Component {
                           name="AdditionalChargedRemark"
                           value={Remark}
                           onChange={(e) => { this.handleInputChange(e) }}
-                          error={ !this.state.isRemarkValidated }
+                          error={!this.state.isRemarkValidated}
                         />
-                        { !this.state.isRemarkValidated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
+                        {!this.state.isRemarkValidated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid</FormHelperText>}
                       </div>
                       <div className="col-4 col-sm-3">
                         <FormControl variant="standard" size="small" fullWidth>
@@ -571,9 +576,9 @@ class InvoicerDetail extends Component {
                             id="deliveryfee"
                             onChange={(e) => { this.handleInputChange(e) }}
                             startAdornment={<InputAdornment position="start">RM</InputAdornment>}
-                            error={ !this.state.isDeliveryFeeValidated }
+                            error={!this.state.isDeliveryFeeValidated}
                           />
-                          { !this.state.isDeliveryFeeValidated  && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
+                          {!this.state.isDeliveryFeeValidated && <FormHelperText sx={{ color: 'red' }} id="AdditionalCost-error-text">Invalid Amount</FormHelperText>}
                         </FormControl>
                       </div>
                     </div>
@@ -624,4 +629,4 @@ class InvoicerDetail extends Component {
     )
   }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(InvoicerDetail));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(InvoiceDetail));
