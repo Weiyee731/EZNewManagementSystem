@@ -24,9 +24,6 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import AddIcon from "@mui/icons-material/Add";
-import SearchBar from "../SearchBar/SearchBar";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
 import {
   isObjectUndefinedOrNull,
   isArrayNotEmpty,
@@ -73,7 +70,7 @@ function EnhancedTableHead(props) {
     tableHeaders,
     renderCheckbox,
     checkboxColor,
-    headerColor
+    headerColor,
   } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -398,7 +395,6 @@ export default function TableComponents(props) {
   const headerColor = !isObjectUndefinedOrNull(props.tableRows.headerColor)
     ? props.tableRows.headerColor
     : "rgb(200, 200, 200)";
-
   const emptyRowColSpan = renderCheckbox
     ? tableHeaders.length + 1
     : tableHeaders.length;
@@ -448,11 +444,9 @@ export default function TableComponents(props) {
                   return (
                     <TableRow
                       hover
-
                       onClick={(event) => handleRowClick(event, row)}
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-
                       key={"row_" + index}
                       selected={isItemSelected}
                     >

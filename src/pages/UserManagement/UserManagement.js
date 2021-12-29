@@ -677,6 +677,7 @@ class UserManagement extends Component {
                         onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                         actionIcon={this.renderTableActionButton()}
                         onSelectRow={this.onSelectItem}
+                        headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                     />
                 </div>
                 <div>
@@ -954,6 +955,7 @@ class UserManagement extends Component {
                                         }}
                                         selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].UserCode : ""}
                                         Data={DataRows}
+                                        headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                                     />
                                 </div>
                             }
@@ -980,6 +982,7 @@ class UserManagement extends Component {
                             selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].UserCode : ""}
                             Data={this.state.errorReportData}
                             fullScreen={true}
+                            headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                         />
                     </ModalPopOut>
                 </div>

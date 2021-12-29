@@ -174,7 +174,6 @@ class InvoiceDetail extends Component {
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.handleChange = this.handleChange.bind(this)
-    this.goBack = this.goBack.bind(this);
     this.onClickConfirmInvoice = this.onClickConfirmInvoice.bind(this)
     this.props.CallFetchAllTransactionByID(this.state)
   }
@@ -233,12 +232,6 @@ class InvoiceDetail extends Component {
         });
       }
     }
-  }
-
-  goBack() {
-    this.props.history.push({
-      pathname: '/CreateInvoice'
-    })
   }
 
   renderTableRows = (data, index) => {
@@ -434,6 +427,7 @@ class InvoiceDetail extends Component {
             }}
             selectedIndexKey={"TransactionDetailID"}
             Data={arr}
+            headerStyle={{ fontWeight: 'medium', fontSize: '10pt' }}
           />
         </div>
 
@@ -483,7 +477,7 @@ class InvoiceDetail extends Component {
                 </div>
               </div>
               <div style={tncDiv} className="col-2 mt-4">
-                
+
               </div>
               <div style={{ textAlign: 'left', ...tncDiv }} className="col-4 offset-1">
                 __________________________________
@@ -517,7 +511,7 @@ class InvoiceDetail extends Component {
               color="primary"
               aria-label="back"
               component="span"
-              onClick={this.goBack}>
+              onClick={() => this.props.history.push('/CreateInvoice')}>
               <ArrowBackIcon />
             </IconButton>
             <IconButton
