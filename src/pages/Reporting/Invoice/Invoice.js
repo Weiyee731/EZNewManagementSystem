@@ -18,6 +18,7 @@ import Backdrop from '@mui/material/Backdrop';
 import AlertDialog from "../../../components/modal/Modal";
 import { toast } from "react-toastify";
 import SearchBar from "../../../components/SearchBar/SearchBar"
+import { roundOffTotal } from "../../../tools/Helpers";
 
 function mapStateToProps(state) {
     return {
@@ -136,8 +137,8 @@ class Invoice extends Component {
                 <TableCell>{data.UserCode}</TableCell>
                 <TableCell>{data.AreaCode}</TableCell>
                 <TableCell>{data.Fullname}</TableCell>
-                <TableCell align="center"><Box color={data.OrderColor}>{data.OrderTotalAmount}</Box></TableCell>
-                <TableCell align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
+                <TableCell align="center"><Box color={data.OrderColor}>{roundOffTotal(data.OrderTotalAmount)}</Box></TableCell>
+                <TableCell align="center"><Box color={data.OrderColor}>{roundOffTotal(data.OrderPaidAmount)}</Box></TableCell>
                 <TableCell align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
             </>
         )

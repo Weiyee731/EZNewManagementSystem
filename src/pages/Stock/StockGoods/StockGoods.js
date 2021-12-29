@@ -20,8 +20,11 @@ import EditStockGoods from "./EditStockGoods";
 import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents";
 import MenuItem from '@mui/material/MenuItem';
 import Autocomplete from '@mui/material/Autocomplete';
-import { isStringNullOrEmpty, getWindowDimensions, isArrayNotEmpty, isObjectUndefinedOrNull } from "../../../tools/Helpers";
+import { isStringNullOrEmpty, getWindowDimensions, isArrayNotEmpty, extractNumberFromStrings, isObjectUndefinedOrNull } from "../../../tools/Helpers";
 import { toast } from "react-toastify";
+import Select from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 
 function mapStateToProps(state) {
     return {
@@ -66,19 +69,19 @@ const headCells = [
         id: 'Depth',
         numeric: true,
         disablePadding: false,
-        label: 'Depth(m)',
+        label: 'Depth(cm)',
     },
     {
         id: 'Width',
         numeric: true,
         disablePadding: false,
-        label: 'Width(m)',
+        label: 'Width(cm)',
     },
     {
         id: 'Height',
         numeric: true,
         disablePadding: false,
-        label: 'Height(m)',
+        label: 'Height(cm)',
     },
     {
         id: 'Dimension',
@@ -178,6 +181,7 @@ const INITIAL_STATE = {
     AdditionalCharges: "0",
     Remark: "no",
     CallResetSelected: false,
+    needCheckBox: true
 }
 
 function onAddButtonClick() {
@@ -228,7 +232,7 @@ class StockGoods extends Component {
         }
 
         if (isArrayNotEmpty(this.props.stockApproval)) {
-            this.setState({ selectedStocks: "", selectedRows: "" }) //may not function as desired
+            this.setState({ selectedStocks: "", selectedRows: "" })
             this.props.CallResetUpdatedStockDetail()
             this.props.CallResetStocks()
             this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
@@ -333,7 +337,7 @@ class StockGoods extends Component {
 
         const fontsize = '9pt'
         var dimension = data.ProductDimensionDeep && data.ProductDimensionWidth && data.ProductDimensionHeight ?
-            data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight : "";
+            ((data.ProductDimensionDeep / 100) * (data.ProductDimensionWidth / 100) * (data.ProductDimensionHeight / 100)).toFixed(3) : "";
 
         const renderAdditionalCost = (charges) => {
             let renderStrings = ""
@@ -346,6 +350,10 @@ class StockGoods extends Component {
                 return renderStrings
             }
         }
+        var color = "#ffffff"
+        var fontcolor = "#000000"
+        if (data.TrackingStatusID === 2) { color = "#87C09B" }
+        if (data.Remark !== "-" || data.AdditionalCharges !== null) { fontcolor = "#FF0000" }
 
         return (
             <>
@@ -358,25 +366,25 @@ class StockGoods extends Component {
                 // >
                 //     {data.Courier}
                 // </TableCell> */}
-                < TableCell sx={{ fontSize: fontsize }}> {data.TrackingNumber}</ TableCell>
-                <TableCell sx={{ fontSize: fontsize }}>{data.ProductWeight}</TableCell>
-                <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep}</TableCell>
-                <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth}</TableCell>
-                <TableCell sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight}</TableCell>
-                <TableCell sx={{ fontSize: fontsize }}>{dimension}</TableCell>
-                <TableCell sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
-                <TableCell sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
-                <TableCell sx={{ fontSize: fontsize }}>{data.AreaCode && data.AreaName ? data.AreaCode + " - " + data.AreaName : ""}</TableCell>
-                <TableCell sx={{ fontSize: fontsize }}>{data.PackagingDate}</TableCell>
-                <TableCell sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>
-                <TableCell sx={{ fontSize: fontsize }}>{data.ContainerName}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{!isStringNullOrEmpty(data.AdditionalCharges) && renderAdditionalCost(data.AdditionalCharges)}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Remark}</TableCell>
+                < TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}> {data.TrackingNumber}</ TableCell>
+                <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.ProductWeight}</TableCell>
+                <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep}</TableCell>
+                <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth}</TableCell>
+                <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight}</TableCell>
+                <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{dimension}</TableCell>
+                <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
+                <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
+                <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.AreaCode && data.AreaName ? data.AreaCode + " - " + data.AreaName : ""}</TableCell>
+                <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.PackagingDate}</TableCell>
+                <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>
+                <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.ContainerName}</TableCell>
+                <TableCell style={{ backgroundColor: color }} align="left" sx={{ fontSize: fontsize }}>{!isStringNullOrEmpty(data.AdditionalCharges) && renderAdditionalCost(data.AdditionalCharges)}</TableCell>
+                <TableCell style={{ backgroundColor: color }} align="left" sx={{ fontSize: fontsize }}>{data.Remark}</TableCell>
                 {/* <TableCell className="sticky" key={data.Tracking_No} sx={{ fontSize: fontsize }}>
-                    //     <Tooltip title="Approve">
-                    //         <IconButton style={{ backgroundColor: "#f2f2f3 " }}><CheckIcon /></IconButton>
-                    //     </Tooltip>
-                    // </TableCell> */}
+                    <Tooltip title="Approve">
+                        <IconButton style={{ backgroundColor: "#f2f2f3 " }}><CheckIcon /></IconButton>
+                    </Tooltip>
+                </TableCell> */}
 
             </>
         )
@@ -389,7 +397,7 @@ class StockGoods extends Component {
         });
     }
 
-    handleSearchfilter = (filter) => {
+    handleSearchfilter = (filter, checked) => {
         switch (filter) {
             case "open":
                 if ((this.state.ContainerName && this.state.ContainerDate) !== "" || undefined) {
@@ -421,29 +429,53 @@ class StockGoods extends Component {
                 }
                 else
                     extraChangesValue = "-"
-
-                if (!isStringNullOrEmpty(this.state.selectedRows.AreaCode) || !isStringNullOrEmpty(this.state.AreaCode)) {
-                    this.setState({ openEditModal: !this.state.openEditModal });
-                    this.props.CallUpdateStockDetailByPost({
-                        StockID: this.state.selectedRows.StockID,
-                        TrackingNumber: this.state.TrackingNumber,
-                        ProductWeight: this.state.ProductWeight,
-                        ProductDimensionHeight: this.state.ProductDimensionHeight,
-                        ProductDimensionWidth: this.state.ProductDimensionWidth,
-                        ProductDimensionDeep: this.state.ProductDimensionDeep,
-                        AreaCode: this.state.AreaCode,
-                        UserCode: this.state.UserCode,
-                        Item: this.state.Item,
-                        TRACKINGSTATUSID: 2,
-                        ContainerName: this.state.ContainerName,
-                        ContainerDate: this.state.ContainerDate,
-                        Remark: this.state.Remark,
-                        AdditionalCharges: extraChangesValue
-                    })
+                if (checked === false) {
+                    if (!isStringNullOrEmpty(this.state.selectedRows.AreaCode) || !isStringNullOrEmpty(this.state.AreaCode)) {
+                        this.setState({ openEditModal: !this.state.openEditModal });
+                        this.props.CallUpdateStockDetailByPost({
+                            StockID: this.state.selectedRows.StockID,
+                            TrackingNumber: this.state.TrackingNumber,
+                            ProductWeight: this.state.ProductWeight,
+                            ProductDimensionHeight: this.state.ProductDimensionHeight,
+                            ProductDimensionWidth: this.state.ProductDimensionWidth,
+                            ProductDimensionDeep: this.state.ProductDimensionDeep,
+                            AreaCode: this.state.AreaCode,
+                            UserCode: this.state.UserCode,
+                            Item: this.state.Item,
+                            TRACKINGSTATUSID: 2,
+                            ContainerName: this.state.ContainerName,
+                            ContainerDate: this.state.ContainerDate,
+                            Remark: this.state.Remark,
+                            AdditionalCharges: extraChangesValue
+                        })
+                        this.searchResult.value = "";
+                    }
+                    else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
+                } else {
+                    if (!isStringNullOrEmpty(this.state.selectedRows.AreaCode) || !isStringNullOrEmpty(this.state.AreaCode)) {
+                        this.setState({ openEditModal: !this.state.openEditModal });
+                        this.props.CallUpdateStockDetailByPost({
+                            StockID: this.state.selectedRows.StockID,
+                            TrackingNumber: this.state.TrackingNumber,
+                            ProductWeight: this.state.ProductWeight,
+                            ProductDimensionHeight: this.state.ProductDimensionHeight,
+                            ProductDimensionWidth: this.state.ProductDimensionWidth,
+                            ProductDimensionDeep: this.state.ProductDimensionDeep,
+                            AreaCode: this.state.AreaCode,
+                            UserCode: this.state.UserCode,
+                            Item: this.state.Item,
+                            TRACKINGSTATUSID: 1,
+                            ContainerName: this.state.ContainerName,
+                            ContainerDate: this.state.ContainerDate,
+                            Remark: this.state.Remark,
+                            AdditionalCharges: extraChangesValue
+                        })
+                        this.searchResult.value = "";
+                    }
+                    else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
                 }
-                else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
-
                 break;
+
             case "openAddModal":
                 this.setState({ openAddModal: !this.state.openAddModal });
                 break;
@@ -458,14 +490,14 @@ class StockGoods extends Component {
             case "All":
                 this.props.CallResetStocks()
                 this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
-                this.setState({ stockFiltered: this.props.Stocks ? this.props.Stocks : "" });
+                this.setState({ stockFiltered: this.props.Stocks ? this.props.Stocks : "", needCheckBox: true });
                 break;
 
             case "Unchecked":
                 this.props.CallResetStocks()
                 this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
                 const FilterArr = this.props.Stocks.filter((searchedItem) => searchedItem.TrackingStatusID === 1)
-                this.setState({ stockFiltered: FilterArr });
+                this.setState({ stockFiltered: FilterArr, needCheckBox: true });
                 break;
 
             case "Checked":
@@ -474,7 +506,7 @@ class StockGoods extends Component {
 
                 const FilterArr2 = this.props.Stocks.filter((searchedItem) => searchedItem.TrackingStatusID === 2)
 
-                this.setState({ stockFiltered: FilterArr2 });
+                this.setState({ stockFiltered: FilterArr2, needCheckBox: false });
                 break;
 
             default:
@@ -577,13 +609,19 @@ class StockGoods extends Component {
         })
     }
 
+    onSelectAllRow = (items) => {
+        this.setState({
+            selectedStocks: this.state.stockFiltered
+        })
+    }
+
     render() {
         const ToggleTabs = [
             { children: "All", key: "All" },
             { children: "Unchecked", key: "Unchecked" },
             { children: "Checked", key: "Checked" }
         ]
-
+        const checked = this.state.selectedRows.TrackingStatusID === 2
         const { open, openEditModal, openAddModal, options } = this.state
         return (
             <div className="container-fluid">
@@ -594,54 +632,43 @@ class StockGoods extends Component {
                     handleToggleDialog={() => this.handleCancel("filter")}
                     handleConfirmFunc={() => this.handleSearchfilter("open")}
                     title={"Please select the container number and date desired"}
-                    message={<div className="row " style={{ minWidth: "45vw" }}>
-                        <div className="col-xl-6 col-12">
-                            <ResponsiveDatePickers title="Stock In Date" value={this.state.datevalue ? this.state.datevalue : ""} onChange={(e) => this.onDateChange(e)} />
-                        </div>
+                    message={<div className="row" style={{ minWidth: "40vw" }}>
+                        <FormControl variant="standard" size="small" fullWidth>
+                            <InputLabel id="Division-label">Container Number and Date</InputLabel>
+                            <Select
+                                labelId="Division"
+                                id="Division"
+                                name="Division"
+                                defaultValue={this.props.AllContainer.ContainerID}
+                                onChange={(e) => {
+                                    isStringNullOrEmpty(e.target.value)
+                                    isArrayNotEmpty(this.props.AllContainer) && this.props.AllContainer.map((container) => {
+                                        if (container.ContainerID === e.target.value) {
+                                            this.setState({ ContainerName: container.ContainerName, ContainerDate: container.ContainerDate })
+                                        }
+                                    })
+                                }
+                                }
+                                label="Division"
+                            >
 
-                        <div className="col-xl-6 col-12">
-                            <Autocomplete
-                                key={options.ContainerID}
-                                options={options}
-                                noOptionsText="Enter to create a new option"
-                                getOptionLabel={(option) => option.ContainerName ? option.ContainerName : option.ReturnMsg}
-                                onInputChange={(e, newValue) => {
-                                    if (newValue !== "Sorry, there is no datas found!")
-                                        this.setState({ ContainerName: newValue });
-                                    else toast.error("Please key in *NEW* container name")
-                                }}
-                                renderInput={(params, idx) => (
-                                    <TextField
-                                        {...params}
-                                        label="Stock in Container Name"
-                                        variant="standard"
-                                        key={idx}
-                                        onKeyDown={(e) => {
-
-                                            if (
-                                                e.key === "Enter"
-                                                && options.ReturnVal !== 0
-                                                &&
-                                                options.findIndex((o) => o.ContainerName === e.target.value) === -1
-                                            ) {
-                                                this.setState({
-                                                    options: this.state.options.concat({ ContainerName: e.target.value, ContainerDate: this.state.ContainerDate })
-                                                }, () => { console.log(this.state.options) })
-                                                // this.state.options.push({ ContainerName: e.target.value, ContainerDate: this.state.ContainerDate })
-                                            } else console.log("hi")
-                                        }}
-                                    />
-                                )}
-                            />
-                        </div>
+                                {
+                                    isArrayNotEmpty(this.props.AllContainer) && this.props.AllContainer.map((el, idx) => {
+                                        return <MenuItem value={el.ContainerID} key={idx}>{el.ContainerName + " ( " + el.ContainerDate + " )"}</MenuItem>
+                                    })
+                                }
+                            </Select>
+                        </FormControl>
                     </div>}
                 />
+
                 {openEditModal &&
                     <ModalPopOut
                         showCancel={true}
                         open={openEditModal}
+                        checked={checked}
                         handleToggleDialog={() => this.handleCancel("form")}
-                        handleConfirmFunc={() => this.handleSearchfilter("openEditModal")}
+                        handleConfirmFunc={() => this.handleSearchfilter("openEditModal", checked)}
                         message={
                             <EditStockGoods data={this.state.selectedRows} ContainerDate={this.state.ContainerDate ? this.state.ContainerDate : ""} ContainerName={this.state.ContainerName ? this.state.ContainerName : ""} parentCallback={this.handleCallback} />
                         }
@@ -652,6 +679,7 @@ class StockGoods extends Component {
                     <ModalPopOut
                         showCancel={true}
                         open={openAddModal}
+                        checked={false}
                         handleToggleDialog={() => this.handleCancel("form")}
                         handleConfirmFunc={() => this.handleSearchfilter("openAddModal")}
                         message={
@@ -660,18 +688,16 @@ class StockGoods extends Component {
                     />
                 }
                 <div>
-                    <div className="row" onClick={() => this.setState({ open: !this.state.open })}>
-                        <div className="col-6 mt-2 mb-md-2">
-                            <ResponsiveDatePickers title="Date" value={this.state.datevalue ? this.state.datevalue : ""} disabled readOnly onChange={(e) => this.onDateChange(e)} />
-                        </div>
-                        <div className="col-6 mt-2">
-                            <TextField id="outlined-basic" value={this.state.ContainerName ? this.state.ContainerName : ""} fullWidth label="Container Number" variant="standard" />
-                        </div>
+                    <div onClick={() => this.setState({ open: !this.state.open })}>
+                        <Tooltip title="Click to change container" placement="bottom-start">
+                            <div style={{ fontSize: "1.05rem" }}><strong>Container Number and Date :    </strong>{this.state.ContainerName + "( " + this.state.ContainerDate + " )"}</div>
+                        </Tooltip>
                     </div>
 
                     <div className='w-100'>
                         <ToggleTabsComponent className="" Tabs={ToggleTabs} onChange={(e) => this.changeTab(e)} size="small" />
-                        <SearchBar placeholder={"Search anything"} autoFocus={true} onChange={(e) => this.onSearchChange(e)} />
+                        <SearchBar placeholder={"Search anything"} id="searchResult" autoFocus={true} onChange={(e) => this.onSearchChange(e)} />
+
                         <TableComponents
                             tableTopLeft={<h3 style={{ fontWeight: 700 }}>Stocks</h3>}
                             actionIcon={this.renderTableActionButton()}
@@ -686,7 +712,7 @@ class StockGoods extends Component {
                             tableHeaders={headCells}
                             tableRows={{
                                 renderTableRows: this.renderTableRows,
-                                checkbox: true,
+                                checkbox: this.state.needCheckBox,
                                 checkboxColor: "primary",
                                 onRowClickSelect: false
                             }}
@@ -695,11 +721,12 @@ class StockGoods extends Component {
                             onTableRowClick={this.onTableRowClick}
                             onActionButtonClick={onAddButtonClick}
                             onSelectRow={this.onSelectRow}
+                            onSelectAllClick={this.onSelectAllRow}
                             CallResetSelected={this.state.CallResetSelected}
                         />
                     </div>
                 </div>
-            </div>
+            </div >
         )
     }
 }
