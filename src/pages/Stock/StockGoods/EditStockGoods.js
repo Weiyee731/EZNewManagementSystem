@@ -142,7 +142,7 @@ class EditStockGoods extends Component {
         switch (name) {
             case "AdditionalChargedRemark":
                 const Value = additionalCostItems[index].Value
-                validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(Value)) && !isNaN(Value) && (Number(value) > 0)
+                validated = (!isStringNullOrEmpty(value)) && ((!isStringNullOrEmpty(Value)) && (!isNaN(Value) && (Number(Value) > 0)))
                 additionalCostItems[index].Charges = value
                 additionalCostItems[index].validated = validated
                 tempFormValue.AdditionalCost = additionalCostItems
@@ -153,7 +153,7 @@ class EditStockGoods extends Component {
 
             case "AdditionalChargedAmount":
                 const Charges = additionalCostItems[index].Charges
-                validated = !(isStringNullOrEmpty(value)) && !(isStringNullOrEmpty(Charges)) && !isNaN(e.target.value) && (Number(value) > 0)
+                validated = (!isStringNullOrEmpty(Charges)) && ((!isStringNullOrEmpty(value)) && (!isNaN(e.target.value) && (Number(value) > 0)))
                 additionalCostItems[index].Value = value
                 additionalCostItems[index].validated = validated
                 tempFormValue.AdditionalCost = additionalCostItems
