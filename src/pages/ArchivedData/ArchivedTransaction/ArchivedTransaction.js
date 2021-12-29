@@ -209,7 +209,6 @@ class ArchivedTransaction extends Component {
     }
 
     onDeleteButtonClick = (items) => {
-        console.log('delete button')
 
     }
 
@@ -311,8 +310,6 @@ class ArchivedTransaction extends Component {
                 searchedItem.Fullname.toLowerCase().includes(searchKeywords) || searchedItem.UserCode.toLowerCase().includes(searchKeywords) ||
                 searchedItem.TransactionName.toLowerCase().includes(searchKeywords) || searchedItem.UserContactNo.toLowerCase().includes(searchKeywords) 
             )
-            console.log(this.props.FilterArr)
-
             this.setState({ TransactionListingFiltered: isStringNullOrEmpty(searchKeywords) ? this.props.archivedData : FilterArr });
         }
 

@@ -174,7 +174,6 @@ class TransactionHistoryDetail extends Component {
   componentDidMount() {
     if (this.props.transaction.length !== this.state.Transaction.length) {
       if (this.props.transaction !== undefined && this.props.transaction[0] !== undefined) {
-        console.log(this.props.transaction)
         this.setState({
           Transaction: this.props.transaction,
           OrderDate: this.props.transaction[0].OrderDate,
@@ -193,7 +192,6 @@ class TransactionHistoryDetail extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log(this.props.transaction)
     if (prevProps.transaction.length !== this.props.transaction.length) {
       if (this.props.transaction !== undefined && this.props.transaction[0] !== undefined) {
         this.setState({
@@ -286,8 +284,6 @@ class TransactionHistoryDetail extends Component {
   }
 
   onDeleteButtonClick = (items) => {
-    console.log('delete button')
-
   }
 
   onClickConfirmInvoice = (items) => {

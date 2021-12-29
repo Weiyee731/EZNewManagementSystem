@@ -258,7 +258,6 @@ class CreateInvoice extends Component {
     }
 
     onAddButtonClick = () => {
-        console.log('add button')
     }
 
     handleCreateInvoice = () => {
@@ -315,7 +314,6 @@ class CreateInvoice extends Component {
     }
 
     handleUpdateRemark = () => {
-        console.log('update remark')
     }
 
     handleFormInput = (e) => {

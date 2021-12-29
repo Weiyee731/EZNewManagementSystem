@@ -91,8 +91,6 @@ export class GitEpic {
 
   User_Profile = action$ =>
     action$.ofType(GitAction.GetUserProfile).switchMap(async ({ payload }) => {
-      console.log(url + "User_ViewProfile"
-      )
       try {
         const response = await fetch(url +
           "User_ViewProfile"
@@ -257,38 +255,6 @@ export class GitEpic {
       }
     });
 
-  //   Inventory_UpdateStockStatus = action$ =>
-  //   action$.ofType(GitAction.UpdateInventoryStockStatus).switchMap(async ({ payload }) => {
-  //     console.log(url +
-  //       "Inventory_UpdateStockStatus?" +
-  //       "STOCKID=" + payload.STOCKID +
-  //       "&CONTAINERNAME=" + payload.CONTAINERNAME +
-  //       "&CONTAINERDATE=" + payload.CONTAINERDATE)
-  //     try {
-  //       const response = await fetch(url +
-  //         "Inventory_UpdateStockStatus?" +
-  //         "STOCKID=" + payload.STOCKID +
-  //         "&CONTAINERNAME=" + payload.CONTAINERNAME +
-  //         "&CONTAINERDATE=" + payload.CONTAINERDATE
-  //       );
-
-  //       let json = await response.json();
-  //       json = JSON.parse(json)
-  //       return {
-  //         type: GitAction.UpdatedInventoryStockStatus,
-  //         payload: json,
-  //       };
-  //     }
-  //     catch (error) {
-  //       toast.error("Error Code: Inventory_InsertStock")
-  //       return {
-  //         type: GitAction.UpdatedInventoryStockStatus,
-  //         payload: [],
-  //       };
-  //     }
-  // >>>>>>> 37db0b75379f395e9b923fa20c436716dbc39c28
-  //   });
-
   Inventory_UpdateStockDetailByGet = action$ =>
     action$.ofType(GitAction.UpdateStockDetailByGet).switchMap(async ({ payload }) => {
       try {
@@ -358,7 +324,6 @@ export class GitEpic {
       )
         .then(response => response.json())
         .then(json => {
-          console.log("json", json)
           if (json !== "fail") {
             json = json;
             toast.success("Successfully update stock. Fetching the latest data..", { autoClose: 3000 })
@@ -426,7 +391,6 @@ export class GitEpic {
       )
         .then(response => response.json())
         .then(json => {
-          console.log("json", json)
           if (json !== "fail") {
             json = json;
           } else {
@@ -442,11 +406,6 @@ export class GitEpic {
 
   Inventory_GetFilteredStockList = action$ =>
     action$.ofType(GitAction.GetFilteredInventory).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Inventory_ViewStockListByFilter?" +
-        "FILTERCOLUMN=" + payload.FILTERCOLUMN +
-        "&FILTERKEYWORD=" + payload.FILTERKEYWORD
-      )
       try {
         const response = await fetch(url +
           "Inventory_ViewStockListByFilter?" +
@@ -472,11 +431,6 @@ export class GitEpic {
 
   Inventory_ViewStockListByDate = action$ =>
     action$.ofType(GitAction.GetFilteredInventoryByDate).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Inventory_ViewStockListByDate?" +
-        "STARTDATE=" + payload.STARTDATE +
-        "&ENDDATE=" + payload.ENDDATE
-      )
       try {
         const response = await fetch(url +
           "Inventory_ViewStockListByDate?" +
@@ -535,7 +489,6 @@ export class GitEpic {
     action$.ofType(GitAction.FetchTransactionByID).switchMap(async ({ payload }) => {
       try {
         const response = await fetch(url + "Transaction_ViewTransactionByID?TRANSACTIONID=" + payload.TransactionID);
-        console.log(url + "Transaction_ViewTransactionByID?TRANSACTIONID=" + payload.TransactionID)
         let json = await response.json();
         json = JSON.parse(json)
         return {
@@ -583,12 +536,6 @@ export class GitEpic {
 
   Transaction_UpdateTransactionStatus = action$ =>
     action$.ofType(GitAction.UpdateTransaction).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Transaction_UpdateTransactionStatus?" +
-        "TRANSACTIONID=" + payload.TransactionID +
-        "&TRANSPORTATIONTYPE=" + payload.TransportationType +
-        "&DELIVERYFEE=" + payload.DeliveryFee
-      )
       try {
         const response = await fetch(url +
           "Transaction_UpdateTransactionStatus?" +
@@ -616,14 +563,6 @@ export class GitEpic {
   Transaction_UpdateTransactionPayment = action$ =>
     action$.ofType(GitAction.UpdateTransactionPayment).switchMap(async ({ payload }) => {
       try {
-        console.log(url +
-          "Transaction_UpdateTransactionPayment?" +
-          "TRANSACTIONID=" + payload.TransactionID +
-          "&PAYMENTAMMOUNT=" + payload.PaymentAmmount +
-          "&PAYMENTMETHOD=" + payload.PaymentMethod +
-          "&REFERENCENO=" + payload.ReferenceNo +
-          "&DATETIME=" + payload.Datetime
-        );
         const response = await fetch(url +
           "Transaction_UpdateTransactionPayment?" +
           "TRANSACTIONID=" + payload.TransactionID +
@@ -705,10 +644,6 @@ export class GitEpic {
   ///////////////////////////////////////////////////   Archived Data  ///////////////////////////////////////////////////
   Inventory_ViewArchiveStockListByDate = action$ =>
     action$.ofType(GitAction.FetchArchivedStocks).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Inventory_ViewArchiveStockListByDate?" +
-        "&STARTDATE=" + payload.STARTDATE +
-        "&ENDDATE=" + payload.ENDDATE)
       try {
         const response = await fetch(url +
           "Inventory_ViewArchiveStockListByDate?" +
@@ -734,10 +669,6 @@ export class GitEpic {
 
   Inventory_ViewArchiveStockListByDate = action$ =>
     action$.ofType(GitAction.FetchArchivedStocks).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Inventory_ViewArchiveStockListByDate?" +
-        "STARTDATE=" + payload.STARTDATE +
-        "&ENDDATE=" + payload.ENDDATE)
       try {
         const response = await fetch(url +
           "Inventory_ViewArchiveStockListByDate?" +
@@ -763,10 +694,6 @@ export class GitEpic {
 
   Transaction_ViewArchiveTransaction = action$ =>
     action$.ofType(GitAction.FetchArchivedTransaction).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Transaction_ViewArchiveTransaction?" +
-        "STARTDATE=" + payload.STARTDATE +
-        "&ENDDATE=" + payload.ENDDATE)
       try {
         const response = await fetch(url +
           "Transaction_ViewArchiveTransaction?" +
@@ -821,7 +748,6 @@ export class GitEpic {
       )
         .then(response => response.json())
         .then(json => {
-          console.log("json", json)
           if (json !== "fail") {
             json = json;
           } else {
@@ -837,23 +763,6 @@ export class GitEpic {
 
   User_UpdateUserProfile = action$ =>
     action$.ofType(GitAction.UpdateUserData).switchMap(async ({ payload }) => {
-      console.log(url +
-        "User_UpdateUserProfile?" +
-        "USERID=" + payload.USERID +
-        "USERCODE=" + payload.USERCODE +
-        "USERAREAID=" + payload.USERAREAID +
-        "FULLNAME=" + payload.FULLNAME +
-        "CONTACTNO=" + payload.CONTACTNO +
-        "USEREMAIL=" + payload.USEREMAIL +
-        "USERADDRESS=" + payload.USERADDRESS +
-        "MINSELFPICKUPPRICE=" + payload.MINSELFPICKUPPRICE +
-        "CUBICSELFPICKUPPRICE=" + payload.CUBICSELFPICKUPPRICE +
-        "CONSOLIDATEPRICE=" + payload.CONSOLIDATEPRICE +
-        "DELIVERYCARGO=" + payload.DELIVERYCARGO +
-        "DELIVERYFIRSTPRICE=" + payload.DELIVERYFIRSTPRICE +
-        "DELIVERYSUBPRICE=" + payload.DELIVERYSUBPRICE
-      )
-
       try {
         const response = await fetch(url +
           "User_UpdateUserProfile?" +
@@ -883,6 +792,34 @@ export class GitEpic {
         toast.error("Error Code: User_UpdateUserProfile")
         return {
           type: GitAction.UserDataUpdated,
+          payload: [],
+        };
+      }
+    });
+
+  User_DeleteUserProfile = action$ =>
+    action$.ofType(GitAction.DeleteUser).switchMap(async ({ payload }) => {
+      console.log(url +
+        "User_DeleteUserProfile?" +
+        "USERID=" + payload.USERID 
+      );
+      try {
+        const response = await fetch(url +
+          "User_DeleteUserProfile?" +
+          "USERID=" + payload.USERID 
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UserDeleted,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: User_DeleteUserProfile")
+        return {
+          type: GitAction.UserDeleted,
           payload: [],
         };
       }

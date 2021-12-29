@@ -53,9 +53,7 @@ class Dashboard extends Component {
             if (!isStringNullOrEmpty(this.props.dashboard[0].SalesByContainer))
                 SalesByContainer = JSON.parse(this.props.dashboard[0].SalesByContainer)
 
-
             let obj = { CardView: CardView, Sales: Sales, SalesByContainer: SalesByContainer }
-            console.log(obj)
             this.setState({ dashboard_data: obj })
         }
     }

@@ -55,7 +55,6 @@ class Dashboard extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(this.props.logonUser)
         if (!this.props.loading && isArrayNotEmpty(this.props.logonUser)) {
             setLogonUser(this.props.logonUser, this.props.sidebars)
         }
@@ -91,7 +90,6 @@ class Dashboard extends Component {
                 username: this.state.username,
                 password: this.state.password,
             }
-            console.log(object)
             this.props.CallUserLogin(object)
         }
     }

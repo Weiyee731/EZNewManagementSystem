@@ -27,7 +27,6 @@ function Layout() {
       return JSON.parse(sidebaritem)
     }
     catch (e) {
-      console.log('sidebar: ', e)
       return [];
     }
   }
