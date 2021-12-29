@@ -319,7 +319,6 @@ class OverallStock extends Component {
         tempFormValue.Remark = !isStringNullOrEmpty(row.Remark) ? row.Remark : ""
 
         let additionalCharges = row.AdditionalCharges
-        console.log(additionalCharges)
         try { additionalCharges = JSON.parse(additionalCharges) } catch (e) { console.log(e); additionalCharges = [] }
         tempFormValue.AdditionalCost = isObjectUndefinedOrNull(additionalCharges) ? [] : additionalCharges
         tempFormValue.AdditionalCost.length > 0 && tempFormValue.AdditionalCost.map((el, idx) => {
@@ -358,6 +357,9 @@ class OverallStock extends Component {
         else
             extraChangesValue = "-"
 
+        let selectedAreaCode = this.props.userAreaCode.filter(x => x.UserAreaID == formValue.Division)
+        selectedAreaCode = (selectedAreaCode.length > 0) ? selectedAreaCode[0].AreaCode : "KU"
+
         let object = {
             STOCKID: formValue.StockID,
             USERCODE: formValue.MemberNumber,
@@ -366,7 +368,7 @@ class OverallStock extends Component {
             PRODUCTHEIGHT: formValue.Height,
             PRODUCTWIDTH: formValue.Width,
             PRODUCTDEEP: formValue.Depth,
-            AREACODE: formValue.Division,
+            AREACODE: selectedAreaCode,
             ITEM: isStringNullOrEmpty(formValue.Item) ? "-" : formValue.Item,
             TRACKINGSTATUSID: formValue.TrackingStatusID,
             CONTAINERNAME: !isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : '-',
@@ -591,8 +593,6 @@ class OverallStock extends Component {
                 if (isArrayNotEmpty(stocks)) {
 
                     if (areaSearchKeys !== "All" && searchCategory === "All") {
-                        console.log(areaSearchKeys)
-
                         // if area is not empty
                         tempList = stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) && (x.TrackingNumber.includes(searchKeys) || x.UserCode.includes(searchKeys)))
                     }
@@ -603,13 +603,9 @@ class OverallStock extends Component {
                     }
                     else if (areaSearchKeys !== "All" && searchCategory !== "All") {
 
-                        console.log(areaSearchKeys)
-                        // if area and category is in the list of filtering options
                         tempList = this.onCategoryAndAreaFilter(stocks, searchCategory, areaSearchKeys, searchKeys)
                     }
                     else {
-                        console.log(areaSearchKeys)
-
                         // if want to search with all options
                         tempList = stocks.filter(x =>
                             (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
@@ -687,7 +683,6 @@ class OverallStock extends Component {
             { children: "Unchecked", key: "Unchecked" },
             { children: "Checked", key: "Checked" },
         ]
-        console.log(this.props)
         const { filteredList, formValue, searchCategory, searchArea } = this.state
         const renderTableTopRightButtons = () => {
             return (

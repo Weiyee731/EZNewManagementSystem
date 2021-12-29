@@ -258,6 +258,14 @@ export function counterReducer(state = INITIAL_STATE, action) {
         userManagementApproval: action.payload
       });
 
+    case GitAction.DeleteUser:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.UserDeleted:
+      return Object.assign({}, state, {
+        loading: false,
+        userManagementApproval: action.payload
+      });
+
     case GitAction.ResetUserApprovalReturn:
       return Object.assign({}, state, {
         loading: false,

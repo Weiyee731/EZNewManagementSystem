@@ -30,6 +30,7 @@ const rootEpic = combineEpics(
   gitEpic.Transaction_ViewArchiveTransaction,
   gitEpic.User_RegisterUsersByPost,
   gitEpic.User_UpdateUserProfile,
+  gitEpic.User_DeleteUserProfile,
 );
 
 const rootReducer = combineReducers({ counterReducer });
