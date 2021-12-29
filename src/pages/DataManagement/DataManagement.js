@@ -358,6 +358,7 @@ class DataManagement extends Component {
                             }}
                             selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].name : ""}
                             Data={DataRows}
+                            headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                         />
                     </div>
                 }
@@ -381,6 +382,7 @@ class DataManagement extends Component {
                         selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].name : ""}
                         Data={this.state.errorReportData}
                         fullScreen={true}
+                        headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                     />
                 </ModalPopOut>
             </div >

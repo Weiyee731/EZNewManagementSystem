@@ -38,7 +38,7 @@ function mapDispatchToProps(dispatch) {
 
 const ProformaList = (props) => {
     const { selectedType, state, userId, totalVolume, totalWeight } = props.location
-    const { userProfile, userAreaCode } = props
+    const { userProfile, userAreaCode, transactionReturn } = props
 
     const [unitPrice, setUnitPrice] = useState(0)
     const [consolidatePrice, setConsolidatePrice] = useState(0)
@@ -56,8 +56,8 @@ const ProformaList = (props) => {
     const [firstKgValidated, setFirstKgValidated] = useState(true)
     const [subsequentKgValidated, setSubsequentKgValidated] = useState(true)
     const [LargeItemMinPriceValidated, setLargeItemMinPriceValidated] = useState(true)
-
-    const ref = useRef(false)
+    let total = 0
+    const ref = useRef(transactionReturn)
 
     useEffect(() => {
         props.CallUserProfileByID({ UserID: userId })
@@ -89,22 +89,20 @@ const ProformaList = (props) => {
                 setFirstKg(userProfile[0].SmallDeliveryFirstPrice)
                 setSubsequentKg(userProfile[0].SmallDeliverySubPrice)
                 setArea(userProfile[0].AreaCode)
-                let area = userAreaCode.filter((el) => el.UserAreaID == userProfile[0].UserAreaID)
+                let area = userAreaCode.filter((el) => el.UserAreaID === userProfile[0].UserAreaID)
                 setMinCubic(area[0].MinimumCubic)
             }
         }
     }, [userProfile])
 
     useEffect(() => {
-        if (isArrayNotEmpty(props.transactionReturn)) {
-            if (props.transactionReturn[0].ReturnVal == 1) {
-                toast.success(props.transactionReturn[0].ReturnMsg)
-                props.history.push(`/InvoiceDetail/${props.transactionReturn[0].TransactionID}`)
-            } else {
-                toast.error("Something went wrong. Please try again")
+        if (ref.current !== transactionReturn) {
+            if (isArrayNotEmpty(transactionReturn) && transactionReturn[0].ReturnVal == 1) {
+                toast.success(transactionReturn[0].ReturnMsg)
+                props.history.push(`/InvoiceDetail/${transactionReturn[0].TransactionID}`)
             }
         }
-    }, [props.transactionReturn])
+    }, [ref, transactionReturn])
 
     const headCellsWithPrice = [
         {
@@ -174,26 +172,28 @@ const ProformaList = (props) => {
 
     const totalPrice = () => {
         if (selectedType != 3) {
-            let total = []
+            let totalArr = []
             items.map((item) => {
-                let volume = volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
-                let price = 0
-                if (item.isFollowStandard) {
-                    price = selectedType == 2 ? consolidatePrice * volume : unitPrice * volume
-                } else {
-                    price = item.unitPrice * volume
-                }
-                if (volume < 0.013) {
-                    if (selectedType == 1) {
-                        total.push(item.isFollowStandard ? Number(selfPickupPrice) : Number(item.unitPrice))
-                    } else {
-                        total.push(price)
-                    }
-                } else {
-                    total.push(price)
-                }
+                // let volume = volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
+                // let price = 0
+                // if (item.isFollowStandard) {
+                //     price = selectedType === 2 ? consolidatePrice * volume ? selectedType === 4 : LargeItemMinPrice * volume : unitPrice * volume
+                // } else {
+                //     price = item.unitPrice * volume
+                // }
+                // if (volume < 0.013) {
+                //     if (selectedType === 1) {
+                //         total.push(item.isFollowStandard ? Number(selfPickupPrice) : Number(item.unitPrice))
+                //     } else {
+                //         total.push(price)
+                //     }
+                // } else {
+                //     total.push(price)
+                // }
+                totalArr.push(Number(subTotal(item).toFixed(2)))
             })
-            return !isNaN(roundOffTotal(total.reduce((a, b) => a + b))) ? roundOffTotal(total.reduce((a, b) => a + b)) : 0.00
+            total = !isNaN(roundOffTotal(totalArr.reduce((a, b) => a + b))) ? roundOffTotal(totalArr.reduce((a, b) => a + b)) : 0.00
+            return !isNaN(roundOffTotal(totalArr.reduce((a, b) => a + b))) ? roundOffTotal(totalArr.reduce((a, b) => a + b)) : 0.00
         } else {
             let subKg = weightCompare() - 1
             return !isNaN(roundOffTotal(firstKg + (subKg * subsequentKg))) ? roundOffTotal(firstKg + (subKg * subsequentKg)) : 0.00
@@ -261,16 +261,20 @@ const ProformaList = (props) => {
         let stockIds = []
 
         items.map((item) => {
-            let volume = volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
-            if (volume < 0.013 && selectedType == 1) {
-                if (item.isFollowStandard && selfPickupPrice != "") {
-                    productPrices.push(Number(selfPickupPrice).toFixed(2))
-                } else if (!item.isFollowStandard) {
-                    productPrices.push(Number(item.unitPrice).toFixed(2))
-                }
-            } else {
-                productPrices.push(volume * item.unitPrice)
-            }
+            // let volume = volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
+            // if (volume < 0.013 && selectedType === 1) {
+            //     if (item.isFollowStandard) {
+            //         console.log('a', Number(selfPickupPrice).toFixed(2))
+            //         productPrices.push(Number(selfPickupPrice).toFixed(2))
+            //     } else {
+            //         console.log('b', Number(item.unitPrice).toFixed(2))
+            //         productPrices.push(Number(item.unitPrice).toFixed(2))
+            //     }
+            // } else {
+            //     console.log('c', volume * item.unitPrice)
+            //     productPrices.push(volume * item.unitPrice)
+            // }
+            productPrices.push(subTotal(item).toFixed(2))
             stockIds.push(item.StockID)
         })
 
@@ -296,45 +300,50 @@ const ProformaList = (props) => {
         }
     }
 
+    const subTotal = (data) => {
+        let price = 0
+        let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
+        if (selectedType == 1) {
+            if (volume < 0.013) {
+                if (data.isFollowStandard && selfPickupPrice != "") {
+                    return Number(selfPickupPrice)
+                } else if (!data.isFollowStandard) {
+                    return Number(data.unitPrice)
+                } else {
+                    return 0
+                }
+            } else {
+                if(data.isFollowStandard) {
+                    price = volume * unitPrice
+                } else {
+                    price = volume * data.unitPrice
+                }
+                return price
+            }
+        } else if (selectedType == 2) {
+            if (data.isFollowStandard) {
+                price = volume * consolidatePrice
+                return price
+            } else {
+                price = volume * data.unitPrice
+                return price
+            }
+        } else if (selectedType == 4) {
+            if (data.isFollowStandard) {
+                price = volume * LargeItemMinPrice
+                return price
+            } else {
+                price = volume * data.unitPrice
+                return price
+            }
+        } else {
+            return 0
+        }
+    }
+
     const renderTableRows = (data, index) => {
         let fontsize = '9pt'
         let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
-
-        const subTotal = () => {
-            let price = 0
-            if (selectedType == 1) {
-                if (volume < 0.013) {
-                    if (data.isFollowStandard && selfPickupPrice != "") {
-                        return Number(selfPickupPrice)
-                    } else if (!data.isFollowStandard) {
-                        return Number(data.unitPrice)
-                    } else {
-                        return 0
-                    }
-                } else {
-                    price = volume * unitPrice
-                    return price
-                }
-            } else if (selectedType == 2) {
-                if (data.isFollowStandard) {
-                    price = volume * consolidatePrice
-                    return price
-                } else {
-                    price = volume * data.unitPrice
-                    return price
-                }
-            } else if (selectedType == 4) {
-                if (data.isFollowStandard) {
-                    price = volume * LargeItemMinPrice
-                    return price
-                } else {
-                    price = volume * data.unitPrice
-                    return price
-                }
-            } else {
-                return 0
-            }
-        }
 
         return (
             <>
@@ -360,7 +369,7 @@ const ProformaList = (props) => {
                                 onChange={(e) => handleChangeSingleUnitPrice(index, e.target.value)}
                             />
                         </TableCell>
-                        <TableCell align="left" sx={{ fontSize: fontsize }}>{subTotal().toFixed(2)}</TableCell>
+                        <TableCell align="left" sx={{ fontSize: fontsize }}>{subTotal(data).toFixed(2)}</TableCell>
                     </>
                 }
             </>
@@ -376,7 +385,7 @@ const ProformaList = (props) => {
                             variant="standard"
                             size="small"
                             type={'number'}
-                            label="Unit Price (min.)"
+                            label="Unit Price (< 0.013 m3)"
                             name="unitPrice"
                             value={selfPickupPrice}
                             onChange={(e) => handleChangeMinSingleUnitPrice(e)}
@@ -494,7 +503,7 @@ const ProformaList = (props) => {
         }
     }
 
-    console.log()
+    console.log(items)
     return (
         <Card>
             <CardContent>
@@ -549,6 +558,7 @@ const ProformaList = (props) => {
                     }}
                     selectedIndexKey={"StockID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
                     Data={isArrayNotEmpty(items) ? items : []}                                  // required, the data that listing in the table
+                    headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                 />
                 <hr />
                 <div className='row text-end mb-3'>
