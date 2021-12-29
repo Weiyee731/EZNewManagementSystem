@@ -73,6 +73,7 @@ function EnhancedTableHead(props) {
     tableHeaders,
     renderCheckbox,
     checkboxColor,
+    headerColor
   } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -94,6 +95,7 @@ function EnhancedTableHead(props) {
         {isArrayNotEmpty(tableHeaders) &&
           tableHeaders.map((headCell) => (
             <TableCell
+              style={{ backgroundColor: headerColor }}
               key={headCell.id}
               align={
                 isStringNullOrEmpty(headCell.align) ? "left" : headCell.align
@@ -161,7 +163,7 @@ const EnhancedTableToolbar = (props) => {
         (item.ProductDimensionDeep *
           item.ProductDimensionWidth *
           item.ProductDimensionHeight) /
-          1000000;
+        1000000;
     });
   }
 
@@ -386,13 +388,17 @@ export default function TableComponents(props) {
   const TableData =
     rowsPerPage !== -1
       ? stableSort(rows, getComparator(order, orderBy)).slice(
-          page * rowsPerPage,
-          page * rowsPerPage + rowsPerPage
-        )
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage
+      )
       : stableSort(rows, getComparator(order, orderBy));
   const checkboxColor = !isObjectUndefinedOrNull(props.tableRows.checkboxColor)
     ? props.tableRows.checkboxColor
     : "primary";
+  const headerColor = !isObjectUndefinedOrNull(props.tableRows.headerColor)
+    ? props.tableRows.headerColor
+    : "rgb(200, 200, 200)";
+
   const emptyRowColSpan = renderCheckbox
     ? tableHeaders.length + 1
     : tableHeaders.length;
@@ -402,15 +408,15 @@ export default function TableComponents(props) {
       <Paper sx={{ width: "100%", mb: 2 }} elevation={elevation}>
         {(typeof props.tableTopRight !== "undefined" ||
           typeof props.tableTopLeft !== "undefined") && (
-          <EnhancedTableToolbar
-            selectedRows={selected}
-            tableTopLeft={props.tableTopLeft}
-            tableTopRight={tableTopRight}
-            OnActionButtonClick={props.onActionButtonClick}
-            actionIcon={props.actionIcon}
-            extraInfo={props.extraInfo}
-          />
-        )}
+            <EnhancedTableToolbar
+              selectedRows={selected}
+              tableTopLeft={props.tableTopLeft}
+              tableTopRight={tableTopRight}
+              OnActionButtonClick={props.onActionButtonClick}
+              actionIcon={props.actionIcon}
+              extraInfo={props.extraInfo}
+            />
+          )}
 
         <TableContainer
           sx={{ maxHeight: stickyTableHeader ? stickyTableHeight : "100%" }}
@@ -431,6 +437,7 @@ export default function TableComponents(props) {
               tableHeaders={tableHeaders}
               renderCheckbox={renderCheckbox}
               checkboxColor={checkboxColor}
+              headerColor={headerColor}
             />
             <TableBody>
               {isArrayNotEmpty(TableData) &&
@@ -441,9 +448,11 @@ export default function TableComponents(props) {
                   return (
                     <TableRow
                       hover
+
                       onClick={(event) => handleRowClick(event, row)}
                       aria-checked={isItemSelected}
                       tabIndex={-1}
+
                       key={"row_" + index}
                       selected={isItemSelected}
                     >

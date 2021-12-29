@@ -415,6 +415,7 @@ class InvoiceDetail extends Component {
           <TableComponents
             style={{
               boxShadow: "0px",
+              color:"white"
             }}
             elevation={"0"}
             tableOptions={{
@@ -427,6 +428,7 @@ class InvoiceDetail extends Component {
             tableRows={{
               renderTableRows: this.renderTableRows,
               checkbox: false,
+              headerColor:"white",
               checkboxColor: "primary",
               onRowClickSelect: false
             }}
