@@ -342,6 +342,7 @@ class StockGoods extends Component {
             Remark: Remark.join(","),
             AdditionalCharges: AdditionalCharges.join(",")
         })
+        this.setState({ searchKeywords: "", stockFiltered: this.props.Stocks })
     }
 
     renderTableRows(data, index) {
@@ -460,6 +461,7 @@ class StockGoods extends Component {
                             Remark: this.state.Remark,
                             AdditionalCharges: extraChangesValue
                         })
+                        this.setState({ searchKeywords: "", stockFiltered: this.props.Stocks })
                     }
                     else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
                 } else {
@@ -481,6 +483,7 @@ class StockGoods extends Component {
                             Remark: this.state.Remark,
                             AdditionalCharges: extraChangesValue
                         })
+                        this.setState({ searchKeywords: "", stockFiltered: this.props.Stocks })
                     }
                     else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
                 }
@@ -930,6 +933,7 @@ class StockGoods extends Component {
                                 <div className="pr-1 w-100">
                                     <SearchBar
                                         id=""
+                                        autoFocus={true}
                                         placeholder="Enter Member No, Tracking No or Container No to search"
                                         buttonOnClick={() => this.onSearch("", "")}
                                         onChange={this.handleSearchInput}
