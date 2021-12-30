@@ -418,7 +418,7 @@ class TransactionHistoryDetail extends Component {
             style={{
               boxShadow: "0px",
             }}
-            elevation={"0"}
+            elevation={0}
             tableOptions={{
               dense: true,
               tableOrderBy: 'asc',
@@ -597,7 +597,7 @@ class TransactionHistoryDetail extends Component {
             <TableComponents style={{ boxShadow: "0px" }}
               // tableTopLeft={""}
               // tableTopRight={this.renderTableActionButton}
-              elevation={"0"}
+              elevation={0}
               tableOptions={{
                 dense: false,
                 tableOrderBy: 'asc',

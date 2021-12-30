@@ -30,9 +30,12 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import ReactToPrint, { useReactToPrint } from "react-to-print";
 import TableRow from '@mui/material/TableRow';
+import te from "date-fns/esm/locale/te/index.js";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 function mapStateToProps(state) {
   return {
+    loading: state.counterReducer["loading"],
     transaction: state.counterReducer["transaction"],
   };
 }
@@ -88,7 +91,7 @@ const headCells = [
     label: 'M³',
   },
   {
-    id: 'HandlingPrice',
+    id: 'handlingCharge',
     align: 'left',
     disablePadding: false,
     label: 'Handling Price',
@@ -149,93 +152,116 @@ const img = {
 class InvoiceDetail extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      Transaction: [],
-      TransactionID: this.props.match.params.transactionid,
-      OrderDate: "",
-      TransactionName: "",
-      TransportationType: 1,
-      TransportationBool: false,
-      Fullname: "",
-      Email: "",
-      Contact: "",
-      Address: "",
-      OrderTotalAmount: "",
-      OrderPaidAmount: "",
-      AddModalOpen: false,
-      AddModalOpen2: false,
-      DeliveryFeeInd: false,
-      DeliveryFee: 0.00,
-      Remark: "",
-      TransactionDetail: [],
-      page: [],
-      isRemarkValidated: false,
-      isDeliveryFeeValidated: false,
-    }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.onClickConfirmInvoice = this.onClickConfirmInvoice.bind(this)
-    this.props.CallFetchAllTransactionByID(this.state)
+    this.props.CallFetchAllTransactionByID({ TransactionID: this.props.match.params.transactionid })
   }
 
-  componentDidMount() {
-    if (this.props.transaction.length !== this.state.Transaction.length) {
-      if (this.props.transaction !== undefined && this.props.transaction[0] !== undefined) {
-        this.setState({
-          Transaction: this.props.transaction,
-          OrderDate: this.props.transaction[0].OrderDate,
-          TransactionName: this.props.transaction[0].TransactionName,
-          Fullname: this.props.transaction[0].Fullname,
-          UserCode: this.props.transaction[0].UserCode,
-          AreaCode: this.props.transaction[0].AreaCode,
-          Contact: this.props.transaction[0].UserContactNo,
-          Address: this.props.transaction[0].UserAddress,
-          OrderTotalAmount: this.props.transaction[0].OrderSubTotalAmount,
-          OrderPaidAmount: this.props.transaction[0].OrderSubPaidAmount,
-          TransactionDetail: JSON.parse(this.props.transaction[0].TransactionDetail),
-        });
-      }
-    }
+  state = {
+    transaction: [],
+    TransactionID: this.props.match.params.transactionid,
+    // OrderDate: "",
+    // TransactionName: "",
+    TransportationType: 1,
+    TransportationBool: false,
+    // Fullname: "",
+    // Email: "",
+    // Contact: "",
+    // Address: "",
+    // OrderTotalAmount: "",
+    // OrderPaidAmount: "",
+    AddModalOpen: false,
+    AddModalOpen2: false,
+    DeliveryFeeInd: false,
+    DeliveryFee: 0.00,
+    Remark: "",
+    TransactionDetail: [],
+    page: [],
+    isRemarkValidated: false,
+    isDeliveryFeeValidated: false,
+
+    handlingCharge: '-',
+    isPrinting: false,
   }
+
+  // static getDerivedStateFromProps(props, state) {
+  //   let tempArr = []
+  //   if (isArrayNotEmpty(props.transaction)) {
+  //     console.log(JSON.parse(props.transaction[0].TransactionID))
+  //     console.log(Number(state.TransactionID))
+  //     if (props.transaction[0].TransactionID !== Number(state.TransactionID)) {
+  //       JSON.parse(props.transaction[0].TransactionDetail).map((item) => {
+  //         tempArr.push({
+  //           ...item,
+  //           handlingCharge: 0,
+  //         })
+  //       })
+  //       console.log('getDerivedStateFromProps')
+  //       localStorage.setItem('currentTransaction', props.transaction)
+  //       return {
+  //         TransactionDetail: tempArr,
+  //         TransactionID: props.transaction[0].TransactionID
+  //       };
+  //     }
+  //   }
+  //   console.log('peter', state.TransactionDetail)
+  //   return {
+  //     TransactionDetail: JSON.parse(localStorage.getItem('currentTransaction')[0].TransactionDetail)
+  //   }
+  // }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.transaction.length !== this.props.transaction.length) {
-      if (this.props.transaction !== undefined && this.props.transaction[0] !== undefined) {
+    if (prevProps.transaction !== this.props.transaction) {
+      if (isArrayNotEmpty(this.props.transaction)) {
+        let tempArr = []
+        JSON.parse(this.props.transaction[0].TransactionDetail).map((item) => {
+          tempArr.push({
+            ...item,
+            handlingCharge: 0,
+            totalPrice: item.ProductPrice * item.ProductQuantity
+          })
+        })
         this.setState({
-          Transaction: this.props.transaction,
-          OrderDate: this.props.transaction[0].OrderDate,
-          TransactionName: this.props.transaction[0].TransactionName,
-          Fullname: this.props.transaction[0].Fullname,
-          UserCode: this.props.transaction[0].UserCode,
-          AreaCode: this.props.transaction[0].AreaCode,
-          Contact: this.props.transaction[0].UserContactNo,
-          Address: this.props.transaction[0].UserAddress,
-          OrderTotalAmount: this.props.transaction[0].OrderSubTotalAmount,
-          OrderPaidAmount: this.props.transaction[0].OrderSubPaidAmount,
-          TransactionDetail: this.props.transaction[0].TransactionDetail !== "null" ? JSON.parse(this.props.transaction[0].TransactionDetail) : [],
-        });
-      }
-    } else {
-      if (prevProps.transaction.length !== this.state.Transaction.length) {
-        this.setState({
-          Transaction: prevProps.transaction,
-          OrderDate: prevProps.transaction[0].OrderDate,
-          TransactionName: prevProps.transaction[0].TransactionName,
-          Fullname: prevProps.transaction[0].Fullname,
-          UserCode: prevProps.transaction[0].UserCode,
-          AreaCode: prevProps.transaction[0].AreaCode,
-          Contact: prevProps.transaction[0].UserContactNo,
-          Address: prevProps.transaction[0].UserAddress,
-          OrderTotalAmount: prevProps.transaction[0].OrderSubTotalAmount,
-          OrderPaidAmount: prevProps.transaction[0].OrderSubPaidAmount,
-          TransactionDetail: JSON.parse(prevProps.transaction[0].TransactionDetail)
-        });
+          TransactionDetail: tempArr,
+          transaction: this.props.transaction
+        })
       }
     }
+  }
+
+  componentWillUnmount() {
+    this.setState(this.state)
+  }
+
+  handlehandlingChargeOnChange = (e, index) => {
+    let tempArr = this.state.TransactionDetail
+    tempArr[index].handlingCharge = Number(e)
+
+    this.setState({
+      TransactionDetail: tempArr,
+    })
+  }
+
+  handleConfirmhandlingCharge = (e, index) => {
+    let tempArr = this.state.TransactionDetail
+    tempArr[index].totalPrice = Number(e) + (tempArr[index].ProductPrice * tempArr[index].ProductQuantity)
+
+    let tempArr2 = this.state.transaction
+    let total = 0;
+    tempArr.map((item) => {
+      total += item.totalPrice
+    })
+    tempArr2[0].OrderSubTotalAmount = total
+    tempArr2[0].OrderTotalAmount = total
+
+    this.setState({
+      TransactionDetail: tempArr,
+      transaction: tempArr2
+    })
   }
 
   renderTableRows = (data, index) => {
-    console.log(data)
     const fontsize = '9pt'
     return (
       <>
@@ -248,22 +274,64 @@ class InvoiceDetail extends Component {
           {(index + 1)}
         </TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }}>{data.TrackingNumber}
-          {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
-            return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px" }}>{additionalCharges.Description}</TableCell></TableRow>
+          {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
+            return (
+              <TableRow>
+                <TableCell align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px" }}>
+                  {additionalCharges.Description}
+                </TableCell>
+              </TableRow>
+            )
           })}
         </TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductQuantity}</TableCell>
         {/* <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ContainerName}</TableCell> */}
         <TableCell align="left" sx={{ fontSize: fontsize }}>{volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{roundOffTotal(1.05)}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{roundOffTotal(data.ProductPrice)}
-          {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
-            return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{additionalCharges.ProductPrice}</TableCell></TableRow>
+        {this.state.isPrinting ?
+          <TableCell align="left" sx={{ fontSize: fontsize }}>
+            {data.handlingCharge !== 0 ? data.handlingCharge : "-"}
+          </TableCell>
+          :
+          <TableCell align="left" sx={{ fontSize: fontsize }}>
+            <TextField
+              variant="outlined"
+              size="small"
+              name="handlingCharge"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              value={data.handlingCharge}
+              onChange={(e) => this.handlehandlingChargeOnChange(e.target.value, index)}
+            />
+            <IconButton
+              color="primary"
+              aria-label="back"
+              component="span"
+              onClick={() => this.handleConfirmhandlingCharge(data.handlingCharge, index)}>
+              <CheckCircleIcon />
+            </IconButton>
+          </TableCell>
+        }
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductPrice}
+          {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
+            return (
+              <TableRow>
+                <TableCell align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>
+                  {additionalCharges.ProductPrice}
+                </TableCell>
+              </TableRow>
+            )
           })}
         </TableCell>
-        <TableCell align="right" sx={{ fontSize: fontsize }}>{roundOffTotal(data.ProductPrice * data.ProductQuantity)}
-          {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
-            return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{(additionalCharges.ProductPrice * additionalCharges.ProductQuantity)}</TableCell></TableRow>
+        <TableCell align="right" sx={{ fontSize: fontsize }}>{data.totalPrice}
+          {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
+            return (
+              <TableRow>
+                <TableCell align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>
+                  {(additionalCharges.ProductPrice * additionalCharges.ProductQuantity)}
+                </TableCell>
+              </TableRow>
+            )
           })}
         </TableCell>
       </>
@@ -275,11 +343,11 @@ class InvoiceDetail extends Component {
   }
 
   handleClose = () => {
-    this.setState({ AddModalOpen: false });
+    this.setState({ AddModalOpen: false, isPrinting: false });
   }
 
   handleClose2 = () => {
-    this.setState({ AddModalOpen2: false });
+    this.setState({ AddModalOpen2: false, isPrinting: false });
   }
 
   onClickConfirmInvoice = (items) => {
@@ -292,10 +360,9 @@ class InvoiceDetail extends Component {
       }
     })
 
-    this.setState({ AddModalOpen: false, AddModalOpen2: true });
+    this.setState({ AddModalOpen: false, AddModalOpen2: true, isPrinting: true });
     if (!isDeliveryExist) {
-      if(this.state.TransportationBool)
-      {
+      if (this.state.TransportationBool) {
         this.state.TransactionDetail.push({ TrackingNumber: "Delivery Fee", ProductQuantity: 1, ProductDimensionDeep: "", ProductDimensionWidth: "", ProductDimensionHeight: "", ProductPrice: this.state.DeliveryFee })
       }
     }
@@ -329,18 +396,12 @@ class InvoiceDetail extends Component {
 
   renderPage = (arr, index) => {
     const {
-      OrderDate,
-      Transaction,
-      TransactionName,
-      Fullname,
-      UserCode,
-      AreaCode,
-      Contact,
-      Address,
-      OrderTotalAmount,
-      TransactionDetail,
       DeliveryFee,
+      transaction
     } = this.state
+    // const { transaction } = this.props
+    let TransactionDetail = isArrayNotEmpty(transaction) ? JSON.parse(transaction[0].TransactionDetail) : transaction
+
     return (
       <div
         className="letter-page-size w-100"
@@ -348,146 +409,149 @@ class InvoiceDetail extends Component {
           padding: '10px 50px 0px'
         }}
       >
-        <div className="row">
-          <div style={companyTitle}>
-            EZ TRANSIT AND LOGISTICS SDN BHD
-          </div>
-          <div style={companyDetailTitle}>
-            NO.2, LORONG A, TAMAN BDC
-          </div>
-          <div style={companyDetailTitle}>
-            JALAN STUTONG 93350 KUCHING, SARAWAK
-          </div>
-          <div style={companyDetailTitle}>
-            TEL: 019 - 883 6783 / 012 - 895 7769
-          </div>
-          <div
-            style={{
-              width: "100%",
-              borderTop: "none",
-              borderRight: "none",
-              borderLeft: "none",
-              borderImage: "initial",
-              borderBottom: "1pt solid rgb(0, 112, 192)",
-              padding: "0 5px",
-              height: "20px",
-              verticalAlign: "top",
-            }}
-          />
-          <div style={companyDetailTitle}>
-            INVOICE
-          </div>
-          <div className="row" style={companyDetail}>
-            <span className="col-9">{UserCode}-{AreaCode}{Fullname}</span>
-            <span className="col-1">No</span>
-            <span className="col-2">: {TransactionName}</span>
-          </div>
-          <div className="row" style={companyDetail}>
-            <span className="col-9">{Address}</span>
-            <span className="col-1">Terms</span>
-            <span className="col-2">: C.O.D</span>
-          </div>
-          <div className="row" style={companyDetail} >
-            <span className="col-9">Tel : {Contact}</span>
-            <span className="col-1">Date</span>
-            <span className="col-2">: {OrderDate}</span>
-          </div>
-          <div className="row" style={companyDetail}>
-            <span className="col-1 offset-9">Page</span>
-            <span className="col-2">{`: ${index + 1} of ${splitArray(TransactionDetail, 16).length}`}</span>
-          </div>
-        </div>
-        <div
-          style={{
-            // marginTop: "10px"
-          }}
-        >
-          <div style={companyDetail}>
-            <b>Container Date:</b> {TransactionDetail[0].ContainerDate !== null ? TransactionDetail[0].ContainerDate : " - "}
-          </div>
-          <TableComponents
-            style={{
-              boxShadow: "0px",
-              color:"white"
-            }}
-            elevation={"0"}
-            tableOptions={{
-              dense: true,
-              tableOrderBy: 'asc',
-              sortingIndex: "fat",
-              stickyTableHeader: false,
-            }}
-            tableHeaders={headCells}
-            tableRows={{
-              renderTableRows: this.renderTableRows,
-              checkbox: false,
-              headerColor:"white",
-              checkboxColor: "primary",
-              onRowClickSelect: false
-            }}
-            selectedIndexKey={"TransactionDetailID"}
-            Data={arr}
-            headerStyle={{ fontWeight: 'medium', fontSize: '10pt' }}
-          />
-        </div>
-
-        <div className="d-flex">
-          <div className="invoice-footer">
-            <hr />
+        {isArrayNotEmpty(transaction) &&
+          <div>
             <div className="row">
-              <div style={tncDiv} className="col-5 mt-4">
-                <div style={tncTitle}>Terms and Conditions</div>
-                <br />
-                <div>
-                  <p>
-                    1. All payment should be make payable to
-                    <br />
-                    EZ TAO BAO ENTERPRISE
-                    <br />
-                    25301009073
-                    <br />
-                    HONG LEONG BANK
-                  </p>
-                  <p>
-                    2. Payment must be cleared within 3 days after the billing date
-                  </p>
-                </div>
+              <div style={companyTitle}>
+                EZ TRANSIT AND LOGISTICS SDN BHD
               </div>
-              <div style={tncDiv} className="col-2 mt-4">
-                <div >Payment can be make through S Pay Global</div>
-                <img style={img} src="https://tourism.denoo.my/Ez/spay.jpeg"></img>
+              <div style={companyDetailTitle}>
+                NO.2, LORONG A, TAMAN BDC
               </div>
-              <div style={tncDiv} className="col-4 offset-1">
-                Total Item :
-                <span style={total}>{TransactionDetail.length}</span>
-                <br />
-                Sub Total (RM) :
-                <span style={total}>{roundOffTotal(OrderTotalAmount)}</span>
-                <br />
-                Total (RM) :
-                <span style={total}>{roundOffTotal(parseFloat(OrderTotalAmount) + parseFloat(DeliveryFee))}</span>
+              <div style={companyDetailTitle}>
+                JALAN STUTONG 93350 KUCHING, SARAWAK
+              </div>
+              <div style={companyDetailTitle}>
+                TEL: 019 - 883 6783 / 012 - 895 7769
+              </div>
+              <div
+                style={{
+                  width: "100%",
+                  borderTop: "none",
+                  borderRight: "none",
+                  borderLeft: "none",
+                  borderImage: "initial",
+                  borderBottom: "1pt solid rgb(0, 112, 192)",
+                  padding: "0 5px",
+                  height: "20px",
+                  verticalAlign: "top",
+                }}
+              />
+              <div style={companyDetailTitle}>
+                INVOICE
+              </div>
+              <div className="row" style={companyDetail}>
+                <span className="col-9">{transaction[0].UserCode}-{transaction[0].AreaCode}{transaction[0].Fullname}</span>
+                <span className="col-1">No</span>
+                <span className="col-2">: {transaction[0].TransactionName}</span>
+              </div>
+              <div className="row" style={companyDetail}>
+                <span className="col-9">{transaction[0].UserAddress}</span>
+                <span className="col-1">Terms</span>
+                <span className="col-2">: C.O.D</span>
+              </div>
+              <div className="row" style={companyDetail} >
+                <span className="col-9">Tel : {transaction[0].UserContactNo}</span>
+                <span className="col-1">Date</span>
+                <span className="col-2">: {transaction[0].OrderDate}</span>
+              </div>
+              <div className="row" style={companyDetail}>
+                <span className="col-1 offset-9">Page</span>
+                <span className="col-2">{`: ${index + 1} of ${splitArray(TransactionDetail, 16).length}`}</span>
               </div>
             </div>
-            <div className="row mt-5 ">
-              <div style={tncDiv} className="col-5 mt-4">
-                __________________________________
-                <div className="text-center">
-                  <div>EZ TRANSIT AND LOGISTICS</div>
-                  <div>SDN BHD</div>
-                </div>
+            <div
+              style={{
+                // marginTop: "10px"
+              }}
+            >
+              <div style={companyDetail}>
+                <b>Container Date:</b> {TransactionDetail[0].ContainerDate !== null ? TransactionDetail[0].ContainerDate : " - "}
               </div>
-              <div style={tncDiv} className="col-2 mt-4">
+              <TableComponents
+                style={{
+                  boxShadow: "0px",
+                }}
+                elevation={0}
+                tableOptions={{
+                  dense: true,
+                  tableOrderBy: 'asc',
+                  sortingIndex: "fat",
+                  stickyTableHeader: false,
+                }}
+                tableHeaders={headCells}
+                tableRows={{
+                  renderTableRows: this.renderTableRows,
+                  checkbox: false,
+                  checkboxColor: "primary",
+                  onRowClickSelect: false
+                }}
+                selectedIndexKey={"TransactionDetailID"}
+                Data={arr}
+                headerStyle={{ fontWeight: 'medium', fontSize: '10pt' }}
+              />
+            </div>
 
-              </div>
-              <div style={{ textAlign: 'left', ...tncDiv }} className="col-4 offset-1">
-                __________________________________
-                <div>Name  : </div>
-                <div>IC NO : </div>
-                <div>DATE  : </div>
+            {/* footer */}
+            <div className="d-flex">
+              <div className="invoice-footer">
+                <hr />
+                <div className="row">
+                  <div style={tncDiv} className="col-5 mt-4">
+                    <div style={tncTitle}>Terms and Conditions</div>
+                    <br />
+                    <div>
+                      <p>
+                        1. All payment should be make payable to
+                        <br />
+                        EZ TAO BAO ENTERPRISE
+                        <br />
+                        25301009073
+                        <br />
+                        HONG LEONG BANK
+                      </p>
+                      <p>
+                        2. Payment must be cleared within 3 days after the billing date
+                      </p>
+                    </div>
+                  </div>
+                  <div style={tncDiv} className="col-2 mt-4">
+                    <div >Payment can be make through S Pay Global</div>
+                    <img style={img} src="https://tourism.denoo.my/Ez/spay.jpeg"></img>
+                  </div>
+                  <div style={tncDiv} className="col-4 offset-1">
+                    Total Item :
+                    <span style={total}>{TransactionDetail.filter((el) => el.TrackingNumber === "Delivery Fee") ? TransactionDetail.length - 1 : TransactionDetail.length}</span>
+                    <br />
+                    Sub Total (RM) :
+                    <span style={total}>{roundOffTotal(transaction[0].OrderSubTotalAmount)}</span>
+                    <br />
+                    Total (RM) :
+                    <span style={total}>{roundOffTotal(parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(DeliveryFee))}</span>
+                  </div>
+                </div>
+                <div className="row mt-5 ">
+                  <div style={tncDiv} className="col-5 mt-4">
+                    __________________________________
+                    <div className="text-center">
+                      <div>EZ TRANSIT AND LOGISTICS</div>
+                      <div>SDN BHD</div>
+                    </div>
+                  </div>
+                  <div style={tncDiv} className="col-2 mt-4">
+
+                  </div>
+                  <div style={{ textAlign: 'left', ...tncDiv }} className="col-4 offset-1">
+                    __________________________________
+                    <div>Name  : </div>
+                    <div>IC NO : </div>
+                    <div>DATE  : </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        }
         <br />
       </div>
     )
@@ -500,7 +564,7 @@ class InvoiceDetail extends Component {
       TransportationBool,
       Remark,
       DeliveryFee,
-      AddModalOpen2
+      AddModalOpen2,
     } = this.state
 
     return (
@@ -602,7 +666,7 @@ class InvoiceDetail extends Component {
                   fullWidth
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
-                  onClick={(e1) => this.onClickConfirmInvoice(e1)}
+                  onClick={(e) => this.onClickConfirmInvoice(e)}
                   disabled={(TransportationBool && (!this.state.isDeliveryFeeValidated || !this.state.isRemarkValidated))}
                 >
                   {TransportationBool ? "Add Additional Charge" : "Submit"}
@@ -630,7 +694,13 @@ class InvoiceDetail extends Component {
                 <ReactToPrint
                   style={{ width: "100%", display: "inline" }}
                   trigger={(e) => {
-                    return (<Button variant="contained">Print this invoice</Button>);
+                    return (
+                      <Button
+                        variant="contained"
+                      >
+                        Print this invoice
+                      </Button>
+                    );
                   }}
                   content={() => this.componentRef}
                 />

@@ -799,14 +799,10 @@ export class GitEpic {
 
   User_DeleteUserProfile = action$ =>
     action$.ofType(GitAction.DeleteUser).switchMap(async ({ payload }) => {
-      console.log(url +
-        "User_DeleteUserProfile?" +
-        "USERID=" + payload.USERID 
-      );
       try {
         const response = await fetch(url +
           "User_DeleteUserProfile?" +
-          "USERID=" + payload.USERID 
+          "USERID=" + payload.USERID
         );
 
         let json = await response.json();
