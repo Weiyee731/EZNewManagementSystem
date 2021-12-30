@@ -293,6 +293,7 @@ class StockGoods extends Component {
         let ContainerDate = []
         let Remark = []
         let AdditionalCharges = []
+
         //status id ===2
         selectedStocks.map((row) => {
             StockID.push(row.StockID)
@@ -311,22 +312,25 @@ class StockGoods extends Component {
             AdditionalCharges.push(row.AdditionalCharges)
         })
 
-        this.props.CallUpdateStockDetailByPost({
-            StockID: StockID.join(","),
-            TrackingNumber: TrackingNumber.join(","),
-            ProductWeight: ProductWeight.join(","),
-            ProductDimensionHeight: ProductDimensionHeight.join(","),
-            ProductDimensionWidth: ProductDimensionWidth.join(","),
-            ProductDimensionDeep: ProductDimensionDeep.join(","),
-            AreaCode: AreaCode.join(","),
-            UserCode: UserCode.join(","),
-            Item: Item.join(","),
-            TRACKINGSTATUSID: TRACKINGSTATUSID.join(","),
-            ContainerName: ContainerName.join(","),
-            ContainerDate: ContainerDate.join(","),
-            Remark: Remark.join(","),
-            AdditionalCharges: AdditionalCharges.join(",")
-        })
+        console.log(selectedStocks)
+
+
+        // this.props.CallUpdateStockDetailByPost({
+        //     StockID: StockID.join(","),
+        //     TrackingNumber: TrackingNumber.join(","),
+        //     ProductWeight: ProductWeight.join(","),
+        //     ProductDimensionHeight: ProductDimensionHeight.join(","),
+        //     ProductDimensionWidth: ProductDimensionWidth.join(","),
+        //     ProductDimensionDeep: ProductDimensionDeep.join(","),
+        //     AreaCode: AreaCode.join(","),
+        //     UserCode: UserCode.join(","),
+        //     Item: Item.join(","),
+        //     TRACKINGSTATUSID: TRACKINGSTATUSID.join(","),
+        //     ContainerName: ContainerName.join(","),
+        //     ContainerDate: ContainerDate.join(","),
+        //     Remark: Remark.join(","),
+        //     AdditionalCharges: AdditionalCharges.join(",")
+        // })
     }
 
     renderTableRows(data, index) {
@@ -362,7 +366,7 @@ class StockGoods extends Component {
                 // >
                 //     {data.Courier}
                 // </TableCell> */}
-                < TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}> {data.TrackingNumber}</ TableCell>
+                <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}> {data.TrackingNumber}</TableCell>
                 <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.ProductWeight}</TableCell>
                 <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep}</TableCell>
                 <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth}</TableCell>
@@ -595,7 +599,8 @@ class StockGoods extends Component {
             // this.state.stockListing[0].ReturnVal !== undefined &&
             // this.state.stockListing[0].ReturnVal !== "0"
         ) {
-            const FilterArr = this.props.Stocks && !isStringNullOrEmpty(this.props.Stocks[0].ReturnVal) && this.props.Stocks[0].ReturnVal !== "0" ? this.props.Stocks.filter((searchedItem) =>
+            console.log(!isStringNullOrEmpty(this.props.Stocks[0].ReturnVal))
+            const FilterArr = isArrayNotEmpty(this.props.Stocks) && isStringNullOrEmpty(this.props.Stocks[0].ReturnVal) ? this.props.Stocks.filter((searchedItem) =>
                 searchedItem.TrackingNumber.toLowerCase().includes(searchKeywords) ||
                 searchedItem.UserCode.includes(searchKeywords)
             ) : toast.warning("No data is found")
@@ -668,7 +673,7 @@ class StockGoods extends Component {
 
     onSelectAllRow = (items) => {
         this.setState({
-            selectedStocks: this.state.stockFiltered
+            selectedStocks: items
         })
     }
 
@@ -782,6 +787,7 @@ class StockGoods extends Component {
                             onSelectAllClick={this.onSelectAllRow}
                             CallResetSelected={this.state.CallResetSelected}
                             headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
+                            handleSelecetedAll={this.handleSelecetedAll}
                         />
                     </div>
                 </div>
