@@ -342,6 +342,7 @@ class StockGoods extends Component {
             Remark: Remark.join(","),
             AdditionalCharges: AdditionalCharges.join(",")
         })
+        this.setState({ searchKeywords: "", stockFiltered: this.props.Stocks })
     }
 
     renderTableRows(data, index) {
@@ -363,7 +364,7 @@ class StockGoods extends Component {
         }
         var color = "#ffffff"
         var fontcolor = "#000000"
-        if (data.TrackingStatusID === 2) { color = "#87C09B" }
+        if (data.TrackingStatusID === 2) { color = "#d3d3d3" }
         if (data.Remark !== "-" || data.AdditionalCharges !== null) { fontcolor = "#FF0000" }
 
         return (
@@ -460,7 +461,7 @@ class StockGoods extends Component {
                             Remark: this.state.Remark,
                             AdditionalCharges: extraChangesValue
                         })
-                        this.searchResult.value = "";
+                        this.setState({ searchKeywords: "", stockFiltered: this.props.Stocks })
                     }
                     else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
                 } else {
@@ -482,7 +483,7 @@ class StockGoods extends Component {
                             Remark: this.state.Remark,
                             AdditionalCharges: extraChangesValue
                         })
-                        this.searchResult.value = "";
+                        this.setState({ searchKeywords: "", stockFiltered: this.props.Stocks })
                     }
                     else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
                 }
@@ -822,7 +823,7 @@ class StockGoods extends Component {
                                 labelId="Division"
                                 id="Division"
                                 name="Division"
-                                value={this.props.AllContainer.ContainerID}
+                                value={isArrayNotEmpty(this.props.AllContainer) ? this.props.AllContainer[0].ContainerID : ""}
                                 onChange={(e) => {
                                     isStringNullOrEmpty(e.target.value)
                                     isArrayNotEmpty(this.props.AllContainer) && this.props.AllContainer.map((container) => {
@@ -932,6 +933,7 @@ class StockGoods extends Component {
                                 <div className="pr-1 w-100">
                                     <SearchBar
                                         id=""
+                                        autoFocus={true}
                                         placeholder="Enter Member No, Tracking No or Container No to search"
                                         buttonOnClick={() => this.onSearch("", "")}
                                         onChange={this.handleSearchInput}
