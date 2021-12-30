@@ -19,7 +19,7 @@ import Typography from '@mui/material/Typography';
 import Backdrop from '@mui/material/Backdrop';
 import SearchBar from "../../components/SearchBar/SearchBar"
 import CsvDownloader from 'react-csv-downloader';
-import { convertDateTimeToString112Format, getWindowDimensions, isArrayNotEmpty } from "../../tools/Helpers";
+import { convertDateTimeToString112Format, isStringNullOrEmpty, isArrayNotEmpty } from "../../tools/Helpers";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import ToggleTabsComponent from "../../components/ToggleTabsComponent/ToggleTabComponents";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -32,7 +32,8 @@ import { toast } from "react-toastify";
 function mapStateToProps(state) {
     return {
         transactions: state.counterReducer["transactions"],
-        transactionReturn: state.counterReducer["transactionReturn"]
+        transactionReturn: state.counterReducer["transactionReturn"],
+        userAreaCode: state.counterReducer["userAreaCode"],
     };
 }
 
@@ -40,6 +41,7 @@ function mapDispatchToProps(dispatch) {
     return {
         CallFetchAllTransaction: (data) => dispatch(GitAction.CallFetchAllTransaction(data)),
         CallUpdateTransactionPayment: (data) => dispatch(GitAction.CallUpdateTransactionPayment(data)),
+        CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
     };
 }
 
@@ -119,7 +121,6 @@ class TransactionHistory extends Component {
             TransactionListing: [],
             TransactionListingFiltered: [],
             TrackingStatusID: 4,
-            filteredList: [],
             selectedRow: [],
             TransactionID: 0,
             searchCategory: "Cash",
@@ -129,13 +130,22 @@ class TransactionHistory extends Component {
             PaymentMethod: "Cash",
             isPayAmountValid: false,
             isDateValid: false,
-            isReferenceValid: false
+            isReferenceValid: false,
+            searchCategory: "All",
+            searchArea: "All",
+            onSearchText: "",
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.handleInputChange = this.handleInputChange.bind(this)
-        this.handleSearchCategory = this.handleSearchCategory.bind(this)
+        this.handlePaymentCategoryCategory = this.handlePaymentCategoryCategory.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
+        this.onSearch = this.onSearch.bind(this)
+        this.handleSearchInput = this.handleSearchInput.bind(this)
+        this.handleSearchCategory = this.handleSearchCategory.bind(this)
+        this.handleSearchArea = this.handleSearchArea.bind(this)
+        this.renderAreaCodeName = this.renderAreaCodeName.bind(this)
         this.props.CallFetchAllTransaction(this.state);
+        this.props.CallUserAreaCode();
     }
 
     componentDidMount() {
@@ -168,13 +178,23 @@ class TransactionHistory extends Component {
         }
     }
 
+    renderAreaCodeName = (areacodeId) => {
+        console.log(areacodeId)
+        if (isArrayNotEmpty(this.props.userAreaCode)) {
+            const AreaCode = this.props.userAreaCode.filter(x => x.UserAreaID == areacodeId)
+            return isArrayNotEmpty(AreaCode) ? AreaCode[0].AreaCode + " - " + AreaCode[0].AreaName : " - "
+        }
+        else
+            return " - "
+    }
+
     renderTableRows = (data, index) => {
         return (
             <>
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)} component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{data.OrderDate}</TableCell>
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.TransactionName}</TableCell>
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.UserCode}</TableCell>
-                <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.AreaCode}</TableCell>
+                <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{this.renderAreaCodeName(data.UserAreaID)}</TableCell>
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.Fullname}</TableCell>
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderTotalAmount}</Box></TableCell>
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
@@ -274,7 +294,7 @@ class TransactionHistory extends Component {
         this.setState({ Datetime: e })
     }
 
-    handleSearchCategory(e) {
+    handlePaymentCategoryCategory(e) {
         this.setState({ PaymentMethod: e.target.value })
     }
 
@@ -300,25 +320,192 @@ class TransactionHistory extends Component {
         }
     }
 
-    render() {
-        const onChange = (e) => {
-            const FilterArr = this.state.TransactionListing.filter((searchedItem) => searchedItem.UserCode.toLowerCase().includes(e.target.value))
-            this.setState({ TransactionListingFiltered: FilterArr });
+    onCategoryFilter(list, searchCategory, searchKeys) {
+        switch (searchCategory) {
+            case "Tracking":
+                return list.filter(x => (!isStringNullOrEmpty(x.TransactionName) && x.TransactionName.includes(searchKeys)))
+
+            case "Member":
+                return list.filter(x => (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) || (!isStringNullOrEmpty(x.Fullname) && x.Fullname.includes(searchKeys)))
+
+            case "Container":
+                return list.filter(x => (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
+
+            default:
+                return list.filter(x =>
+                    (!isStringNullOrEmpty(x.TransactionName) && x.TransactionName.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.Fullname) && x.Fullname.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys))
+                )
         }
+    }
+
+    onCategoryAndAreaFilter(list, searchCategory, searchArea, searchKeys) {
+        switch (searchCategory) {
+            case "Tracking":
+                return list.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.TransactionName) && x.TransactionName.includes(searchKeys)))
+
+            case "Member":
+                return list.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) || (!isStringNullOrEmpty(x.Fullname) && x.Fullname.includes(searchKeys)))
+
+            case "Container":
+                return list.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
+
+            default:
+                return this.props.transactions.filter(x =>
+                    (!isStringNullOrEmpty(x.TransactionName) && x.TransactionName.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.Fullname) && x.Fullname.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys))
+                )
+        }
+    }
+
+    onSearch(keywords, area) {
+        const { TransactionListingFiltered, searchKeywords, searchCategory, searchArea, } = this.state
+        const { transactions } = this.props
+        let searchKeys = ((!isStringNullOrEmpty(keywords))) ? keywords : searchKeywords
+        searchKeys = (!isStringNullOrEmpty(searchKeys)) ? searchKeys.toUpperCase() : searchKeys
+        let areaSearchKeys = ((!isStringNullOrEmpty(area))) ? area : searchArea
+
+        console.log(transactions)
+        // CallFilterInventory
+        let tempList;
+        if (!isStringNullOrEmpty(searchKeys)) {
+            // if search keywords is exists
+            if (isArrayNotEmpty(transactions)) {
+
+                if (areaSearchKeys !== "All" && searchCategory === "All") {
+                    // if area is not empty
+                    tempList = transactions.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) && (x.TransactionName.includes(searchKeys) || x.UserCode.includes(searchKeys) || x.Fullname.includes(searchKeys)))
+                }
+                else if (areaSearchKeys === "All" && searchCategory !== "All") {
+                    // if category is not empty
+                    tempList = this.onCategoryFilter(transactions, searchCategory, searchKeys)
+                }
+                else if (areaSearchKeys !== "All" && searchCategory !== "All") {
+                    tempList = this.onCategoryAndAreaFilter(transactions, searchCategory, areaSearchKeys, searchKeys)
+                }
+                else {
+                    // if want to search with all options
+                    tempList = transactions.filter(x =>
+                        (!isStringNullOrEmpty(x.TransactionName) && x.TransactionName.includes(searchKeys)) ||
+                        (!isStringNullOrEmpty(x.Fullname) && x.Fullname.includes(searchKeys)) ||
+                        (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
+                        (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys))
+                    )
+                }
+            }
+            this.setState({ TransactionListingFiltered: tempList })
+        }
+        else {
+            if (searchCategory === "All" && areaSearchKeys !== "All") {
+                // if area is not empty but search string is empty
+                this.setState({ searchCategory: "All", searchDates: [], TransactionListingFiltered: transactions.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) })
+            }
+            else if (searchCategory !== "All" && areaSearchKeys === "All") {
+                // if category is not empty but search string is empty
+                // no point to search with category if there are no searching keywords
+                this.setState({ areaSearchKeys: "All", searchDates: [], TransactionListingFiltered: transactions })
+            }
+            else {
+                this.setState({ searchCategory: "All", areaSearchKeys: "All", searchDates: [], TransactionListingFiltered: transactions })
+            }
+        }
+    }
+    handleSearchInput(e) {
+        let searchKeywords = e.target.value
+        this.onSearch(searchKeywords)
+        this.setState({ searchKeywords: searchKeywords })
+    }
+
+    handleSearchCategory(e) {
+        this.setState({ searchCategory: e.target.value })
+    }
+
+    handleSearchArea(e) {
+        this.onSearch("", e.target.value)
+        this.setState({ searchArea: e.target.value })
+    }
+
+    render() {
         const ToggleTabs = [
             { children: "All", key: "All" },
             { children: "Unpaid", key: "Unpaid" },
             { children: "Paid", key: "Paid" }
         ]
-        const { selectedRow } = this.state
+        const { searchCategory, searchArea, selectedRow } = this.state
         return (
             <>
                 <div className="w-100 container-fluid">
                     <div className="row d-flex">
-                        <div className="col-md-11 col-11 m-auto">
-                            <SearchBar onChange={onChange} />
+                        <div className="col-md-11 col-11">
+                            {/* <SearchBar onChange={onChange} /> */}
+                            <div className="row">
+                                <div className="col-md-6 col-12 mb-2">
+                                    <div className="filter-dropdown row">
+                                        <div className="col-md-6 col-12 mb-2">
+                                            <div className="d-inline-flex w-100">
+                                                <label className="my-auto col-3">Filter By:</label>
+                                                <Select
+                                                    labelId="search-filter-category"
+                                                    id="search-filter-category"
+                                                    value={searchCategory}
+                                                    label="Search By"
+                                                    onChange={this.handleSearchCategory}
+                                                    size="small"
+                                                    IconComponent={FilterListOutlinedIcon}
+                                                    className="col-9"
+                                                    placeholder="filter by"
+                                                >
+                                                    <MenuItem key="search_all" value="All">All</MenuItem>
+                                                    <MenuItem key="search_tracking" value="Tracking">Invoice Number</MenuItem>
+                                                    <MenuItem key="search_member" value={"Member"}>Member</MenuItem>
+                                                    {/* <MenuItem key="search_container" value={"Container"}>Container</MenuItem> */}
+                                                </Select>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-6 col-12">
+                                            <div className="d-inline-block w-100">
+                                                <label className="my-auto col-3">Area:</label>
+                                                <Select
+                                                    labelId="search-filter-area"
+                                                    id="search-filter-area"
+                                                    value={searchArea}
+                                                    label="Area"
+                                                    onChange={this.handleSearchArea}
+                                                    size="small"
+                                                    className="col-9"
+                                                    placeholder="filter by"
+                                                >
+                                                    <MenuItem key="all_area" value="All">All</MenuItem>
+                                                    {
+                                                        isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
+                                                            return <MenuItem key={el.AreaName + "_" + idx} value={el.UserAreaID}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
+                                                        })
+                                                    }
+                                                </Select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-6 col-12 d-flex">
+                                    <div className="pr-1 w-100">
+                                        <SearchBar
+                                            id=""
+                                            placeholder="Enter Member No, Tracking No or Container No to search"
+                                            buttonOnClick={() => this.onSearch("", "")}
+                                            onChange={this.handleSearchInput}
+                                            className="searchbar-input mb-auto"
+                                            disableButton={this.state.isDataFetching}
+                                            tooltipText="Search with current data"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="col-md-1 col-1 m-auto">
+                        <div className="col-md-1 col-1">
                             <CsvDownloader
                                 filename="transactionhistory-list"
                                 extension=".xls"
@@ -393,7 +580,7 @@ class TransactionHistory extends Component {
                                             id="search-filter-category"
                                             value={this.state.PaymentMethod}
                                             label="Search By"
-                                            onChange={this.handleSearchCategory}
+                                            onChange={this.handlePaymentCategoryCategory}
                                             size="large"
                                             className="col-9"
                                             placeholder="filter by"
