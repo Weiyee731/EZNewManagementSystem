@@ -125,7 +125,7 @@ class ArchivedTransaction extends Component {
             ReferenceNo: "",
             searchDates: [],
             isDataFetching: false,
-
+            searchKeywords: "",
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.handleInputChange = this.handleInputChange.bind(this)
@@ -306,11 +306,13 @@ class ArchivedTransaction extends Component {
     render() {
         const onLocalSearch = (e) => {
             let searchKeywords = isStringNullOrEmpty(e.target.value) ? "" : e.target.value.toLowerCase()
-            let FilterArr = this.props.archivedData.filter((searchedItem) => 
-                searchedItem.Fullname.toLowerCase().includes(searchKeywords) || searchedItem.UserCode.toLowerCase().includes(searchKeywords) ||
-                searchedItem.TransactionName.toLowerCase().includes(searchKeywords) || searchedItem.UserContactNo.toLowerCase().includes(searchKeywords) 
+            let FilterArr = this.props.archivedData.filter((searchedItem) =>
+                (!isStringNullOrEmpty(searchedItem.Fullname) && searchedItem.Fullname.toLowerCase().includes(searchKeywords)) || 
+                (!isStringNullOrEmpty(searchedItem.UserCode) && searchedItem.UserCode.toLowerCase().includes(searchKeywords)) ||
+                (!isStringNullOrEmpty(searchedItem.TransactionName) && searchedItem.TransactionName.toLowerCase().includes(searchKeywords)) || 
+                (!isStringNullOrEmpty(searchedItem.UserContactNo) && searchedItem.UserContactNo.includes(searchKeywords))
             )
-            this.setState({ TransactionListingFiltered: isStringNullOrEmpty(searchKeywords) ? this.props.archivedData : FilterArr });
+            this.setState({ TransactionListingFiltered: isStringNullOrEmpty(searchKeywords) ? this.props.archivedData : FilterArr, searchKeywords: searchKeywords });
         }
 
         const ToggleTabs = [
@@ -350,7 +352,7 @@ class ArchivedTransaction extends Component {
                             </div>
                         </div>
                         <div className="col-md-11 col-11 m-auto">
-                            <SearchBar onChange={onLocalSearch} />
+                            <SearchBar onChange={onLocalSearch} value={this.state.searchKeywords} />
                         </div>
                         <div className="col-md-1 col-1 m-auto">
                             <CsvDownloader

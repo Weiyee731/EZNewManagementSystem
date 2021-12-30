@@ -146,7 +146,6 @@ class Invoice extends Component {
     }
 
     renderAreaCodeName = (areacodeId) => {
-        console.log(areacodeId)
         if (isArrayNotEmpty(this.props.userAreaCode)) {
             const AreaCode = this.props.userAreaCode.filter(x => x.UserAreaID == areacodeId)
             return isArrayNotEmpty(AreaCode) ? AreaCode[0].AreaCode + " - " + AreaCode[0].AreaName : " - "
@@ -377,6 +376,7 @@ class Invoice extends Component {
                                 className="searchbar-input mb-auto"
                                 disableButton={this.state.isDataFetching}
                                 tooltipText="Search with current data"
+                                value={this.state.searchKeywords}
                             />
                         </div>
                     </div>

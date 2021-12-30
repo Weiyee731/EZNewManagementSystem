@@ -105,6 +105,7 @@ class UserManagement extends Component {
             selectedRows: [],
             UserListingfiltered: [],
             addWithCSVModalOpen: false,
+            searchKeywords: "",
 
             //form data
             userCode: "",
@@ -627,7 +628,7 @@ class UserManagement extends Component {
 
         const onChange = (e) => {
             const FilterArr = this.state.UserListing.filter((searchedItem) => searchedItem.UserCode.toLowerCase().includes(e.target.value))
-            this.setState({ UserListingfiltered: FilterArr });
+            this.setState({ UserListingfiltered: FilterArr, searchKeywords: e.target.value });
         }
 
         return (
@@ -635,7 +636,7 @@ class UserManagement extends Component {
                 <div className="w-100 container-fluid">
                     <div className="row d-flex">
                         <div className="col-md-10 col-10 m-auto">
-                            <SearchBar onChange={onChange} />
+                            <SearchBar onChange={onChange} value={this.state.searchKeywords} />
                         </div>
                         <div className="col-md-2 col-2 m-auto">
                             <div className="d-flex w-100">

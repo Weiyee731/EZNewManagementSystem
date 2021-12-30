@@ -561,6 +561,7 @@ class ArchivedStock extends Component {
                                 className="searchbar-input mb-auto"
                                 disableButton={this.state.isDataFetching}
                                 tooltipText="Search with current data"
+                                value={this.state.searchKeywords}
                             />
                         </div>
                     </div>
