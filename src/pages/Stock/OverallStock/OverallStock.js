@@ -576,7 +576,6 @@ class OverallStock extends Component {
         const { stocks } = this.props
         let searchKeys = ((!isStringNullOrEmpty(keywords))) ? keywords : searchKeywords
         searchKeys = (!isStringNullOrEmpty(searchKeys)) ? searchKeys.toUpperCase() : searchKeys
-
         let areaSearchKeys = ((!isStringNullOrEmpty(area))) ? area : searchArea
 
         // CallFilterInventory
@@ -597,12 +596,10 @@ class OverallStock extends Component {
                         tempList = stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) && (x.TrackingNumber.includes(searchKeys) || x.UserCode.includes(searchKeys)))
                     }
                     else if (areaSearchKeys === "All" && searchCategory !== "All") {
-
                         // if category is not empty
                         tempList = this.onCategoryFilter(stocks, searchCategory, searchKeys)
                     }
                     else if (areaSearchKeys !== "All" && searchCategory !== "All") {
-
                         tempList = this.onCategoryAndAreaFilter(stocks, searchCategory, areaSearchKeys, searchKeys)
                     }
                     else {
