@@ -23,7 +23,7 @@ import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutli
 import CsvDownloader from 'react-csv-downloader';
 import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull, volumeCalc } from "../../../tools/Helpers";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
-import { toast } from "react-toastify";
+import { toast, Flip } from "react-toastify";
 
 function mapStateToProps(state) {
     return {
@@ -136,6 +136,7 @@ const INITIAL_STATE = {
     totalVolumeSelected: null,
     totalWeightSelected: null,
     searchCategory: "All",
+    searchArea: "All",
     onSearchText: "",
 
     formValue: {
@@ -178,6 +179,10 @@ class CreateInvoice extends Component {
         this.RenderAdditionalCost = this.RenderAdditionalCost.bind(this)
         this.handleRemoveAdditionalCosts = this.handleRemoveAdditionalCosts.bind(this)
         this.removeAllAdditionalCost = this.removeAllAdditionalCost.bind(this)
+        this.onSearch = this.onSearch.bind(this)
+        this.handleSearchInput = this.handleSearchInput.bind(this)
+        this.handleSearchCategory = this.handleSearchCategory.bind(this)
+        this.handleSearchArea = this.handleSearchArea.bind(this)
     }
 
     componentDidMount() {
@@ -437,42 +442,150 @@ class CreateInvoice extends Component {
         this.setState({ formValue: tempFormValue })
     }
 
-    handleSearchCategory(e) {
-        if (isArrayNotEmpty(this.state.filteredList)) {
-            this.setState({
-                searchCategory: e.target.value,
-                filteredList: this.state.filteredList.filter((el) => el.AreaCode == e.target.value)
-            })
-        } else {
-            this.setState({
-                searchCategory: e.target.value,
-                filteredList: this.props.stocks.filter((el) => el.AreaCode == e.target.value)
-            })
+    // handleSearchCategory(e) {
+    //     if (isArrayNotEmpty(this.state.filteredList)) {
+    //         this.setState({
+    //             searchCategory: e.target.value,
+    //             filteredList: this.state.filteredList.filter((el) => el.AreaCode == e.target.value)
+    //         })
+    //     } else {
+    //         this.setState({
+    //             searchCategory: e.target.value,
+    //             filteredList: this.props.stocks.filter((el) => el.AreaCode == e.target.value)
+    //         })
+    //     }
+    // }
+
+    // onSearch = (e) => {
+    //     if (isArrayNotEmpty(this.state.filteredList)) {
+    //         this.setState({
+    //             onSearchText: e.target.value,
+    //             filteredList:
+    //                 this.state.filteredList.filter((el) =>
+    //                     el.TrackingNumber.toLowerCase().trim().includes(e.target.value.toLowerCase().trim())
+    //                     ||
+    //                     el.UserCode.trim().includes(e.target.value.trim())
+    //                 )
+    //         })
+    //     } else {
+    //         this.setState({
+    //             onSearchText: e.target.value,
+    //             filteredList:
+    //                 this.props.stocks.filter((el) =>
+    //                     el.TrackingNumber.toLowerCase().trim().includes(e.target.value.toLowerCase().trim())
+    //                     ||
+    //                     el.UserCode.trim().includes(e.target.value.trim())
+    //                 )
+    //         })
+    //     }
+    // }
+
+    onCategoryFilter(stocks, searchCategory, searchKeys) {
+        switch (searchCategory) {
+            case "Tracking":
+                return stocks.filter(x => (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)))
+
+            case "Member":
+                return stocks.filter(x => (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)))
+
+            case "Container":
+                return stocks.filter(x => (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
+
+            default:
+                return stocks.filter(x =>
+                    (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys))
+                )
         }
     }
 
-    onSearch = (e) => {
-        if (isArrayNotEmpty(this.state.filteredList)) {
-            this.setState({
-                onSearchText: e.target.value,
-                filteredList:
-                    this.state.filteredList.filter((el) =>
-                        el.TrackingNumber.toLowerCase().trim().includes(e.target.value.toLowerCase().trim())
-                        ||
-                        el.UserCode.trim().includes(e.target.value.trim())
-                    )
-            })
-        } else {
-            this.setState({
-                onSearchText: e.target.value,
-                filteredList:
-                    this.props.stocks.filter((el) =>
-                        el.TrackingNumber.toLowerCase().trim().includes(e.target.value.toLowerCase().trim())
-                        ||
-                        el.UserCode.trim().includes(e.target.value.trim())
-                    )
-            })
+    onCategoryAndAreaFilter(stocks, searchCategory, searchArea, searchKeys) {
+        switch (searchCategory) {
+            case "Tracking":
+                return stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)))
+
+            case "Member":
+                return stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)))
+
+            case "Container":
+                return stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
+
+            default:
+                return this.props.stocks.filter(x =>
+                    (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys))
+                )
         }
+    }
+
+    onSearch(keywords, area) {
+        const { filteredList, searchKeywords, searchCategory, searchArea, searchDates, isDataFetching } = this.state
+        const { stocks } = this.props
+        let searchKeys = ((!isStringNullOrEmpty(keywords))) ? keywords : searchKeywords
+        searchKeys = (!isStringNullOrEmpty(searchKeys)) ? searchKeys.toUpperCase() : searchKeys
+        let areaSearchKeys = ((!isStringNullOrEmpty(area))) ? area : searchArea
+
+        // CallFilterInventory
+        let tempList;
+        if (!isStringNullOrEmpty(searchKeys)) {
+            // if search keywords is exists
+            if (isArrayNotEmpty(stocks)) {
+                if (areaSearchKeys !== "All" && searchCategory === "All") {
+                    // if area is not empty
+                    tempList = stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) && (x.TrackingNumber.includes(searchKeys) || x.UserCode.includes(searchKeys)))
+                }
+                else if (areaSearchKeys === "All" && searchCategory !== "All") {
+                    // if category is not empty
+                    tempList = this.onCategoryFilter(stocks, searchCategory, searchKeys)
+                }
+                else if (areaSearchKeys !== "All" && searchCategory !== "All") {
+                    tempList = this.onCategoryAndAreaFilter(stocks, searchCategory, areaSearchKeys, searchKeys)
+                }
+                else {
+                    // if want to search with all options
+                    tempList = stocks.filter(x =>
+                        (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
+                        (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) ||
+                        (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
+                        (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys))
+                    )
+                }
+            }
+            this.setState({ filteredList: tempList })
+        }
+        else {
+            if (searchCategory === "All" && areaSearchKeys !== "All") {
+                // if area is not empty but search string is empty
+                this.setState({ searchCategory: "All", filteredList: stocks.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) })
+            }
+            else if (searchCategory !== "All" && areaSearchKeys === "All") {
+                // if category is not empty but search string is empty
+                // no point to search with category if there are no searching keywords
+                this.setState({ areaSearchKeys: "All", filteredList: stocks })
+            }
+            else {
+                this.setState({ searchCategory: "All", areaSearchKeys: "All", filteredList: stocks })
+            }
+        }
+    }
+
+    handleSearchInput(e) {
+        let searchKeywords = e.target.value
+        this.onSearch(searchKeywords)
+        this.setState({ searchKeywords: searchKeywords })
+    }
+
+    handleSearchCategory(e) {
+        this.setState({ searchCategory: e.target.value })
+    }
+
+    handleSearchArea(e) {
+        this.onSearch("", e.target.value)
+        this.setState({ searchArea: e.target.value })
     }
 
     renderTableActionButton = () => {
@@ -486,14 +599,13 @@ class CreateInvoice extends Component {
     }
 
     render() {
-        const { filteredList, formValue, openDeliveryModal, openRemarkModal, searchCategory, onSearchText, openCancelModal } = this.state
+        const { filteredList, formValue, openDeliveryModal, openRemarkModal, searchCategory, searchArea, onSearchText, openCancelModal, } = this.state
         const { userAreaCode, stocks } = this.props
-        console.log(stocks)
 
         return (
             <div className="container-fluid">
                 <div className="row">
-                    <div className="col-2">
+                    {/* <div className="col-2">
                         <div className="w-100 filter-dropdown">
                             <Select
                                 labelId="search-filter-category"
@@ -522,6 +634,70 @@ class CreateInvoice extends Component {
                             placeholder="Search by Member No. or Tracking No."
                             onChange={(e) => this.onSearch(e)}
                         />
+                    </div> */}
+                    <div className="col-11">
+                        <div className="row">
+                            <div className="col-md-6 col-12 mb-2">
+                                <div className="filter-dropdown row">
+                                    <div className="col-md-6 col-12 mb-2">
+                                        <div className="d-inline-flex w-100">
+                                            <label className="my-auto col-3">Filter By:</label>
+                                            <Select
+                                                labelId="search-filter-category"
+                                                id="search-filter-category"
+                                                value={searchCategory}
+                                                label="Search By"
+                                                onChange={this.handleSearchCategory}
+                                                size="small"
+                                                IconComponent={FilterListOutlinedIcon}
+                                                className="col-9"
+                                                placeholder="filter by"
+                                            >
+                                                <MenuItem key="search_all" value="All">All</MenuItem>
+                                                <MenuItem key="search_tracking" value="Tracking">Tracking Number</MenuItem>
+                                                <MenuItem key="search_member" value={"Member"}>Member</MenuItem>
+                                                <MenuItem key="search_container" value={"Container"}>Container</MenuItem>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6 col-12">
+                                        <div className="d-inline-block w-100">
+                                            <label className="my-auto col-3">Area:</label>
+                                            <Select
+                                                labelId="search-filter-area"
+                                                id="search-filter-area"
+                                                value={searchArea}
+                                                label="Area"
+                                                onChange={this.handleSearchArea}
+                                                size="small"
+                                                className="col-9"
+                                                placeholder="filter by"
+                                            >
+                                                <MenuItem key="all_area" value="All">All</MenuItem>
+                                                {
+                                                    isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
+                                                        return <MenuItem key={el.AreaName + "_" + idx} value={el.UserAreaID}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
+                                                    })
+                                                }
+                                            </Select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-6 col-12 d-flex">
+                                <div className="pr-1 w-100">
+                                    <SearchBar
+                                        id=""
+                                        placeholder="Enter Member No, Tracking No or Container No to search"
+                                        buttonOnClick={() => this.onSearch("", "")}
+                                        onChange={this.handleSearchInput}
+                                        className="searchbar-input mb-auto"
+                                        disableButton={this.state.isDataFetching}
+                                        tooltipText="Search with current data"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div className="col-1">
                         <CsvDownloader
@@ -556,7 +732,7 @@ class CreateInvoice extends Component {
                         onRowClickSelect: true                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                     }}
                     selectedIndexKey={"StockID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
-                    Data={searchCategory == "All" && onSearchText == "" ? stocks : filteredList}                                  // required, the data that listing in the table
+                    Data={filteredList === null ? [] : filteredList}                                  // required, the data that listing in the table
                     // onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                     onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                     actionIcon={this.renderTableActionButton()}
