@@ -445,7 +445,6 @@ class StockGoods extends Component {
                             Remark: this.state.Remark,
                             AdditionalCharges: extraChangesValue
                         })
-                        this.searchResult.value = "";
                     }
                     else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
                 } else {
@@ -467,7 +466,6 @@ class StockGoods extends Component {
                             Remark: this.state.Remark,
                             AdditionalCharges: extraChangesValue
                         })
-                        this.searchResult.value = "";
                     }
                     else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
                 }
@@ -696,7 +694,7 @@ class StockGoods extends Component {
                                 labelId="Division"
                                 id="Division"
                                 name="Division"
-                                value={this.props.AllContainer.ContainerID}
+                                value={isArrayNotEmpty(this.props.AllContainer) ? this.props.AllContainer[0].ContainerID : ""}
                                 onChange={(e) => {
                                     isStringNullOrEmpty(e.target.value)
                                     isArrayNotEmpty(this.props.AllContainer) && this.props.AllContainer.map((container) => {
@@ -753,7 +751,7 @@ class StockGoods extends Component {
 
                     <div className='w-100'>
                         <ToggleTabsComponent className="" Tabs={ToggleTabs} onChange={(e) => this.changeTab(e)} size="small" />
-                        <SearchBar placeholder={"Search anything"} id="searchResult" autoFocus={true} onChange={(e) => this.onSearchChange(e)} />
+                        <SearchBar placeholder={"Search Tracking Number or Member Number here"} autoFocus={true} onChange={(e) => this.onSearchChange(e)} />
 
                         <TableComponents
                             tableTopLeft={<h3 style={{ fontWeight: 700 }}>Stocks</h3>}

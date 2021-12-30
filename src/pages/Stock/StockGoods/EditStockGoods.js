@@ -217,7 +217,6 @@ class EditStockGoods extends Component {
         const ContainerDate = this.props.ContainerDate ? this.props.ContainerDate : [];
         const ContainerName = this.props.ContainerName ? this.props.ContainerName : [];
         const addOrder = this.props.addOrder;
-        console.log(addOrder)
         return (
             <div>
                 <div className="py-md-3 py-1">
@@ -244,7 +243,7 @@ class EditStockGoods extends Component {
                                     labelId="Division"
                                     id="Division"
                                     name="Division"
-                                    defaultValue={formValue.AreaCode}
+                                    defaultValue={formValue.AreaCode ? formValue.AreaCode : ""}
                                     onChange={(e) => this.onTrigger(e, "UserAreaID")}
                                     label="Division"
                                 >
