@@ -38,7 +38,7 @@ function mapDispatchToProps(dispatch) {
 
 const ProformaList = (props) => {
     const { selectedType, state, userId, totalVolume, totalWeight } = props.location
-    const { userProfile, userAreaCode, transactionReturn } = props
+    const { userProfile, userAreaCode, transactionReturn, loading } = props
 
     const [unitPrice, setUnitPrice] = useState(0)
     const [consolidatePrice, setConsolidatePrice] = useState(0)
@@ -60,18 +60,22 @@ const ProformaList = (props) => {
     const ref = useRef(transactionReturn)
 
     useEffect(() => {
-        props.CallUserProfileByID({ UserID: userId })
         props.CallUserAreaCode()
-        let abc = []
+        if (userId !== undefined && typeof userId !== 'undefined') {
+            localStorage.setItem('proformaUserId', userId)
+        }
+        props.CallUserProfileByID({ UserID: userId !== undefined && typeof userId !== 'undefined' ? userId : localStorage.getItem('proformaUserId') })
+
+        let tempArr = []
 
         items.map((item) => {
-            abc.push({
+            tempArr.push({
                 ...item,
                 unitPrice: unitPrice,
                 isFollowStandard: true
             })
         })
-        setItems(abc)
+        setItems(tempArr)
     }, [])
 
     useEffect(() => {
@@ -93,7 +97,7 @@ const ProformaList = (props) => {
                 setMinCubic(area[0].MinimumCubic)
             }
         }
-    }, [userProfile])
+    }, [userProfile, userAreaCode])
 
     useEffect(() => {
         if (ref.current !== transactionReturn) {
@@ -174,22 +178,6 @@ const ProformaList = (props) => {
         if (selectedType != 3) {
             let totalArr = []
             items.map((item) => {
-                // let volume = volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
-                // let price = 0
-                // if (item.isFollowStandard) {
-                //     price = selectedType === 2 ? consolidatePrice * volume ? selectedType === 4 : LargeItemMinPrice * volume : unitPrice * volume
-                // } else {
-                //     price = item.unitPrice * volume
-                // }
-                // if (volume < 0.013) {
-                //     if (selectedType === 1) {
-                //         total.push(item.isFollowStandard ? Number(selfPickupPrice) : Number(item.unitPrice))
-                //     } else {
-                //         total.push(price)
-                //     }
-                // } else {
-                //     total.push(price)
-                // }
                 totalArr.push(Number(subTotal(item).toFixed(2)))
             })
             total = !isNaN(roundOffTotal(totalArr.reduce((a, b) => a + b))) ? roundOffTotal(totalArr.reduce((a, b) => a + b)) : 0.00
@@ -261,19 +249,6 @@ const ProformaList = (props) => {
         let stockIds = []
 
         items.map((item) => {
-            // let volume = volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
-            // if (volume < 0.013 && selectedType === 1) {
-            //     if (item.isFollowStandard) {
-            //         console.log('a', Number(selfPickupPrice).toFixed(2))
-            //         productPrices.push(Number(selfPickupPrice).toFixed(2))
-            //     } else {
-            //         console.log('b', Number(item.unitPrice).toFixed(2))
-            //         productPrices.push(Number(item.unitPrice).toFixed(2))
-            //     }
-            // } else {
-            //     console.log('c', volume * item.unitPrice)
-            //     productPrices.push(volume * item.unitPrice)
-            // }
             productPrices.push(subTotal(item).toFixed(2))
             stockIds.push(item.StockID)
         })
@@ -313,7 +288,7 @@ const ProformaList = (props) => {
                     return 0
                 }
             } else {
-                if(data.isFollowStandard) {
+                if (data.isFollowStandard) {
                     price = volume * unitPrice
                 } else {
                     price = volume * data.unitPrice
@@ -503,7 +478,6 @@ const ProformaList = (props) => {
         }
     }
 
-    console.log(items)
     return (
         <Card>
             <CardContent>
