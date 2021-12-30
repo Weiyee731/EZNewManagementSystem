@@ -10,7 +10,10 @@ import PropTypes from "prop-types";
 import "./Searchbar.css"
 
 const SearchBox = (props) => {
-
+    const [searchKeywords, setSearchKeywords] = React.useState(props.value)
+    useEffect(() => {
+        setSearchKeywords(isStringNullOrEmpty(props.value) ? "" : props.value)
+    }, [props.value])
     return (
         <TextField
             className={(isStringNullOrEmpty(props.className)) ? "searchbar-input" : props.className}
@@ -25,6 +28,7 @@ const SearchBox = (props) => {
             size="small"
             margin="normal"
             variant="outlined"
+            value={searchKeywords}
             InputProps={{
                 endAdornment: (
                     <InputAdornment position="end">

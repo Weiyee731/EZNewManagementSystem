@@ -322,9 +322,6 @@ class StockGoods extends Component {
             AdditionalCharges.push(row.AdditionalCharges)
         })
 
-        console.log(selectedStocks)
-
-
         this.props.CallUpdateStockDetailByPost({
             StockID: StockID.join(","),
             TrackingNumber: TrackingNumber.join(","),
@@ -725,11 +722,9 @@ class StockGoods extends Component {
                 // if category is not empty but search string is empty
                 // no point to search with category if there are no searching keywords
                 this.setState({ areaSearchKeys: "All", searchDates: [], stockFiltered: Stocks })
-                toast.warning("Please enter searching keywords", { autoClose: 1500, position: "top-center", theme: "dark" })
             }
             else {
                 this.setState({ searchCategory: "All", areaSearchKeys: "All", searchDates: [], stockFiltered: Stocks })
-                toast.warning("Please enter searching keywords", { autoClose: 1500, position: "top-center", theme: "dark" })
             }
         }
     }
