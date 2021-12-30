@@ -871,7 +871,7 @@ class StockGoods extends Component {
                     />
                 }
                 <div>
-                    <div onClick={() => this.setState({ open: !this.state.open })}>
+                    <div onClick={() => this.setState({ open: !this.state.open })} style={{ cursor: "pointer" }}>
                         <Tooltip title="Click to change container" placement="bottom-start">
                             <div style={{ fontSize: "1.05rem" }}><strong>Container Number and Date :    </strong>{this.state.ContainerName + "( " + this.state.ContainerDate + " )"}</div>
                         </Tooltip>
@@ -932,6 +932,8 @@ class StockGoods extends Component {
                                 <div className="pr-1 w-100">
                                     <SearchBar
                                         id=""
+                                        inputRef={input => input && input.focus()}
+
                                         autoFocus={true}
                                         placeholder="Enter Member No, Tracking No or Container No to search"
                                         buttonOnClick={() => this.onSearch("", "")}
@@ -942,7 +944,7 @@ class StockGoods extends Component {
                                         value={this.state.searchKeywords}
                                     />
                                 </div>
-                                {this.state.searchKeywords}
+                                {console.log(this.state.searchKeywords)}
                             </div>
                         </div>
 
