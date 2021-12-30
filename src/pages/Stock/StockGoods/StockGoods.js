@@ -25,12 +25,16 @@ import { toast } from "react-toastify";
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import AddIcon from '@mui/icons-material/Add';
+import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
+
 
 function mapStateToProps(state) {
     return {
         Stocks: state.counterReducer["stocks"],
         stockApproval: state.counterReducer["stockApproval"],
         AllContainer: state.counterReducer["AllContainer"],
+        userAreaCode: state.counterReducer["userAreaCode"],
     };
 }
 
@@ -40,6 +44,7 @@ function mapDispatchToProps(dispatch) {
         CallUpdateStockStatus: (props) => dispatch(GitAction.CallUpdateStockStatus(props)),
         CallViewContainer: (props) => dispatch(GitAction.CallViewContainer(props)),
         CallUpdateStockDetailByPost: (props) => dispatch(GitAction.CallUpdateStockDetailByPost(props)),
+        CallInsertStockByPost: (props) => dispatch(GitAction.CallInsertStockByPost(props)),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
         CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
         CallResetStocks: () => dispatch(GitAction.CallResetStocks()),
@@ -54,31 +59,31 @@ const headCells = [
     //     label: 'Courier',
     // },
     {
-        id: 'Tracking_No',
+        id: 'TrackingNumber',
         numeric: true,
         disablePadding: false,
         label: 'Tracking No',
     },
     {
-        id: 'Weight',
+        id: 'ProductWeight',
         numeric: true,
         disablePadding: false,
         label: 'Weight(kg)',
     },
     {
-        id: 'Depth',
+        id: 'ProductDimensionDeep',
         numeric: true,
         disablePadding: false,
         label: 'Depth(cm)',
     },
     {
-        id: 'Width',
+        id: 'ProductDimensionWidth',
         numeric: true,
         disablePadding: false,
         label: 'Width(cm)',
     },
     {
-        id: 'Height',
+        id: 'ProductDimensionHeight',
         numeric: true,
         disablePadding: false,
         label: 'Height(cm)',
@@ -89,12 +94,6 @@ const headCells = [
         disablePadding: false,
         label: 'Dimension (m^3)',
     },
-    // {
-    //     id: 'Category_Name',
-    //     numeric: true,
-    //     disablePadding: false,
-    //     label: 'Category Name',
-    // },
     {
         id: 'Item',
         numeric: true,
@@ -102,7 +101,7 @@ const headCells = [
         label: 'Item',
     },
     {
-        id: 'Member_No',
+        id: 'UserCode',
         numeric: true,
         disablePadding: false,
         label: 'Member No',
@@ -181,7 +180,11 @@ const INITIAL_STATE = {
     AdditionalCharges: "0",
     Remark: "no",
     CallResetSelected: false,
-    needCheckBox: true
+    needCheckBox: true,
+
+    //search
+    searchCategory: "All",
+    searchArea: "All",
 }
 
 function onAddButtonClick() {
@@ -195,6 +198,7 @@ class StockGoods extends Component {
         // this.props.CallFetchAllStock({USERID:JSON.parse(localStorage.getItem("loginUser"))[0].UserID});
         this.props.CallFetchAllStock({ TRACKINGSTATUSID: "1" });
         this.props.CallViewContainer();  //view container
+        this.props.CallUserAreaCode()
         this.state.stockListing = this.props.Stocks;
 
         this.onTableRowClick = this.onTableRowClick.bind(this);
@@ -202,8 +206,11 @@ class StockGoods extends Component {
         this.handleCancel = this.handleCancel.bind(this);
         this.changeTab = this.changeTab.bind(this);
         this.onContainerChange = this.onContainerChange.bind(this);
-        this.onSearchChange = this.onSearchChange.bind(this);
+        // this.onSearchChange = this.onSearchChange.bind(this);
         this.onDateChange = this.onDateChange.bind(this);
+        this.handleSearchCategory = this.handleSearchCategory.bind(this)
+        this.handleSearchArea = this.handleSearchArea.bind(this)
+        this.handleSearchInput = this.handleSearchInput.bind(this)
     }
 
     componentDidMount() {
@@ -236,8 +243,7 @@ class StockGoods extends Component {
             this.props.CallResetUpdatedStockDetail()
             this.props.CallResetStocks()
             this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
-
-            this.setState({ CallResetSelected: true })
+            this.setState({ CallResetSelected: true, searchKeywords: "", stockFiltered: this.props.Stocks })
             setTimeout(() => { this.setState({ CallResetSelected: false }) }, 300)
 
         }
@@ -297,6 +303,7 @@ class StockGoods extends Component {
         let ContainerDate = []
         let Remark = []
         let AdditionalCharges = []
+
         //status id ===2
         selectedStocks.map((row) => {
             StockID.push(row.StockID)
@@ -331,6 +338,7 @@ class StockGoods extends Component {
             Remark: Remark.join(","),
             AdditionalCharges: AdditionalCharges.join(",")
         })
+        this.setState({ searchKeywords: "", stockFiltered: this.props.Stocks })
     }
 
     renderTableRows(data, index) {
@@ -352,7 +360,7 @@ class StockGoods extends Component {
         }
         var color = "#ffffff"
         var fontcolor = "#000000"
-        if (data.TrackingStatusID === 2) { color = "#87C09B" }
+        if (data.TrackingStatusID === 2) { color = "#d3d3d3" }
         if (data.Remark !== "-" || data.AdditionalCharges !== null) { fontcolor = "#FF0000" }
 
         return (
@@ -366,7 +374,7 @@ class StockGoods extends Component {
                 // >
                 //     {data.Courier}
                 // </TableCell> */}
-                < TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}> {data.TrackingNumber}</ TableCell>
+                <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}> {data.TrackingNumber}</TableCell>
                 <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.ProductWeight}</TableCell>
                 <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep}</TableCell>
                 <TableCell style={{ backgroundColor: color, color: fontcolor }} sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth}</TableCell>
@@ -429,6 +437,7 @@ class StockGoods extends Component {
                 }
                 else
                     extraChangesValue = "-"
+
                 if (checked === false) {
                     if (!isStringNullOrEmpty(this.state.selectedRows.AreaCode) || !isStringNullOrEmpty(this.state.AreaCode)) {
                         this.setState({ openEditModal: !this.state.openEditModal });
@@ -448,7 +457,7 @@ class StockGoods extends Component {
                             Remark: this.state.Remark,
                             AdditionalCharges: extraChangesValue
                         })
-                        this.searchResult.value = "";
+                        this.setState({ searchKeywords: "", stockFiltered: this.props.Stocks })
                     }
                     else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
                 } else {
@@ -470,14 +479,66 @@ class StockGoods extends Component {
                             Remark: this.state.Remark,
                             AdditionalCharges: extraChangesValue
                         })
-                        this.searchResult.value = "";
+                        this.setState({ searchKeywords: "", stockFiltered: this.props.Stocks })
                     }
                     else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
                 }
                 break;
 
             case "openAddModal":
-                this.setState({ openAddModal: !this.state.openAddModal });
+                let ExtraChangesValue = "", IsNotVerified = 0;
+                // let extraChangesValue = "", isNotVerified = 0;
+                if (this.state.AdditionalCharges.length > 0) {
+                    for (var i = 0; i < this.state.AdditionalCharges.length; i++) {
+
+                        if (this.state.AdditionalCharges[i].Charges === undefined || this.state.AdditionalCharges[i].Value === undefined) {
+                            this.setState({ AdditionalCharges: "" })
+                            ExtraChangesValue = "-"
+                        } else {
+                            ExtraChangesValue += this.state.AdditionalCharges[i].Charges + "=" + this.state.AdditionalCharges[i].Value
+                            if (i !== this.state.AdditionalCharges.length - 1)
+                                ExtraChangesValue += ';'
+
+                            //check extra charge
+                            if (this.state.AdditionalCharges[i].validated === false)
+                                IsNotVerified++;
+                        }
+                    }
+                }
+                else
+                    ExtraChangesValue = "-"
+
+                if (!isStringNullOrEmpty(this.state.AreaCode) ||
+                    !isStringNullOrEmpty(this.state.TrackingNumber) ||
+                    !isStringNullOrEmpty(this.state.UserCode) ||
+                    !isStringNullOrEmpty(this.state.ProductDimensionDeep) ||
+                    !isStringNullOrEmpty(this.state.ProductWeight) ||
+                    !isStringNullOrEmpty(this.state.ProductDimensionHeight) ||
+                    !isStringNullOrEmpty(this.state.ProductDimensionWidth)) {
+                    this.setState({ openAddModal: !this.state.openAddModal });
+                    this.props.CallInsertStockByPost({
+                        // StockID: this.state.selectedRows.StockID,
+                        TRACKINGNUMBER: this.state.TrackingNumber,
+                        PRODUCTWEIGHT: this.state.ProductWeight,
+                        PRODUCTHEIGHT: this.state.ProductDimensionHeight,
+                        PRODUCTWIDTH: this.state.ProductDimensionWidth,
+                        PRODUCTDEEP: this.state.ProductDimensionDeep,
+                        AREACODE: this.state.AreaCode,
+                        USERCODE: this.state.UserCode,
+                        ITEM: this.state.Item,
+                        STOCKDATE: "-",
+                        PACKAGINGDATE: "-",
+                        // TRACKINGSTATUSID: 2,
+                        REMARK: this.state.Remark,
+                        EXTRACHARGE: ExtraChangesValue,
+                        CONTAINERNAME: this.state.ContainerName,
+                        CONTAINERDATE: this.state.ContainerDate,
+
+                    })
+
+                }
+                else { toast.warning("User may not registered in the system. Please register the user in 'User Management' page. ", { autoClose: 2000 }) }
+
                 break;
 
             default:
@@ -539,26 +600,135 @@ class StockGoods extends Component {
         }
     }
 
-    onSearchChange = (e, type) => {
-        let searchKeywords = isStringNullOrEmpty(e.target.value) ? "" : e.target.value.toLowerCase()
-        if (searchKeywords !== ""
-            //  &&
-            // this.state.stockListing[0].ReturnVal !== undefined &&
-            // this.state.stockListing[0].ReturnVal !== "0"
-        ) {
-            const FilterArr = this.props.Stocks && this.props.Stocks[0].ReturnVal !== "0" ? this.props.Stocks.filter((searchedItem) =>
-                searchedItem.TrackingNumber.toLowerCase().includes(searchKeywords) ||
-                searchedItem.UserCode.includes(searchKeywords)
-            ) : toast.warning("No data is found")
+    // onSearchChange = (e, type) => {
+    //     let searchKeywords = isStringNullOrEmpty(e.target.value) ? "" : e.target.value.toLowerCase()
+    //     if (searchKeywords !== ""
+    //         //  &&
+    //         // this.state.stockListing[0].ReturnVal !== undefined &&
+    //         // this.state.stockListing[0].ReturnVal !== "0"
+    //     ) {
+    //         const FilterArr = isArrayNotEmpty(this.props.Stocks) && isStringNullOrEmpty(this.props.Stocks[0].ReturnVal) ? this.props.Stocks.filter((searchedItem) =>
+    //             searchedItem.TrackingNumber.toLowerCase().includes(searchKeywords) ||
+    //             searchedItem.UserCode.includes(searchKeywords)
+    //         ) : toast.warning("No data is found")
 
-            this.setState({ stockFiltered: FilterArr })
-            if (FilterArr.length === 1 && FilterArr[0].TrackingNumber === e.target.value) {
-                this.setState({ selectedRows: FilterArr[0], openEditModal: !this.state.openEditModal });
-            }
-        } else {
-            this.setState({ stockFiltered: this.props.Stocks });
+    //         this.setState({ stockFiltered: FilterArr })
+    //         if (FilterArr.length === 1 && FilterArr[0].TrackingNumber === e.target.value) {
+    //             this.setState({ selectedRows: FilterArr[0], openEditModal: !this.state.openEditModal });
+    //         }
+    //     } else {
+    //         this.setState({ stockFiltered: this.props.Stocks });
+    //     }
+    // }
+
+    handleSearchCategory(e) {
+        this.setState({ searchCategory: e.target.value })
+    }
+
+    handleSearchArea(e) {
+        this.onSearch("", e.target.value)
+        this.setState({ searchArea: e.target.value })
+    }
+
+    handleSearchInput(e) {
+        let searchKeywords = e.target.value
+        this.onSearch(searchKeywords)
+        this.setState({ searchKeywords: searchKeywords })
+    }
+
+    onCategoryFilter(stocks, searchCategory, searchKeys) {
+        switch (searchCategory) {
+            case "Tracking":
+                return stocks.filter(x => (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)))
+
+            case "Member":
+                return stocks.filter(x => (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)))
+
+            case "Container":
+                return stocks.filter(x => (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
+
+            default:
+                return stocks.filter(x =>
+                    (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys))
+                )
         }
     }
+
+    onCategoryAndAreaFilter(stocks, searchCategory, searchArea, searchKeys) {
+        switch (searchCategory) {
+            case "Tracking":
+                return stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)))
+
+            case "Member":
+                return stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)))
+
+            case "Container":
+                return stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea)) && (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)))
+
+            default:
+                return this.props.Stocks.filter(x =>
+                    (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
+                    (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys))
+                )
+        }
+    }
+
+    onSearch(keywords, area) {
+        const { stockFiltered, searchKeywords, searchCategory, searchArea } = this.state
+        const { Stocks } = this.props
+        let searchKeys = ((!isStringNullOrEmpty(keywords))) ? keywords : searchKeywords
+        searchKeys = (!isStringNullOrEmpty(searchKeys)) ? searchKeys.toUpperCase() : searchKeys
+
+        let areaSearchKeys = ((!isStringNullOrEmpty(area))) ? area : searchArea
+        let tempList;
+        if (!isStringNullOrEmpty(searchKeys)) {
+            // if search keywords is exists
+            if (isArrayNotEmpty(Stocks)) {
+
+                if (areaSearchKeys !== "All" && searchCategory === "All") {
+                    // if area is not empty
+                    tempList = Stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) && (x.TrackingNumber.includes(searchKeys) || x.UserCode.includes(searchKeys)))
+                }
+                else if (areaSearchKeys === "All" && searchCategory !== "All") {
+                    // if category is not empty
+                    tempList = this.onCategoryFilter(Stocks, searchCategory, searchKeys)
+                }
+                else if (areaSearchKeys !== "All" && searchCategory !== "All") {
+                    tempList = this.onCategoryAndAreaFilter(Stocks, searchCategory, areaSearchKeys, searchKeys)
+                }
+                else {
+                    // if want to search with all options
+                    tempList = Stocks.filter(x =>
+                        (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
+                        (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) ||
+                        (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
+                        (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys))
+                    )
+                }
+            }
+            this.setState({ stockFiltered: tempList })
+        }
+        else {
+            if (searchCategory === "All" && areaSearchKeys !== "All") {
+                // if area is not empty but search string is empty
+                this.setState({ searchCategory: "All", searchDates: [], stockFiltered: Stocks.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) })
+            }
+            else if (searchCategory !== "All" && areaSearchKeys === "All") {
+                // if category is not empty but search string is empty
+                // no point to search with category if there are no searching keywords
+                this.setState({ areaSearchKeys: "All", searchDates: [], stockFiltered: Stocks })
+            }
+            else {
+                this.setState({ searchCategory: "All", areaSearchKeys: "All", searchDates: [], stockFiltered: Stocks })
+            }
+        }
+    }
+
 
     handleCallback = (childData) => {
         this.setState({ childData: childData })
@@ -572,7 +742,7 @@ class StockGoods extends Component {
             this.setState({ ProductDimensionWidth: childData.ProductDimensionWidth })
         }
         if (childData.ProductDimensionHeight !== null && childData.ProductDimensionHeight !== undefined) {
-            this.setState({ ProductDimensionWidth: childData.ProductDimensionHeight })
+            this.setState({ ProductDimensionHeight: childData.ProductDimensionHeight })
         }
         if (childData.ProductDimensionDeep !== null && childData.ProductDimensionDeep !== undefined) {
             this.setState({ ProductDimensionDeep: childData.ProductDimensionDeep })
@@ -603,6 +773,14 @@ class StockGoods extends Component {
         )
     }
 
+    tableTopRight = () => {
+        return (
+            <IconButton onClick={(event) => { this.onAddButtonClick() }}>
+                <AddIcon />
+            </IconButton>
+        )
+    }
+
     onSelectRow = (items) => {
         this.setState({
             selectedStocks: items
@@ -610,8 +788,9 @@ class StockGoods extends Component {
     }
 
     onSelectAllRow = (items) => {
+        console.log(items)
         this.setState({
-            selectedStocks: this.state.stockFiltered
+            selectedStocks: items
         })
     }
 
@@ -622,7 +801,7 @@ class StockGoods extends Component {
             { children: "Checked", key: "Checked" }
         ]
         const checked = this.state.selectedRows.TrackingStatusID === 2
-        const { open, openEditModal, openAddModal, options } = this.state
+        const { open, openEditModal, openAddModal, options, searchCategory, searchArea } = this.state
         return (
             <div className="container-fluid">
                 <ModalPopOut
@@ -639,7 +818,7 @@ class StockGoods extends Component {
                                 labelId="Division"
                                 id="Division"
                                 name="Division"
-                                defaultValue={this.props.AllContainer.ContainerID}
+                                value={isArrayNotEmpty(this.props.AllContainer) ? this.props.AllContainer[0].ContainerID : ""}
                                 onChange={(e) => {
                                     isStringNullOrEmpty(e.target.value)
                                     isArrayNotEmpty(this.props.AllContainer) && this.props.AllContainer.map((container) => {
@@ -683,12 +862,12 @@ class StockGoods extends Component {
                         handleToggleDialog={() => this.handleCancel("form")}
                         handleConfirmFunc={() => this.handleSearchfilter("openAddModal")}
                         message={
-                            <EditStockGoods />
+                            <EditStockGoods addOrder={true} ContainerDate={this.state.ContainerDate ? this.state.ContainerDate : ""} ContainerName={this.state.ContainerName ? this.state.ContainerName : ""} parentCallback={this.handleCallback} />
                         }
                     />
                 }
                 <div>
-                    <div onClick={() => this.setState({ open: !this.state.open })}>
+                    <div onClick={() => this.setState({ open: !this.state.open })} style={{ cursor: "pointer" }}>
                         <Tooltip title="Click to change container" placement="bottom-start">
                             <div style={{ fontSize: "1.05rem" }}><strong>Container Number and Date :    </strong>{this.state.ContainerName + "( " + this.state.ContainerDate + " )"}</div>
                         </Tooltip>
@@ -696,7 +875,74 @@ class StockGoods extends Component {
 
                     <div className='w-100'>
                         <ToggleTabsComponent className="" Tabs={ToggleTabs} onChange={(e) => this.changeTab(e)} size="small" />
-                        <SearchBar placeholder={"Search anything"} id="searchResult" autoFocus={true} onChange={(e) => this.onSearchChange(e)} />
+                        {/* <SearchBar placeholder={"Search anything"} id="searchResult" autoFocus={true} onChange={(e) => this.onSearchChange(e)} /> */}
+
+                        <div className="row my-2">
+                            <div className="col-md-6 col-12 mb-2">
+                                <div className="filter-dropdown row">
+                                    <div className="col-md-6 col-12 mb-2">
+                                        <div className="d-inline-flex w-100">
+                                            <label className="my-auto col-3">Filter By:</label>
+                                            <Select
+                                                labelId="search-filter-category"
+                                                id="search-filter-category"
+                                                value={searchCategory}
+                                                label="Search By"
+                                                onChange={this.handleSearchCategory}
+                                                size="small"
+                                                IconComponent={FilterListOutlinedIcon}
+                                                className="col-9"
+                                                placeholder="filter by"
+                                            >
+                                                <MenuItem key="search_all" value="All">All</MenuItem>
+                                                <MenuItem key="search_tracking" value="Tracking">Tracking Number</MenuItem>
+                                                <MenuItem key="search_member" value={"Member"}>Member</MenuItem>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6 col-12">
+                                        <div className="d-inline-block w-100">
+                                            <label className="my-auto col-3">Area:</label>
+                                            <Select
+                                                labelId="search-filter-area"
+                                                id="search-filter-area"
+                                                value={searchArea}
+                                                label="Area"
+                                                onChange={this.handleSearchArea}
+                                                size="small"
+                                                className="col-9"
+                                                placeholder="filter by"
+                                            >
+                                                <MenuItem key="all_area" value="All">All</MenuItem>
+                                                {
+                                                    isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
+                                                        return <MenuItem key={el.AreaName + "_" + idx} value={el.UserAreaID}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
+                                                    })
+                                                }
+                                            </Select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-6 col-12 d-flex">
+                                <div className="pr-1 w-100">
+                                    <SearchBar
+                                        id=""
+                                        inputRef={input => input && input.focus()}
+
+                                        autoFocus={true}
+                                        placeholder="Enter Member No, Tracking No or Container No to search"
+                                        buttonOnClick={() => this.onSearch("", "")}
+                                        onChange={this.handleSearchInput}
+                                        className="searchbar-input mb-auto"
+                                        disableButton={this.state.isDataFetching}
+                                        tooltipText="Search with current data"
+                                        value={this.state.searchKeywords}
+                                    />
+                                </div>
+                                {console.log(this.state.searchKeywords)}
+                            </div>
+                        </div>
 
                         <TableComponents
                             tableTopLeft={<h3 style={{ fontWeight: 700 }}>Stocks</h3>}
@@ -720,10 +966,12 @@ class StockGoods extends Component {
                             Data={this.state.stockFiltered ? this.state.stockFiltered : []}
                             onTableRowClick={this.onTableRowClick}
                             onActionButtonClick={onAddButtonClick}
+                            tableTopRight={this.tableTopRight}
                             onSelectRow={this.onSelectRow}
                             onSelectAllClick={this.onSelectAllRow}
                             CallResetSelected={this.state.CallResetSelected}
                             headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
+                            handleSelecetedAll={this.handleSelecetedAll}
                         />
                     </div>
                 </div>

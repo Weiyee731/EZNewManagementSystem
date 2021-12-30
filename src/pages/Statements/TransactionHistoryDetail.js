@@ -429,6 +429,7 @@ class TransactionHistoryDetail extends Component {
             tableRows={{
               renderTableRows: this.renderTableRows,
               checkbox: false,
+              headerColor:"white",
               checkboxColor: "primary",
               onRowClickSelect: false
             }}
