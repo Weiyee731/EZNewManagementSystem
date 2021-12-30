@@ -70,11 +70,12 @@ function EnhancedTableHead(props) {
     tableHeaders,
     renderCheckbox,
     checkboxColor,
-    headerColor,
+    headerColor
   } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
+
   return (
     <TableHead>
       <TableRow>
@@ -336,9 +337,13 @@ export default function TableComponents(props) {
     if (event.target.checked) {
       const newSelecteds = rows.map((n) => n);
       setSelected(newSelecteds);
+      if (typeof props.onSelectAllClick === "function")
+        props.onSelectAllClick(newSelecteds)
       return;
     } else {
       setSelected([]);
+      if (typeof props.onSelectAllClick === "function")
+        props.onSelectAllClick([])
     }
   };
 
