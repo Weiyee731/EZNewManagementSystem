@@ -243,8 +243,7 @@ class StockGoods extends Component {
             this.props.CallResetUpdatedStockDetail()
             this.props.CallResetStocks()
             this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
-
-            this.setState({ CallResetSelected: true })
+            this.setState({ CallResetSelected: true, searchKeywords: "", stockFiltered: this.props.Stocks })
             setTimeout(() => { this.setState({ CallResetSelected: false }) }, 300)
 
         }
@@ -941,8 +940,10 @@ class StockGoods extends Component {
                                         className="searchbar-input mb-auto"
                                         disableButton={this.state.isDataFetching}
                                         tooltipText="Search with current data"
+                                        value={this.state.searchKeywords}
                                     />
                                 </div>
+                                {this.state.searchKeywords}
                             </div>
                         </div>
 
