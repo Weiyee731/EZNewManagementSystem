@@ -293,11 +293,9 @@ class Invoice extends Component {
                 // if category is not empty but search string is empty
                 // no point to search with category if there are no searching keywords
                 this.setState({ areaSearchKeys: "All", searchDates: [], TransactionListingFiltered: transactions })
-                toast.warning("Please enter searching keywords", { autoClose: 1500, position: "top-center", transition: Flip, theme: "dark" })
             }
             else {
                 this.setState({ searchCategory: "All", areaSearchKeys: "All", searchDates: [], TransactionListingFiltered: transactions })
-                toast.warning("Please enter searching keywords", { autoClose: 1500, position: "top-center", transition: Flip, theme: "dark" })
             }
         }
     }

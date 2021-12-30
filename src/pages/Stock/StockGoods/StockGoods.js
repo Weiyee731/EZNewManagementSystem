@@ -794,6 +794,7 @@ class StockGoods extends Component {
     }
 
     onSelectAllRow = (items) => {
+        console.log(items)
         this.setState({
             selectedStocks: items
         })
