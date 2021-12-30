@@ -215,13 +215,15 @@ class InvoiceDetail extends Component {
     if (prevProps.transaction !== this.props.transaction) {
       if (isArrayNotEmpty(this.props.transaction)) {
         let tempArr = []
-        JSON.parse(this.props.transaction[0].TransactionDetail).map((item) => {
+
+        !isStringNullOrEmpty(this.props.transaction[0].TransactionDetail) && JSON.parse(this.props.transaction[0].TransactionDetail).map((item) => {
           tempArr.push({
             ...item,
             handlingCharge: 0,
             totalPrice: item.ProductPrice * item.ProductQuantity
           })
         })
+
         this.setState({
           TransactionDetail: tempArr,
           transaction: this.props.transaction
@@ -263,7 +265,6 @@ class InvoiceDetail extends Component {
 
   renderTableRows = (data, index) => {
     const fontsize = '9pt'
-    console.log(data)
     return (
       <>
         <TableCell
@@ -576,7 +577,7 @@ class InvoiceDetail extends Component {
               color="primary"
               aria-label="back"
               component="span"
-              onClick={() => this.props.history.push('/CreateInvoice')}>
+              onClick={() => this.props.history.push('/Invoice')}>
               <ArrowBackIcon />
             </IconButton>
             <IconButton
