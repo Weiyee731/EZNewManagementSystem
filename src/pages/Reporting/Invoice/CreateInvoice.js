@@ -219,10 +219,10 @@ class CreateInvoice extends Component {
                 </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight ? data.ProductWeight.toFixed(2) : ""}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionDeep ? data.ProductDimensionDeep.toFixed(2) : ""}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionWidth ? data.ProductDimensionWidth.toFixed(2) : ""}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductDimensionHeight ? data.ProductDimensionHeight.toFixed(2) : ""}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight).toFixed(2)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionDeep) ? data.ProductDimensionDeep.toFixed(0) : 0} </TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionWidth) ? data.ProductDimensionWidth.toFixed(0) : 0} </TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionHeight) ? data.ProductDimensionHeight.toFixed(0) : 0} </TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{((data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight )/ 1000000).toFixed(3)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>

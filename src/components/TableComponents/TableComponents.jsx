@@ -156,12 +156,11 @@ const EnhancedTableToolbar = (props) => {
   if (extraInfo) {
     selectedRows.map((item) => {
       weight = weight + item.ProductWeight;
-      mCube =
-        mCube +
-        (item.ProductDimensionDeep *
+      mCube = mCube +
+        ((item.ProductDimensionDeep *
           item.ProductDimensionWidth *
           item.ProductDimensionHeight) /
-        1000000;
+        1000000).toFixed(3);
     });
   }
 

@@ -263,6 +263,7 @@ class InvoiceDetail extends Component {
 
   renderTableRows = (data, index) => {
     const fontsize = '9pt'
+    console.log(data)
     return (
       <>
         <TableCell
@@ -286,7 +287,7 @@ class InvoiceDetail extends Component {
         </TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductQuantity}</TableCell>
         {/* <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ContainerName}</TableCell> */}
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.TrackingNumber === "Delivery Fee") ? "-" : volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)}</TableCell>
         {this.state.isPrinting ?
           <TableCell align="left" sx={{ fontSize: fontsize }}>
             {data.handlingCharge !== 0 ? data.handlingCharge : "-"}
