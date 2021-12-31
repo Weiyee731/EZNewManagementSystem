@@ -569,6 +569,7 @@ class InvoiceDetail extends Component {
       AddModalOpen2,
     } = this.state
 
+    console.log(TransactionDetail)
     return (
       <Card>
         <CardContent>

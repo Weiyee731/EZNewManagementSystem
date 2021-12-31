@@ -408,7 +408,7 @@ class StockGoods extends Component {
     handleSearchfilter = (filter, checked) => {
         switch (filter) {
             case "open":
-                if ((this.state.ContainerName && this.state.ContainerDate) !== "" || undefined) {
+                if (!isStringNullOrEmpty(this.state.ContainerName)) {
                     this.setState({ open: !this.state.open });
                 }
                 else { toast.warning("Please fill in the all the details before proceed") }
@@ -420,7 +420,6 @@ class StockGoods extends Component {
                 let extraChangesValue = "", isNotVerified = 0;
                 if (this.state.AdditionalCharges.length > 0) {
                     for (var i = 0; i < this.state.AdditionalCharges.length; i++) {
-
                         if (this.state.AdditionalCharges[i].Charges === undefined || this.state.AdditionalCharges[i].Value === undefined) {
                             this.setState({ AdditionalCharges: "" })
                             extraChangesValue = "-"
@@ -820,7 +819,7 @@ class StockGoods extends Component {
                                 name="Division"
                                 value={isArrayNotEmpty(this.props.AllContainer) ? this.props.AllContainer[0].ContainerID : ""}
                                 onChange={(e) => {
-                                    isStringNullOrEmpty(e.target.value)
+                                    // isStringNullOrEmpty(e.target.value)
                                     isArrayNotEmpty(this.props.AllContainer) && this.props.AllContainer.map((container) => {
                                         if (container.ContainerID === e.target.value) {
                                             this.setState({ ContainerName: container.ContainerName, ContainerDate: container.ContainerDate })
@@ -929,7 +928,6 @@ class StockGoods extends Component {
                                     <SearchBar
                                         id=""
                                         inputRef={input => input && input.focus()}
-
                                         autoFocus={true}
                                         placeholder="Enter Member No, Tracking No or Container No to search"
                                         buttonOnClick={() => this.onSearch("", "")}
@@ -940,7 +938,6 @@ class StockGoods extends Component {
                                         value={this.state.searchKeywords}
                                     />
                                 </div>
-                                {console.log(this.state.searchKeywords)}
                             </div>
                         </div>
 
