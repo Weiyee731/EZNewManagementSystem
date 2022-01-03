@@ -577,7 +577,8 @@ class StockGoods extends Component {
     handleCancel = (condition) => {
         if (condition !== "filter") {
             this.setState({ openEditModal: !this.state.openEditModal })
-        } else this.setState({ open: !this.state.open })
+        } else this.setState({ open: !this.state.open, })
+
     }
 
     //depreciated
@@ -678,6 +679,7 @@ class StockGoods extends Component {
     }
 
     onSearch(keywords, area) {
+        console.log("onsearch")
         const { stockFiltered, searchKeywords, searchCategory, searchArea } = this.state
         const { Stocks } = this.props
         let searchKeys = ((!isStringNullOrEmpty(keywords))) ? keywords : searchKeywords
@@ -708,19 +710,24 @@ class StockGoods extends Component {
                         (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
                         (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys))
                     )
+                    console.log("Result", tempList)
+
                 }
             }
             this.setState({ stockFiltered: tempList })
+            if (tempList.length === 1) { this.setState({ openEditModal: !this.state.openEditModal, selectedRows: tempList[0] }) }
         }
         else {
             if (searchCategory === "All" && areaSearchKeys !== "All") {
                 // if area is not empty but search string is empty
                 this.setState({ searchCategory: "All", searchDates: [], stockFiltered: Stocks.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) })
+
             }
             else if (searchCategory !== "All" && areaSearchKeys === "All") {
                 // if category is not empty but search string is empty
                 // no point to search with category if there are no searching keywords
                 this.setState({ areaSearchKeys: "All", searchDates: [], stockFiltered: Stocks })
+
             }
             else {
                 this.setState({ searchCategory: "All", areaSearchKeys: "All", searchDates: [], stockFiltered: Stocks })
