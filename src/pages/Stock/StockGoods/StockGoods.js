@@ -194,7 +194,7 @@ class StockGoods extends Component {
     constructor(props) {
         super(props);
         this.state = INITIAL_STATE
-
+        this.textInput = React.createRef();
         // this.props.CallFetchAllStock({USERID:JSON.parse(localStorage.getItem("loginUser"))[0].UserID});
         this.props.CallFetchAllStock({ TRACKINGSTATUSID: "1" });
         this.props.CallViewContainer();  //view container
@@ -262,7 +262,7 @@ class StockGoods extends Component {
         if (prevProps.Stocks.length !== this.props.Stocks.length) {
             if (this.props.Stocks !== undefined && this.props.Stocks[0] !== undefined) {
                 this.setState({ stockFiltered: this.props.Stocks });
-            } else { console.log("match") }
+            } else { console.log("No result found, please try to refresh or check network connection") }
         }
         else {
             //     if (prevProps.Stocks.length !== this.state.stockFiltered.length) {
@@ -287,6 +287,11 @@ class StockGoods extends Component {
         }
     }
 
+    focusTextInput() {
+        // Explicitly focus the text input using the raw DOM API
+        // Note: we're accessing "current" to get the DOM node
+        this.textInput.current.focus();
+    }
     onDeleteButtonClick = () => {
         const { selectedStocks } = this.state
         let StockID = []
@@ -679,7 +684,6 @@ class StockGoods extends Component {
     }
 
     onSearch(keywords, area) {
-        console.log("onsearch")
         const { stockFiltered, searchKeywords, searchCategory, searchArea } = this.state
         const { Stocks } = this.props
         let searchKeys = ((!isStringNullOrEmpty(keywords))) ? keywords : searchKeywords
@@ -710,8 +714,6 @@ class StockGoods extends Component {
                         (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) ||
                         (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys))
                     )
-                    console.log("Result", tempList)
-
                 }
             }
             this.setState({ stockFiltered: tempList })
@@ -794,7 +796,6 @@ class StockGoods extends Component {
     }
 
     onSelectAllRow = (items) => {
-        console.log(items)
         this.setState({
             selectedStocks: items
         })
@@ -826,7 +827,6 @@ class StockGoods extends Component {
                                 name="Division"
                                 value={isArrayNotEmpty(this.props.AllContainer) ? this.props.AllContainer[0].ContainerID : ""}
                                 onChange={(e) => {
-                                    // isStringNullOrEmpty(e.target.value)
                                     isArrayNotEmpty(this.props.AllContainer) && this.props.AllContainer.map((container) => {
                                         if (container.ContainerID === e.target.value) {
                                             this.setState({ ContainerName: container.ContainerName, ContainerDate: container.ContainerDate })
@@ -836,7 +836,6 @@ class StockGoods extends Component {
                                 }
                                 label="Division"
                             >
-
                                 {
                                     isArrayNotEmpty(this.props.AllContainer) && this.props.AllContainer.map((el, idx) => {
                                         return <MenuItem value={el.ContainerID} key={idx}>{el.ContainerName + " ( " + el.ContainerDate + " )"}</MenuItem>
