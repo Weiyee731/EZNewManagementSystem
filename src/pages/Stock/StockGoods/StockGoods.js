@@ -957,7 +957,8 @@ class StockGoods extends Component {
                                 renderTableRows: this.renderTableRows,
                                 checkbox: this.state.needCheckBox,
                                 checkboxColor: "primary",
-                                onRowClickSelect: false
+                                onRowClickSelect: false,
+                                headerColor: 'rgb(200, 200, 200)'
                             }}
                             selectedIndexKey={"StockID"}
                             Data={this.state.stockFiltered ? this.state.stockFiltered : []}
@@ -967,7 +968,6 @@ class StockGoods extends Component {
                             onSelectRow={this.onSelectRow}
                             onSelectAllClick={this.onSelectAllRow}
                             CallResetSelected={this.state.CallResetSelected}
-                            headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                             handleSelecetedAll={this.handleSelecetedAll}
                         />
                     </div>

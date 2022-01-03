@@ -399,7 +399,8 @@ class Invoice extends Component {
                         renderTableRows: this.renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
                         checkbox: true,                          // optional, by default is true
                         checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
-                        onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
+                        onRowClickSelect: false,                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
+                        headerColor: 'rgb(200, 200, 200)'
                     }}
                     selectedIndexKey={"pid"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
                     Data={this.state.TransactionListingFiltered}                                  // required, the data that listing in the table
@@ -407,7 +408,6 @@ class Invoice extends Component {
                     onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                     actionIcon={this.renderTableActionButton()}
                     onSelectRow={this.onSelectRow}
-                    headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                 />
                 <AlertDialog
                     open={openCancelModal}              // required, pass the boolean whether modal is open or close

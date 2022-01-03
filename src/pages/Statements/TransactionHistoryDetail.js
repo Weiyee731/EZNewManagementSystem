@@ -80,7 +80,7 @@ const headCells = [
     id: 'Dimension',
     align: 'left',
     disablePadding: false,
-    label: 'M³',
+    label: 'm³',
   },
   {
     id: 'HandlingPrice',

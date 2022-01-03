@@ -583,7 +583,8 @@ class ArchivedStock extends Component {
                         renderTableRows: this.renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
                         checkbox: false,                          // optional, by default is true
                         checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
-                        onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
+                        onRowClickSelect: false,                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
+                        headerColor: 'rgb(200, 200, 200)'
                     }}
                     selectedIndexKey={"StockID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
                     Data={isArrayNotEmpty(filteredList) ? filteredList : []}                                  // required, the data that listing in the table
@@ -591,7 +592,6 @@ class ArchivedStock extends Component {
                     onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                     onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items
                     tableTopRight={renderTableTopRightButtons()}
-                    headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                 />
 
                 <AlertDialog

@@ -80,10 +80,10 @@ const headCells = [
         label: 'Height',
     },
     {
-        id: 'Dimension',
+        id: 'm³',
         align: 'left',
         disablePadding: false,
-        label: 'Dimension',
+        label: 'm³',
     },
     {
         id: 'Item',
@@ -730,7 +730,8 @@ class CreateInvoice extends Component {
                         renderTableRows: this.renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
                         checkbox: true,                          // optional, by default is true
                         checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
-                        onRowClickSelect: true                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
+                        onRowClickSelect: true,                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
+                        headerColor: 'rgb(200, 200, 200)'
                     }}
                     selectedIndexKey={"StockID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
                     Data={filteredList === null ? [] : filteredList}                                  // required, the data that listing in the table
@@ -739,7 +740,6 @@ class CreateInvoice extends Component {
                     actionIcon={this.renderTableActionButton()}
                     extraInfo={true}
                     onSelectRow={this.onSelectItem}
-                    headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                 />
 
                 <AlertDialog

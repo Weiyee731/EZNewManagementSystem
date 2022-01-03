@@ -131,7 +131,7 @@ const ProformaList = (props) => {
             id: 'volume',
             align: 'left',
             disablePadding: false,
-            label: 'Volume (m3)',
+            label: 'Volume (m³)',
         },
         {
             id: 'unitPrice',
@@ -170,7 +170,7 @@ const ProformaList = (props) => {
             id: 'volume',
             align: 'left',
             disablePadding: false,
-            label: 'Volume (m3)',
+            label: 'Volume (m³)',
         },
     ];
 
@@ -360,7 +360,7 @@ const ProformaList = (props) => {
                             variant="standard"
                             size="small"
                             type={'number'}
-                            label="Unit Price (< 0.013 m3)"
+                            label="Unit Price (< 0.013 m³)"
                             name="unitPrice"
                             value={selfPickupPrice}
                             onChange={(e) => handleChangeMinSingleUnitPrice(e)}
@@ -376,7 +376,7 @@ const ProformaList = (props) => {
                         variant="standard"
                         size="small"
                         type={'number'}
-                        label="Unit Price per m3"
+                        label="Unit Price per m³"
                         name="unitPrice"
                         value={selectedType == 2 ? consolidatePrice : unitPrice}
                         onChange={(e) => handleChangeAllUnitPrice(e)}
@@ -528,11 +528,11 @@ const ProformaList = (props) => {
                         renderTableRows: renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
                         checkbox: false,                          // optional, by default is true
                         checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
-                        onRowClickSelect: false                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
+                        onRowClickSelect: false,                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
+                        headerColor: 'rgb(200, 200, 200)'
                     }}
                     selectedIndexKey={"StockID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
                     Data={isArrayNotEmpty(items) ? items : []}                                  // required, the data that listing in the table
-                    headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                 />
                 <hr />
                 <div className='row text-end mb-3'>
@@ -542,13 +542,19 @@ const ProformaList = (props) => {
                                 Actual Weight (kg):
                             </div>
                             <div className='col-2'>
-                                {Math.ceil(totalWeight)}
+                                {Math.ceil(totalWeight).toFixed(2)}
                             </div>
                             <div className='col-10'>
-                                Volumatric Weight (kg):
+                                Total Volume (m³):
                             </div>
                             <div className='col-2'>
-                                {volumeWeight()}
+                                {totalVolume}
+                            </div>
+                            <div className='col-10'>
+                                Volumetric Weight (kg):
+                            </div>
+                            <div className='col-2'>
+                                {volumeWeight().toFixed(2)}
                             </div>
                         </>
                     }

@@ -80,7 +80,7 @@ function EnhancedTableHead(props) {
     <TableHead>
       <TableRow>
         {renderCheckbox === true && (
-          <TableCell padding="checkbox" sx={{ bgcolor: "rgb(200, 200, 200)" }}>
+          <TableCell padding="checkbox" sx={{ bgcolor: headerColor }}>
             <Checkbox
               color={checkboxColor}
               indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -105,7 +105,7 @@ function EnhancedTableHead(props) {
               sortDirection={orderBy === headCell.id ? order : false}
               sx={{
                 fontWeight: "medium",
-                bgcolor: "rgb(200, 200, 200)",
+                bgcolor: headerColor,
                 fontSize: "10pt",
               }} // change table header bg color
             >
@@ -186,7 +186,7 @@ const EnhancedTableToolbar = (props) => {
           component="div"
         >
           {numSelected} selected{" "}
-          {extraInfo && ` | ${round(mCube, 3)} m3 | ${round(weight, 3)} kg`}
+          {extraInfo && ` | ${round(mCube, 3)} m³ | ${round(weight, 3)} kg`}
         </Typography>
       ) : (
         <Typography sx={{ flex: "1 1 100%" }} id="tableTitle" component="div">
@@ -398,7 +398,7 @@ export default function TableComponents(props) {
     : "primary";
   const headerColor = !isObjectUndefinedOrNull(props.tableRows.headerColor)
     ? props.tableRows.headerColor
-    : "rgb(200, 200, 200)";
+    : "";
   const emptyRowColSpan = renderCheckbox
     ? tableHeaders.length + 1
     : tableHeaders.length;

@@ -1145,11 +1145,11 @@ class UserDetail extends Component {
                     tableRows={{
                       renderTableRows: this.renderPaymentTableRows,
                       checkbox: false,
-                      onRowClickSelect: false
+                      onRowClickSelect: false,
+                      headerColor: 'rgb(200, 200, 200)'
                     }}
                     selectedIndexKey={"PaymentID"}
                     Data={isArrayNotEmpty(this.state.Payment) ? this.state.Payment : []}
-                    headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                   />
                 </div>
               </div>
@@ -1175,11 +1175,11 @@ class UserDetail extends Component {
               renderTableRows: this.renderTableRows,
               checkbox: false,
               checkboxColor: "primary",
-              onRowClickSelect: false
+              onRowClickSelect: false,
+              headerColor: 'rgb(200, 200, 200)'
             }}
             selectedIndexKey={"pid"}
             Data={this.state.filteredList}
-            headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
           />
         </div>
         <div>

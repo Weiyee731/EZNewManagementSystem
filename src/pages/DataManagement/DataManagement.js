@@ -358,7 +358,7 @@ class DataManagement extends Component {
                             }}
                             selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].name : ""}
                             Data={DataRows}
-                            headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
+                            headerColor={'rgb(200, 200, 200)'}
                         />
                     </div>
                 }
@@ -377,12 +377,12 @@ class DataManagement extends Component {
                             renderTableRows: this.renderTableRows,
                             checkbox: false,
                             checkboxColor: "primary",
-                            onRowClickSelect: false
+                            onRowClickSelect: false,
+                            headerColor: 'rgb(200, 200, 200)'
                         }}
                         selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].name : ""}
                         Data={this.state.errorReportData}
                         fullScreen={true}
-                        headerStyle={{ fontWeight: 'medium', bgcolor: 'rgb(200, 200, 200)', fontSize: '10pt' }}
                     />
                 </ModalPopOut>
             </div >
