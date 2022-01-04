@@ -31,6 +31,9 @@ import Switch from '@mui/material/Switch';
 import ReactToPrint, { useReactToPrint } from "react-to-print";
 import TableRow from '@mui/material/TableRow';
 import TransactionHistory from './TransactionHistory';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import { ModalPopOut } from "../../components/modal/Modal";
+import CheckIcon from '@mui/icons-material/Check';
 
 function mapStateToProps(state) {
   return {
@@ -102,10 +105,26 @@ const headCells = [
   }
 ];
 
+const cashbill_headcells = [
+  {
+    id: 'TrackingNumber',
+    align: 'left',
+    disablePadding: false,
+    label: 'Description',
+  },
+  {
+    id: 'Actions',
+    align: 'left',
+    disablePadding: false,
+    label: 'Description',
+  },
+  
+];
+
 const companyTitle = {
   fontWeight: "bolder",
   fontSize: "16px",
-  textAlign: "center"
+  textAlign: "left"
 };
 
 const companyDetailTitle = {
@@ -171,12 +190,18 @@ class TransactionHistoryDetail extends Component {
       DeliveryFeeInd: false,
       DeliveryFee: 0.00,
       Remark: "",
-      TransactionDetail: []
+      TransactionDetail: [],
+
+      generateCashBillModalOpen: false,
+      CallResetSelected: false,
+      cashbillSelectedRows: [],
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.handleChange = this.handleChange.bind(this)
 
     this.onClickConfirmInvoice = this.onClickConfirmInvoice.bind(this)
+    this.onSelectRow = this.onSelectRow.bind(this)
+    this.onSelectAllRow = this.onSelectAllRow.bind(this)
     this.props.CallFetchAllTransactionByID(this.state)
   }
 
@@ -251,19 +276,27 @@ class TransactionHistoryDetail extends Component {
         <TableCell align="left" sx={{ fontSize: fontsize }}>{data.TrackingNumber}
           {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
             return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px" }}>{additionalCharges.Description}</TableCell></TableRow>
-          })}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductQuantity}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{roundOffTotal(data.ProductPrice)}
+          })}
+        </TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.TrackingNumber !== "Delivery Fee") ? data.ProductQuantity : "-"}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.TrackingNumber !== "Delivery Fee") ? volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) : "-"}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>
+
+        </TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>
+          {roundOffTotal(data.ProductPrice)}
           {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
             return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{additionalCharges.ProductPrice}</TableCell></TableRow>
           })}
         </TableCell>
-        <TableCell align="right" sx={{ fontSize: fontsize }}>{roundOffTotal(data.ProductPrice * data.ProductQuantity)}
+
+        <TableCell align="left" sx={{ fontSize: fontsize }}>
+          {roundOffTotal(data.ProductPrice * data.ProductQuantity)}
           {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
             return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{(additionalCharges.ProductPrice * additionalCharges.ProductQuantity)}</TableCell></TableRow>
           })}
         </TableCell>
+
       </>
     )
   }
@@ -274,8 +307,6 @@ class TransactionHistoryDetail extends Component {
       </div>
     )
   }
-
-
 
   onTableRowClick = (event, row) => {
     this.props.history.push(`/UserDetail/${row.UserID}/${row.UserCode}`)
@@ -294,6 +325,7 @@ class TransactionHistoryDetail extends Component {
   }
 
   onDeleteButtonClick = (items) => {
+
   }
 
   onClickConfirmInvoice = (items) => {
@@ -356,6 +388,7 @@ class TransactionHistoryDetail extends Component {
         style={{
           padding: '10px 50px 0px'
         }}
+        key={"page_" + index}
       >
         <div className="row">
           <div style={companyTitle}>
@@ -429,7 +462,7 @@ class TransactionHistoryDetail extends Component {
             tableRows={{
               renderTableRows: this.renderTableRows,
               checkbox: false,
-              headerColor:"white",
+              headerColor: "white",
               checkboxColor: "primary",
               onRowClickSelect: false
             }}
@@ -500,6 +533,36 @@ class TransactionHistoryDetail extends Component {
     )
   }
 
+  renderCashBillTableActionButton = () => {
+    return (
+      <IconButton onClick={(event) => { console.log(this.state.cashbillSelectedRows) }}>
+        <CheckIcon />
+      </IconButton>
+    )
+  }
+
+  onAddButtonClick = () => {
+    this.setState({ openAddModal: true })
+  }
+
+  onSelectRow(row) {
+    this.setState({ cashbillSelectedRows: row })
+  }
+
+  onSelectAllRow(rows) {
+    this.setState({ cashbillSelectedRows: rows })
+  }
+
+  renderCashbillTableRows = (data, index) => {
+    const fontsize = '9pt'
+    return (
+      <>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.TrackingNumber}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.TrackingNumber}</TableCell>
+      </>
+    )
+  }
+
   render() {
     const {
       TransactionDetail,
@@ -509,7 +572,9 @@ class TransactionHistoryDetail extends Component {
       DeliveryFee,
       AddModalOpen2
     } = this.state
-    
+
+    console.log(this.state.TransactionDetail)
+
     return (
       <Card>
         <CardContent>
@@ -521,13 +586,16 @@ class TransactionHistoryDetail extends Component {
               onClick={() => this.props.history.goBack()}>
               <ArrowBackIcon />
             </IconButton>
-            <IconButton
-              color="primary"
-              aria-label="back"
-              component="span"
-              onClick={this.onAddButtonClick}>
-              <PrintIcon />
-            </IconButton>
+            <div>
+              <Button sx={{ marginRight: 2 }} variant="contained" startIcon={<NoteAddIcon />} onClick={() => this.setState({ generateCashBillModalOpen: true })}>
+                Generate Cash Bill
+              </Button>
+              <IconButton color="primary" aria-label="back"
+                component="span"
+                onClick={this.onAddButtonClick}>
+                <PrintIcon />
+              </IconButton>
+            </div>
           </div>
           <div ref={(el) => (this.componentRef = el)}>
             {splitArray(TransactionDetail, 16).map((arr, index) => {
@@ -684,6 +752,46 @@ class TransactionHistoryDetail extends Component {
                 </Box>
               </Box>
             </Modal>
+
+            <ModalPopOut
+              title="Generate Cash Bill"
+              fullScreen={true}
+              handleToggleDialog={() => this.setState({ generateCashBillModalOpen: false })}
+              open={this.state.generateCashBillModalOpen}
+              onClose={() => this.setState({ generateCashBillModalOpen: false })}
+              showCancel={false}
+            // handleConfirmFunc={() => { console.log('cnfirm ') }}
+            >
+              <div>
+                <TableComponents
+                  style={{
+                    boxShadow: "0px",
+                  }}
+                  elevation={0}
+                  tableOptions={{
+                    dense: true,
+                    tableOrderBy: 'asc',
+                    sortingIndex: "fat",
+                    stickyTableHeader: false,
+                  }}
+                  tableHeaders={cashbill_headcells}
+                  tableRows={{
+                    renderTableRows: this.renderCashbillTableRows,
+                    checkbox: true,
+                    headerColor: "white",
+                    checkboxColor: "primary",
+                    onRowClickSelect: true
+                  }}
+                  selectedIndexKey={"TransactionDetailID"}
+                  Data={TransactionDetail}
+                  onActionButtonClick={this.onAddButtonClick}
+                  onSelectRow={this.onSelectRow}
+                  onSelectAllClick={this.onSelectAllRow}
+                  CallResetSelected={this.state.CallResetSelected}
+                  actionIcon={this.renderCashBillTableActionButton()}
+                />
+              </div>
+            </ModalPopOut>
           </div>
         </CardContent>
       </Card>

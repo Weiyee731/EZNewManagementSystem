@@ -134,6 +134,7 @@ class TransactionHistory extends Component {
             searchCategory: "All",
             searchArea: "All",
             onSearchText: "",
+            searchKeys: "",
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.handleInputChange = this.handleInputChange.bind(this)
@@ -415,7 +416,7 @@ class TransactionHistory extends Component {
     handleSearchInput(e) {
         let searchKeywords = e.target.value
         this.onSearch(searchKeywords)
-        this.setState({ searchKeywords: searchKeywords })
+        this.setState({ searchKeys: searchKeywords })
     }
 
     handleSearchCategory(e) {
@@ -439,7 +440,6 @@ class TransactionHistory extends Component {
                 <div className="w-100 container-fluid">
                     <div className="row d-flex">
                         <div className="col-md-11 col-11">
-                            {/* <SearchBar onChange={onChange} /> */}
                             <div className="row">
                                 <div className="col-md-6 col-12 mb-2">
                                     <div className="filter-dropdown row">
@@ -498,7 +498,7 @@ class TransactionHistory extends Component {
                                             className="searchbar-input mb-auto"
                                             disableButton={this.state.isDataFetching}
                                             tooltipText="Search with current data"
-                                            value={this.state.searchKeywords}
+                                            value={this.state.searchKeys}
                                         />
                                     </div>
                                 </div>

@@ -284,7 +284,7 @@ class CreateInvoice extends Component {
 
     handleSelectDeliveryType = (i) => {
         const { selectedItems, selectedUserID } = this.state
-        console.log(this.state)
+        // console.log(this.state.selectedItems)
         let mCube = 0
         let weight = 0
         this.state.selectedItems.map((item) => {

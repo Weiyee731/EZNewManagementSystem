@@ -160,7 +160,7 @@ const EnhancedTableToolbar = (props) => {
         ((item.ProductDimensionDeep *
           item.ProductDimensionWidth *
           item.ProductDimensionHeight) /
-        1000000).toFixed(3);
+          1000000).toFixed(3);
     });
   }
 
@@ -406,17 +406,16 @@ export default function TableComponents(props) {
   return (
     <Box className="my-1" sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }} elevation={elevation}>
-        {(typeof props.tableTopRight !== "undefined" ||
-          typeof props.tableTopLeft !== "undefined") && (
-            <EnhancedTableToolbar
-              selectedRows={selected}
-              tableTopLeft={props.tableTopLeft}
-              tableTopRight={tableTopRight}
-              OnActionButtonClick={props.onActionButtonClick}
-              actionIcon={props.actionIcon}
-              extraInfo={props.extraInfo}
-            />
-          )}
+        {(typeof props.tableTopRight !== "undefined" || typeof props.tableTopLeft !== "undefined" || selected.length > 0) && (
+          <EnhancedTableToolbar
+            selectedRows={selected}
+            tableTopLeft={props.tableTopLeft}
+            tableTopRight={tableTopRight}
+            OnActionButtonClick={props.onActionButtonClick}
+            actionIcon={props.actionIcon}
+            extraInfo={props.extraInfo}
+          />
+        )}
 
         <TableContainer
           sx={{ maxHeight: stickyTableHeader ? stickyTableHeight : "100%" }}

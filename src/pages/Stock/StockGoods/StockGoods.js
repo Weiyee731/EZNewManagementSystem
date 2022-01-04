@@ -968,7 +968,6 @@ class StockGoods extends Component {
                             onSelectRow={this.onSelectRow}
                             onSelectAllClick={this.onSelectAllRow}
                             CallResetSelected={this.state.CallResetSelected}
-                            handleSelecetedAll={this.handleSelecetedAll}
                         />
                     </div>
                 </div>
