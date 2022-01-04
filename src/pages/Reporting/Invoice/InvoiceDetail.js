@@ -59,6 +59,8 @@ const style = {
   p: 4,
 };
 
+const noOfArrShow = 15
+
 const headCells = [
   {
     id: 'index',
@@ -294,6 +296,7 @@ class InvoiceDetail extends Component {
 
   renderTableRows = (data, index) => {
     const fontsize = '9pt'
+
     return (
       <>
         <TableCell
@@ -302,7 +305,7 @@ class InvoiceDetail extends Component {
           scope="row"
           sx={{ fontSize: fontsize }}
         >
-          {(index + 1)}
+          {index + 1}
         </TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }}>{data.TrackingNumber}
           {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
@@ -338,8 +341,13 @@ class InvoiceDetail extends Component {
               size="small"
               name="handlingCharge"
               type={'number'}
-              InputLabelProps={{
-                shrink: true,
+              inputProps={{
+                style: {
+                  padding: '0px',
+                  justifyContent: 'center',
+                  flex: 1,
+                  display: 'flex',
+                }
               }}
               // value={data.handlingCharge}
               onChange={(e) => this.handlehandlingChargeOnChange(e.target.value, index)}
@@ -348,8 +356,17 @@ class InvoiceDetail extends Component {
               color="primary"
               aria-label="back"
               component="span"
-              onClick={() => this.handleConfirmhandlingCharge(data.handlingCharge, index)}>
-              <CheckCircleIcon />
+              style={{
+                padding: '0 0 0 5px'
+              }}
+              onClick={() => this.handleConfirmhandlingCharge(data.handlingCharge, index)}
+            >
+              <CheckCircleIcon 
+              style={{
+                width: '20px',
+                height: '20px'
+              }}
+              />
             </IconButton>
           </TableCell>
         }
@@ -446,9 +463,9 @@ class InvoiceDetail extends Component {
   renderPage = (arr, index) => {
     const {
       DeliveryFee,
-      transaction
+      transaction,
     } = this.state
-    // const { transaction } = this.props
+
     let TransactionDetail = isArrayNotEmpty(transaction) ? JSON.parse(transaction[0].TransactionDetail) : transaction
 
     return (
@@ -459,7 +476,8 @@ class InvoiceDetail extends Component {
         }}
       >
         {isArrayNotEmpty(transaction) &&
-          <div>
+          <>
+            {/* header */}
             <div className="row">
               <div style={companyTitle}>
                 EZ TRANSIT AND LOGISTICS SDN BHD
@@ -506,14 +524,12 @@ class InvoiceDetail extends Component {
               </div>
               <div className="row" style={companyDetail}>
                 <span className="col-1 offset-9">Page</span>
-                <span className="col-2">{`: ${index + 1} of ${splitArray(TransactionDetail, 16).length}`}</span>
+                <span className="col-2">{`: ${index + 1} of ${splitArray(TransactionDetail, noOfArrShow).length}`}</span>
               </div>
             </div>
-            <div
-              style={{
-                // marginTop: "10px"
-              }}
-            >
+
+            {/* content */}
+            <div>
               <div style={companyDetail}>
                 <b>Container Date:</b> {TransactionDetail[0].ContainerDate !== null ? TransactionDetail[0].ContainerDate : " - "}
               </div>
@@ -542,81 +558,84 @@ class InvoiceDetail extends Component {
             </div>
 
             {/* footer */}
-            <div className="d-flex">
-              <div className="invoice-footer">
-                <hr />
-                {this.props.transaction[0].CalculationType === "3" &&
-                  <>
-                    <div style={tncDiv}>
-                      * First kg - RM 10, Sub. kg - RM 6
+            {
+              arr.length < noOfArrShow &&
+              <div className="d-flex">
+                <div className="invoice-footer">
+                  <hr />
+                  {this.props.transaction[0].CalculationType === "3" &&
+                    <>
+                      <div style={tncDiv}>
+                        * First kg - RM 10, Sub. kg - RM 6
+                      </div>
+                      <div style={tncDiv}>
+                        * Volumetric weight = volume * 1000000 / 6000
+                      </div>
+                    </>
+                  }
+                  <div className="row">
+                    <div style={tncDiv} className="col-5 mt-4">
+                      <div style={tncTitle}>Terms and Conditions</div>
+                      <br />
+                      <div>
+                        <p>
+                          1. All payment should be make payable to
+                          <br />
+                          EZ TAO BAO ENTERPRISE
+                          <br />
+                          25301009073
+                          <br />
+                          HONG LEONG BANK
+                        </p>
+                        <p>
+                          2. Payment must be cleared within 3 days after the billing date
+                        </p>
+                      </div>
                     </div>
-                    <div style={tncDiv}>
-                      * Volumetric weight = volume * 1000000 / 6000
+                    <div style={tncDiv} className="col-2 mt-4">
+                      <div >Payment can be make through S Pay Global</div>
+                      <img style={img} src="https://tourism.denoo.my/Ez/spay.jpeg"></img>
                     </div>
-                  </>
-                }
-                <div className="row">
-                  <div style={tncDiv} className="col-5 mt-4">
-                    <div style={tncTitle}>Terms and Conditions</div>
-                    <br />
-                    <div>
-                      <p>
-                        1. All payment should be make payable to
-                        <br />
-                        EZ TAO BAO ENTERPRISE
-                        <br />
-                        25301009073
-                        <br />
-                        HONG LEONG BANK
-                      </p>
-                      <p>
-                        2. Payment must be cleared within 3 days after the billing date
-                      </p>
-                    </div>
-                  </div>
-                  <div style={tncDiv} className="col-2 mt-4">
-                    <div >Payment can be make through S Pay Global</div>
-                    <img style={img} src="https://tourism.denoo.my/Ez/spay.jpeg"></img>
-                  </div>
-                  <div style={tncDiv} className="col-4 offset-1">
-                    {this.props.transaction[0].CalculationType === "3" &&
-                      <>
-                        Total Weight:
-                        <span style={total}>{roundOffTotal(transaction[0].OrderSubTotalAmount)}</span>
-                        <br />
-                      </>
-                    }
-                    Total Item :
-                    <span style={total}>{TransactionDetail.filter((el) => el.TrackingNumber === "Delivery Fee").length > 0 ? TransactionDetail.length - 1 : TransactionDetail.length}</span>
-                    <br />
-                    Sub Total (RM) :
-                    <span style={total}>{roundOffTotal(transaction[0].OrderSubTotalAmount)}</span>
-                    <br />
-                    Total (RM) :
-                    <span style={total}>{roundOffTotal(parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(DeliveryFee))}</span>
-                  </div>
-                </div>
-                <div className="row mt-5 ">
-                  <div style={tncDiv} className="col-5 mt-4">
-                    <div className="text-center">
-                      __________________________________
-                      <div>EZ TRANSIT AND LOGISTICS</div>
-                      <div>SDN BHD</div>
+                    <div style={tncDiv} className="col-4 offset-1">
+                      {this.props.transaction[0].CalculationType === "3" &&
+                        <>
+                          Total Weight:
+                          <span style={total}>{roundOffTotal(transaction[0].OrderSubTotalAmount)}</span>
+                          <br />
+                        </>
+                      }
+                      Total Item :
+                      <span style={total}>{TransactionDetail.filter((el) => el.TrackingNumber === "Delivery Fee").length > 0 ? TransactionDetail.length - 1 : TransactionDetail.length}</span>
+                      <br />
+                      Sub Total (RM) :
+                      <span style={total}>{roundOffTotal(transaction[0].OrderSubTotalAmount)}</span>
+                      <br />
+                      Total (RM) :
+                      <span style={total}>{roundOffTotal(parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(DeliveryFee))}</span>
                     </div>
                   </div>
-                  <div style={tncDiv} className="col-2 mt-4">
+                  <div className="row mt-5 ">
+                    <div style={tncDiv} className="col-5 mt-4">
+                      <div className="text-center">
+                        __________________________________
+                        <div>EZ TRANSIT AND LOGISTICS</div>
+                        <div>SDN BHD</div>
+                      </div>
+                    </div>
+                    <div style={tncDiv} className="col-2 mt-4">
 
-                  </div>
-                  <div style={{ textAlign: 'left', ...tncDiv }} className="col-4 offset-1">
-                    __________________________________
-                    <div>Name  : </div>
-                    <div>IC NO : </div>
-                    <div>DATE  : </div>
+                    </div>
+                    <div style={{ textAlign: 'left', ...tncDiv }} className="col-4 offset-1">
+                      __________________________________
+                      <div>Name  : </div>
+                      <div>IC NO : </div>
+                      <div>DATE  : </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            }
+          </>
         }
         <br />
       </div>
@@ -633,7 +652,6 @@ class InvoiceDetail extends Component {
       AddModalOpen2,
     } = this.state
 
-    console.log(TransactionDetail)
     return (
       <Card>
         <CardContent>
@@ -654,7 +672,7 @@ class InvoiceDetail extends Component {
             </IconButton>
           </div>
           <div ref={(el) => (this.componentRef = el)}>
-            {splitArray(TransactionDetail, 16).map((arr, index) => {
+            {splitArray(TransactionDetail, noOfArrShow).map((arr, index) => {
               return (
                 this.renderPage(arr, index)
               )

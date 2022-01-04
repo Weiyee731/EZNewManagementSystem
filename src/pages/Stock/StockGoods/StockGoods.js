@@ -194,7 +194,7 @@ class StockGoods extends Component {
     constructor(props) {
         super(props);
         this.state = INITIAL_STATE
-
+        this.textInput = React.createRef();
         // this.props.CallFetchAllStock({USERID:JSON.parse(localStorage.getItem("loginUser"))[0].UserID});
         this.props.CallFetchAllStock({ TRACKINGSTATUSID: "1" });
         this.props.CallViewContainer();  //view container
@@ -262,7 +262,7 @@ class StockGoods extends Component {
         if (prevProps.Stocks.length !== this.props.Stocks.length) {
             if (this.props.Stocks !== undefined && this.props.Stocks[0] !== undefined) {
                 this.setState({ stockFiltered: this.props.Stocks });
-            } else { console.log("match") }
+            } else { console.log("No result found, please try to refresh or check network connection") }
         }
         else {
             //     if (prevProps.Stocks.length !== this.state.stockFiltered.length) {
@@ -287,6 +287,11 @@ class StockGoods extends Component {
         }
     }
 
+    focusTextInput() {
+        // Explicitly focus the text input using the raw DOM API
+        // Note: we're accessing "current" to get the DOM node
+        this.textInput.current.focus();
+    }
     onDeleteButtonClick = () => {
         const { selectedStocks } = this.state
         let StockID = []
@@ -577,7 +582,8 @@ class StockGoods extends Component {
     handleCancel = (condition) => {
         if (condition !== "filter") {
             this.setState({ openEditModal: !this.state.openEditModal })
-        } else this.setState({ open: !this.state.open })
+        } else this.setState({ open: !this.state.open, })
+
     }
 
     //depreciated
@@ -711,16 +717,19 @@ class StockGoods extends Component {
                 }
             }
             this.setState({ stockFiltered: tempList })
+            if (tempList.length === 1) { this.setState({ openEditModal: !this.state.openEditModal, selectedRows: tempList[0] }) }
         }
         else {
             if (searchCategory === "All" && areaSearchKeys !== "All") {
                 // if area is not empty but search string is empty
                 this.setState({ searchCategory: "All", searchDates: [], stockFiltered: Stocks.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) })
+
             }
             else if (searchCategory !== "All" && areaSearchKeys === "All") {
                 // if category is not empty but search string is empty
                 // no point to search with category if there are no searching keywords
                 this.setState({ areaSearchKeys: "All", searchDates: [], stockFiltered: Stocks })
+
             }
             else {
                 this.setState({ searchCategory: "All", areaSearchKeys: "All", searchDates: [], stockFiltered: Stocks })
@@ -787,7 +796,6 @@ class StockGoods extends Component {
     }
 
     onSelectAllRow = (items) => {
-        console.log(items)
         this.setState({
             selectedStocks: items
         })
@@ -819,7 +827,6 @@ class StockGoods extends Component {
                                 name="Division"
                                 value={isArrayNotEmpty(this.props.AllContainer) ? this.props.AllContainer[0].ContainerID : ""}
                                 onChange={(e) => {
-                                    // isStringNullOrEmpty(e.target.value)
                                     isArrayNotEmpty(this.props.AllContainer) && this.props.AllContainer.map((container) => {
                                         if (container.ContainerID === e.target.value) {
                                             this.setState({ ContainerName: container.ContainerName, ContainerDate: container.ContainerDate })
@@ -829,7 +836,6 @@ class StockGoods extends Component {
                                 }
                                 label="Division"
                             >
-
                                 {
                                     isArrayNotEmpty(this.props.AllContainer) && this.props.AllContainer.map((el, idx) => {
                                         return <MenuItem value={el.ContainerID} key={idx}>{el.ContainerName + " ( " + el.ContainerDate + " )"}</MenuItem>

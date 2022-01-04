@@ -29,6 +29,7 @@ import {
   isArrayNotEmpty,
   isStringNullOrEmpty,
   round,
+  volumeCalc
 } from "../../tools/Helpers";
 
 function descendingComparator(a, b, orderBy) {
@@ -85,7 +86,7 @@ function EnhancedTableHead(props) {
               color={checkboxColor}
               indeterminate={numSelected > 0 && numSelected < rowCount}
               checked={rowCount > 0 && numSelected === rowCount}
-              onChange={onSelectAllClick}
+              onClick={onSelectAllClick}
               inputProps={{ "aria-label": "select all desserts" }}
             />
           </TableCell>
@@ -186,7 +187,7 @@ const EnhancedTableToolbar = (props) => {
           component="div"
         >
           {numSelected} selected{" "}
-          {extraInfo && ` | ${round(mCube, 3)} m³ | ${round(weight, 3)} kg`}
+          {extraInfo && ` | ${round(mCube, 3)} m³ | ${round(weight, 2)} kg`}
         </Typography>
       ) : (
         <Typography sx={{ flex: "1 1 100%" }} id="tableTitle" component="div">
