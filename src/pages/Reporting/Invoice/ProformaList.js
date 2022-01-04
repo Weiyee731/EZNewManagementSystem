@@ -319,6 +319,7 @@ const ProformaList = (props) => {
     const renderTableRows = (data, index) => {
         let fontsize = '9pt'
         let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
+        console.log(data)
 
         return (
             <>
@@ -570,7 +571,7 @@ const ProformaList = (props) => {
                                 * Extra add-on:
                             </div>
                             <div className='col-2'>
-                                {(LargeItemMinPrice / 2 - totalPrice()).toFixed(2)}
+                                RM {(LargeItemMinPrice / 2 - totalPrice()).toFixed(2)}
                             </div>
                         </>
                     }
