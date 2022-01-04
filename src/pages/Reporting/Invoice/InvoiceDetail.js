@@ -59,7 +59,7 @@ const style = {
   p: 4,
 };
 
-const noOfArrShow = 25
+const noOfArrShow = 15
 
 const headCells = [
   {
@@ -357,11 +357,16 @@ class InvoiceDetail extends Component {
               aria-label="back"
               component="span"
               style={{
-                padding: '0 0 0 5px',
+                padding: '0 0 0 5px'
               }}
               onClick={() => this.handleConfirmhandlingCharge(data.handlingCharge, index)}
             >
-              <CheckCircleIcon />
+              <CheckCircleIcon 
+              style={{
+                width: '20px',
+                height: '20px'
+              }}
+              />
             </IconButton>
           </TableCell>
         }
@@ -458,12 +463,10 @@ class InvoiceDetail extends Component {
   renderPage = (arr, index) => {
     const {
       DeliveryFee,
-      transaction
+      transaction,
     } = this.state
 
     let TransactionDetail = isArrayNotEmpty(transaction) ? JSON.parse(transaction[0].TransactionDetail) : transaction
-
-    console.log(!this.state.isPrinting && index > 0)
 
     return (
       <div
@@ -474,62 +477,56 @@ class InvoiceDetail extends Component {
       >
         {isArrayNotEmpty(transaction) &&
           <>
-            {
-              this.state.isPrinting &&
-              <>
-                <div className="row">
-                  <div style={companyTitle}>
-                    EZ TRANSIT AND LOGISTICS SDN BHD
-                  </div>
-                  <div style={companyDetailTitle}>
-                    NO.2, LORONG A, TAMAN BDC
-                  </div>
-                  <div style={companyDetailTitle}>
-                    JALAN STUTONG 93350 KUCHING, SARAWAK
-                  </div>
-                  <div style={companyDetailTitle}>
-                    TEL: 019 - 883 6783 / 012 - 895 7769
-                  </div>
-                  <div
-                    style={{
-                      width: "100%",
-                      borderTop: "none",
-                      borderRight: "none",
-                      borderLeft: "none",
-                      borderImage: "initial",
-                      borderBottom: "1pt solid rgb(0, 112, 192)",
-                      padding: "0 5px",
-                      height: "20px",
-                      verticalAlign: "top",
-                    }}
-                  />
-                  <div style={companyDetailTitle}>
-                    INVOICE
-                  </div>
-                  <div className="row" style={companyDetail}>
-                    <span className="col-9">{`${transaction[0].UserCode} - ${transaction[0].AreaCode} ${transaction[0].Fullname}`}</span>
-                    <span className="col-1">No</span>
-                    <span className="col-2">: {transaction[0].TransactionName}</span>
-                  </div>
-                  <div className="row" style={companyDetail}>
-                    <span className="col-9">{transaction[0].UserAddress}</span>
-                    <span className="col-1">Terms</span>
-                    <span className="col-2">: C.O.D</span>
-                  </div>
-                  <div className="row" style={companyDetail} >
-                    <span className="col-9">Tel : {transaction[0].UserContactNo}</span>
-                    <span className="col-1">Date</span>
-                    <span className="col-2">: {transaction[0].OrderDate}</span>
-                  </div>
-                  <div className="row" style={companyDetail}>
-                    <span className="col-1 offset-9">Page</span>
-                    <span className="col-2">{`: ${index + 1} of ${splitArray(TransactionDetail, noOfArrShow).length}`}</span>
-                  </div>
-                </div>
-              </>
-            }
             {/* header */}
-
+            <div className="row">
+              <div style={companyTitle}>
+                EZ TRANSIT AND LOGISTICS SDN BHD
+              </div>
+              <div style={companyDetailTitle}>
+                NO.2, LORONG A, TAMAN BDC
+              </div>
+              <div style={companyDetailTitle}>
+                JALAN STUTONG 93350 KUCHING, SARAWAK
+              </div>
+              <div style={companyDetailTitle}>
+                TEL: 019 - 883 6783 / 012 - 895 7769
+              </div>
+              <div
+                style={{
+                  width: "100%",
+                  borderTop: "none",
+                  borderRight: "none",
+                  borderLeft: "none",
+                  borderImage: "initial",
+                  borderBottom: "1pt solid rgb(0, 112, 192)",
+                  padding: "0 5px",
+                  height: "20px",
+                  verticalAlign: "top",
+                }}
+              />
+              <div style={companyDetailTitle}>
+                INVOICE
+              </div>
+              <div className="row" style={companyDetail}>
+                <span className="col-9">{`${transaction[0].UserCode} - ${transaction[0].AreaCode} ${transaction[0].Fullname}`}</span>
+                <span className="col-1">No</span>
+                <span className="col-2">: {transaction[0].TransactionName}</span>
+              </div>
+              <div className="row" style={companyDetail}>
+                <span className="col-9">{transaction[0].UserAddress}</span>
+                <span className="col-1">Terms</span>
+                <span className="col-2">: C.O.D</span>
+              </div>
+              <div className="row" style={companyDetail} >
+                <span className="col-9">Tel : {transaction[0].UserContactNo}</span>
+                <span className="col-1">Date</span>
+                <span className="col-2">: {transaction[0].OrderDate}</span>
+              </div>
+              <div className="row" style={companyDetail}>
+                <span className="col-1 offset-9">Page</span>
+                <span className="col-2">{`: ${index + 1} of ${splitArray(TransactionDetail, noOfArrShow).length}`}</span>
+              </div>
+            </div>
 
             {/* content */}
             <div>
@@ -562,7 +559,7 @@ class InvoiceDetail extends Component {
 
             {/* footer */}
             {
-              arr.length < 15 &&
+              arr.length < noOfArrShow &&
               <div className="d-flex">
                 <div className="invoice-footer">
                   <hr />
