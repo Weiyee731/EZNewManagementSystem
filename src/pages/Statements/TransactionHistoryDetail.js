@@ -34,6 +34,8 @@ import TransactionHistory from './TransactionHistory';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import { ModalPopOut } from "../../components/modal/Modal";
 import CheckIcon from '@mui/icons-material/Check';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 function mapStateToProps(state) {
   return {
@@ -110,15 +112,8 @@ const cashbill_headcells = [
     id: 'TrackingNumber',
     align: 'left',
     disablePadding: false,
-    label: 'Description',
+    label: 'Transactions',
   },
-  {
-    id: 'Actions',
-    align: 'left',
-    disablePadding: false,
-    label: 'Description',
-  },
-  
 ];
 
 const companyTitle = {
@@ -195,6 +190,9 @@ class TransactionHistoryDetail extends Component {
       generateCashBillModalOpen: false,
       CallResetSelected: false,
       cashbillSelectedRows: [],
+      cashbillRemarks: "",
+      cashbillRemarksValidated: null,
+      cashbillAmount: -1,
     }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.handleChange = this.handleChange.bind(this)
@@ -202,6 +200,9 @@ class TransactionHistoryDetail extends Component {
     this.onClickConfirmInvoice = this.onClickConfirmInvoice.bind(this)
     this.onSelectRow = this.onSelectRow.bind(this)
     this.onSelectAllRow = this.onSelectAllRow.bind(this)
+    this.handleCashBillInputs = this.handleCashBillInputs.bind(this)
+    this.addReferencesToRemark = this.addReferencesToRemark.bind(this)
+    this.generateCashBill = this.generateCashBill.bind(this)
     this.props.CallFetchAllTransactionByID(this.state)
   }
 
@@ -553,14 +554,57 @@ class TransactionHistoryDetail extends Component {
     this.setState({ cashbillSelectedRows: rows })
   }
 
+  addReferencesToRemark() {
+    if (isArrayNotEmpty(this.state.cashbillSelectedRows)) {
+      let TrackingNumber = "";
+      this.state.cashbillSelectedRows.map((el) => { TrackingNumber += el.TrackingNumber + "\n" })
+      this.setState({
+        cashbillRemarks: this.state.cashbillRemarks + "\n" + TrackingNumber,
+        cashbillRemarksValidated: true
+      })
+    }
+  }
+
   renderCashbillTableRows = (data, index) => {
     const fontsize = '9pt'
     return (
       <>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.TrackingNumber}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.TrackingNumber}</TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }}>
+          <div>
+            <h6 className="text-uppercase"><b>{data.TrackingNumber}</b> -- {data.Item} </h6>
+            <div>
+              <div><b>Weigth: </b> {data.ProductWeight + 'KG'}</div>
+              <div><b>Dim: </b> {data.ProductDimensionDeep + "cm (D)"} X {data.ProductDimensionHeight + "cm (H)"} X {data.ProductDimensionWidth + "cm (W)"}, {(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight / 1000000).toFixed(3)} m<sup>3</sup></div>
+              <div><b>Price: </b>{"RM " + data.ProductPrice + " x " + (isStringNullOrEmpty(data.ProductQuantity) ? 0 : data.ProductQuantity)}</div>
+              <div><b>Remark: </b>{data.Remark}</div>
+            </div>
+          </div>
+        </TableCell>
       </>
     )
+  }
+
+  handleCashBillInputs(e) {
+    const { name, value } = e.target
+    switch (name) {
+      case "CashBillAmount":
+        this.setState({
+          cashbillAmount: value
+        })
+        break;
+      case "CashBillRemarks":
+        this.setState({
+          cashbillRemarks: value, cashbillRemarksValidated: !(isStringNullOrEmpty(value))
+        })
+        break;
+      default:
+        break;
+    }
+  }
+
+  generateCashBill() {
+    const { cashbillAmount, cashbillRemarks, cashbillRemarksValidated, cashbillSelectedRows } = this.state
+    console.log(cashbillAmount, cashbillRemarks, cashbillRemarksValidated, cashbillSelectedRows)
   }
 
   render() {
@@ -572,8 +616,6 @@ class TransactionHistoryDetail extends Component {
       DeliveryFee,
       AddModalOpen2
     } = this.state
-
-    console.log(this.state.TransactionDetail)
 
     return (
       <Card>
@@ -587,12 +629,12 @@ class TransactionHistoryDetail extends Component {
               <ArrowBackIcon />
             </IconButton>
             <div>
-              <Button sx={{ marginRight: 2 }} variant="contained" startIcon={<NoteAddIcon />} onClick={() => this.setState({ generateCashBillModalOpen: true })}>
-                Generate Cash Bill
-              </Button>
-              <IconButton color="primary" aria-label="back"
-                component="span"
-                onClick={this.onAddButtonClick}>
+              {
+                // <Button sx={{ marginRight: 2 }} variant="contained" startIcon={<NoteAddIcon />} onClick={() => this.setState({ generateCashBillModalOpen: true })}>
+                //   Generate Cash Bill
+                // </Button>
+              }
+              <IconButton color="primary" aria-label="back" component="span" onClick={this.onAddButtonClick}>
                 <PrintIcon />
               </IconButton>
             </div>
@@ -762,34 +804,113 @@ class TransactionHistoryDetail extends Component {
               showCancel={false}
             // handleConfirmFunc={() => { console.log('cnfirm ') }}
             >
-              <div>
-                <TableComponents
-                  style={{
-                    boxShadow: "0px",
-                  }}
-                  elevation={0}
-                  tableOptions={{
-                    dense: true,
-                    tableOrderBy: 'asc',
-                    sortingIndex: "fat",
-                    stickyTableHeader: false,
-                  }}
-                  tableHeaders={cashbill_headcells}
-                  tableRows={{
-                    renderTableRows: this.renderCashbillTableRows,
-                    checkbox: true,
-                    headerColor: "white",
-                    checkboxColor: "primary",
-                    onRowClickSelect: true
-                  }}
-                  selectedIndexKey={"TransactionDetailID"}
-                  Data={TransactionDetail}
-                  onActionButtonClick={this.onAddButtonClick}
-                  onSelectRow={this.onSelectRow}
-                  onSelectAllClick={this.onSelectAllRow}
-                  CallResetSelected={this.state.CallResetSelected}
-                  actionIcon={this.renderCashBillTableActionButton()}
-                />
+              <div className="row">
+                <div className="col-12 col-md-6">
+                  {
+                    isArrayNotEmpty(this.state.cashbillSelectedRows) &&
+                    <div className="thin-scrollbar " style={{ height: "150px", overflowY: 'auto', padding: '0px 0px 10px', marginBottom: '15px' }}>
+                      <div className="d-flex justify-content-between" style={{ position: "sticky", top: 0, background: "white" }}>
+                        <h5><b>*Selected Tracking Number for References</b></h5>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          size="small"
+                          onClick={() => {
+                            this.setState({ CallResetSelected: true, cashbillSelectedRows: [] })
+                            setTimeout(() => { this.setState({ CallResetSelected: false }) }, 300)
+                          }}
+                          startIcon={<DeleteOutlineIcon />}
+                        >
+                          Clear
+                        </Button>
+                      </div>
+
+                      {
+                        this.state.cashbillSelectedRows.map((el, idx) => {
+                          return (
+                            <div className="w-100 border-bottom-2"><b>{el.TrackingNumber}</b> {" ( " + el.Item + " )"}</div>
+                          )
+                        })
+                      }
+                    </div>
+                  }
+                  {
+                    isArrayNotEmpty(this.state.cashbillSelectedRows) &&
+                    <Button style={{ marginBottom: "10px" }} variant="outlined" onClick={() => this.addReferencesToRemark()} startIcon={<ArrowDownwardIcon />} endIcon={<ArrowDownwardIcon />} fullWidth>
+                      Add selected Tracking Numbers to Remark
+                    </Button>
+                  }
+                  <div>
+                    <TextField
+                      id="CashBillRemarks"
+                      name="CashBillRemarks"
+                      label="Remarks"
+                      placeholder="Write the description about the cashbill "
+                      multiline
+                      required
+                      fullWidth
+                      size="small"
+                      onChange={(e) => this.handleCashBillInputs(e)}
+                      value={this.state.cashbillRemarks}
+                      error={!this.state.cashbillRemarksValidated && this.state.cashbillRemarksValidated !== null}
+                      helperText={!this.state.cashbillRemarksValidated && this.state.cashbillRemarksValidated !== null ? "This is require valid remark for references" : ""}
+                    />
+                    <FormControl sx={{ marginTop: "10px" }} variant="standard" size="small" fullWidth>
+                      <Input
+                        id="CashBillAmount"
+                        name="CashBillAmount"
+                        variant="standard"
+                        size="small"
+                        required
+                        type="number"
+                        onChange={(e) => this.handleCashBillInputs(e)}
+                        value={this.state.cashbillAmount}
+                        startAdornment={<InputAdornment position="start">RM</InputAdornment>}
+                      />
+                    </FormControl>
+                    <Button
+                      sx={{ marginTop: "10px" }}
+                      color="primary"
+                      variant="contained"
+                      fullWidth
+                      startIcon={<PrintIcon />}
+                      endIcon={<PrintIcon />}
+                      disabled={!this.state.cashbillRemarksValidated}
+                      onClick={() => this.generateCashBill()}
+                    >
+                      Generate Cash Bill
+                    </Button>
+                  </div>
+                </div>
+                <div className="col-12 col-md-6 thin-scrollbar" style={{ height: "87vh", overflowY: 'auto' }}>
+                  <TableComponents
+                    style={{
+                      boxShadow: "0px",
+                    }}
+                    paginationOptions={[100, 250, { label: 'All', value: -1 }]} // optional, by default it will hide the table pagination. You should set settings for pagination options as in array, eg.: [5, 100, 250, { label: 'All', value: -1 }]
+                    elevation={0}
+                    tableOptions={{
+                      dense: true,
+                      tableOrderBy: 'asc',
+                      sortingIndex: "fat",
+                      stickyTableHeader: false,
+                    }}
+                    tableHeaders={cashbill_headcells}
+                    tableRows={{
+                      renderTableRows: this.renderCashbillTableRows,
+                      checkbox: true,
+                      headerColor: "white",
+                      checkboxColor: "primary",
+                      onRowClickSelect: true
+                    }}
+                    selectedIndexKey={"TrackingNumber"}
+                    Data={TransactionDetail}
+                    onActionButtonClick={this.onAddButtonClick}
+                    onSelectRow={this.onSelectRow}
+                    onSelectAllClick={this.onSelectAllRow}
+                    CallResetSelected={this.state.CallResetSelected}
+                  />
+                </div>
               </div>
             </ModalPopOut>
           </div>

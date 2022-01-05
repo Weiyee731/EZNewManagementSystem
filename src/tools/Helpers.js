@@ -254,7 +254,7 @@ const leftPad = (number, targetLength) => {
 
 // split array
 export const splitArray = (arr, len) => {
-    var chunks = [], i = 0, n = arr.length;
+    var chunks = [], i = 0, n = isArrayNotEmpty(arr) ? arr.length : 0;
     while (i < n) {
         chunks.push(arr.slice(i, i += len));
     }
