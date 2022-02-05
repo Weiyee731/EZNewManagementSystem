@@ -62,6 +62,8 @@ const style = {
   p: 4,
 };
 
+const noOfArrShow = 16
+
 const headCells = [
   {
     id: 'index',
@@ -101,7 +103,58 @@ const headCells = [
   },
   {
     id: 'Total',
+    align: 'right',
+    disablePadding: false,
+    label: 'Total',
+  }
+];
+
+const smallItemHeadCells = [
+  {
+    id: 'index',
     align: 'left',
+    disablePadding: false,
+    label: 'No.',
+  },
+  {
+    id: 'TrackingNumber',
+    align: 'left',
+    disablePadding: false,
+    label: 'Description',
+  },
+  {
+    id: 'ProductQuantity',
+    align: 'left',
+    disablePadding: false,
+    label: 'Qty',
+  },
+  {
+    id: 'weight',
+    align: 'left',
+    disablePadding: false,
+    label: 'Weight (kg)',
+  },
+  {
+    id: 'Dimension',
+    align: 'left',
+    disablePadding: false,
+    label: 'm³',
+  },
+  {
+    id: 'handlingCharge',
+    align: 'left',
+    disablePadding: false,
+    label: 'Handling Price',
+  },
+  // {
+  //   id: 'ProductPrice',
+  //   align: 'center',
+  //   disablePadding: false,
+  //   label: 'Price',
+  // },
+  {
+    id: 'Total',
+    align: 'right',
     disablePadding: false,
     label: 'Total',
   }
@@ -119,7 +172,7 @@ const cashbill_headcells = [
 const companyTitle = {
   fontWeight: "bolder",
   fontSize: "16px",
-  textAlign: "left"
+  textAlign: "center"
 };
 
 const companyDetailTitle = {
@@ -140,19 +193,19 @@ const total = {
 };
 
 const tncTitle = {
-  fontSize: "14px",
+  fontSize: "12px",
   color: "#0070C0",
 };
 
 const tncDiv = {
   // margin: "1%",
   fontWeight: "bold",
-  fontSize: "11px",
+  fontSize: "10px",
 };
 
 const img = {
   width: 'auto',
-  height: '150px',
+  height: '100px',
 };
 
 function printPDF() {
@@ -218,7 +271,7 @@ class TransactionHistoryDetail extends Component {
           AreaCode: this.props.transaction[0].AreaCode,
           Contact: this.props.transaction[0].UserContactNo,
           Address: this.props.transaction[0].UserAddress,
-          OrderTotalAmount: this.props.transaction[0].OrderSubTotalAmount,
+          OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
           OrderPaidAmount: this.props.transaction[0].OrderSubPaidAmount,
           TransactionDetail: JSON.parse(this.props.transaction[0].TransactionDetail),
         });
@@ -238,7 +291,7 @@ class TransactionHistoryDetail extends Component {
           AreaCode: this.props.transaction[0].AreaCode,
           Contact: this.props.transaction[0].UserContactNo,
           Address: this.props.transaction[0].UserAddress,
-          OrderTotalAmount: this.props.transaction[0].OrderSubTotalAmount,
+          OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
           OrderPaidAmount: this.props.transaction[0].OrderSubPaidAmount,
           TransactionDetail: this.props.transaction[0].TransactionDetail !== "null" ? JSON.parse(this.props.transaction[0].TransactionDetail) : [],
         });
@@ -264,6 +317,7 @@ class TransactionHistoryDetail extends Component {
 
   renderTableRows = (data, index) => {
     const fontsize = '9pt'
+    let dataIndex = this.state.TransactionDetail.findIndex(x => parseInt(x.TransactionDetailID) === parseInt(data.TransactionDetailID))
     return (
       <>
         <TableCell
@@ -272,31 +326,49 @@ class TransactionHistoryDetail extends Component {
           scope="row"
           sx={{ fontSize: fontsize }}
         >
-          {(index + 1)}
+          {(dataIndex + 1)}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>{data.TrackingNumber}
+        <TableCell align="left" sx={{ fontSize: fontsize }}>{
+          this.props.transaction[0].CalculationType === "4" && data.Description === "Delivery Fee" ? "Delivery Min 0.5m³" : data.TrackingNumber}
           {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
-            return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px" }}>{additionalCharges.Description}</TableCell></TableRow>
+            return <div align="left" sx={{ fontSize: fontsize, borderBottom: "0px" }}>{additionalCharges.Description}</div>
           })}
         </TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.TrackingNumber !== "Delivery Fee") ? data.ProductQuantity : "-"}</TableCell>
+        {
+          this.props.transaction[0].CalculationType === "3" &&
+          <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? "-" : data.ProductWeight !== null && data.ProductWeight !== undefined && (data.ProductWeight).toFixed(2)}</TableCell>
+        }
         <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.TrackingNumber !== "Delivery Fee") ? volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) : "-"}</TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }}>
-
+          {data.handlingCharge !== 0 && data.handlingCharge !== undefined ? parseFloat(data.handlingCharge).toFixed(2) : "-"}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
-          {roundOffTotal(data.ProductPrice)}
+        {/* <TableCell align="left" sx={{ fontSize: fontsize }}>
+          {data.ProductPrice}
           {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
             return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{additionalCharges.ProductPrice}</TableCell></TableRow>
           })}
-        </TableCell>
+        </TableCell> */}
 
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
-          {roundOffTotal(data.ProductPrice * data.ProductQuantity)}
+        {
+          this.props.transaction[0].CalculationType !== "3" &&
+          <TableCell align="left" sx={{ fontSize: fontsize }}>
+            {
+              this.props.transaction[0].CalculationType === "1" ?
+                volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) > 0.013 ? (data.ProductPrice / volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)).toFixed(2) : parseFloat(data.ProductPrice).toFixed(2)
+                :
+                volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) > 0 ? (data.ProductPrice / volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)).toFixed(2) : data.Description === "Delivery Fee" || data.Description === undefined ? "-" : <p style={{ color: "red" }}>0 m³</p>
+            }
+          </TableCell>
+        }
+
+        <TableCell align="right" sx={{ fontSize: fontsize }}>
+          {data.Description === "Delivery Fee" ? parseFloat(data.ProductPrice).toFixed(2) : this.props.transaction[0].CalculationType === "3" ? "-" : parseFloat(data.ProductPrice) * data.ProductQuantity}
           {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
-            return <TableRow><TableCell align="left" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{(additionalCharges.ProductPrice * additionalCharges.ProductQuantity)}</TableCell></TableRow>
+            return <div align="right" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{(parseFloat(additionalCharges.ProductPrice) * additionalCharges.ProductQuantity).toFixed(2)}</div>
           })}
         </TableCell>
+
 
       </>
     )
@@ -383,6 +455,34 @@ class TransactionHistoryDetail extends Component {
       TransactionDetail,
       DeliveryFee,
     } = this.state
+
+    // let TransactionDetail = isArrayNotEmpty(transaction) ? JSON.parse(transaction[0].TransactionDetail) : transaction
+    let actualWeight = 0
+    let actualVolume = 0
+    let m3Weight = 0
+    let finalWeight = 0
+    let subTotal = 0
+    let handlingCharge = 0
+    let additionalCharges = 0
+
+    if (isArrayNotEmpty(Transaction) && Transaction[0].TransactionDetail !== null) {
+      actualWeight = JSON.parse(Transaction[0].TransactionDetail).reduce((weight, item) => weight + item.ProductWeight, 0).toFixed(2)
+      actualVolume = JSON.parse(Transaction[0].TransactionDetail).reduce((dimension, item) => dimension + ((item.ProductDimensionDeep * item.ProductDimensionHeight * item.ProductDimensionWidth) / 1000000), 0)
+      actualVolume = (Math.ceil(actualVolume * 1000) / 1000).toFixed(3)
+      m3Weight = (actualVolume * 1000000 / 6000).toFixed(2)
+
+      if (actualWeight > m3Weight)
+        finalWeight = actualWeight
+      else
+        finalWeight = m3Weight
+
+      handlingCharge = this.state.TransactionDetail.reduce((charges, item) => charges + item.handlingCharge, 0)
+      handlingCharge = !isNaN(handlingCharge) ? handlingCharge : 0
+
+      additionalCharges = this.state.TransactionDetail[0].TransactionDetailCharges != null && JSON.parse(this.state.TransactionDetail[0].TransactionDetailCharges).reduce((additionalCharge, item) => additionalCharge + item.ProductPrice, 0).toFixed(2)
+      subTotal = ((Math.ceil(finalWeight).toFixed(2) - 1) * 6 + 10 + parseFloat(handlingCharge) + parseFloat(additionalCharges)).toFixed(2)
+    }
+
     return (
       <div
         className="letter-page-size w-100"
@@ -421,7 +521,7 @@ class TransactionHistoryDetail extends Component {
             INVOICE
           </div>
           <div className="row" style={companyDetail}>
-            <span className="col-9">{UserCode}-{AreaCode}{Fullname}</span>
+            <span className="col-9">{UserCode}-{AreaCode} {Fullname}</span>
             <span className="col-1">No</span>
             <span className="col-2">: {TransactionName}</span>
           </div>
@@ -437,7 +537,7 @@ class TransactionHistoryDetail extends Component {
           </div>
           <div className="row" style={companyDetail}>
             <span className="col-1 offset-9">Page</span>
-            <span className="col-2">{`: ${index + 1} of ${splitArray(TransactionDetail, 16).length}`}</span>
+            <span className="col-2">{`: ${index + 1} of ${splitArray(TransactionDetail, noOfArrShow).length}`}</span>
           </div>
         </div>
         <div
@@ -446,7 +546,7 @@ class TransactionHistoryDetail extends Component {
           }}
         >
           <div style={companyDetail}>
-            <b>Container Date:</b> {TransactionDetail[0].ContainerDate !== null ? TransactionDetail[0].ContainerDate : " - "}
+            <b>Container Date:</b> {TransactionDetail[0].ContainerDate !== null ? TransactionDetail[0].ContainerDate : " - "} {this.props.transaction[0].CalculationType === "4" && "( Cargo Delivery )"}
           </div>
           <TableComponents
             style={{
@@ -459,7 +559,7 @@ class TransactionHistoryDetail extends Component {
               sortingIndex: "fat",
               stickyTableHeader: false,
             }}
-            tableHeaders={headCells}
+            tableHeaders={this.props.transaction[0].CalculationType !== "3" ? headCells : smallItemHeadCells}
             tableRows={{
               renderTableRows: this.renderTableRows,
               checkbox: false,
@@ -472,63 +572,113 @@ class TransactionHistoryDetail extends Component {
           />
         </div>
 
-        <div className="d-flex">
-          <div className="invoice-footer">
-            <hr />
-            <div className="row">
-              <div style={tncDiv} className="col-5 mt-4">
-                <div style={tncTitle}>Terms and Conditions</div>
-                <br />
-                <div>
-                  <p>
-                    1. All payment should be make payable to
-                    <br />
-                    EZ TAO BAO ENTERPRISE
-                    <br />
-                    25301009073
-                    <br />
-                    HONG LEONG BANK
-                  </p>
-                  <p>
-                    2. Payment must be cleared within 3 days after the billing date
-                  </p>
-                </div>
-              </div>
-              <div style={tncDiv} className="col-2 mt-4">
-                <div >Payment can be make through S Pay Global</div>
-                <img style={img} src="https://tourism.denoo.my/Ez/spay.jpeg"></img>
-              </div>
-              <div style={tncDiv} className="col-4 offset-1">
-                Total Item :
-                <span style={total}>{TransactionDetail.length}</span>
-                <br />
-                Sub Total (RM) :
-                <span style={total}>{roundOffTotal(OrderTotalAmount)}</span>
-                <br />
-                Total (RM) :
-                <span style={total}>{roundOffTotal(parseFloat(OrderTotalAmount) + parseFloat(DeliveryFee))}</span>
-              </div>
-            </div>
-            <div className="row mt-5 ">
-              <div style={tncDiv} className="col-5 mt-4">
-                __________________________________
-                <div className="text-center">
-                  <div>EZ TRANSIT AND LOGISTICS</div>
-                  <div>SDN BHD</div>
-                </div>
-              </div>
-              <div style={tncDiv} className="col-2 mt-4">
+        {
+          arr.length < noOfArrShow &&
+          <div className="d-flex">
+            <div className="invoice-footer">
+              <hr />
+              {this.props.transaction[0].CalculationType === "3" &&
+                <>
+                  <div style={tncDiv}>
+                    Actual Weight : {actualWeight} kg  |  Volume : {actualVolume} m³  |  Volumetric Weight : {m3Weight} kg
+                  </div>
+                  <div style={tncDiv}>
+                    * First kg : RM 10, Sub. kg : RM 6
+                  </div>
+                  <div style={tncDiv}>
+                    * Volumetric weight = volume * 1000000 / 6000
+                  </div>
 
+                </>
+              }
+              {this.props.transaction[0].CalculationType === "4" &&
+                <>
+                  <div style={tncDiv}>
+                    Volume : {actualVolume} m³  |  Minimum Volume = 0.50 m³
+                  </div>
+                </>
+              }
+              <div className="row">
+                <div style={tncDiv} className="col-5 mt-4">
+                  <div style={tncTitle}>Terms and Conditions</div>
+                  <br />
+                  <div>
+                    <p>
+                      1. All payment should be make payable to
+                      <br />
+                      EZ TAO BAO ENTERPRISE
+                      <br />
+                      25301009073
+                      <br />
+                      HONG LEONG BANK
+                    </p>
+                    <p>
+                      2. Payment must be cleared within 3 days after the billing date
+                    </p>
+                  </div>
+                </div>
+                <div style={tncDiv} className="col-3 mt-4">
+                  <div >Payment can be make through SPay Global</div>
+                  <img style={img} src="https://tourism.denoo.my/Ez/spay.jpeg"></img>
+                </div>
+                <div style={tncDiv} className="col-3 offset-1">
+                  {this.props.transaction[0].CalculationType === "3" &&
+                    <>
+                      Total Weight (kg):
+                      <span style={total}>
+                        {Math.ceil(finalWeight).toFixed(2)}
+                      </span>
+                      <br />
+                    </>
+                  }
+                  {/* Total Item :
+                  <span style={total}>{TransactionDetail.length}</span>
+                  <br />
+                  Sub Total (RM) :
+                  <span style={total}>{roundOffTotal(OrderTotalAmount)}</span>
+                  <br />
+                  Total (RM) :
+                  <span style={total}>{roundOffTotal(parseFloat(OrderTotalAmount) + parseFloat(DeliveryFee))}</span> */}
+                  Total Item :
+                  <span style={total}>{TransactionDetail.filter((el) => el.TrackingNumber === "Delivery Fee").length > 0 ? TransactionDetail.length - 1 : TransactionDetail.length}</span>
+                  <br />
+                  Sub Total (RM) :
+                  {this.props.transaction[0].CalculationType === "3" ?
+                    <span style={total}>{roundOffTotal(parseFloat(subTotal) + parseFloat(DeliveryFee))}</span>
+                    :
+                    <span style={total}>{roundOffTotal(parseFloat(OrderTotalAmount) + parseFloat(DeliveryFee))}</span>
+                  }
+                  <br />
+                  Total (RM) :
+                  {this.props.transaction[0].CalculationType === "3" ?
+                    <span style={total}>{roundOffTotal(parseFloat(subTotal) + parseFloat(DeliveryFee))}</span>
+                    :
+                    <span style={total}>{roundOffTotal(parseFloat(OrderTotalAmount) + parseFloat(DeliveryFee))}</span>
+                  }
+                </div>
               </div>
-              <div style={{ textAlign: 'left', ...tncDiv }} className="col-4 offset-1">
-                __________________________________
-                <div>Name  : </div>
-                <div>IC NO : </div>
-                <div>DATE  : </div>
+              <div className="row mt-4">
+                <div style={tncDiv} className="col-3 mt-4">
+                  <div className="text-center">
+                    __________________________________
+                    <div>EZ TRANSIT AND LOGISTICS</div>
+                    <div>SDN BHD</div>
+                  </div>
+                </div>
+                <div style={tncDiv} className="col-5 mt-4">
+
+                </div>
+                <div style={{ textAlign: 'left', ...tncDiv }} className="col-3 mt-4">
+                  __________________________________
+                  <div>Name  : </div>
+                  <div>IC NO : </div>
+                  <div>DATE  : </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        }
+
         <br />
       </div>
     )
@@ -543,7 +693,8 @@ class TransactionHistoryDetail extends Component {
   }
 
   onAddButtonClick = () => {
-    this.setState({ openAddModal: true })
+    // this.setState({ openAddModal: true })
+    this.setState({ AddModalOpen: true, isPrinting: true })
   }
 
   onSelectRow(row) {
@@ -640,7 +791,7 @@ class TransactionHistoryDetail extends Component {
             </div>
           </div>
           <div ref={(el) => (this.componentRef = el)}>
-            {splitArray(TransactionDetail, 16).map((arr, index) => {
+            {splitArray(TransactionDetail, noOfArrShow).map((arr, index) => {
               return (
                 this.renderPage(arr, index)
               )

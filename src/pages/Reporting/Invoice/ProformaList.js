@@ -188,8 +188,10 @@ const ProformaList = (props) => {
         }
     }
 
-    const handleChangeSingleUnitPrice = (index, value) => {
+    const handleChangeSingleUnitPrice = (value, data) => {
         const newItems = [...items];
+        let index = newItems.findIndex(x => parseInt(x.StockID) === parseInt(data.StockID))
+
         newItems[index]['isFollowStandard'] = false;
         newItems[index]['unitPrice'] = value;
         setItems(newItems)
@@ -319,7 +321,6 @@ const ProformaList = (props) => {
     const renderTableRows = (data, index) => {
         let fontsize = '9pt'
         let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
-        console.log(data)
 
         return (
             <>
@@ -341,8 +342,9 @@ const ProformaList = (props) => {
                                 variant="outlined"
                                 size="small"
                                 name="unitPrice"
+                                label=""
                                 value={data.isFollowStandard ? singleUnitPrice(volume) : data.unitPrice}
-                                onChange={(e) => handleChangeSingleUnitPrice(index, e.target.value)}
+                                onChange={(e) => handleChangeSingleUnitPrice(e.target.value, data)}
                             />
                         </TableCell>
                         <TableCell align="left" sx={{ fontSize: fontsize }}>{subTotal(data).toFixed(2)}</TableCell>
@@ -395,7 +397,7 @@ const ProformaList = (props) => {
                             label="First KG price"
                             name="unitPrice"
                             value={firstKg}
-                            onChange={(e) => { setFirstKg(e.target.value); setFirstKgValidated(isNumber(e.target.value)) }}
+                            onChange={(e) => { setFirstKg(parseFloat(e.target.value)); setFirstKgValidated(isNumber(e.target.value)) }}
                             error={!firstKgValidated}
                             helperText={(!firstKgValidated) ? "It should be a valid digit" : ""}
                         />
@@ -408,7 +410,7 @@ const ProformaList = (props) => {
                             label="Subsequent KG price"
                             name="unitPrice"
                             value={subsequentKg}
-                            onChange={(e) => { setSubsequentKg(e.target.value); setSubsequentKgValidated(isNumber(e.target.value)) }}
+                            onChange={(e) => { setSubsequentKg(parseFloat(e.target.value)); setSubsequentKgValidated(isNumber(e.target.value)) }}
                             error={!subsequentKgValidated}
                             helperText={(!subsequentKgValidated) ? "It should be a valid digit" : ""}
                         />
@@ -549,7 +551,7 @@ const ProformaList = (props) => {
                                 Total Volume (m³):
                             </div>
                             <div className='col-2'>
-                                {totalVolume}
+                                {totalVolume.toFixed(3)}
                             </div>
                             <div className='col-10'>
                                 Volumetric Weight (kg):
@@ -568,7 +570,7 @@ const ProformaList = (props) => {
                     {selectedType === 4 && (totalVolume) < minCubic &&
                         <>
                             <div className='col-10'>
-                                * Extra add-on:
+                                * Min 0.5m³:
                             </div>
                             <div className='col-2'>
                                 RM {(LargeItemMinPrice / 2 - totalPrice()).toFixed(2)}

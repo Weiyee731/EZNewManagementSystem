@@ -236,7 +236,8 @@ export const round = (num, places) => {
 
 export const volumeCalc = (depth, width, height) => {
     let volume = (depth * width * height) / 1000000
-    volume = round(volume, 3)
+    // volume = round(volume, 3)
+    volume = (Math.ceil(volume * 1000) / 1000).toFixed(3)
     return Number(volume)
 }
 

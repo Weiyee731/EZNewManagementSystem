@@ -107,7 +107,7 @@ function EnhancedTableHead(props) {
               sx={{
                 fontWeight: "medium",
                 bgcolor: headerColor,
-                fontSize: "10pt",
+                fontSize: "9pt",
               }} // change table header bg color
             >
               <TableSortLabel
@@ -153,15 +153,18 @@ const EnhancedTableToolbar = (props) => {
   const numSelected = selectedRows.length;
   let mCube = 0;
   let weight = 0;
+  let itemDimension = 0;
 
   if (extraInfo) {
     selectedRows.map((item) => {
       weight = weight + item.ProductWeight;
-      mCube = mCube +
-        ((item.ProductDimensionDeep *
-          item.ProductDimensionWidth *
-          item.ProductDimensionHeight) /
-          1000000).toFixed(3);
+
+      itemDimension = ((item.ProductDimensionDeep *
+        item.ProductDimensionWidth *
+        item.ProductDimensionHeight) /
+        1000000).toFixed(3)
+
+      mCube = parseFloat(mCube) + parseFloat(itemDimension)
     });
   }
 

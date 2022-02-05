@@ -24,6 +24,7 @@ import CsvDownloader from 'react-csv-downloader';
 import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull, volumeCalc } from "../../../tools/Helpers";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import { toast, Flip } from "react-toastify";
+import { Tooltip } from "@mui/material";
 
 function mapStateToProps(state) {
     return {
@@ -50,13 +51,13 @@ const headCells = [
         displayName: 'Tracking No. '
     },
     {
-        id: 'Member',
+        id: 'UserCode',
         align: 'left',
         disablePadding: false,
         label: 'Member',
     },
     {
-        id: 'Weight',
+        id: 'ProductWeight',
         align: 'left',
         disablePadding: false,
         label: 'Weight (KG)',
@@ -92,7 +93,7 @@ const headCells = [
         label: 'Item',
     },
     {
-        id: 'Division',
+        id: 'AreaCode',
         align: 'left',
         disablePadding: false,
         label: 'Division',
@@ -222,7 +223,7 @@ class CreateInvoice extends Component {
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionDeep) ? data.ProductDimensionDeep.toFixed(0) : 0} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionWidth) ? data.ProductDimensionWidth.toFixed(0) : 0} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionHeight) ? data.ProductDimensionHeight.toFixed(0) : 0} </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{((data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight )/ 1000000).toFixed(3)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{((data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight) / 1000000).toFixed(3)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>
@@ -268,18 +269,45 @@ class CreateInvoice extends Component {
     handleCreateInvoice = () => {
         const { selectedRows } = this.state
         let arr = []
+        let arrType = []
+        let arrArea = []
+        let user = []
+
         selectedRows.map((item) => {
             arr.push(item.UserID)
+            arrType.push(item.AgentInd)
+            arrArea.push(item.UserAreaID)
         })
-        if ((arr.filter((el) => el === selectedRows[0].UserID)).length === arr.length) {
-            this.setState({
-                selectedItems: selectedRows,
-                selectedUserID: selectedRows[0].UserID
-            })
-            this.handleDeliveryModal()
-        } else {
-            toast.error("Please select the tracking records with the same user")
+
+        if (arrType.filter(el => el !== null && el === 1).length > 0) {
+            if ((arrArea.filter((el) => el === selectedRows[0].UserAreaID)).length === arrArea.length) {
+                user = isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.filter((x) => parseInt(x.UserAreaID) === parseInt(selectedRows[0].UserAreaID))
+
+                if (user.length > 0) {
+                    this.setState({
+                        selectedItems: selectedRows,
+                        selectedUserID: selectedRows[0].UserID
+                        // selectedUserID: user[0].UserID
+                    })
+                    this.handleDeliveryModal()
+                }
+
+            } else {
+                toast.error("Please select the tracking records with the same user")
+            }
         }
+        else {
+            if ((arr.filter((el) => el === selectedRows[0].UserID)).length === arr.length) {
+                this.setState({
+                    selectedItems: selectedRows,
+                    selectedUserID: selectedRows[0].UserID
+                })
+                this.handleDeliveryModal()
+            } else {
+                toast.error("Please select the tracking records with the same user")
+            }
+        }
+
     }
 
     handleSelectDeliveryType = (i) => {
@@ -559,7 +587,7 @@ class CreateInvoice extends Component {
         else {
             if (searchCategory === "All" && areaSearchKeys !== "All") {
                 // if area is not empty but search string is empty
-                this.setState({ searchCategory: "All", filteredList: stocks.filter(x => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) })
+                this.setState({ searchCategory: "All", filteredList: stocks.filter(x => !isStringNullOrEmpty(x.UserAreaID) && parseInt(x.UserAreaID) === parseInt(areaSearchKeys)) })
             }
             else if (searchCategory !== "All" && areaSearchKeys === "All") {
                 // if category is not empty but search string is empty
@@ -705,9 +733,15 @@ class CreateInvoice extends Component {
                             extension=".xls"
                             separator=","
                             columns={headCells}
-                            datas={searchCategory == "All" && onSearchText == "" ? stocks : filteredList}
+                            datas={searchCategory == "All" && searchArea == "All" && onSearchText == "" ?
+                                this.state.selectedRows.length > 0 ? this.state.selectedRows : stocks
+                                :
+                                this.state.selectedRows.length > 0 ? this.state.selectedRows : filteredList}
                         >
+                            {/* <Tooltip title="Download Data">  */}
                             <DownloadForOfflineIcon color="primary" sx={{ fontSize: 45 }} />
+                            {/* </Tooltip> */}
+
                         </CsvDownloader>
                     </div>
                 </div>
@@ -947,7 +981,7 @@ class CreateInvoice extends Component {
                         </Button>
                     </Stack>
                 </AlertDialog>
-            </div>
+            </div >
         )
     }
 }

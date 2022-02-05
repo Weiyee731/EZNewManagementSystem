@@ -14,6 +14,9 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Draggable from 'react-draggable';
 import Paper from '@mui/material/Paper';
+import FormControl from '@mui/material/FormControl';
+
+import Input from '@mui/material/Input';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -134,9 +137,16 @@ export function ModalPopOut(props) {
       </DialogContent>
       <DialogActions>
         {props.showCancel ? <Button onClick={() => props.handleToggleDialog()}>Cancel</Button> : ""}
+
         {
           typeof props.handleConfirmFunc === "function" &&
-          <Button onClick={() => props.handleConfirmFunc()} variant='contained'>
+          <Button
+            onClick={() => props.handleConfirmFunc()}
+            autoFocus={true}
+            variant='contained'
+            onKeyDown={(event) => event.key === "Enter" && props.handleConfirmFunc()}
+            focusVisible={true}
+          >
             {props.checked ? "Unchecked" : "Confirm"}
           </Button>
         }

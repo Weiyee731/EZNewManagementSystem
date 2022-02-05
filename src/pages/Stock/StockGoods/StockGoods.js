@@ -169,6 +169,8 @@ const INITIAL_STATE = {
 
     ContainerName: "",
     ContainerDate: "",
+    ContainerID: "",
+    isContainerSet: false,
     TrackingNumber: "",
     UserCode: "",
     ProductDimensionWidth: "",
@@ -229,6 +231,7 @@ class StockGoods extends Component {
                 stockFiltered: (isStringNullOrEmpty(Stocks.ReturnVal) && Stocks.ReturnVal === 0) ? [] : Stocks
             })
         }
+
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -717,7 +720,7 @@ class StockGoods extends Component {
                 }
             }
             this.setState({ stockFiltered: tempList })
-            if (tempList.length === 1) { this.setState({ openEditModal: !this.state.openEditModal, selectedRows: tempList[0] }) }
+            if (isArrayNotEmpty(tempList) && tempList.length === 1) { this.setState({ openEditModal: !this.state.openEditModal, selectedRows: tempList[0] }) }
         }
         else {
             if (searchCategory === "All" && areaSearchKeys !== "All") {
@@ -808,7 +811,12 @@ class StockGoods extends Component {
             { children: "Checked", key: "Checked" }
         ]
         const checked = this.state.selectedRows.TrackingStatusID === 2
-        const { open, openEditModal, openAddModal, options, searchCategory, searchArea } = this.state
+        const { open, openEditModal, openAddModal, options, searchCategory, searchArea, isContainerSet } = this.state
+
+        if (isArrayNotEmpty(this.props.AllContainer) && isContainerSet === false) {
+            this.setState({ ContainerName: this.props.AllContainer[0].ContainerName, ContainerDate: this.props.AllContainer[0].ContainerDate, ContainerID: this.props.AllContainer[0].ContainerID, isContainerSet: true })
+        }
+
         return (
             <div className="container-fluid">
                 <ModalPopOut
@@ -825,11 +833,12 @@ class StockGoods extends Component {
                                 labelId="Division"
                                 id="Division"
                                 name="Division"
-                                value={isArrayNotEmpty(this.props.AllContainer) ? this.props.AllContainer[0].ContainerID : ""}
+                                // value={isArrayNotEmpty(this.props.AllContainer) ? this.props.AllContainer[0].ContainerID : ""}
+                                value={this.state.ContainerID}
                                 onChange={(e) => {
                                     isArrayNotEmpty(this.props.AllContainer) && this.props.AllContainer.map((container) => {
                                         if (container.ContainerID === e.target.value) {
-                                            this.setState({ ContainerName: container.ContainerName, ContainerDate: container.ContainerDate })
+                                            this.setState({ ContainerName: container.ContainerName, ContainerDate: container.ContainerDate, ContainerID: container.ContainerID })
                                         }
                                     })
                                 }
