@@ -317,8 +317,9 @@ class TransactionHistoryDetail extends Component {
 
   renderTableRows = (data, index) => {
     const fontsize = '9pt'
+    let charges = data.TransactionDetailCharges != [] ? JSON.parse(data.TransactionDetailCharges).reduce((price, item) => price + item.ProductPrice, 0).toFixed(2) : 0
     let dataIndex = this.state.TransactionDetail.findIndex(x => parseInt(x.TransactionDetailID) === parseInt(data.TransactionDetailID))
-    return (
+   return (
       <>
         <TableCell
           component="th"
@@ -341,7 +342,11 @@ class TransactionHistoryDetail extends Component {
         }
         <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.TrackingNumber !== "Delivery Fee") ? volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) : "-"}</TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }}>
-          {data.handlingCharge !== 0 && data.handlingCharge !== undefined ? parseFloat(data.handlingCharge).toFixed(2) : "-"}
+          <div>-</div>
+          {data.TransactionDetailCharges != [] && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
+            return <div align="left" sx={{ fontSize: fontsize, borderBottom: "0px" }}>{parseFloat(additionalCharges.ProductPrice).toFixed(2)}</div>
+          })}
+          {/* {data.handlingCharge !== 0 && data.handlingCharge !== undefined ? parseFloat(data.handlingCharge).toFixed(2) : "-"} */}
         </TableCell>
         {/* <TableCell align="left" sx={{ fontSize: fontsize }}>
           {data.ProductPrice}
@@ -363,10 +368,15 @@ class TransactionHistoryDetail extends Component {
         }
 
         <TableCell align="right" sx={{ fontSize: fontsize }}>
-          {data.Description === "Delivery Fee" ? parseFloat(data.ProductPrice).toFixed(2) : this.props.transaction[0].CalculationType === "3" ? "-" : parseFloat(data.ProductPrice) * data.ProductQuantity}
-          {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
+
+          {data.Description === "Delivery Fee" ? (parseFloat(data.ProductPrice) + parseFloat(charges)).toFixed(2) : this.props.transaction[0].CalculationType === "3" ? "-" : (parseFloat(data.ProductPrice) + parseFloat(charges)).toFixed(2)}
+          {/* {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges) => {
             return <div align="right" sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>{(parseFloat(additionalCharges.ProductPrice) * additionalCharges.ProductQuantity).toFixed(2)}</div>
-          })}
+          })} */}
+
+          {/* {
+            data.TransactionDetailCharges != [] ? JSON.parse(data.TransactionDetailCharges).reduce((weight, item) => weight + item.ProductWeight, 0).toFixed(2)
+          } */}
         </TableCell>
 
 

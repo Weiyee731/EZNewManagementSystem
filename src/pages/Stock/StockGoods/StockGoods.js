@@ -426,18 +426,21 @@ class StockGoods extends Component {
             case "openEditModal":
 
                 let extraChangesValue = "", isNotVerified = 0;
-                if (this.state.AdditionalCharges.length > 0) {
-                    for (var i = 0; i < this.state.AdditionalCharges.length; i++) {
-                        if (this.state.AdditionalCharges[i].Charges === undefined || this.state.AdditionalCharges[i].Value === undefined) {
+                let additionalCharge = this.state.AdditionalCharges
+                if (additionalCharge[0].Charges === undefined)
+                    additionalCharge = JSON.parse(this.state.AdditionalCharges)
+                if (additionalCharge.length > 0) {
+                    for (var i = 0; i < additionalCharge.length; i++) {
+                        if (additionalCharge[i].Charges === undefined || additionalCharge[i].Value === undefined) {
                             this.setState({ AdditionalCharges: "" })
                             extraChangesValue = "-"
                         } else {
-                            extraChangesValue += this.state.AdditionalCharges[i].Charges + "=" + this.state.AdditionalCharges[i].Value
-                            if (i !== this.state.AdditionalCharges.length - 1)
+                            extraChangesValue += additionalCharge[i].Charges + "=" + additionalCharge[i].Value
+                            if (i !== additionalCharge.length - 1)
                                 extraChangesValue += ';'
 
                             //check extra charge
-                            if (this.state.AdditionalCharges[i].validated === false)
+                            if (additionalCharge[i].validated === false)
                                 isNotVerified++;
                         }
                     }
@@ -816,7 +819,6 @@ class StockGoods extends Component {
         if (isArrayNotEmpty(this.props.AllContainer) && isContainerSet === false) {
             this.setState({ ContainerName: this.props.AllContainer[0].ContainerName, ContainerDate: this.props.AllContainer[0].ContainerDate, ContainerID: this.props.AllContainer[0].ContainerID, isContainerSet: true })
         }
-
         return (
             <div className="container-fluid">
                 <ModalPopOut

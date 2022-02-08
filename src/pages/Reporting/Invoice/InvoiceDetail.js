@@ -44,6 +44,8 @@ function mapDispatchToProps(dispatch) {
   return {
     CallFetchAllTransactionByID: (data) => dispatch(GitAction.CallFetchAllTransactionByID(data)),
     CallUpdateTransaction: (data) => dispatch(GitAction.CallUpdateTransaction(data)),
+    // CallUpdateStockDetailByPost: (data) => dispatch(GitAction.CallUpdateStockDetailByPost(data)),
+    CallUpdateStockDetailByGet: (data) => dispatch(GitAction.CallUpdateStockDetailByGet(data)),
   };
 }
 
@@ -231,6 +233,7 @@ class InvoiceDetail extends Component {
     detailsIndex: 0,
     actualVolume: 0,
     minDelivery: 0,
+    handlingArray: []
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -279,7 +282,9 @@ class InvoiceDetail extends Component {
         this.setState({
           TransactionDetail: tempArr,
           transaction: this.props.transaction,
-          actualVolume: actualVolume
+          actualVolume: actualVolume,
+          TransportationBool: true
+          // TransportationBool: tempArr.filter((x) => x.Description === "Delivery Fee").length > 0 ? true : false
         })
 
         if (this.props.transaction[0].DeliveryFee > 0) {
@@ -325,20 +330,42 @@ class InvoiceDetail extends Component {
       TransactionDetail: tempArr,
       transaction: tempArr2
     })
+
+    if (this.state.handlingArray.length > 0) {
+      if (this.state.handlingArray.filter((data) => parseInt(data.TransactionDetailID) === parseInt(tempArr[index].TransactionDetailID)).length > 0) {
+        let arrayIndex = this.state.handlingArray.findIndex((data) => parseInt(data.TransactionDetailID) === parseInt(tempArr[index].TransactionDetailID))
+        this.state.handlingArray[arrayIndex] = tempArr[index]
+      } else
+        this.state.handlingArray.push(tempArr[index])
+    }
+    else
+      this.state.handlingArray.push(tempArr[index])
   }
 
   renderTableRows = (data, index) => {
     const fontsize = '9pt'
+    let DBextraCharge = []
+    let charges = data.TransactionDetailCharges !== "[]" && data.TransactionDetailCharges !== undefined ? JSON.parse(data.TransactionDetailCharges).reduce((price, item) => price + parseFloat(item.ProductPrice), 0).toFixed(2) : 0
+
+    // data.AdditionalCharges !== "[]" && data.AdditionalCharges.split(";").map((x) => {
+    //   DBextraCharge.push(x.split("=")[1])
+    // })
+
+    // if (DBextraCharge.length > 0)
+    //   charges = charges + DBextraCharge.reduce((price, item) => price + parseFloat(item), 0).toFixed(2)
+
     let dataIndex = this.state.TransactionDetail.findIndex(x => parseInt(x.TransactionDetailID) === parseInt(data.TransactionDetailID))
     let existDelivery = this.state.TransactionDetail.filter(x => x.Description === "Delivery Fee").length
     if (this.state.TransportationBool === true && data.TransactionDetailID === undefined) {
       if (existDelivery === 0) {
         dataIndex = this.state.TransactionDetail.length - 1
       }
+      // if (data.TrackingNumber === "Delivery Min 0.5m³")
+      //   dataIndex = this.state.TransactionDetail.length
     }
 
     return (
-      data.Description === "Delivery Fee" && this.state.TransportationBool === false ? "" :
+      (data.Description === "Delivery Fee" && this.state.TransportationBool === false) || (data.TrackingNumber === "Delivery Fee" && this.state.TransportationBool === false && this.props.transaction[0].CalculationType !== "4") ? "" :
         (
           <>
             <TableCell
@@ -350,13 +377,29 @@ class InvoiceDetail extends Component {
               {dataIndex + 1}
             </TableCell>
             <TableCell align="left" sx={{ fontSize: fontsize }}>{this.props.transaction[0].CalculationType === "4" && data.Description === "Delivery Fee" || this.props.transaction[0].CalculationType === "4" && data.Description === undefined ? "Delivery Min 0.5m³" : data.TrackingNumber}
-              {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
-                return (
-                  <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px" }}>
-                    {additionalCharges.Description}
-                  </div>
-                )
-              })}
+              {data.TransactionDetailCharges !== "[]" && data.TransactionDetailCharges !== undefined &&
+                JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
+                  return (
+                    <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px" }}>
+                      {additionalCharges.Description}
+                    </div>
+                  )
+                })
+              }
+              {/* {data.TransactionDetailCharges !== "[]" &&
+                JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
+                 console.log("additionalCharges11", additionalCharges)
+                })
+              } */}
+              {/* {
+                data.AdditionalCharges !== "[]" && data.AdditionalCharges.split(";").map((x) => {
+                  return (
+                    <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px" }}>
+                      {x.split("=")[0]}
+                    </div>
+                  )
+                })
+              } */}
             </TableCell>
             <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? "-" : data.ProductQuantity}</TableCell>
             {
@@ -372,10 +415,18 @@ class InvoiceDetail extends Component {
             </TableCell>
             {this.state.isPrinting ?
               <TableCell align="left" sx={{ fontSize: fontsize }}>
-                {data.handlingCharge !== 0 ? data.handlingCharge : "-"}
+                {data.handlingCharge !== 0 && data.handlingCharge !== undefined ? parseFloat(data.handlingCharge).toFixed(2) : "-"}
+          
+                {data.TransactionDetailCharges !== undefined && data.TransactionDetailCharges !== "[]" ? JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
+                  return (
+                    <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>
+                      {parseFloat(additionalCharges.ProductPrice).toFixed(2)}
+                    </div>
+                  )
+                }) : "-"}
+
               </TableCell>
               :
-
               <TableCell align="left" sx={{ fontSize: fontsize }}>
                 {
                   data.Description === "Delivery Fee" || data.Description === undefined ? "" :
@@ -394,7 +445,6 @@ class InvoiceDetail extends Component {
                             display: 'flex',
                           }
                         }}
-                        // value={data.handlingCharge}
                         onChange={(e) => this.handlehandlingChargeOnChange(e.target.value, index)}
                       />
                       <IconButton
@@ -415,15 +465,22 @@ class InvoiceDetail extends Component {
                       </IconButton>
                     </>
                 }
-                {data.TransactionDetailCharges != null && data.TransactionDetailCharges !== "[]" && JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
+                {data.TransactionDetailCharges != undefined && data.TransactionDetailCharges !== "[]" && JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
                   return (
-                    <TableRow>
-                      <TableCell align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>
-                        {(additionalCharges.ProductPrice).toFixed(2)}
-                      </TableCell>
-                    </TableRow>
+                    <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>
+                      {(additionalCharges.ProductPrice).toFixed(2)}
+                    </div>
                   )
                 })}
+                {/* {
+                  data.AdditionalCharges !== "[]" && data.AdditionalCharges.split(";").map((x) => {
+                    return (
+                      <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px" }}>
+                        {parseFloat(x.split("=")[1]).toFixed(2)}
+                      </div>
+                    )
+                  })
+                } */}
               </TableCell>
             }
 
@@ -440,12 +497,16 @@ class InvoiceDetail extends Component {
               </TableCell>
             }
 
-            <TableCell align="right" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? parseFloat(data.ProductPrice) === undefined ? "-" : parseFloat(data.ProductPrice).toFixed(2)
+            <TableCell align="right" sx={{ fontSize: fontsize }}>
+              {data.Description === "Delivery Fee" ? (parseFloat(data.ProductPrice) + parseFloat(charges)).toFixed(2)
+                : this.props.transaction[0].CalculationType === "3" ? "-" : (parseFloat(data.totalPrice) + parseFloat(charges)).toFixed(2)}
+
+              {/* {data.Description === "Delivery Fee" ? parseFloat(data.ProductPrice) === undefined ? "-" : parseFloat(data.ProductPrice).toFixed(2)
               : data.totalPrice === 0 ? '-' : parseFloat(data.totalPrice).toFixed(2)}
               {data.TransactionDetailCharges != null && JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
                 return (<div key={index} sx={{ fontSize: fontsize, borderBottom: "0px" }}>{(additionalCharges.ProductPrice * additionalCharges.ProductQuantity).toFixed(2)}</div>)
-              })
-              }
+              }) */}
+              {/* } */}
             </TableCell>
           </>)
 
@@ -470,9 +531,10 @@ class InvoiceDetail extends Component {
 
     if (this.state.TransportationBool === true) {
       this.state.TransactionDetail.map((search) => {
-        if (search.Description === "Delivery Fee") {
+        if (search.Description === "Delivery Fee" || search.TrackingNumber === "Delivery Fee") {
           this.props.CallUpdateTransaction(this.state);
           search.ProductPrice = this.state.DeliveryFee
+          search.totalPrice = this.state.DeliveryFee
           isDeliveryExist = true
         }
       })
@@ -502,6 +564,54 @@ class InvoiceDetail extends Component {
         }
       }
     }
+
+    if (this.state.handlingArray.length > 0) {
+      this.state.handlingArray.map((data) => {
+        let extraCharge = ""
+        if (data.AdditionalCharges !== "[]") {
+          extraCharge = data.AdditionalCharges + ";Handling Charges=" + data.handlingCharge
+        }
+        else {
+          extraCharge = "Handling Charges=" + data.handlingCharge
+        }
+        this.props.CallUpdateStockDetailByGet({
+          STOCKID: data.StockID,
+          USERCODE: data.UserCode,
+          TRACKINGNUMBER: data.TrackingNumber,
+          PRODUCTWEIGHT: data.ProductWeight,
+          PRODUCTHEIGHT: data.ProductDimensionHeight,
+          PRODUCTWIDTH: data.ProductDimensionWidth,
+          PRODUCTDEEP: data.ProductDimensionDeep,
+          AREACODE: data.UserAreaID,
+
+          ITEM: data.Item,
+          TRACKINGSTATUSID: data.TrackingStatusID,
+          CONTAINERNAME: data.ContainerName,
+          CONTAINERDATE: data.ContainerDate,
+          REMARK: data.Remark,
+          EXTRACHARGE: extraCharge,
+        })
+
+        //   this.props.CallUpdateStockDetailByPost({
+        //     StockID: data.StockID,
+        //     TrackingNumber: data.TrackingNumber,
+        //     ProductWeight:  data.ProductWeight,
+        //     ProductDimensionHeight: data.ProductDimensionHeight,
+        //     ProductDimensionWidth: data.ProductDimensionWidth,
+        //     ProductDimensionDeep: data.ProductDimensionDeep,
+        //     AreaCode: data.UserAreaID,
+        //     UserCode:  data.UserCode,
+        //     Item: data.Item,
+        //     TRACKINGSTATUSID: 2,
+        //     ContainerName: data.ContainerName,
+        //     ContainerDate: data.ContainerDate,
+        //     Remark: data.Remark,
+        //     AdditionalCharges: extraCharge
+        // })
+
+      })
+    }
+
     this.setState({ AddModalOpen: false, AddModalOpen2: true, isPrinting: true });
 
   }
@@ -551,6 +661,8 @@ class InvoiceDetail extends Component {
     let subTotal = 0
     let handlingCharge = 0
     let additionalCharges = 0
+    let AdminChargesArray = []
+    let AdminExtraCharges = 0
 
     if (isArrayNotEmpty(transaction) && transaction[0].TransactionDetail !== null) {
       actualWeight = JSON.parse(transaction[0].TransactionDetail).reduce((weight, item) => weight + item.ProductWeight, 0).toFixed(2)
@@ -565,8 +677,17 @@ class InvoiceDetail extends Component {
 
       handlingCharge = this.state.TransactionDetail.reduce((charges, item) => charges + item.handlingCharge, 0)
       handlingCharge = !isNaN(handlingCharge) ? handlingCharge : 0
-      additionalCharges = this.state.TransactionDetail[0].TransactionDetailCharges != null && JSON.parse(this.state.TransactionDetail[0].TransactionDetailCharges).reduce((additionalCharge, item) => additionalCharge + item.ProductPrice, 0).toFixed(2)
-      subTotal = ((Math.ceil(finalWeight).toFixed(2) - 1) * 6 + 10 + parseFloat(handlingCharge) + parseFloat(additionalCharges)).toFixed(2)
+      additionalCharges = this.state.TransactionDetail[0].TransactionDetailCharges != null && JSON.parse(this.state.TransactionDetail[0].TransactionDetailCharges).reduce((additionalCharge, item) => additionalCharge + parseFloat(item.ProductPrice), 0).toFixed(2)
+
+      // this.state.TransactionDetail.map((data) => {
+      //   if (data.AdditionalCharges !== "[]") {
+      //     data.AdditionalCharges.split(";").map((x) => {
+      //       AdminChargesArray.push(x.split("=")[1])
+      //     })
+      //   }
+      // })
+      // AdminExtraCharges = AdminChargesArray.length > 0 && AdminChargesArray.reduce((price, item) => price + parseFloat(item), 0)
+      subTotal = ((Math.ceil(finalWeight).toFixed(2) - 1) * 6 + 10 + parseFloat(handlingCharge) + parseFloat(additionalCharges)).toFixed(2) + parseFloat(AdminExtraCharges).toFixed(2)
     }
 
     return (
@@ -655,10 +776,6 @@ class InvoiceDetail extends Component {
                 }}
                 selectedIndexKey={"TransactionDetailID"}
                 Data={arr}
-
-              // if (tempArr.filter((data) => data.TransactionID === undefined).length > 1)
-              // tempArr = tempArr.filter((data) => data.TrackingNumber === "Delivery Min 0.5m³")
-
               />
             </div>
 
@@ -729,14 +846,14 @@ class InvoiceDetail extends Component {
                       {this.props.transaction[0].CalculationType === "3" ?
                         <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(DeliveryFee) : parseFloat(subTotal))}</span>
                         :
-                        <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(DeliveryFee) : parseFloat(transaction[0].OrderSubTotalAmount))}</span>
+                        <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(DeliveryFee) + parseFloat(AdminExtraCharges) : parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(AdminExtraCharges))}</span>
                       }
                       <br />
                       Total (RM) :
                       {this.props.transaction[0].CalculationType === "3" ?
                         <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(DeliveryFee) : parseFloat(subTotal))}</span>
                         :
-                        <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(DeliveryFee) : parseFloat(transaction[0].OrderSubTotalAmount))}</span>
+                        <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(DeliveryFee) + parseFloat(AdminExtraCharges) : parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(AdminExtraCharges))}</span>
                       }
                     </div>
                   </div>

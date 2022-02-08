@@ -282,6 +282,7 @@ export class GitEpic {
           type: GitAction.UpdatedStockDetailByGet,
           payload: json,
         };
+
       }
       catch (error) {
         toast.error("Error Code: Inventory_UpdateStockDetailByGet")
@@ -294,7 +295,6 @@ export class GitEpic {
 
   Inventory_UpdateStockDetailByPost = action$ =>
     action$.ofType(GitAction.UpdateStockDetailByPost).switchMap(async ({ payload }) => {
-
       return fetch(
         url + "Inventory_UpdateStockDetailByPost"
         , {
@@ -461,9 +461,7 @@ export class GitEpic {
 
   Transaction_ViewTransaction = action$ =>
     action$.ofType(GitAction.FetchTransaction).switchMap(async ({ payload }) => {
-      // console.log(url + 
-      //   double_click_and_paste_url_here
-      // )
+     
       try {
         const response = await fetch(url +
           "Transaction_ViewTransaction?TrackingStatusID=" + payload.TrackingStatusID
@@ -487,6 +485,7 @@ export class GitEpic {
 
   Transaction_ViewTransactionByID = action$ =>
     action$.ofType(GitAction.FetchTransactionByID).switchMap(async ({ payload }) => {
+
       try {
         const response = await fetch(url + "Transaction_ViewTransactionByID?TRANSACTIONID=" + payload.TransactionID);
         let json = await response.json();
@@ -537,11 +536,6 @@ export class GitEpic {
   Transaction_UpdateTransactionStatus = action$ =>
     action$.ofType(GitAction.UpdateTransaction).switchMap(async ({ payload }) => {
 
-      console.log(url +
-        "Transaction_UpdateTransactionStatus?" +
-        "TRANSACTIONID=" + payload.TransactionID +
-        "&TRANSPORTATIONTYPE=" + payload.TransportationType +
-        "&DELIVERYFEE=" + payload.DeliveryFee)
       try {
         const response = await fetch(url +
           "Transaction_UpdateTransactionStatus?" +

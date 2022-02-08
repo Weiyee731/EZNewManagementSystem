@@ -189,6 +189,7 @@ class OverallStock extends Component {
         this.state = INITIAL_STATE
 
         // this.props.CallFetchAllStock({ USERID: 1 })
+        this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
         this.props.CallUserAreaCode()
 
         this.changeTab = this.changeTab.bind(this)
