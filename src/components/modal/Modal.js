@@ -7,20 +7,16 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import CloseIcon from '@mui/icons-material/Close';
 import { isStringNullOrEmpty } from '../../tools/Helpers';
-import Slide from '@mui/material/Slide';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Draggable from 'react-draggable';
 import Paper from '@mui/material/Paper';
-import FormControl from '@mui/material/FormControl';
 
-import Input from '@mui/material/Input';
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+// const Transition = React.forwardRef(function Transition(props, ref) {
+//   return <Slide direction="up" ref={ref} {...props} />;
+// });
 
 function PaperComponent(props) {
   return (
@@ -145,7 +141,7 @@ export function ModalPopOut(props) {
             autoFocus={true}
             variant='contained'
             onKeyDown={(event) => event.key === "Enter" && props.handleConfirmFunc()}
-            focusVisible={true}
+          // focusVisible={true}
           >
             {props.checked ? "Unchecked" : "Confirm"}
           </Button>
