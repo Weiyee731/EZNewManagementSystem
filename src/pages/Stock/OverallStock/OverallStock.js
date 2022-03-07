@@ -334,6 +334,12 @@ class OverallStock extends Component {
         return renderStrings
       }
     }
+    var color = "#ffffff"
+    var fontcolor = "#000000"
+    if (data.AreaCode === null || data.AreaName === null) {
+      color = "#f44336"
+      fontcolor = "#FFF4EF"
+    }
 
     return (
       <>
@@ -342,28 +348,49 @@ class OverallStock extends Component {
           id={`table-checkbox-${index}`}
           scope="row"
           sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
         >
           {data.TrackingNumber}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
+        <TableCell
+          align="left"
+          sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
+        >
           {!isNaN(data.ProductWeight) ? data.ProductWeight.toFixed(2) : 0}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
+        <TableCell
+          align="left"
+          sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
+        >
           {!isNaN(data.ProductDimensionDeep)
             ? data.ProductDimensionDeep.toFixed(1)
             : 0}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
+        <TableCell
+          align="left"
+          sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
+        >
           {!isNaN(data.ProductDimensionWidth)
             ? data.ProductDimensionWidth.toFixed(1)
             : 0}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
+        <TableCell
+          align="left"
+          sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
+        >
           {!isNaN(data.ProductDimensionHeight)
             ? data.ProductDimensionHeight.toFixed(1)
             : 0}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
+        <TableCell
+          align="left"
+          sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
+        >
           {(
             (data.ProductDimensionDeep *
               data.ProductDimensionWidth *
@@ -371,29 +398,61 @@ class OverallStock extends Component {
             1000000
           ).toFixed(3)}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
+        <TableCell
+          align="left"
+          sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
+        >
           {data.Item}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
+        <TableCell
+          align="left"
+          sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
+        >
           {data.UserCode}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
+        <TableCell
+          align="left"
+          sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
+        >
           {data.AreaCode + " - " + data.AreaName}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
+        <TableCell
+          align="left"
+          sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
+        >
           {data.StockDate}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
+        <TableCell
+          align="left"
+          sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
+        >
           {data.PackagingDate}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
+        <TableCell
+          align="left"
+          sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
+        >
           {data.ContainerName}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
+        <TableCell
+          align="left"
+          sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
+        >
           {!isStringNullOrEmpty(data.AdditionalCharges) &&
             renderAdditionalCost(data.AdditionalCharges)}
         </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }}>
+        <TableCell
+          align="left"
+          sx={{ fontSize: fontsize }}
+          style={{ backgroundColor: color, color: fontcolor }}
+        >
           {data.Remark}
         </TableCell>
         {this.state.approvePage && data.TrackingStatusID === 1 ? (
@@ -1091,11 +1150,65 @@ class OverallStock extends Component {
         }
       }
       //show up when the keywords 100% match with the selection
+
       if (
+        !isObjectUndefinedOrNull(tempList) &&
         tempList.length === 1 &&
+        !isObjectUndefinedOrNull(filteredList[0]) &&
+        !isNaN(filteredList[0].TrackingNumber) &&
         filteredList[0].TrackingNumber === keywords
       ) {
         // isStringNullOrEmpty(tempList.TrackingNumber)?(this.setState(formValue.TrackingNumberVerified:true)):""
+        tempList[0].TrackingNumberVerified = !isStringNullOrEmpty(
+          tempList[0].TrackingNumber
+        )
+        tempList[0].MemberNumberVerified = !isStringNullOrEmpty(
+          tempList[0].UserCode
+        )
+        tempList[0].DepthVerified =
+          !isStringNullOrEmpty(tempList[0].ProductDimensionDeep) &&
+          !isNaN(tempList[0].ProductDimensionDeep)
+        tempList[0].WidthVerified =
+          !isStringNullOrEmpty(tempList[0].ProductDimensionWidth) &&
+          !isNaN(tempList[0].ProductDimensionWidth)
+        tempList[0].HeightVerified =
+          !isStringNullOrEmpty(tempList[0].ProductDimensionHeight) &&
+          !isNaN(tempList[0].ProductDimensionHeight)
+        tempList[0].WeightVerified =
+          !isStringNullOrEmpty(tempList[0].ProductWeight) &&
+          !isNaN(tempList[0].ProductWeight)
+        tempList[0].UserAreaID = Number(filteredList[0].UserAreaID)
+
+        let additionalCharges = filteredList[0].AdditionalCharges
+        if (typeof additionalCharges === "string") {
+          try {
+            additionalCharges = JSON.parse(additionalCharges)
+          } catch (e) {
+            console.log(e)
+            additionalCharges = []
+          }
+        } else console.log(typeof additionalCharges)
+
+        tempList[0].AdditionalCharges = isObjectUndefinedOrNull(
+          additionalCharges
+        )
+          ? []
+          : additionalCharges
+        tempList[0].AdditionalCharges.length > 0 &&
+          tempList[0].AdditionalCharges.map((el, idx) => {
+            el.Value =
+              !isStringNullOrEmpty(el.Value) &&
+              !isNaN(el.Value) &&
+              Number(el.Value) > 0
+                ? el.Value
+                : 0
+            el.validated =
+              !isStringNullOrEmpty(el.Charges) &&
+              !isStringNullOrEmpty(el.Value) &&
+              !isNaN(el.Value) &&
+              Number(el.Value) > 0
+          })
+
         this.setState({ openAddChrgModal: true, formValue: tempList[0] })
       }
     }

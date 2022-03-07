@@ -3,7 +3,7 @@
 }
 
 .searchbar-input fieldset {
-    top          : 0;
+    top: 0;
 }
 
 /* the border radius are corelevant with each other */
@@ -15,12 +15,12 @@
 
 .searchbar-input input,
 .searchbar-input button {
-    color  : black;
+    color: black;
     outline: none;
     font-size: 10.5pt;
     padding: 0.7em;
 }
 
-.searchbar-input .Mui-focused{
+.searchbar-input .Mui-focused {
     outline: none;
 }
