@@ -169,7 +169,7 @@ class TransactionHistory extends Component {
         }
 
         if (prevProps.transactionReturn !== this.props.transactionReturn) {
-            if (this.props.transactionReturn[0].ReturnVal && this.props.transactionReturn[0].ReturnVal == 1) {
+            if (this.props.transactionReturn[0].ReturnVal && this.props.transactionReturn[0].ReturnVal === 1) {
                 toast.success(this.props.transactionReturn[0].ReturnMsg)
                 this.props.CallFetchAllTransaction(this.state);
                 this.setState({
@@ -181,7 +181,7 @@ class TransactionHistory extends Component {
 
     renderAreaCodeName = (areacodeId) => {
         if (isArrayNotEmpty(this.props.userAreaCode)) {
-            const AreaCode = this.props.userAreaCode.filter(x => x.UserAreaID == areacodeId)
+            const AreaCode = this.props.userAreaCode.filter(x => x.UserAreaID === areacodeId)
             return isArrayNotEmpty(AreaCode) ? AreaCode[0].AreaCode + " - " + AreaCode[0].AreaName : " - "
         }
         else
@@ -205,7 +205,7 @@ class TransactionHistory extends Component {
                             <IconButton onClick={(event) => this.onAddButtonClick(event, data)}>
                                 <CheckCircleIcon color="dark" sx={{ fontSize: 30 }}></CheckCircleIcon>
                             </IconButton>
-                        </TableCell> : ""
+                        </TableCell> : <TableCell align="center"></TableCell>
                 }
             </>
         )
@@ -256,7 +256,7 @@ class TransactionHistory extends Component {
         switch (elementId) {
             case "payment":
                 this.setState({ Payment: e.target.value.trim() })
-                if (e.target.value == "") {
+                if (e.target.value === "") {
                     this.setState({
                         isPayAmountValid: true
                     })
@@ -273,7 +273,7 @@ class TransactionHistory extends Component {
 
             case "reference":
                 this.setState({ ReferenceNo: e.target.value })
-                if (e.target.value == "") {
+                if (e.target.value === "") {
                     this.setState({
                         isReferenceValid: true
                     })
@@ -595,13 +595,14 @@ class TransactionHistory extends Component {
                                             autoComplete="given-name"
                                             name="payment"
                                             required
+                                            type="number"
                                             fullWidth
                                             onChange={(e) => this.handleInputChange(e)}
                                             id="payment"
-                                            label="Pay Ammount"
+                                            label="Pay Amount(RM)"
                                             autoFocus
                                             error={this.state.isPayAmountValid}
-                                            helperText={this.state.isPayAmountValid ? "Invalid ammount" : ""}
+                                            helperText={this.state.isPayAmountValid ? "Invalid amount" : ""}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -645,7 +646,7 @@ class TransactionHistory extends Component {
                                     variant="contained"
                                     sx={{ mt: 3, mb: 2 }}
                                     onClick={() => this.onUpdateTransactionPayment()}
-                                    disabled={this.state.Payment == "" || this.state.ReferenceNo == ""}
+                                    disabled={this.state.Payment === "" || this.state.ReferenceNo === ""}
                                 >
                                     Update Payment
                                 </Button>

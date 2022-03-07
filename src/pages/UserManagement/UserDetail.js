@@ -40,6 +40,7 @@ function mapStateToProps(state) {
     loading: state.counterReducer["loading"],
     userAreaCode: state.counterReducer["userAreaCode"],
     userManagementApproval: state.counterReducer["userManagementApproval"],
+    transactionReturn: state.counterReducer["transactionReturn"],
   };
 }
 
@@ -217,6 +218,7 @@ class UserDetail extends Component {
     }
     this.onTextFieldOnChange = this.onTextFieldOnChange.bind(this)
     this.toggleEditMode = this.toggleEditMode.bind(this)
+    this.handleInputChange = this.handleInputChange.bind(this)
     this.onSubmitUpdateUser = this.onSubmitUpdateUser.bind(this)
     this.handleOnDelete = this.handleOnDelete.bind(this)
     this.props.CallUserProfileByID(this.state)
@@ -396,7 +398,7 @@ class UserDetail extends Component {
 
     // successfully update user profile
     if (isArrayNotEmpty(this.props.userManagementApproval)) {
-      if (this.props.userManagementApproval[0].ReturnVal == 1) {
+      if (this.props.userManagementApproval[0].ReturnVal === 1) {
         if (this.state.deleteManagerOpen) {
           this.props.CallResetUserApprovalReturn()
           toast.success("This member removed successfully.", { autoClose: 2000, position: 'top-center', theme: 'dark', transition: Flip })
@@ -435,6 +437,12 @@ class UserDetail extends Component {
       }
 
     }
+
+    // console.log(prevProps.transactionReturn[0])
+    // console.log(this.props.transactionReturn[0])
+    // if (prevProps.transactionReturn !== this.props.transactionReturn) {
+
+    // }
   }
 
   onTextFieldOnChange = (e) => {
@@ -537,6 +545,26 @@ class UserDetail extends Component {
     }
   }
 
+  handleInputChange = (e) => {
+    const elementId = e.target.id
+    switch (elementId) {
+      case "payment":
+        this.setState({ payment: e.target.value.trim() })
+        if (e.target.value === "") {
+          this.setState({
+            isPayAmountValid: true
+          })
+        } else {
+          this.setState({
+            isPayAmountValid: false
+          })
+        }
+        break;
+      default:
+        break;
+    }
+
+  }
   onSubmitUpdateUser = () => {
     const { userAreaCode, userProfile } = this.props
     const {
@@ -621,13 +649,18 @@ class UserDetail extends Component {
 
   onUpdateTransactionPayment = (event, row) => {
     this.props.CallUpdateTransactionPayment({ TransactionID: row.TransactionID, PaymentAmmount: this.state.payment })
-    this.state.filteredList[this.state.selectedindex].OrderPaidAmount = this.state.payment;
-    if (this.state.filteredList[this.state.selectedindex].OrderTotalAmount <= this.state.payment) {
-      this.state.filteredList[this.state.selectedindex].OrderStatus = 'Paid'
-      this.state.filteredList[this.state.selectedindex].OrderColor = 'green'
-    }
-    this.setState({ AddModalOpen: false })
+    if (this.props.transactionReturn.ReturnVal === 1 || 241) {
+      let filteredList = this.state.filteredList;
+      filteredList[this.state.selectedindex + 1].OrderPaidAmount += parseInt(this.state.payment);
+      if (filteredList[this.state.selectedindex + 1].OrderTotalAmount <= this.state.payment) {
+        filteredList[this.state.selectedindex + 1].OrderStatus = 'Paid'
+        filteredList[this.state.selectedindex + 1].OrderColor = 'green'
+      }
+      toast.success("Invoice No. " + filteredList[this.state.selectedindex + 1].TransactionName + " has been updated successfully", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
+      this.setState({ AddModalOpen: false, filteredList: filteredList })
+    } else toast.error("Update failed, please check your internet connection and input", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
   }
+
 
   toggleEditMode() {
     this.setState({ isOnEditMode: true })
@@ -1199,11 +1232,12 @@ class UserDetail extends Component {
                     <TextField
                       autoComplete="given-name"
                       name="payment"
+                      type="number"
                       required
                       fullWidth
                       onChange={(e) => this.handleInputChange(e)}
                       id="payment"
-                      label="Pay ammount"
+                      label="Pay amount(RM)"
                       autoFocus
                     />
                   </Grid>

@@ -307,9 +307,9 @@ class ArchivedTransaction extends Component {
         const onLocalSearch = (e) => {
             let searchKeywords = isStringNullOrEmpty(e.target.value) ? "" : e.target.value.toLowerCase()
             let FilterArr = this.props.archivedData.filter((searchedItem) =>
-                (!isStringNullOrEmpty(searchedItem.Fullname) && searchedItem.Fullname.toLowerCase().includes(searchKeywords)) || 
+                (!isStringNullOrEmpty(searchedItem.Fullname) && searchedItem.Fullname.toLowerCase().includes(searchKeywords)) ||
                 (!isStringNullOrEmpty(searchedItem.UserCode) && searchedItem.UserCode.toLowerCase().includes(searchKeywords)) ||
-                (!isStringNullOrEmpty(searchedItem.TransactionName) && searchedItem.TransactionName.toLowerCase().includes(searchKeywords)) || 
+                (!isStringNullOrEmpty(searchedItem.TransactionName) && searchedItem.TransactionName.toLowerCase().includes(searchKeywords)) ||
                 (!isStringNullOrEmpty(searchedItem.UserContactNo) && searchedItem.UserContactNo.includes(searchKeywords))
             )
             this.setState({ TransactionListingFiltered: isStringNullOrEmpty(searchKeywords) ? this.props.archivedData : FilterArr, searchKeywords: searchKeywords });
@@ -433,7 +433,7 @@ class ArchivedTransaction extends Component {
                                             fullWidth
                                             onChange={(e) => this.handleInputChange(e)}
                                             id="payment"
-                                            label="Pay ammount"
+                                            label="Pay amount(RM)"
                                             autoFocus
                                         />
                                     </Grid>

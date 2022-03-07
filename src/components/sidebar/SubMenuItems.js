@@ -18,6 +18,7 @@ const SubMenuItems = (props) => {
             {
                 typeof submenus !== "undefined" && submenus !== null && submenus.map((menuitem, index) => {
                     return (
+
                         typeof menuitem.submenus !== "undefined" && menuitem.submenus !== null && menuitem.submenus.length > 0 ?
                             <SubMenuItems key={'submenu-' + menuitem.item} item={menuitem} />
                             :
@@ -27,7 +28,7 @@ const SubMenuItems = (props) => {
                                 icon={typeof menuitem.icon !== "undefined" && menuitem.icon !== null ? sidebar_items[menuitem.icon].icon : ""}
                                 suffix={typeof menuitem.suffix !== "undefined" && menuitem.suffix !== null ? menuitem.suffix : null}
                             >
-                                {menuitem.title} {!isStringNullOrEmpty(menuitem.page) ? <Link to={menuitem.page} /> : ""}
+                                {menuitem.title} {!isStringNullOrEmpty(menuitem.page) ? <Link to={{ pathname: menuitem.page, state: menuitem.type }} /> : ""}
                             </MenuItem>
                     )
                 })

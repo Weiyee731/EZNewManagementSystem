@@ -33,7 +33,7 @@ function Layout() {
 
   return (
     <div className={`app ${rtl ? 'rtl' : ''} ${toggled ? 'toggled' : ''}`}>
-      <ToastContainer  />
+      <ToastContainer />
       {
         isLogon === "true" ?
           <>

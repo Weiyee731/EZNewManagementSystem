@@ -52,7 +52,7 @@ const Aside = ({ rtl, toggled, handleToggleSidebar, sidebar }) => {
       onToggle={handleToggleSidebar}
       onMouseEnter={() => { isCollapsed && setCollapsed(false) }}
       onMouseLeave={() => { isCollapsed && setCollapsed(true) }}
-      style={{zIndex: 1301}}
+      style={{ zIndex: 1301 }}
     >
       <SidebarHeader>
         <SidebarButtons handleCollapseSidebar={handleCollapseSidebar} isCollapsed={isCollapsed} />
@@ -65,6 +65,7 @@ const Aside = ({ rtl, toggled, handleToggleSidebar, sidebar }) => {
         <Menu iconShape="circle" innerSubMenuArrows={false} popperArrow={false} subMenuBullets={false}>
           {
             sidebar.length > 0 && sidebar.map((item, index) => {
+
               return (
                 typeof item.submenus === "undefined" || item.submenus === null || item.submenus === "null" ?
                   <MenuItem

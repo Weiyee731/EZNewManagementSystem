@@ -335,6 +335,10 @@ class StockGoods extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.props.CallResetStocks()
+  }
+
   focusTextInput() {
     // Explicitly focus the text input using the raw DOM API
     // Note: we're accessing "current" to get the DOM node
@@ -372,6 +376,7 @@ class StockGoods extends Component {
       ContainerDate.push(this.state.ContainerDate)
       Remark.push(row.Remark)
       AdditionalCharges.push(row.AdditionalCharges)
+      return <></>
     })
 
     this.props.CallUpdateStockDetailByPost({

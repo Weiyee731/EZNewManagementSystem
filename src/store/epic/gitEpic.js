@@ -201,6 +201,9 @@ export class GitEpic {
   Inventory_ViewStockList = action$ =>
     action$.ofType(GitAction.FetchStocks).switchMap(async ({ payload }) => {
       try {
+        console.log(url +
+          "Inventory_ViewStockList?" +
+          "TRACKINGSTATUSID=" + payload.TRACKINGSTATUSID)
         const response = await fetch(url +
           "Inventory_ViewStockList?" +
           "TRACKINGSTATUSID=" + payload.TRACKINGSTATUSID
@@ -432,6 +435,10 @@ export class GitEpic {
   Inventory_ViewStockListByDate = action$ =>
     action$.ofType(GitAction.GetFilteredInventoryByDate).switchMap(async ({ payload }) => {
       try {
+        console.log(url +
+          "Inventory_ViewStockListByDate?" +
+          "STARTDATE=" + payload.STARTDATE +
+          "&ENDDATE=" + payload.ENDDATE)
         const response = await fetch(url +
           "Inventory_ViewStockListByDate?" +
           "STARTDATE=" + payload.STARTDATE +
@@ -461,7 +468,7 @@ export class GitEpic {
 
   Transaction_ViewTransaction = action$ =>
     action$.ofType(GitAction.FetchTransaction).switchMap(async ({ payload }) => {
-     
+
       try {
         const response = await fetch(url +
           "Transaction_ViewTransaction?TrackingStatusID=" + payload.TrackingStatusID

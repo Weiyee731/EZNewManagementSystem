@@ -39,17 +39,18 @@ const routes = [
     {
         path: "/OverallStock",
         exact: true,
-        element: <OverallStock />,
+        element: <OverallStock typeIndicator="overall" />,
     },
     {
         path: "/StockGoods",
         exact: true,
-        element: <StockGoods />,
+        element: <OverallStock typeIndicator="approve" />,
+        // typeIndicator="approve"
     },
     {
         path: "/EditStockGoods",
         exact: true,
-        element: <EditStockGoods />,
+        element: <OverallStock />,
     },
     {
         path: "/Invoice",
