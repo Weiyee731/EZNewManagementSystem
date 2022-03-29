@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { GitAction } from "../../../store/action/gitAction"
-import { browserHistory } from "react-router"
 
 import TableCell from "@mui/material/TableCell"
 import TextField from "@mui/material/TextField"
@@ -32,8 +31,7 @@ import {
   convertDateTimeToString112Format,
 } from "../../../tools/Helpers"
 import ResponsiveDatePickers from "../../../components/datePicker/datePicker"
-import axios from "axios"
-import { toast, Slide, Zoom, Flip, Bounce } from "react-toastify"
+import { toast, Flip } from "react-toastify"
 import CsvDownloader from "react-csv-downloader"
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline"
 import ManageSearchOutlinedIcon from "@mui/icons-material/ManageSearchOutlined"
@@ -51,11 +49,11 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    CallFetchAllStock: (propsData) =>
-      dispatch(GitAction.CallFetchAllStock(propsData)),
+    // CallFetchAllStock: (propsData) =>
+    //   dispatch(GitAction.CallFetchAllStock(propsData)),
     CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
-    CallFilterInventory: (propsData) =>
-      dispatch(GitAction.CallFilterInventory(propsData)),
+    // CallFilterInventory: (propsData) =>
+    //   dispatch(GitAction.CallFilterInventory(propsData)),
     CallUpdateStockDetailByGet: (propsData) =>
       dispatch(GitAction.CallUpdateStockDetailByGet(propsData)),
     CallResetUpdatedStockDetail: () =>
@@ -235,6 +233,7 @@ class OverallStock extends Component {
     } else {
       this.setState.approvePage = false
     }
+    this.onDatabaseSearch()
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -243,13 +242,26 @@ class OverallStock extends Component {
       isArrayNotEmpty(this.props.stocks)
     ) {
       const { stocks } = this.props
-      this.setState({
-        filteredList:
-          !isStringNullOrEmpty(stocks[0].ReturnVal) && stocks[0].ReturnVal === 0
-            ? []
-            : stocks,
-        isDataFetching: false,
-      })
+      if (this.state.approvePage === true) {
+        this.setState({
+          filteredList:
+            !isStringNullOrEmpty(stocks[0].ReturnVal) &&
+            stocks[0].ReturnVal === 0
+              ? []
+              : stocks.filter((x) => x.TrackingStatusID !== 3),
+          isDataFetching: false,
+        })
+      } else {
+        this.setState({
+          filteredList:
+            !isStringNullOrEmpty(stocks[0].ReturnVal) &&
+            stocks[0].ReturnVal === 0
+              ? []
+              : stocks,
+          isDataFetching: false,
+        })
+      }
+
       toast.dismiss()
 
       if (
@@ -266,7 +278,6 @@ class OverallStock extends Component {
     if (isArrayNotEmpty(this.props.stockApproval)) {
       this.props.CallResetUpdatedStockDetail()
       this.props.CallResetStocks()
-      // this.props.CallFetchAllStock({ TRACKINGSTATUSID: 1 })
       this.setState({
         openAddChrgModal: false,
         isDataFetching: true,
@@ -294,7 +305,20 @@ class OverallStock extends Component {
   changeTab = (key) => {
     switch (key) {
       case "All":
-        this.setState({ filteredList: this.props.stocks })
+        if (this.state.approvePage === true) {
+          //only show those stock which is not created performa invoice status
+          this.setState({
+            filteredList: this.props.stocks.filter(
+              (x) => x.TrackingStatusID != 3
+            ),
+          })
+          console.log("1", this.state.filteredList)
+        } else {
+          //show all stock history if overall stock
+          this.setState({ filteredList: this.props.stocks })
+          console.log("2", this.props.stocks)
+        }
+
         break
 
       case "Unchecked":
@@ -544,7 +568,21 @@ class OverallStock extends Component {
   // }
 
   handleAddChrgModal = () => {
-    this.setState({ openAddChrgModal: !this.state.openAddChrgModal })
+    this.setState({
+      openAddChrgModal: !this.state.openAddChrgModal,
+      searchKeywords: "",
+    })
+    if (this.state.approvePage === true) {
+      //only show those stock which is not created performa invoice status
+      this.setState({
+        filteredList: this.props.stocks.filter((x) => x.TrackingStatusID != 3),
+      })
+      console.log("1", this.state.filteredList)
+    } else {
+      //show all stock history if overall stock
+      this.setState({ filteredList: this.props.stocks })
+      console.log("2", this.props.stocks)
+    }
   }
 
   handleSubmitUpdate = () => {

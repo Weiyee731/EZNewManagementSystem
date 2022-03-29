@@ -155,6 +155,7 @@ class UserManagement extends Component {
     }
 
     componentDidMount() {
+        toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
         if (this.props.user.length !== this.state.UserListing.length) {
             if (this.props.user !== undefined && this.props.user[0] !== undefined) {
                 this.setState({ UserListing: this.props.user, UserListingfiltered: this.props.user });
@@ -172,6 +173,22 @@ class UserManagement extends Component {
                 this.setState({ UserListing: prevProps.user, UserListingfiltered: prevProps.user });
             }
         }
+
+        console.log(this.state.UserListingfiltered === null)
+        console.log(isArrayNotEmpty(this.props.user))
+        if (isArrayNotEmpty(this.props.user)) {
+            toast.dismiss();
+        }
+
+        // if (
+        //     !isStringNullOrEmpty(this.props.user[0].ReturnVal) &&
+        //     this.props.user[0].ReturnVal === 0
+        // ) {
+        //     toast.warning("Fetched data is empty. ", {
+        //         autoClose: 3000,
+        //         theme: "dark",
+        //     })
+        // }
 
         if (isArrayNotEmpty(this.props.userManagementApproval)) {
             if (this.props.userManagementApproval[0].ReturnVal == 1) {
