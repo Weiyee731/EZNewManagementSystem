@@ -517,6 +517,7 @@ class TransactionHistory extends Component {
                         </div>
                     </div>
                     <ToggleTabsComponent Tabs={ToggleTabs} size="small" onChange={this.changeTab} />
+                    {console.log(this.state.TransactionListingFiltered)}
                     <TableComponents
                         // table settings 
                         tableTopLeft={<h3 style={{ fontWeight: 700 }}>Transaction History</h3>}  // optional, it can pass as string or as children elements
@@ -631,15 +632,15 @@ class TransactionHistory extends Component {
                                         />
                                     </Grid>
                                     {/*<Grid item xs={12}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="Address"
-                      label="Address"
-                      id="address"
-                      autoComplete="address"
-                    />
-                  </Grid> */}
+                                    <TextField
+                                    required
+                                    fullWidth
+                                    name="Address"
+                                    label="Address"
+                                    id="address"
+                                    autoComplete="address"
+                                    />
+                                </Grid> */}
                                 </Grid>
                                 <Button
                                     type="submit"

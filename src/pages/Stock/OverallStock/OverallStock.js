@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { GitAction } from "../../../store/action/gitAction"
-import { browserHistory } from "react-router"
 
 import TableCell from "@mui/material/TableCell"
 import TextField from "@mui/material/TextField"
@@ -32,8 +31,7 @@ import {
   convertDateTimeToString112Format,
 } from "../../../tools/Helpers"
 import ResponsiveDatePickers from "../../../components/datePicker/datePicker"
-import axios from "axios"
-import { toast, Slide, Zoom, Flip, Bounce } from "react-toastify"
+import { toast, Flip } from "react-toastify"
 import CsvDownloader from "react-csv-downloader"
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline"
 import ManageSearchOutlinedIcon from "@mui/icons-material/ManageSearchOutlined"
@@ -228,6 +226,7 @@ class OverallStock extends Component {
     } else {
       this.setState.approvePage = false
     }
+    this.onDatabaseSearch()
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -280,7 +279,19 @@ class OverallStock extends Component {
   changeTab = (key) => {
     switch (key) {
       case "All":
-        this.setState({ filteredList: this.props.stocks })
+        if (this.state.approvePage === true) {
+          //only show those stock which is not created performa invoice status
+          this.setState({
+            filteredList: this.props.stocks.filter(
+              (x) => x.TrackingStatusID !== 3
+            ),
+          })
+        } else {
+          //show all stock history if overall stock
+          this.setState({ filteredList: this.props.stocks })
+          console.log("2", this.props.stocks)
+        }
+
         break
 
       case "Unchecked":
@@ -412,7 +423,21 @@ class OverallStock extends Component {
   // }
 
   handleAddChrgModal = () => {
-    this.setState({ openAddChrgModal: !this.state.openAddChrgModal })
+    this.setState({
+      openAddChrgModal: !this.state.openAddChrgModal,
+      searchKeywords: "",
+    })
+    if (this.state.approvePage === true) {
+      //only show those stock which is not created performa invoice status
+      this.setState({
+        filteredList: this.props.stocks.filter((x) => x.TrackingStatusID != 3),
+      })
+      console.log("1", this.state.filteredList)
+    } else {
+      //show all stock history if overall stock
+      this.setState({ filteredList: this.props.stocks })
+      console.log("2", this.props.stocks)
+    }
   }
 
   handleSubmitUpdate = () => {

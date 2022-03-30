@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { GitAction } from "../../store/action/gitAction";
 import { withRouter } from "react-router";
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -23,15 +22,15 @@ import ToggleTabsComponent from "../../components/ToggleTabsComponent/ToggleTabC
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import { isArrayNotEmpty, getWindowDimensions, isStringNullOrEmpty } from '../../tools/Helpers';
-import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import { toast, Flip } from 'react-toastify';
 import AlertDialog from "../../components/modal/Modal";
 import DeleteIcon from '@mui/icons-material/Delete';
+import ResponsiveDatePickers from '../../components/datePicker/datePicker';
 
 import './UserDetail.css'
 function mapStateToProps(state) {
@@ -63,7 +62,7 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: '40%',
-  height: '25%',
+  // height: '25%',
   bgcolor: 'background.paper',
   border: '0px solid #000',
   boxShadow: 24,
@@ -201,8 +200,9 @@ class UserDetail extends Component {
       userDeliveryOn1stKGValidated: null,
       userDeliveryOnSubKG: "",
       userDeliveryOnSubKGValidated: null,
-      userDeliveryOnSubKG: "",
-      userDeliveryOnSubKGValidated: null,
+      PaymentMethod: '',
+      // userDeliveryOnSubKG: "",
+      // userDeliveryOnSubKGValidated: null,
 
       // comment below used for future used, as the member may able to login to view their details
       // userDescription: "",
@@ -317,8 +317,8 @@ class UserDetail extends Component {
       userDeliveryOn1stKGValidated: null,
       userDeliveryOnSubKG: "",
       userDeliveryOnSubKGValidated: null,
-      userDeliveryOnSubKG: "",
-      userDeliveryOnSubKGValidated: null,
+      // userDeliveryOnSubKG: "",
+      // userDeliveryOnSubKGValidated: null,
 
       // comment below used for future used, as the member may able to login to view their details
       // userDescription: "",
@@ -563,10 +563,14 @@ class UserDetail extends Component {
       default:
         break;
     }
-
   }
+
+  onDateChange(e) {
+    this.setState({ Datetime: e })
+  }
+
   onSubmitUpdateUser = () => {
-    const { userAreaCode, userProfile } = this.props
+    const { userAreaCode } = this.props
     const {
       UserID,
       userCode,
@@ -1223,22 +1227,82 @@ class UserDetail extends Component {
             aria-describedby="modal-modal-description"
             closeAfterTransition
             BackdropComponent={Backdrop}
-            BackdropProps={{ timeout: 500 }}>
+            BackdropProps={{ timeout: 500 }}
+          >
             <Box sx={style} component="main" maxWidth="xs">
               <Typography component="h1" variant="h5">Update Payment</Typography>
+
               <Box noValidate sx={{ mt: 3 }}>
+                <div className="row my-2">
+                  <Box className="col-12">
+                    <div className="clearfix">
+                      <div className="float-start">
+                        Trans. No: <b>{this.state.selectedRow.TransactionName}</b>
+                      </div>
+                      <div className="float-end">
+                        Unpaid(RM): <b className="text-danger" style={{ fontSize: '14pt', marginRight: 15 }}>{this.state.selectedRow.OrderTotalAmount}</b>
+                        Paid(RM): <b className="text-success" style={{ fontSize: '14pt' }}>{this.state.selectedRow.OrderPaidAmount}</b>
+                      </div>
+                    </div>
+                  </Box>
+                  <hr />
+                </div>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={12}>
+                    <label className="my-auto col-3">Payment Method:</label>
+                    <Select
+                      labelId="search-filter-category"
+                      id="search-filter-category"
+                      value={this.state.PaymentMethod}
+                      label="Search By"
+                      onChange={this.handlePaymentCategoryCategory}
+                      size="large"
+                      className="col-9"
+                      placeholder="filter by"
+                    >
+                      <MenuItem key="search_all" value="Cash">Cash</MenuItem>
+                      <MenuItem key="search_tracking" value="Tracking">Bank Transfer</MenuItem>
+                      <MenuItem key="search_member" value={"Member"}>Boost</MenuItem>
+                      <MenuItem key="search_container" value={"Container"}>S Pay Global</MenuItem>
+                    </Select>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
                     <TextField
                       autoComplete="given-name"
                       name="payment"
-                      type="number"
                       required
+                      type="number"
                       fullWidth
                       onChange={(e) => this.handleInputChange(e)}
                       id="payment"
-                      label="Pay amount(RM)"
+                      label="Pay Amount(RM)"
                       autoFocus
+                      error={this.state.isPayAmountValid}
+                      helperText={this.state.isPayAmountValid ? "Invalid amount" : ""}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <ResponsiveDatePickers
+                      // rangePicker
+                      openTo="day"
+                      title="Date"
+                      required
+                      value={this.state.Datetime ? this.state.Datetime : ""}
+                      onChange={(e) => this.onDateChange(e)}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={12}>
+                    <TextField
+                      required
+                      fullWidth
+                      name="reference"
+                      label="Reference"
+                      id="reference"
+                      onChange={(e) => this.handleInputChange(e)}
+                      autoComplete="reference"
+                      error={this.state.isReferenceValid}
+                      helperText={this.state.isReferenceValid ? "Invalid reference" : ""}
                     />
                   </Grid>
                 </Grid>
@@ -1247,7 +1311,8 @@ class UserDetail extends Component {
                   fullWidth
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
-                  onClick={(e) => { this.onUpdateTransactionPayment(e, this.state.selectedRow) }}
+                  onClick={() => this.onUpdateTransactionPayment()}
+                  disabled={this.state.Payment === "" || this.state.ReferenceNo === ""}
                 >
                   Update Payment
                 </Button>
