@@ -309,10 +309,9 @@ class OverallStock extends Component {
           //only show those stock which is not created performa invoice status
           this.setState({
             filteredList: this.props.stocks.filter(
-              (x) => x.TrackingStatusID != 3
+              (x) => x.TrackingStatusID !== 3
             ),
           })
-          console.log("1", this.state.filteredList)
         } else {
           //show all stock history if overall stock
           this.setState({ filteredList: this.props.stocks })
@@ -1558,6 +1557,7 @@ class OverallStock extends Component {
           size="small"
           onChange={this.changeTab}
         />
+        {console.log(filteredList)}
         <TableComponents
           // table settings
           tableOptions={{
