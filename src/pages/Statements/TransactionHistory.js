@@ -158,6 +158,7 @@ class TransactionHistory extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
+        console.log(this.props.transactions)
         if (prevProps.transactions !== this.props.transactions) {
             if (this.props.transactions !== undefined && this.props.transactions[0] !== undefined) {
                 this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
