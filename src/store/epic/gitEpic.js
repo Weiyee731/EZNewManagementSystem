@@ -464,6 +464,7 @@ export class GitEpic {
 
         let json = await response.json();
         json = JSON.parse(json)
+        console.log(json)
         return {
           type: GitAction.GotFilteredInventoryByDate,
           payload: json,

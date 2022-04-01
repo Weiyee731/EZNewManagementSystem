@@ -36,7 +36,9 @@ import CsvDownloader from "react-csv-downloader"
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline"
 import ManageSearchOutlinedIcon from "@mui/icons-material/ManageSearchOutlined"
 import Tooltip from "@mui/material/Tooltip"
+import CheckIcon from "@mui/icons-material/Check"
 import "./OverallStock.css"
+import { Paper } from "@mui/material"
 
 function mapStateToProps(state) {
   return {
@@ -56,6 +58,7 @@ function mapDispatchToProps(dispatch) {
     CallResetStocks: () => dispatch(GitAction.CallResetStocks()),
     CallViewContainer: (props) => dispatch(GitAction.CallViewContainer(props)),
     CallFilterInventoryByDate: (propsData) => dispatch(GitAction.CallFilterInventoryByDate(propsData)),
+    CallUpdateStockDetailByPost: (props) => dispatch(GitAction.CallUpdateStockDetailByPost(props)),
   }
 }
 
@@ -190,6 +193,9 @@ const INITIAL_STATE = {
   searchArea: "All",
   searchDates: [],
   isDataFetching: false,
+  totalItem: 0,
+  bulkVerificationModalToggled: false,
+  CallResetSelected: false, //for table use purposes
 }
 
 class OverallStock extends Component {
@@ -206,8 +212,7 @@ class OverallStock extends Component {
     this.handleFormInput = this.handleFormInput.bind(this)
     this.handleAdditionalCostInputs = this.handleAdditionalCostInputs.bind(this)
     this.RenderAdditionalCost = this.RenderAdditionalCost.bind(this)
-    this.handleRemoveAdditionalCosts =
-      this.handleRemoveAdditionalCosts.bind(this)
+    this.handleRemoveAdditionalCosts = this.handleRemoveAdditionalCosts.bind(this)
     this.removeAllAdditionalCost = this.removeAllAdditionalCost.bind(this)
     this.onSearch = this.onSearch.bind(this)
     this.handleSearchInput = this.handleSearchInput.bind(this)
@@ -218,13 +223,16 @@ class OverallStock extends Component {
     this.handleCancel = this.handleCancel.bind(this)
     this.onDatabaseSearch = this.onDatabaseSearch.bind(this)
     this.handleSearchfilter = this.handleSearchfilter.bind(this)
+    this.onBulkVerifyItems = this.onBulkVerifyItems.bind(this)
+    this.onSelectAllRow = this.onSelectAllRow.bind(this)
+    this.onSelectRow = this.onSelectRow.bind(this)
   }
 
   componentDidMount() {
     if (this.props.typeIndicator === "approve") {
       this.setState({ approvePage: true })
     } else {
-      this.setState.approvePage = false
+      this.setState({ approvePage: false })
     }
     this.onDatabaseSearch()
   }
@@ -232,11 +240,13 @@ class OverallStock extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.state.filteredList === null && isArrayNotEmpty(this.props.stocks)) {
       const { stocks } = this.props
-      let list =  !isStringNullOrEmpty(stocks[0].ReturnVal) && stocks[0].ReturnVal == 0 ? [] : stocks
-      list = (this.state.approvePage === true) ? list.filter(x => x.TrackingStatusID === 1) : list
+
+      let list = !isStringNullOrEmpty(stocks[0].ReturnVal) && stocks[0].ReturnVal == 0 ? [] : stocks
+      // list = (this.state.approvePage === true) ? list.filter(x => x.TrackingStatusID === 1) : list
       this.setState({
         filteredList: list,
         isDataFetching: false,
+        totalItem: list.length
       })
       toast.dismiss()
 
@@ -251,15 +261,18 @@ class OverallStock extends Component {
     if (isArrayNotEmpty(this.props.stockApproval)) {
       this.props.CallResetUpdatedStockDetail()
       this.props.CallResetStocks()
-      
-      let today = convertDateTimeToString112Format(new Date())
-      this.props.CallFilterInventoryByDate({ STARTDATE: today, ENDDATE: today })
+
+      this.props.CallFilterInventoryByDate({ STARTDATE: '-', ENDDATE: '-' })
 
       this.setState({
         openAddChrgModal: false,
         isDataFetching: false,
         filteredList: null,
+        CallResetSelected: true,
+        bulkVerificationModalToggled: false,
       })
+
+      setTimeout(() => { this.setState({ CallResetSelected: false }) }, 300)
     }
 
     if (isArrayNotEmpty(this.props.AllContainer) && this.state.isContainerSet === false) {
@@ -277,37 +290,21 @@ class OverallStock extends Component {
   }
 
   changeTab = (key) => {
+    let list = []
     switch (key) {
       case "All":
-        if (this.state.approvePage === true) {
-          //only show those stock which is not created performa invoice status
-          this.setState({
-            filteredList: this.props.stocks.filter(
-              (x) => x.TrackingStatusID !== 3
-            ),
-          })
-        } else {
-          //show all stock history if overall stock
-          this.setState({ filteredList: this.props.stocks })
-          console.log("2", this.props.stocks)
-        }
-
+        // both overall stock page and stock in page are using the same list. 
+        this.setState({ filteredList: this.props.stocks, totalItem: this.props.stocks.length })
         break
 
       case "Unchecked":
-        this.setState({
-          filteredList: this.props.stocks.filter(
-            (x) => x.TrackingStatusID === 1
-          ),
-        })
+        list = this.props.stocks.filter((x) => x.TrackingStatusID === 1)
+        this.setState({ filteredList: list, totalItem: list.length })
         break
 
       case "Checked":
-        this.setState({
-          filteredList: this.props.stocks.filter(
-            (x) => x.TrackingStatusID === 2
-          ),
-        })
+        list = this.props.stocks.filter((x) => x.TrackingStatusID === 2)
+        this.setState({ filteredList: list, totalItem: list.length })
         break
 
       default:
@@ -318,23 +315,31 @@ class OverallStock extends Component {
 
   renderTableRows = (data, index) => {
     const fontsize = "9pt"
+
     const renderAdditionalCost = (charges) => {
       let renderStrings = ""
       try {
         charges = JSON.parse(charges)
-        charges.length > 0 &&
-          charges.map((el) => {
+        charges.length > 0 && charges.map((el) => {
+          if (!(el.Charges === "[]" || isStringNullOrEmpty(el.Value)))
             renderStrings = renderStrings + el.Charges + ": " + el.Value + "; "
-          })
-        return renderStrings
-      } catch (e) {
+          return renderStrings
+        })
+      }
+      catch (e) {
         return renderStrings
       }
     }
+
     var color = "#ffffff"
     var fontcolor = "#000000"
     if (data.AreaCode === null || data.AreaName === null) {
       color = "#f44336"
+      fontcolor = "#FFF4EF"
+    }
+
+    if (data.TrackingStatusID === 2 ) {
+      color = "#009B77"
       fontcolor = "#FFF4EF"
     }
 
@@ -362,8 +367,7 @@ class OverallStock extends Component {
                   <CheckCircleIcon />
                 </IconButton>
               </TableCell>
-            )
-            : (<></>)
+            ) : (<></>)
         }
       </>
     )
@@ -376,11 +380,8 @@ class OverallStock extends Component {
     tempFormValue.TrackingStatusID = row.TrackingStatusID
     tempFormValue.ContainerName = row.ContainerName
     tempFormValue.StockDate = row.StockDate
-
     tempFormValue.TrackingNumber = row.TrackingNumber
-    tempFormValue.TrackingNumberVerified = !isStringNullOrEmpty(
-      row.TrackingNumber
-    )
+    tempFormValue.TrackingNumberVerified = !isStringNullOrEmpty(row.TrackingNumber)
     tempFormValue.UserCode = row.UserCode
     tempFormValue.MemberNumberVerified = !isStringNullOrEmpty(row.UserCode)
     tempFormValue.ProductDimensionDeep = row.ProductDimensionDeep
@@ -395,12 +396,17 @@ class OverallStock extends Component {
     tempFormValue.Remark = !isStringNullOrEmpty(row.Remark) ? row.Remark : ""
 
     let additionalCharges = row.AdditionalCharges
+    console.log(additionalCharges)
     try {
       additionalCharges = JSON.parse(additionalCharges)
-    } catch (e) {
+    }
+    catch (e) {
       console.log(e)
       additionalCharges = []
     }
+
+    console.log(additionalCharges)
+
     tempFormValue.AdditionalCharges = isObjectUndefinedOrNull(additionalCharges) ? [] : additionalCharges
     tempFormValue.AdditionalCharges.length > 0 &&
       tempFormValue.AdditionalCharges.map((el, idx) => {
@@ -423,20 +429,15 @@ class OverallStock extends Component {
   // }
 
   handleAddChrgModal = () => {
-    this.setState({
-      openAddChrgModal: !this.state.openAddChrgModal,
-      searchKeywords: "",
-    })
+    this.setState({ openAddChrgModal: !this.state.openAddChrgModal, searchKeywords: "", })
     if (this.state.approvePage === true) {
       //only show those stock which is not created performa invoice status
       this.setState({
         filteredList: this.props.stocks.filter((x) => x.TrackingStatusID != 3),
       })
-      console.log("1", this.state.filteredList)
     } else {
       //show all stock history if overall stock
       this.setState({ filteredList: this.props.stocks })
-      console.log("2", this.props.stocks)
     }
   }
 
@@ -496,7 +497,32 @@ class OverallStock extends Component {
     }
 
     if (isNotVerified === 0) {
-      this.props.CallUpdateStockDetailByGet(object)
+      if (this.state.approvePage) {
+        // if this is the stockin page
+        let postObject = {
+          StockID: object.STOCKID,
+          TrackingNumber: object.TRACKINGNUMBER,
+          ProductWeight: object.PRODUCTWEIGHT,
+          ProductDimensionHeight: object.PRODUCTHEIGHT,
+          ProductDimensionWidth: object.PRODUCTWIDTH,
+          ProductDimensionDeep: object.PRODUCTDEEP,
+          AreaCode: object.AREACODE,
+          UserCode: object.USERCODE,
+          Item: object.ITEM,
+          TRACKINGSTATUSID: object.TRACKINGSTATUSID,
+          ContainerName: object.CONTAINERNAME,
+          ContainerDate: object.CONTAINERDATE,
+          Remark: object.REMARK,
+          AdditionalCharges: object.EXTRACHARGE,
+        }
+        console.log(postObject)
+
+      }
+      else {
+        // if this is the overall stock page
+        this.props.CallUpdateStockDetailByGet(object)
+      }
+
       toast.loading("Submitting data... Please wait...", {
         autoClose: false,
         position: "top-center",
@@ -593,8 +619,7 @@ class OverallStock extends Component {
 
       case "AdditionalChargedAmount":
         const chargedRemark = additionalCostItems[index].Charges
-        validated =
-          !isStringNullOrEmpty(chargedRemark) &&
+        validated = !isStringNullOrEmpty(chargedRemark) &&
           !isStringNullOrEmpty(value) &&
           !isNaN(e.target.value) &&
           Number(value) > 0
@@ -611,11 +636,7 @@ class OverallStock extends Component {
   RenderAdditionalCost = () => {
     const { formValue } = this.state
     let tempFormValue = formValue
-    let additionalCostItems = !isObjectUndefinedOrNull(
-      tempFormValue.AdditionalCharges
-    )
-      ? formValue.AdditionalCharges
-      : []
+    let additionalCostItems = !isObjectUndefinedOrNull(tempFormValue.AdditionalCharges) ? formValue.AdditionalCharges : []
     let obj = {
       Charges: "",
       Value: "",
@@ -634,11 +655,7 @@ class OverallStock extends Component {
   handleRemoveAdditionalCosts(index) {
     const { formValue } = this.state
     let tempFormValue = formValue
-    let additionalCostItems = !isObjectUndefinedOrNull(
-      tempFormValue.AdditionalCharges
-    )
-      ? tempFormValue.AdditionalCharges
-      : []
+    let additionalCostItems = !isObjectUndefinedOrNull(tempFormValue.AdditionalCharges) ? tempFormValue.AdditionalCharges : []
 
     if (additionalCostItems.length > 0) {
       additionalCostItems.splice(index, 1)
@@ -663,166 +680,11 @@ class OverallStock extends Component {
       case "open":
         if (!isStringNullOrEmpty(this.state.ContainerName)) {
           this.setState({ open: !this.state.open })
-          let today = convertDateTimeToString112Format(new Date())
-          this.props.CallFilterInventoryByDate({ STARTDATE: today, ENDDATE: today })
+          // this.props.CallFilterInventoryByDate({ STARTDATE: '-', ENDDATE: '-' })
         }
         else {
           toast.warning("Please fill in the all the details before proceed")
         }
-
-        break
-
-      case "openEditModal":
-        // let extraChangesValue = "",
-        //   isNotVerified = 0
-        // let additionalCharge = this.state.AdditionalCharges
-        // if (additionalCharge[0].Charges === undefined)
-        //   additionalCharge = JSON.parse(this.state.AdditionalCharges)
-        // if (additionalCharge.length > 0) {
-        //   for (var i = 0; i < additionalCharge.length; i++) {
-        //     if (
-        //       additionalCharge[i].Charges === undefined ||
-        //       additionalCharge[i].Value === undefined
-        //     ) {
-        //       this.setState({ AdditionalCharges: "" })
-        //       extraChangesValue = "-"
-        //     } else {
-        //       extraChangesValue +=
-        //         additionalCharge[i].Charges + "=" + additionalCharge[i].Value
-        //       if (i !== additionalCharge.length - 1) extraChangesValue += ";"
-
-        //       //check extra charge
-        //       if (additionalCharge[i].validated === false) isNotVerified++
-        //     }
-        //   }
-        // } else extraChangesValue = "-"
-
-        // if (checked === false) {
-        //   if (
-        //     !isStringNullOrEmpty(this.state.selectedRows.AreaCode) ||
-        //     !isStringNullOrEmpty(this.state.AreaCode)
-        //   ) {
-        //     this.setState({ openEditModal: !this.state.openEditModal })
-        //     this.props.CallUpdateStockDetailByPost({
-        //       StockID: this.state.selectedRows.StockID,
-        //       TrackingNumber: this.state.TrackingNumber,
-        //       ProductWeight: this.state.ProductWeight,
-        //       ProductDimensionHeight: this.state.ProductDimensionHeight,
-        //       ProductDimensionWidth: this.state.ProductDimensionWidth,
-        //       ProductDimensionDeep: this.state.ProductDimensionDeep,
-        //       AreaCode: this.state.AreaCode,
-        //       UserCode: this.state.UserCode,
-        //       Item: this.state.Item,
-        //       TRACKINGSTATUSID: 2,
-        //       ContainerName: this.state.ContainerName,
-        //       ContainerDate: this.state.ContainerDate,
-        //       Remark: this.state.Remark,
-        //       AdditionalCharges: extraChangesValue,
-        //     })
-        //     this.setState({
-        //       searchKeywords: "",
-        //       stockFiltered: this.props.Stocks,
-        //     })
-        //   } else {
-        //     toast.warning(
-        //       "User may not registered in the system. Please register the user in 'User Management' page. ",
-        //       { autoClose: 2000 }
-        //     )
-        //   }
-        // } else {
-        //   if (
-        //     !isStringNullOrEmpty(this.state.selectedRows.AreaCode) ||
-        //     !isStringNullOrEmpty(this.state.AreaCode)
-        //   ) {
-        //     this.setState({ openEditModal: !this.state.openEditModal })
-        //     this.props.CallUpdateStockDetailByPost({
-        //       StockID: this.state.selectedRows.StockID,
-        //       TrackingNumber: this.state.TrackingNumber,
-        //       ProductWeight: this.state.ProductWeight,
-        //       ProductDimensionHeight: this.state.ProductDimensionHeight,
-        //       ProductDimensionWidth: this.state.ProductDimensionWidth,
-        //       ProductDimensionDeep: this.state.ProductDimensionDeep,
-        //       AreaCode: this.state.AreaCode,
-        //       UserCode: this.state.UserCode,
-        //       Item: this.state.Item,
-        //       TRACKINGSTATUSID: 1,
-        //       ContainerName: this.state.ContainerName,
-        //       ContainerDate: this.state.ContainerDate,
-        //       Remark: this.state.Remark,
-        //       AdditionalCharges: extraChangesValue,
-        //     })
-        //     this.setState({
-        //       searchKeywords: "",
-        //       stockFiltered: this.props.Stocks,
-        //     })
-        //   } else {
-        //     toast.warning(
-        //       "User may not registered in the system. Please register the user in 'User Management' page. ",
-        //       { autoClose: 2000 }
-        //     )
-        //   }
-        // }
-        // SearchBar.focus = "true"
-        break
-
-      case "openAddModal":
-        // let ExtraChangesValue = "",
-        //   IsNotVerified = 0
-        // if (this.state.AdditionalCharges.length > 0) {
-        //   for (var i = 0; i < this.state.AdditionalCharges.length; i++) {
-        //     if (
-        //       this.state.AdditionalCharges[i].Charges === undefined ||
-        //       this.state.AdditionalCharges[i].Value === undefined
-        //     ) {
-        //       this.setState({ AdditionalCharges: "" })
-        //       ExtraChangesValue = "-"
-        //     } else {
-        //       ExtraChangesValue +=
-        //         this.state.AdditionalCharges[i].Charges +
-        //         "=" +
-        //         this.state.AdditionalCharges[i].Value
-        //       if (i !== this.state.AdditionalCharges.length - 1)
-        //         ExtraChangesValue += ";"
-
-        //       //check extra charge
-        //       if (this.state.AdditionalCharges[i].validated === false)
-        //         IsNotVerified++
-        //     }
-        //   }
-        // } else ExtraChangesValue = "-"
-
-        // if (
-        //   !isStringNullOrEmpty(this.state.AreaCode) ||
-        //   !isStringNullOrEmpty(this.state.TrackingNumber) ||
-        //   !isStringNullOrEmpty(this.state.UserCode) ||
-        //   !isStringNullOrEmpty(this.state.ProductDimensionDeep) ||
-        //   !isStringNullOrEmpty(this.state.ProductWeight) ||
-        //   !isStringNullOrEmpty(this.state.ProductDimensionHeight) ||
-        //   !isStringNullOrEmpty(this.state.ProductDimensionWidth)
-        // ) {
-        //   this.setState({ openAddModal: !this.state.openAddModal })
-        //   this.props.CallInsertStockByPost({
-        //     TRACKINGNUMBER: this.state.TrackingNumber,
-        //     PRODUCTWEIGHT: this.state.ProductWeight,
-        //     PRODUCTHEIGHT: this.state.ProductDimensionHeight,
-        //     PRODUCTWIDTH: this.state.ProductDimensionWidth,
-        //     PRODUCTDEEP: this.state.ProductDimensionDeep,
-        //     AREACODE: this.state.AreaCode,
-        //     USERCODE: this.state.UserCode,
-        //     ITEM: this.state.Item,
-        //     STOCKDATE: "-",
-        //     PACKAGINGDATE: "-",
-        //     REMARK: this.state.Remark,
-        //     EXTRACHARGE: ExtraChangesValue,
-        //     CONTAINERNAME: this.state.ContainerName,
-        //     CONTAINERDATE: this.state.ContainerDate,
-        //   })
-        // } else {
-        //   toast.warning(
-        //     "User may not registered in the system. Please register the user in 'User Management' page. ",
-        //     { autoClose: 2000 }
-        //   )
-        // }
 
         break
 
@@ -854,61 +716,23 @@ class OverallStock extends Component {
         )
 
       default:
-        return stocks.filter(
-          (x) =>
-            (!isStringNullOrEmpty(x.TrackingNumber) &&
-              x.TrackingNumber.includes(searchKeys)) ||
-            (!isStringNullOrEmpty(x.ContainerName) &&
-              x.ContainerName.includes(searchKeys)) ||
-            (!isStringNullOrEmpty(x.UserCode) &&
-              x.UserCode.includes(searchKeys)) ||
-            (!isStringNullOrEmpty(x.UserAreaID) &&
-              x.UserAreaID.includes(searchKeys))
-        )
+        return stocks.filter((x) => (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) || (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) || (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) || (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys)))
     }
   }
 
   onCategoryAndAreaFilter(stocks, searchCategory, searchArea, searchKeys) {
     switch (searchCategory) {
       case "Tracking":
-        return stocks.filter(
-          (x) =>
-            !isStringNullOrEmpty(x.UserAreaID) &&
-            x.UserAreaID.includes(searchArea) &&
-            !isStringNullOrEmpty(x.TrackingNumber) &&
-            x.TrackingNumber.includes(searchKeys)
-        )
+        return stocks.filter((x) => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea) && !isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys))
 
       case "Member":
-        return stocks.filter(
-          (x) =>
-            !isStringNullOrEmpty(x.UserAreaID) &&
-            x.UserAreaID.includes(searchArea) &&
-            !isStringNullOrEmpty(x.UserCode) &&
-            x.UserCode.includes(searchKeys)
-        )
+        return stocks.filter((x) => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea) && !isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys))
 
       case "Container":
-        return stocks.filter(
-          (x) =>
-            !isStringNullOrEmpty(x.UserAreaID) &&
-            x.UserAreaID.includes(searchArea) &&
-            !isStringNullOrEmpty(x.ContainerName) &&
-            x.ContainerName.includes(searchKeys)
-        )
+        return stocks.filter((x) => !isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchArea) && !isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys))
 
       default:
-        return this.props.stocks.filter(
-          (x) =>
-            (!isStringNullOrEmpty(x.TrackingNumber) &&
-              x.TrackingNumber.includes(searchKeys)) ||
-            (!isStringNullOrEmpty(x.ContainerName) &&
-              x.ContainerName.includes(searchKeys)) ||
-            (!isStringNullOrEmpty(x.UserCode) &&
-              x.UserCode.includes(searchKeys)) ||
-            (!isStringNullOrEmpty(x.UserAreaID) &&
-              x.UserAreaID.includes(searchKeys))
-        )
+        return this.props.stocks.filter((x) => (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) || (!isStringNullOrEmpty(x.ContainerName) && x.ContainerName.includes(searchKeys)) || (!isStringNullOrEmpty(x.UserCode) && x.UserCode.includes(searchKeys)) || (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(searchKeys)))
     }
   }
 
@@ -1048,10 +872,15 @@ class OverallStock extends Component {
     let date_range = typeof searchDates === "string" && !Array.isArray(searchDates) ? JSON.parse(searchDates) : searchDates
     if (!date_range.includes(null)) {
       this.props.CallResetStocks()
+      // const object = {
+      //   STARTDATE: convertDateTimeToString112Format(date_range[0], false).replace(/[^0-9 ]/g, ""),
+      //   ENDDATE: convertDateTimeToString112Format(date_range[1], false).replace(/[^0-9 ]/g, ""),
+      // }
       const object = {
-        STARTDATE: convertDateTimeToString112Format(date_range[0], false).replace(/[^0-9 ]/g, ""),
-        ENDDATE: convertDateTimeToString112Format(date_range[1], false).replace(/[^0-9 ]/g, ""),
+        STARTDATE: "-",
+        ENDDATE: "-",
       }
+
       this.props.CallFilterInventoryByDate(object)
       toast.loading("Pulling data... Please wait...", {
         autoClose: false,
@@ -1092,6 +921,89 @@ class OverallStock extends Component {
     this.setState({ searchDates: e })
   }
 
+  onSelectRow = (items) => { this.setState({ selectedStocks: items }) }
+  onSelectAllRow = (items) => { this.setState({ selectedStocks: items }) }
+
+  toggleVerificationModal = () => {
+    this.setState({ bulkVerificationModalToggled: !this.state.bulkVerificationModalToggled })
+  }
+
+  onBulkVerifyItems = () => {
+    const { selectedStocks } = this.state
+    let StockID = []
+    let TrackingNumber = []
+    let ProductWeight = []
+    let ProductDimensionHeight = []
+    let ProductDimensionWidth = []
+    let ProductDimensionDeep = []
+    let AreaCode = []
+    let UserCode = []
+    let Item = []
+    let TRACKINGSTATUSID = []
+    let ContainerName = []
+    let ContainerDate = []
+    let Remark = []
+    let AdditionalCharges = []
+
+    isArrayNotEmpty(selectedStocks) && selectedStocks.map((row) => {
+      StockID.push(row.StockID)
+      TrackingNumber.push(row.TrackingNumber)
+      ProductWeight.push(row.ProductWeight)
+      ProductDimensionHeight.push(row.ProductDimensionHeight)
+      ProductDimensionWidth.push(row.ProductDimensionWidth)
+      ProductDimensionDeep.push(row.ProductDimensionDeep)
+      AreaCode.push(row.AreaCode)
+      UserCode.push(row.UserCode)
+      Item.push(row.Item)
+      TRACKINGSTATUSID.push(2)
+      ContainerName.push(this.state.ContainerName)
+      ContainerDate.push(this.state.ContainerDate)
+      Remark.push(row.Remark)
+      AdditionalCharges.push(row.AdditionalCharges)
+    })
+
+    this.props.CallUpdateStockDetailByPost({
+      StockID: StockID.join(","),
+      TrackingNumber: TrackingNumber.join(","),
+      ProductWeight: ProductWeight.join(","),
+      ProductDimensionHeight: ProductDimensionHeight.join(","),
+      ProductDimensionWidth: ProductDimensionWidth.join(","),
+      ProductDimensionDeep: ProductDimensionDeep.join(","),
+      AreaCode: AreaCode.join(","),
+      UserCode: UserCode.join(","),
+      Item: Item.join(","),
+      TRACKINGSTATUSID: TRACKINGSTATUSID.join(","),
+      ContainerName: ContainerName.join(","),
+      ContainerDate: ContainerDate.join(","),
+      Remark: Remark.join(","),
+      AdditionalCharges: AdditionalCharges.join(","),
+    })
+    this.setState({ searchKeywords: "", stockFiltered: this.props.Stocks })
+  }
+
+  renderTableActionButton = () => {
+    return (
+      <IconButton onClick={(event) => { this.toggleVerificationModal() }} >
+        <CheckIcon />
+      </IconButton>
+    )
+  }
+
+  renderAdditionalDisplay = (charges) => {
+    let renderStrings = ""
+    try {
+      charges = JSON.parse(charges)
+      charges.length > 0 && charges.map((el) => {
+        if (!(el.Charges === "[]" || isStringNullOrEmpty(el.Value)))
+          renderStrings = renderStrings + el.Charges + ": " + el.Value + "; "
+        return isStringNullOrEmpty(renderStrings) ? "N/A" : renderStrings
+      })
+    }
+    catch (e) {
+      return isStringNullOrEmpty(renderStrings) ? "N/A" : renderStrings
+    }
+  }
+
   render() {
     const ToggleTabs = [
       { children: "All", key: "All" },
@@ -1104,14 +1016,16 @@ class OverallStock extends Component {
       return (
         <div className="d-flex">
           <Tooltip title="Synchronize Data">
-            <IconButton
-              aria-label="Pull Data"
-              size="small"
-              onClick={() => { this.onDatabaseSearch() }}
-              disabled={this.state.isDataFetching}
-            >
-              <CachedIcon fontSize="large" />
-            </IconButton>
+            <>
+              <IconButton
+                aria-label="Pull Data"
+                size="small"
+                onClick={() => { this.onDatabaseSearch() }}
+                disabled={this.state.isDataFetching}
+              >
+                <CachedIcon fontSize="large" />
+              </IconButton>
+            </>
           </Tooltip>
           <CsvDownloader
             filename="overallstock-list"
@@ -1121,13 +1035,15 @@ class OverallStock extends Component {
             datas={isArrayNotEmpty(this.state.filteredList) ? this.state.filteredList : []}
           >
             <Tooltip title="Download">
-              <IconButton size="small">
-                <DownloadForOfflineIcon
-                  color="primary"
-                  fontSize="large"
-                  sx={{}}
-                />
-              </IconButton>
+              <>
+                <IconButton size="small">
+                  <DownloadForOfflineIcon
+                    color="primary"
+                    fontSize="large"
+                    sx={{}}
+                  />
+                </IconButton>
+              </>
             </Tooltip>
           </CsvDownloader>
         </div>
@@ -1199,20 +1115,22 @@ class OverallStock extends Component {
               }}
             />
             <Tooltip title="Search Date">
-              <IconButton
-                aria-label="Search Date"
-                size="small"
-                onClick={() => { this.onDatabaseSearch() }}
-                sx={{
-                  marginTop: "auto",
-                  marginBottom: "auto",
-                  marginLeft: "5px",
-                  border: "1px solid rgba(33, 33, 33, 0.6)",
-                }}
-                disabled={this.state.isDataFetching}
-              >
-                <ManageSearchOutlinedIcon fontSize="medium" />
-              </IconButton>
+              <>
+                <IconButton
+                  aria-label="Search Date"
+                  size="small"
+                  onClick={() => { this.onDatabaseSearch() }}
+                  sx={{
+                    marginTop: "auto",
+                    marginBottom: "auto",
+                    marginLeft: "5px",
+                    border: "1px solid rgba(33, 33, 33, 0.6)",
+                  }}
+                  disabled={this.state.isDataFetching}
+                >
+                  <ManageSearchOutlinedIcon fontSize="medium" />
+                </IconButton>
+              </>
             </Tooltip>
           </div>
           {/* show only in approve page */}
@@ -1221,20 +1139,15 @@ class OverallStock extends Component {
               (
                 <div className="col-md-6 col-12 d-flex" onClick={() => this.setState({ open: !this.state.open })} style={{ cursor: "pointer" }} >
                   <label className="my-auto">Container Number and Date :</label>
-                  <Tooltip
-                    title="Click to change container"
-                    placement="bottom-start"
-                  >
-                    <div className="my-auto ms-2">
-                      {this.state.ContainerName +
-                        "( " +
-                        this.state.ContainerDate +
-                        " )"}
-                    </div>
+                  <Tooltip title="Click to change container" placement="bottom-start" >
+                    <>
+                      <div className="my-auto ms-2">
+                        {this.state.ContainerName + "( " + this.state.ContainerDate + " )"}
+                      </div>
+                    </>
                   </Tooltip>
                 </div>
-              )
-              : ("")
+              ) : ("")
           }
         </div>
         <div className="row">
@@ -1275,15 +1188,13 @@ class OverallStock extends Component {
                     placeholder="filter by"
                   >
                     <MenuItem key="all_area" value="All"> All </MenuItem>
-                    {
-                      isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
-                        return (
-                          <MenuItem key={el.AreaName + "_" + idx} value={el.UserAreaID}  >
-                            {el.AreaName + " - " + el.AreaCode}
-                          </MenuItem>
-                        )
-                      })
-                    }
+                    {isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
+                      return (
+                        <MenuItem key={el.AreaName + "_" + idx} value={el.UserAreaID}  >
+                          {el.AreaName + " - " + el.AreaCode}
+                        </MenuItem>
+                      )
+                    })}
                   </Select>
                 </div>
               </div>
@@ -1315,11 +1226,12 @@ class OverallStock extends Component {
             stickyTableHeader: true, // optional, default is true
             stickyTableHeight: getWindowDimensions().screenHeight * 0.7, // optional, default is 300px
           }}
+          actionIcon={this.renderTableActionButton()}
           paginationOptions={[50, 100, 250, { label: "All", value: -1 }]} // optional, by default it will hide the table pagination. You should set settings for pagination options as in array, eg.: [5, 100, 250, { label: 'All', value: -1 }]
           tableHeaders={headCells} //required
           tableRows={{
             renderTableRows: this.renderTableRows, // required, it is a function, please refer to the example I have done in Table Components
-            checkbox: false, // optional, by default is true
+            checkbox: (this.state.approvePage === true) ? true : false, // optional, by default is true
             checkboxColor: "primary", // optional, by default is primary, as followed the MUI documentation
             onRowClickSelect: false, // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
             headerColor: "rgb(200, 200, 200)",
@@ -1329,7 +1241,15 @@ class OverallStock extends Component {
           onTableRowClick={this.onTableRowClick} // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row
           onActionButtonClick={this.onAddButtonClick} // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
           tableTopRight={renderTableTopRightButtons()}
-          tableTopLeft={(this.state.approvePage === true) ? <em style={{ fontWeight: 600, color: 'red' }}>Stock in the stocks from the container</em> : <em style={{ fontWeight: 600 }}>Overall Stock that waiting for stock in</em>}
+          onSelectRow={this.onSelectRow}
+          onSelectAllClick={this.onSelectAllRow}
+          tableTopLeft={
+            (this.state.approvePage === true)
+              ? <em style={{ fontWeight: 600, color: 'red' }}>Stock in the stocks from the container <span style={{ fontSize: '14pt', color: 'black' }}>(Item: {this.state.totalItem})</span></em>
+              : <em style={{ fontWeight: 600 }}>Overall Stock</em>
+          }
+          CallResetSelected={this.state.CallResetSelected}
+
         />
 
         <AlertDialog
@@ -1496,55 +1416,55 @@ class OverallStock extends Component {
                 </Button>
               </div>
             </div>
-            {isArrayNotEmpty(formValue.AdditionalCharges) &&
-              formValue.AdditionalCharges.map((el, idx) => {
-                return (
-                  <div key={idx} className="row">
-                    <div className="col-6 col-sm-8">
-                      <TextField
+
+            {isArrayNotEmpty(formValue.AdditionalCharges) && formValue.AdditionalCharges.map((el, idx) => {
+              return (
+                <div key={idx} className="row">
+                  <div className="col-6 col-sm-8">
+                    <TextField
+                      variant="standard"
+                      size="small"
+                      fullWidth
+                      label={"Add. Chg. " + (idx + 1)}
+                      name="AdditionalChargedRemark"
+                      value={el.Charges}
+                      onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
+                      error={!el.validated}
+                    />
+                    {!el.validated && (
+                      <FormHelperText sx={{ color: "red" }} id="AdditionalCost-error-text" > Invalid </FormHelperText>)}
+                  </div>
+                  <div className="col-4 col-sm-3">
+                    <FormControl variant="standard" size="small" fullWidth>
+                      <InputLabel htmlFor="AdditionalChargedAmount"></InputLabel>
+                      <Input
                         variant="standard"
                         size="small"
-                        fullWidth
-                        label={"Add. Chg. " + (idx + 1)}
-                        name="AdditionalChargedRemark"
-                        value={el.Charges}
+                        name="AdditionalChargedAmount"
+                        value={el.Value}
                         onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
+                        startAdornment={<InputAdornment position="start">RM</InputAdornment>}
                         error={!el.validated}
                       />
-                      {!el.validated && (
-                        <FormHelperText sx={{ color: "red" }} id="AdditionalCost-error-text" > Invalid </FormHelperText>)}
-                    </div>
-                    <div className="col-4 col-sm-3">
-                      <FormControl variant="standard" size="small" fullWidth>
-                        <InputLabel htmlFor="AdditionalChargedAmount"></InputLabel>
-                        <Input
-                          variant="standard"
-                          size="small"
-                          name="AdditionalChargedAmount"
-                          value={el.Value}
-                          onChange={(e) => { this.handleAdditionalCostInputs(e, idx) }}
-                          startAdornment={<InputAdornment position="start">RM</InputAdornment>}
-                          error={!el.validated}
-                        />
-                        {!el.validated && (<FormHelperText sx={{ color: "red" }} id="AdditionalCost-error-text" >  Invalid Amount  </FormHelperText>)}
-                      </FormControl>
-                    </div>
-                    <div className="col-2 col-sm-1 d-flex">
-                      <IconButton
-                        className="m-auto"
-                        color="primary"
-                        size="small"
-                        aria-label="remove-additional-cost"
-                        component="span"
-                        onClick={() => this.handleRemoveAdditionalCosts(idx)}
-                        disabled={this.state.isDataFetching}
-                      >
-                        <DeleteIcon size="inherit" />
-                      </IconButton>
-                    </div>
+                      {!el.validated && (<FormHelperText sx={{ color: "red" }} id="AdditionalCost-error-text" >  Invalid Amount  </FormHelperText>)}
+                    </FormControl>
                   </div>
-                )
-              })}
+                  <div className="col-2 col-sm-1 d-flex">
+                    <IconButton
+                      className="m-auto"
+                      color="primary"
+                      size="small"
+                      aria-label="remove-additional-cost"
+                      component="span"
+                      onClick={() => this.handleRemoveAdditionalCosts(idx)}
+                      disabled={this.state.isDataFetching}
+                    >
+                      <DeleteIcon size="inherit" />
+                    </IconButton>
+                  </div>
+                </div>
+              )
+            })}
             {isArrayNotEmpty(formValue.AdditionalCharges) && (
               <div className="mt-3 col-12">
                 <Button
@@ -1557,6 +1477,7 @@ class OverallStock extends Component {
                 > Clear Additional Costs </Button>
               </div>
             )}
+
             <div className="row mt-2">
               <div className="col-12">
                 <Box sx={{ width: "100%" }}>
@@ -1572,6 +1493,43 @@ class OverallStock extends Component {
                 </Box>
               </div>
             </div>
+          </div>
+        </AlertDialog>
+
+        <AlertDialog
+          open={this.state.bulkVerificationModalToggled} // required, pass the boolean whether modal is open or close
+          handleToggleDialog={this.toggleVerificationModal} // required, pass the toggle function of modal
+          handleConfirmFunc={this.onBulkVerifyItems} // required, pass the confirm function
+          showAction={true} // required, to show the footer of modal display
+          title={"Are you sure to verify the list?"} // required, title of the modal
+          buttonTitle={"Confirm"} // required, title of button
+          singleButton={false} // required, to decide whether to show a single full width button or 2 buttons
+          maxWidth={"md"}
+          draggable={true}
+        >
+          <div className="container-fluid">
+            {isArrayNotEmpty(this.state.selectedStocks) && this.state.selectedStocks.map((el, index) => {
+              return (
+                <Paper elevation={2} sx={{ padding: 2, marginBottom: 1, bgcolor: (index % 2 !== 0) ? '#F5F5F5' : '#FFFFFF' }} key={"item_" + index}>
+                  <div className="row">
+                    <div className="col-1" style={{fontSize: '16pt', display: 'flex'}}><b style={{margin: 'auto'}}>{index + 1}</b></div>
+                    <div className="col-11">
+                      <h6> <span style={{fontSize: '16pt', color: 'red'}}>{el.TrackingNumber}</span> - {el.AreaName + " (" + el.AreaCode + ") "} - {" (" + el.UserCode + ") " + " " + el.Fullname}</h6>
+                      <div> <b>(H/P)</b> {el.UserContactNo} {" "} <b>(Email)</b>  {el.UserEmailAddress} </div>
+                      <div><b>Address:</b> {el.UserAddress}</div>
+                      <hr />
+                      <div>
+                        {el.Item} ( {el.ProductDimensionWidth + "(W) x " + el.ProductDimensionDeep + "(D) x " + el.ProductDimensionHeight + "(H) "} ) ( {el.ProductWeight + " KG"} )
+                        <div>
+                          <b>Additional Charges:</b>  {this.renderAdditionalDisplay(el.AdditionalCharges)}<br />
+                          <b>Remarks:</b> {el.Remark}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Paper>
+              )
+            })}
           </div>
         </AlertDialog>
       </div>
