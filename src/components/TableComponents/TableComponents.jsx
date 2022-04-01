@@ -350,7 +350,7 @@ export default function TableComponents(props) {
     }
   };
 
-  const handleSelectItem = (event, key) => {
+  const handleSelectItem = (event, key, index) => {
     event.stopPropagation();
 
     const selectedIndex = selected.indexOf(key);
@@ -368,15 +368,15 @@ export default function TableComponents(props) {
       );
     }
     setSelected(newSelected);
-    props.onSelectRow && props.onSelectRow(newSelected);
+    props.onSelectRow && props.onSelectRow(newSelected, index);
   };
 
-  const handleRowClick = (event, row) => {
+  const handleRowClick = (event, row, index) => {
     if (!onRowSelect) {
       if (typeof props.onTableRowClick !== "undefined")
         props.onTableRowClick(event, row);
     } else {
-      handleSelectItem(event, row);
+      handleSelectItem(event, row, index);
     }
   };
   const handleChangePage = (event, newPage) => {
@@ -451,7 +451,7 @@ export default function TableComponents(props) {
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleRowClick(event, row)}
+                      onClick={(event) => handleRowClick(event, row, index)}
                       aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={"row_" + index}
@@ -463,7 +463,7 @@ export default function TableComponents(props) {
                             color={checkboxColor}
                             checked={isItemSelected}
                             inputProps={{ "aria-labelledby": labelId }}
-                            onClick={(event) => handleSelectItem(event, row)}
+                            onClick={(event) => handleSelectItem(event, row, index)}
                           />
                         </TableCell>
                       )}

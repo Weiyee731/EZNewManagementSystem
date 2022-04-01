@@ -256,70 +256,72 @@ class TransactionHistoryDetail extends Component {
     this.handleCashBillInputs = this.handleCashBillInputs.bind(this)
     this.addReferencesToRemark = this.addReferencesToRemark.bind(this)
     this.generateCashBill = this.generateCashBill.bind(this)
-    this.props.CallFetchAllTransactionByID(this.state)
   }
 
   componentDidMount() {
-    if (this.props.transaction.length !== this.state.Transaction.length) {
-      if (this.props.transaction !== undefined && this.props.transaction[0] !== undefined) {
-        this.setState({
-          Transaction: this.props.transaction,
-          OrderDate: this.props.transaction[0].OrderDate,
-          TransactionName: this.props.transaction[0].TransactionName,
-          Fullname: this.props.transaction[0].Fullname,
-          UserCode: this.props.transaction[0].UserCode,
-          AreaCode: this.props.transaction[0].AreaCode,
-          Contact: this.props.transaction[0].UserContactNo,
-          Address: this.props.transaction[0].UserAddress,
-          OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
-          OrderPaidAmount: this.props.transaction[0].OrderSubPaidAmount,
-          TransactionDetail: JSON.parse(this.props.transaction[0].TransactionDetail),
-        });
-      }
-    }
+    if (!isStringNullOrEmpty(this.props.match.params.transactionid))
+      this.props.CallFetchAllTransactionByID({ TransactionID: this.props.match.params.transactionid })
+    else
+      alert("Error occured when pulling the list. Please select the transaction again.")
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.transaction.length !== this.props.transaction.length) {
-      if (this.props.transaction !== undefined && this.props.transaction[0] !== undefined) {
-        this.setState({
-          Transaction: this.props.transaction,
-          OrderDate: this.props.transaction[0].OrderDate,
-          TransactionName: this.props.transaction[0].TransactionName,
-          Fullname: this.props.transaction[0].Fullname,
-          UserCode: this.props.transaction[0].UserCode,
-          AreaCode: this.props.transaction[0].AreaCode,
-          Contact: this.props.transaction[0].UserContactNo,
-          Address: this.props.transaction[0].UserAddress,
-          OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
-          OrderPaidAmount: this.props.transaction[0].OrderSubPaidAmount,
-          TransactionDetail: this.props.transaction[0].TransactionDetail !== "null" ? JSON.parse(this.props.transaction[0].TransactionDetail) : [],
-        });
-      }
-    } else {
-      if (prevProps.transaction.length !== this.state.Transaction.length) {
-        this.setState({
-          Transaction: prevProps.transaction,
-          OrderDate: prevProps.transaction[0].OrderDate,
-          TransactionName: prevProps.transaction[0].TransactionName,
-          Fullname: prevProps.transaction[0].Fullname,
-          UserCode: prevProps.transaction[0].UserCode,
-          AreaCode: prevProps.transaction[0].AreaCode,
-          Contact: prevProps.transaction[0].UserContactNo,
-          Address: prevProps.transaction[0].UserAddress,
-          OrderTotalAmount: prevProps.transaction[0].OrderSubTotalAmount,
-          OrderPaidAmount: prevProps.transaction[0].OrderSubPaidAmount,
-          TransactionDetail: JSON.parse(prevProps.transaction[0].TransactionDetail)
-        });
-      }
+    if (isArrayNotEmpty(this.props.transaction) && (this.props.transaction !== prevProps.transaction) && (this.props.transaction.length !== this.state.Transaction.length)) {
+      this.setState({
+        Transaction: this.props.transaction,
+        OrderDate: this.props.transaction[0].OrderDate,
+        TransactionName: this.props.transaction[0].TransactionName,
+        Fullname: this.props.transaction[0].Fullname,
+        UserCode: this.props.transaction[0].UserCode,
+        AreaCode: this.props.transaction[0].AreaCode,
+        Contact: this.props.transaction[0].UserContactNo,
+        Address: this.props.transaction[0].UserAddress,
+        OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
+        OrderPaidAmount: this.props.transaction[0].OrderSubPaidAmount,
+        TransactionDetail: this.props.transaction[0].TransactionDetail !== "null" ? JSON.parse(this.props.transaction[0].TransactionDetail) : [],
+      });
     }
+    // if (prevProps.transaction.length !== this.props.transaction.length) {
+    //   if (this.props.transaction !== undefined && this.props.transaction[0] !== undefined) {
+    //     this.setState({
+    //       Transaction: this.props.transaction,
+    //       OrderDate: this.props.transaction[0].OrderDate,
+    //       TransactionName: this.props.transaction[0].TransactionName,
+    //       Fullname: this.props.transaction[0].Fullname,
+    //       UserCode: this.props.transaction[0].UserCode,
+    //       AreaCode: this.props.transaction[0].AreaCode,
+    //       Contact: this.props.transaction[0].UserContactNo,
+    //       Address: this.props.transaction[0].UserAddress,
+    //       OrderTotalAmount: this.props.transaction[0].OrderTotalAmount,
+    //       OrderPaidAmount: this.props.transaction[0].OrderSubPaidAmount,
+    //       TransactionDetail: this.props.transaction[0].TransactionDetail !== "null" ? JSON.parse(this.props.transaction[0].TransactionDetail) : [],
+    //     });
+    //   }
+    // }
+    // else {
+    //   if (prevProps.transaction.length !== this.state.Transaction.length) {
+    //     this.setState({
+    //       Transaction: prevProps.transaction,
+    //       OrderDate: prevProps.transaction[0].OrderDate,
+    //       TransactionName: prevProps.transaction[0].TransactionName,
+    //       Fullname: prevProps.transaction[0].Fullname,
+    //       UserCode: prevProps.transaction[0].UserCode,
+    //       AreaCode: prevProps.transaction[0].AreaCode,
+    //       Contact: prevProps.transaction[0].UserContactNo,
+    //       Address: prevProps.transaction[0].UserAddress,
+    //       OrderTotalAmount: prevProps.transaction[0].OrderSubTotalAmount,
+    //       OrderPaidAmount: prevProps.transaction[0].OrderSubPaidAmount,
+    //       TransactionDetail: JSON.parse(prevProps.transaction[0].TransactionDetail)
+    //     });
+    //   }
+    // }
   }
 
   renderTableRows = (data, index) => {
     const fontsize = '9pt'
     let charges = data.TransactionDetailCharges != [] ? JSON.parse(data.TransactionDetailCharges).reduce((price, item) => price + item.ProductPrice, 0).toFixed(2) : 0
     let dataIndex = this.state.TransactionDetail.findIndex(x => parseInt(x.TransactionDetailID) === parseInt(data.TransactionDetailID))
-   return (
+    return (
       <>
         <TableCell
           component="th"

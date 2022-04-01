@@ -174,8 +174,8 @@ class UserManagement extends Component {
             }
         }
 
-        console.log(this.state.UserListingfiltered === null)
-        console.log(isArrayNotEmpty(this.props.user))
+        // console.log(this.state.UserListingfiltered === null)
+        // console.log(isArrayNotEmpty(this.props.user))
         if (isArrayNotEmpty(this.props.user)) {
             toast.dismiss();
         }

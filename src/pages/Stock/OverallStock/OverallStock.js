@@ -213,8 +213,7 @@ class OverallStock extends Component {
     this.handleFormInput = this.handleFormInput.bind(this)
     this.handleAdditionalCostInputs = this.handleAdditionalCostInputs.bind(this)
     this.RenderAdditionalCost = this.RenderAdditionalCost.bind(this)
-    this.handleRemoveAdditionalCosts =
-      this.handleRemoveAdditionalCosts.bind(this)
+    this.handleRemoveAdditionalCosts = this.handleRemoveAdditionalCosts.bind(this)
     this.removeAllAdditionalCost = this.removeAllAdditionalCost.bind(this)
     this.onSearch = this.onSearch.bind(this)
     this.handleSearchInput = this.handleSearchInput.bind(this)
@@ -244,20 +243,12 @@ class OverallStock extends Component {
       const { stocks } = this.props
       if (this.state.approvePage === true) {
         this.setState({
-          filteredList:
-            !isStringNullOrEmpty(stocks[0].ReturnVal) &&
-            stocks[0].ReturnVal === 0
-              ? []
-              : stocks.filter((x) => x.TrackingStatusID !== 3),
+          filteredList: !isStringNullOrEmpty(stocks[0].ReturnVal) && stocks[0].ReturnVal === 0 ? [] : stocks.filter((x) => x.TrackingStatusID !== 3),
           isDataFetching: false,
         })
       } else {
         this.setState({
-          filteredList:
-            !isStringNullOrEmpty(stocks[0].ReturnVal) &&
-            stocks[0].ReturnVal === 0
-              ? []
-              : stocks,
+          filteredList: !isStringNullOrEmpty(stocks[0].ReturnVal) && stocks[0].ReturnVal === 0 ? [] : stocks,
           isDataFetching: false,
         })
       }
@@ -308,9 +299,7 @@ class OverallStock extends Component {
         if (this.state.approvePage === true) {
           //only show those stock which is not created performa invoice status
           this.setState({
-            filteredList: this.props.stocks.filter(
-              (x) => x.TrackingStatusID !== 3
-            ),
+            filteredList: this.props.stocks.filter((x) => x.TrackingStatusID !== 3),
           })
         } else {
           //show all stock history if overall stock
@@ -322,9 +311,7 @@ class OverallStock extends Component {
 
       case "Unchecked":
         this.setState({
-          filteredList: this.props.stocks.filter(
-            (x) => x.TrackingStatusID === 1
-          ),
+          filteredList: this.props.stocks.filter((x) => x.TrackingStatusID === 1),
         })
         break
 
@@ -541,8 +528,8 @@ class OverallStock extends Component {
       tempFormValue.AdditionalCharges.map((el, idx) => {
         el.Value =
           !isStringNullOrEmpty(el.Value) &&
-          !isNaN(el.Value) &&
-          Number(el.Value) > 0
+            !isNaN(el.Value) &&
+            Number(el.Value) > 0
             ? el.Value
             : 0
         el.validated =
@@ -1235,8 +1222,8 @@ class OverallStock extends Component {
           tempList[0].AdditionalCharges.map((el, idx) => {
             el.Value =
               !isStringNullOrEmpty(el.Value) &&
-              !isNaN(el.Value) &&
-              Number(el.Value) > 0
+                !isNaN(el.Value) &&
+                Number(el.Value) > 0
                 ? el.Value
                 : 0
             el.validated =

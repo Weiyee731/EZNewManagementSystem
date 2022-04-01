@@ -19,9 +19,8 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import ToggleTabsComponent from "../../components/ToggleTabsComponent/ToggleTabComponents";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
-import { isArrayNotEmpty, getWindowDimensions, isStringNullOrEmpty } from '../../tools/Helpers';
+import { isArrayNotEmpty, getWindowDimensions, isStringNullOrEmpty, convertDateTimeToString112Format, roundOffTotal } from '../../tools/Helpers';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
@@ -31,8 +30,10 @@ import { toast, Flip } from 'react-toastify';
 import AlertDialog from "../../components/modal/Modal";
 import DeleteIcon from '@mui/icons-material/Delete';
 import ResponsiveDatePickers from '../../components/datePicker/datePicker';
+import PaidIcon from '@mui/icons-material/Paid';
 
 import './UserDetail.css'
+
 function mapStateToProps(state) {
   return {
     userProfile: state.counterReducer["userProfile"],
@@ -62,7 +63,6 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: '40%',
-  // height: '25%',
   bgcolor: 'background.paper',
   border: '0px solid #000',
   boxShadow: 24,
@@ -117,13 +117,14 @@ const headCells = [
     align: 'center',
     disablePadding: false,
     label: 'Status',
-  },
-  {
-    id: 'action',
-    align: 'center',
-    disablePadding: false,
-    label: '',
-  },
+  }
+  // ,
+  // {
+  //   id: 'action',
+  //   align: 'center',
+  //   disablePadding: false,
+  //   label: '',
+  // },
 ];
 
 const PaymentHeadCells = [
@@ -172,7 +173,7 @@ class UserDetail extends Component {
       filteredList: [],
       selectedRow: [],
       payment: "",
-      selectedindex: "",
+      selectedindex: [],
       isOnEditMode: false,
       AddModalOpen: false,
       PieChartData: [],
@@ -201,6 +202,9 @@ class UserDetail extends Component {
       userDeliveryOnSubKG: "",
       userDeliveryOnSubKGValidated: null,
       PaymentMethod: '',
+      TransactionID: [],
+      ReferenceNo: '',
+      Datetime: '',
       // userDeliveryOnSubKG: "",
       // userDeliveryOnSubKGValidated: null,
 
@@ -215,16 +219,21 @@ class UserDetail extends Component {
       passwordValidated: null,
       deleteManagerOpen: false,
 
+      enableCheckbox: false,
+      totalDebt: 0
     }
     this.onTextFieldOnChange = this.onTextFieldOnChange.bind(this)
     this.toggleEditMode = this.toggleEditMode.bind(this)
     this.handleInputChange = this.handleInputChange.bind(this)
     this.onSubmitUpdateUser = this.onSubmitUpdateUser.bind(this)
     this.handleOnDelete = this.handleOnDelete.bind(this)
-    this.props.CallUserProfileByID(this.state)
+    this.handlePaymentCategoryCategory = this.handlePaymentCategoryCategory.bind(this)
+    this.onSelectRow = this.onSelectRow.bind(this)
+    this.onSelectAllRow = this.onSelectAllRow.bind(this)
   }
 
   componentDidMount() {
+    this.props.CallUserProfileByID(this.state)
     if (this.props.userProfile.length !== this.state.UserProfile.length) {
       if (typeof this.props.userProfile !== "undefined" && typeof this.props.userProfile[0] !== "undefined") {
         let piechart_data = (isArrayNotEmpty(this.props.userProfile)) ? [
@@ -265,7 +274,7 @@ class UserDetail extends Component {
           // userAccountNameValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].Username)) ? true : false,
 
           Transaction: JSON.parse(this.props.userProfile[0].Transaction),
-          filteredList: JSON.parse(this.props.userProfile[0].Transaction),
+          filteredList: JSON.parse(this.props.userProfile[0].Transaction), //console.log(this.state.filteredList)
           PieChartData: piechart_data,
           isPieChartNoData: (piechart_data[0].value === 0 && piechart_data[0].value === 0),
           Payment: (isStringNullOrEmpty(this.props.userProfile[0].Payment)) ? [] : JSON.parse(this.props.userProfile[0].Payment)
@@ -289,7 +298,7 @@ class UserDetail extends Component {
       filteredList: [],
       selectedRow: [],
       payment: "",
-      selectedindex: "",
+      selectedindex: [],
       isOnEditMode: false,
       AddModalOpen: false,
       PieChartData: [],
@@ -438,11 +447,64 @@ class UserDetail extends Component {
 
     }
 
-    // console.log(prevProps.transactionReturn[0])
-    // console.log(this.props.transactionReturn[0])
-    // if (prevProps.transactionReturn !== this.props.transactionReturn) {
+    if (prevProps.transactionReturn !== this.props.transactionReturn) {
 
-    // }
+      this.props.CallResetUserProfile()
+      this.props.CallUserProfileByID(this.state)
+
+      if (this.props.transactionReturn && this.props.transactionReturn[0].ReturnVal === 1) {
+        if (typeof this.props.userProfile !== "undefined" && typeof this.props.userProfile[0] !== "undefined") {
+          console.log(JSON.parse(this.props.userProfile[0].Transaction))
+          let filteredList = JSON.parse(this.props.userProfile[0].Transaction).filter(x => x.OrderStatus === "Unpaid")
+          console.log(filteredList)
+          toast.success("Invoice has been updated successfully", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
+          this.setState({ AddModalOpen: false, filteredList: filteredList })
+        }
+      } else toast.error("Update failed, please check your internet connection and input", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
+    }
+  }
+
+  onSelectRow(row, i) {
+    var totalDebt = 0;
+    var sorted = []
+    if (isArrayNotEmpty(row)) {
+      sorted = [...row].sort((a, b) =>
+        parseInt(a.TransactionID) - parseInt(b.TransactionID)
+      );
+    }
+
+    if (this.state.selectedindex.indexOf(i) === -1) {
+      this.state.selectedindex.push(i)
+
+    } else {
+      this.setState({ selectedindex: this.state.selectedindex.filter(index => index !== i) })
+    }
+    if (isArrayNotEmpty(sorted)) {
+      sorted.map(el => {
+        var debt = el.OrderTotalAmount - el.OrderPaidAmount
+        totalDebt += debt
+        return (totalDebt)
+      })
+    }
+    this.setState({ selectedRow: sorted, totalDebt: totalDebt.toFixed(2) })
+  }
+
+  onSelectAllRow(rows) {
+    var index = []
+    if (isArrayNotEmpty(rows)) {
+      for (var x = 0; x < rows.length; x++) {
+        index.push(x)
+      }
+      this.setState({ selectedRow: rows, selectedindex: index })
+    }
+  }
+
+  renderTableActionButton = () => {
+    return (
+      <IconButton onClick={(event) => { this.onAddButtonClick(event, this.state.selectedRow, this.state.selectedindex) }}>
+        <PaidIcon color="error" />
+      </IconButton>
+    )
   }
 
   onTextFieldOnChange = (e) => {
@@ -560,6 +622,24 @@ class UserDetail extends Component {
           })
         }
         break;
+
+      case "date":
+        this.setState({ Datetime: e.target.value })
+        break;
+
+      case "reference":
+        this.setState({ ReferenceNo: e.target.value })
+        if (e.target.value === "") {
+          this.setState({
+            isReferenceValid: true
+          })
+        } else {
+          this.setState({
+            isReferenceValid: false
+          })
+        }
+        break;
+
       default:
         break;
     }
@@ -567,6 +647,10 @@ class UserDetail extends Component {
 
   onDateChange(e) {
     this.setState({ Datetime: e })
+  }
+
+  handlePaymentCategoryCategory(e) {
+    this.setState({ PaymentMethod: e.target.value })
   }
 
   onSubmitUpdateUser = () => {
@@ -651,18 +735,84 @@ class UserDetail extends Component {
     }
   }
 
-  onUpdateTransactionPayment = (event, row) => {
-    this.props.CallUpdateTransactionPayment({ TransactionID: row.TransactionID, PaymentAmmount: this.state.payment })
-    if (this.props.transactionReturn.ReturnVal === 1 || 241) {
-      let filteredList = this.state.filteredList;
-      filteredList[this.state.selectedindex + 1].OrderPaidAmount += parseInt(this.state.payment);
-      if (filteredList[this.state.selectedindex + 1].OrderTotalAmount <= this.state.payment) {
-        filteredList[this.state.selectedindex + 1].OrderStatus = 'Paid'
-        filteredList[this.state.selectedindex + 1].OrderColor = 'green'
+  onUpdateTransactionPayment = async (event, row) => {
+    const { TransactionID, payment, totalDebt, selectedRow, PaymentMethod, ReferenceNo, Datetime } = this.state
+    var TotalPayment = payment
+    var AllTransactionID = TransactionID
+    var pays = [];
+    var pay = []
+    if (isArrayNotEmpty(selectedRow)) {
+      selectedRow.map(el => {
+        AllTransactionID.push(el.TransactionID)
+        pays.push(el.OrderTotalAmount - el.OrderPaidAmount)
+        return AllTransactionID
+      })
+    }
+
+    if (payment === totalDebt) {
+      pay = pays
+      console.log('equal')
+    } else if (payment > totalDebt) {
+      console.log('more')
+      var count = 0
+      pays.map(el => {
+
+        if ((TotalPayment - el) >= 0) {
+          console.log('1 yes')
+          if (count <= pays.length - 2) {
+            pay.push(Number(el));
+            // console.log('count', count, '+pays', pays.length - 2)
+          } else {
+            pay.push(Number(TotalPayment));
+            console.log(Number(TotalPayment))
+          }
+        } else if (TotalPayment - el < 0 && TotalPayment > 0) {
+          pay.push(Number(TotalPayment))
+        } else pay.push(0)
+
+        TotalPayment -= el
+        count += 1
+        TotalPayment = roundOffTotal(TotalPayment)
+        return (pay)
+      })
+
+    } else if (payment < totalDebt) {
+      console.log('less')
+      pays.map(el => {
+        if ((TotalPayment - el) >= 0) {
+          pay.push(el);
+        } else if (TotalPayment - el < 0 && TotalPayment > 0) {
+
+          pay.push(Number(TotalPayment))
+
+        } else pay.push(0)
+
+        TotalPayment -= el
+        TotalPayment = roundOffTotal(TotalPayment)
+        return (pay)
+      })
+
+      //need to calculate which one to pay
+    } else console.log("no payment")
+
+
+    if (pay.length === AllTransactionID.length) {
+      AllTransactionID = AllTransactionID.join(';')
+      pay = pay.join(';')
+      let object = {
+        TransactionID: AllTransactionID,
+        PaymentAmmount: pay,
+        PaymentMethod: PaymentMethod,
+        ReferenceNo: ReferenceNo,
+        Datetime: convertDateTimeToString112Format(Datetime),
       }
-      toast.success("Invoice No. " + filteredList[this.state.selectedindex + 1].TransactionName + " has been updated successfully", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
-      this.setState({ AddModalOpen: false, filteredList: filteredList })
-    } else toast.error("Update failed, please check your internet connection and input", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
+      this.props.CallUpdateTransactionPayment(object)
+    } else {
+      console.log('Error occured. Please choose the transaction and key in correct payment');
+      console.log(AllTransactionID.length);
+      console.log(pay.length)
+    }
+
   }
 
 
@@ -689,9 +839,9 @@ class UserDetail extends Component {
         <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderTotalAmount}</Box></TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
-        {
+        {/* {
           data.OrderStatus === "Unpaid" && <TableCell onClick={(event) => this.onAddButtonClick(event, data, index)} align="center"><CheckCircleIcon color="grey" sx={{ fontSize: 30 }}></CheckCircleIcon></TableCell>
-        }
+        } */}
       </>
     )
   }
@@ -704,13 +854,6 @@ class UserDetail extends Component {
         <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.PaymentAmount}</TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.PaymentDatetime}</TableCell>
       </>
-    )
-  }
-
-  renderTableActionButton = () => {
-    return (
-      <div className="d-flex">
-      </div>
     )
   }
 
@@ -730,17 +873,20 @@ class UserDetail extends Component {
     switch (key) {
       case "All":
         this.setState({
-          filteredList: this.state.Transaction
+          filteredList: this.state.Transaction,
+          enableCheckbox: false
         })
         break;
       case "Unpaid":
         this.setState({
-          filteredList: this.state.Transaction.filter(x => x.OrderStatus === "Unpaid")
+          filteredList: this.state.Transaction.filter(x => x.OrderStatus === "Unpaid"),
+          enableCheckbox: true
         })
         break;
       case "Paid":
         this.setState({
-          filteredList: this.state.Transaction.filter(x => x.OrderStatus === "Paid")
+          filteredList: this.state.Transaction.filter(x => x.OrderStatus === "Paid"),
+          enableCheckbox: false
         })
         break;
       default:
@@ -771,7 +917,7 @@ class UserDetail extends Component {
 
     const renderAreaCodeName = (areaId) => {
       if (isArrayNotEmpty(this.props.userAreaCode)) {
-        let selectedArea = this.props.userAreaCode.filter(x => x.UserAreaID == areaId)
+        let selectedArea = this.props.userAreaCode.filter(x => x.UserAreaID === areaId)
         return selectedArea.length > 0 ? selectedArea[0].AreaCode + " - " + selectedArea[0].AreaName : "Nil"
       }
       else
@@ -1198,7 +1344,7 @@ class UserDetail extends Component {
           <ToggleTabsComponent Tabs={ToggleTabs} size="small" onChange={this.changeTab} />
           <TableComponents
             tableTopLeft={<h3 style={{ fontWeight: 700 }}>History Transaction</h3>}
-            tableTopRight={this.renderTableActionButton}
+            tableTopRight={this.state.enableCheckbox ? this.renderTableActionButton() : ""}
             tableOptions={{
               dense: false,
               tableOrderBy: 'asc',
@@ -1210,11 +1356,14 @@ class UserDetail extends Component {
             tableHeaders={headCells}
             tableRows={{
               renderTableRows: this.renderTableRows,
-              checkbox: false,
+              checkbox: this.state.enableCheckbox,
               checkboxColor: "primary",
               onRowClickSelect: false,
               headerColor: 'rgb(200, 200, 200)'
             }}
+            onSelectRow={this.onSelectRow}
+            onSelectAllClick={this.onSelectAllRow}
+            actionIcon={this.state.enableCheckbox ? this.renderTableActionButton() : ""}
             selectedIndexKey={"pid"}
             Data={this.state.filteredList}
           />
@@ -1229,23 +1378,40 @@ class UserDetail extends Component {
             BackdropComponent={Backdrop}
             BackdropProps={{ timeout: 500 }}
           >
+            {/* {console.log(this.state.selectedRow)} */}
             <Box sx={style} component="main" maxWidth="xs">
               <Typography component="h1" variant="h5">Update Payment</Typography>
 
               <Box noValidate sx={{ mt: 3 }}>
                 <div className="row my-2">
-                  <Box className="col-12">
-                    <div className="clearfix">
-                      <div className="float-start">
-                        Trans. No: <b>{this.state.selectedRow.TransactionName}</b>
-                      </div>
-                      <div className="float-end">
-                        Unpaid(RM): <b className="text-danger" style={{ fontSize: '14pt', marginRight: 15 }}>{this.state.selectedRow.OrderTotalAmount}</b>
-                        Paid(RM): <b className="text-success" style={{ fontSize: '14pt' }}>{this.state.selectedRow.OrderPaidAmount}</b>
-                      </div>
+                  {this.state.selectedRow ?
+                    <div>
+                      {this.state.selectedRow.map((el, index) => {
+                        return (
+                          <Box className="col-12" key={index}>
+                            <div className="clearfix">
+                              <div className="float-start">
+                                Trans. No: <b>{el.TransactionName}</b>
+                              </div>
+                              <div className="float-end">
+                                Unpaid(RM): <b className="text-danger" style={{ fontSize: '14pt', marginRight: 15 }}>{el.OrderTotalAmount}</b>
+                                Paid(RM): <b className="text-success" style={{ fontSize: '14pt' }}>{el.OrderPaidAmount}</b>
+                              </div>
+                            </div>
+                          </Box>
+                        )
+                      })}
+                      <hr />
+                      <Box className="col-12" >
+                        <div className="clearfix">
+                          <div className="float-end">
+                            Total to Pay(RM): <b className="text-danger" style={{ fontSize: '14pt', marginRight: 15 }}>{this.state.totalDebt}</b>
+                          </div>
+                        </div>
+                      </Box>
                     </div>
-                  </Box>
-                  <hr />
+                    : ""}
+
                 </div>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={12}>
@@ -1312,7 +1478,7 @@ class UserDetail extends Component {
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
                   onClick={() => this.onUpdateTransactionPayment()}
-                  disabled={this.state.Payment === "" || this.state.ReferenceNo === ""}
+                  disabled={this.state.Payment === "" || this.state.ReferenceNo === "" || this.state.Datetime === "" || this.state.PaymentMethod === ""}
                 >
                   Update Payment
                 </Button>
