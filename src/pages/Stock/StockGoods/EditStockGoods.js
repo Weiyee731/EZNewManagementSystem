@@ -2,14 +2,9 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { GitAction } from "../../../store/action/gitAction";
 import { withRouter } from "react-router";
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import IconButton from '@mui/material/IconButton';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
@@ -19,7 +14,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { isArrayNotEmpty, isStringNullOrEmpty, extractNumberFromStrings, isObjectUndefinedOrNull } from "../../../tools/Helpers";
+import { isArrayNotEmpty, isStringNullOrEmpty, isObjectUndefinedOrNull } from "../../../tools/Helpers";
 
 function mapStateToProps(state) {
     return {

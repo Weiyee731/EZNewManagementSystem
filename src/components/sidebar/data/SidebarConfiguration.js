@@ -31,8 +31,6 @@
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
-import AllInboxIcon from '@mui/icons-material/AllInbox';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -40,22 +38,21 @@ import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import ReceiptIcon from '@mui/icons-material/Receipt';
-import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FeedIcon from '@mui/icons-material/Feed';
 
 const sidebar_items = [
-    { icon: <DashboardIcon />},
-    { icon: <AssignmentIndIcon />},
-    { icon: <IndeterminateCheckBoxIcon />},
-    { icon: <InsertDriveFileIcon />},
+    { icon: <DashboardIcon /> },
+    { icon: <AssignmentIndIcon /> },
+    { icon: <IndeterminateCheckBoxIcon /> },
+    { icon: <InsertDriveFileIcon /> },
     { icon: <ReceiptLongIcon /> },
     { icon: <DescriptionIcon /> },
     { icon: <LocalAtmIcon /> },
     { icon: <FileUploadIcon /> },
     { icon: <AccountBalanceIcon /> },
     { icon: <PaymentsIcon /> },
-    { icon: <ReceiptIcon />},
+    { icon: <ReceiptIcon /> },
     { icon: <FeedIcon /> },
 ]
 

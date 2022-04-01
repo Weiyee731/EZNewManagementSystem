@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Aside from './Aside';
 import Main from './Main';
 import { isUserLogon, getSidebaritems } from "../auth/AuthManagement";
