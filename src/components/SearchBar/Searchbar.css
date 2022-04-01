@@ -4,6 +4,7 @@
 
 .searchbar-input fieldset {
     top: 0;
+    padding: 0px 2px;
 }
 
 /* the border radius are corelevant with each other */

@@ -195,6 +195,7 @@ class DataManagement extends Component {
                 }
             }
 
+
             let object = {
                 USERCODE: Member,
                 TRACKINGNUMBER: TrackingNo,
@@ -211,6 +212,8 @@ class DataManagement extends Component {
                 CONTAINERNAME: ContainerName,
                 CONTAINERDATE: convertDateTimeToString112Format(ContainerDate)
             }
+
+            console.log(object)
 
             if (ContainerNameValidated === false || ContainerNameValidated === null || ContainerDateValidated === false) {
                 this.setState({ ContainerNameValidated: false })

@@ -260,6 +260,23 @@ export class GitEpic {
 
   Inventory_UpdateStockDetailByGet = action$ =>
     action$.ofType(GitAction.UpdateStockDetailByGet).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Inventory_UpdateStockDetail?" +
+        "STOCKID=" + payload.STOCKID +
+        "&USERCODE=" + payload.USERCODE +
+        "&TRACKINGNUMBER=" + payload.TRACKINGNUMBER +
+        "&PRODUCTWEIGHT=" + payload.PRODUCTWEIGHT +
+        "&PRODUCTHEIGHT=" + payload.PRODUCTHEIGHT +
+        "&PRODUCTWIDTH=" + payload.PRODUCTWIDTH +
+        "&PRODUCTDEEP=" + payload.PRODUCTDEEP +
+        "&AREACODE=" + payload.AREACODE +
+        "&ITEM=" + payload.ITEM +
+        "&TRACKINGSTATUSID=" + payload.TRACKINGSTATUSID +
+        "&CONTAINERNAME=" + payload.CONTAINERNAME +
+        "&CONTAINERDATE=" + payload.CONTAINERDATE +
+        "&REMARK=" + payload.REMARK +
+        "&EXTRACHARGE=" + payload.EXTRACHARGE
+      );
       try {
         const response = await fetch(url +
           "Inventory_UpdateStockDetail?" +
@@ -447,6 +464,7 @@ export class GitEpic {
 
         let json = await response.json();
         json = JSON.parse(json)
+        console.log(json)
         return {
           type: GitAction.GotFilteredInventoryByDate,
           payload: json,
