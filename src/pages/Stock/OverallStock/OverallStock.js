@@ -1259,7 +1259,6 @@ class OverallStock extends Component {
 
         />
 
-        {console.log('valid', validateForm)}
         <AlertDialog
           open={this.state.openAddChrgModal} // required, pass the boolean whether modal is open or close
           handleToggleDialog={this.handleAddChrgModal} // required, pass the toggle function of modal
