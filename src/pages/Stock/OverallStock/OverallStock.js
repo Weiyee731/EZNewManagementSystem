@@ -1011,6 +1011,13 @@ class OverallStock extends Component {
       { children: "Checked", key: "Checked" },
     ]
 
+    const validateForm = this.state.formValue.TrackingNumberVerified &&
+      this.state.formValue.MemberNumberVerified &&
+      this.state.formValue.DepthVerified &&
+      this.state.formValue.WidthVerified &&
+      this.state.formValue.HeightVerified &&
+      this.state.formValue.WeightVerified
+
     const { filteredList, formValue, searchCategory, searchArea } = this.state
     const renderTableTopRightButtons = () => {
       return (
@@ -1252,6 +1259,7 @@ class OverallStock extends Component {
 
         />
 
+        {console.log('valid', validateForm)}
         <AlertDialog
           open={this.state.openAddChrgModal} // required, pass the boolean whether modal is open or close
           handleToggleDialog={this.handleAddChrgModal} // required, pass the toggle function of modal
@@ -1259,6 +1267,7 @@ class OverallStock extends Component {
           showAction={true} // required, to show the footer of modal display
           title={this.state.formValue.Item} // required, title of the modal
           buttonTitle={"Update"} // required, title of button
+          buttonDisabled={!validateForm}
           singleButton={true} // required, to decide whether to show a single full width button or 2 buttons
           maxWidth={"md"}
           draggable={true}
