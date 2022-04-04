@@ -413,6 +413,7 @@ export class GitEpic {
         .then(json => {
           if (json !== "fail") {
             json = json;
+            console.log(json)
           } else {
             json = [];
           }
@@ -421,7 +422,13 @@ export class GitEpic {
             payload: json,
           };
         })
-        .catch(error => toast.error("Error code: 8003"));
+        .catch(error => {
+          toast.error("Error code: 8003")
+          return {
+            type: GitAction.StockInsertedByPost,
+            payload: [],
+          };
+        });
     });
 
   Inventory_GetFilteredStockList = action$ =>

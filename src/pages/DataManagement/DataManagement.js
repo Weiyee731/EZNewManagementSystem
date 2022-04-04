@@ -63,14 +63,22 @@ class DataManagement extends Component {
     }
 
     componentDidMount() {
-
     }
 
     componentDidUpdate(prevProps, prevState) {
+        console.log(this.state.ContainerDate)
+
         if (isArrayNotEmpty(this.props.stockApproval)) {
-            this.props.CallResetUpdatedStockDetail()
-            toast.success("Data is uploaded successfully", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark", onClose: () => this.props.history.push('/StockGoods') })
-            this.setState(INITIAL_STATE)
+            console.log(this.props.stockApproval)
+            if (this.props.stockApproval[0].ReturnVal == 0) {
+                this.props.CallResetUpdatedStockDetail()
+                toast.error(this.props.stockApproval[0].ReturnMsg, { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark", onClose: () => { this.setState(INITIAL_STATE) } })
+            }
+            else {
+                this.props.CallResetUpdatedStockDetail()
+                toast.success("Data is uploaded successfully", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark", onClose: () => this.props.history.push('/StockGoods') })
+                this.setState(INITIAL_STATE)
+            }
         }
     }
 
