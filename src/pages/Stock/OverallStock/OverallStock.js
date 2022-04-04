@@ -433,7 +433,7 @@ class OverallStock extends Component {
     if (this.state.approvePage === true) {
       //only show those stock which is not created performa invoice status
       this.setState({
-        filteredList: this.props.stocks.filter((x) => x.TrackingStatusID != 3),
+        filteredList: this.props.stocks.filter((x) => x.TrackingStatusID !== 3),
       })
     } else {
       //show all stock history if overall stock

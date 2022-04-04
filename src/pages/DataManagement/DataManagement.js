@@ -213,7 +213,7 @@ class DataManagement extends Component {
                 CONTAINERDATE: convertDateTimeToString112Format(ContainerDate)
             }
 
-            console.log(object)
+
 
             if (ContainerNameValidated === false || ContainerNameValidated === null || ContainerDateValidated === false) {
                 this.setState({ ContainerNameValidated: false })
