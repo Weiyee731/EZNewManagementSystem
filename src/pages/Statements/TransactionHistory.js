@@ -158,7 +158,6 @@ class TransactionHistory extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(this.props.transactions)
         if (prevProps.transactions !== this.props.transactions) {
             if (this.props.transactions !== undefined && this.props.transactions[0] !== undefined) {
                 this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
@@ -517,7 +516,6 @@ class TransactionHistory extends Component {
                         </div>
                     </div>
                     <ToggleTabsComponent Tabs={ToggleTabs} size="small" onChange={this.changeTab} />
-                    {console.log(this.state.TransactionListingFiltered)}
                     <TableComponents
                         // table settings 
                         tableTopLeft={<h3 style={{ fontWeight: 700 }}>Transaction History</h3>}  // optional, it can pass as string or as children elements

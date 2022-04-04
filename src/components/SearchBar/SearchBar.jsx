@@ -1,11 +1,9 @@
 import React, { useEffect } from "react"
-import Box from "@mui/material/Box"
 import TextField from "@mui/material/TextField"
 import InputAdornment from "@mui/material/InputAdornment"
 import IconButton from "@mui/material/IconButton"
 import SearchIcon from "@mui/icons-material/Search"
 import {
-  isObjectUndefinedOrNull,
   isStringNullOrEmpty,
 } from "../../tools/Helpers"
 import Tooltip from "@mui/material/Tooltip"
@@ -38,7 +36,7 @@ const SearchBox = (props) => {
       }
       onKeyDown={(e) =>
         (e.key === "Enter" || e.keyCode === 13) &&
-        typeof props.onChange === "function"
+          typeof props.onChange === "function"
           ? props.onChange(e)
           : {}
       }
@@ -65,7 +63,7 @@ const SearchBox = (props) => {
                 }
                 disabled={
                   typeof props.disableButton !== "undefined" &&
-                  typeof props.disableButton === "boolean"
+                    typeof props.disableButton === "boolean"
                     ? props.disableButton
                     : false
                 }

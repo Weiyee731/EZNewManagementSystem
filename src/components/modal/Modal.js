@@ -73,6 +73,7 @@ export default function AlertDialog(props) {
               onClick={() => props.handleConfirmFunc()}
               variant='contained'
               fullWidth
+              disabled={props.buttonDisabled}
             >
               {props.buttonTitle}
             </Button>

@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { GitAction } from "../../../store/action/gitAction";
 import { withRouter } from "react-router";
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -11,26 +10,20 @@ import TextField from '@mui/material/TextField';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import IconButton from '@mui/material/IconButton';
 import TableCell from '@mui/material/TableCell';
-import Tooltip from '@mui/material/Tooltip';
-import AddIcon from '@mui/icons-material/Add';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Backdrop from '@mui/material/Backdrop';
 import TableComponents from "../../../components/TableComponents/TableComponents"
-import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUndefinedOrNull, volumeCalc, roundOffTotal, splitArray, round } from "../../../tools/Helpers";
+import { isArrayNotEmpty, isStringNullOrEmpty, volumeCalc, roundOffTotal, splitArray } from "../../../tools/Helpers";
 import PrintIcon from '@mui/icons-material/Print';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/Input';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import ReactToPrint, { useReactToPrint } from "react-to-print";
-import TableRow from '@mui/material/TableRow';
-import te from "date-fns/esm/locale/te/index.js";
+import ReactToPrint from "react-to-print";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 function mapStateToProps(state) {
@@ -416,7 +409,7 @@ class InvoiceDetail extends Component {
             {this.state.isPrinting ?
               <TableCell align="left" sx={{ fontSize: fontsize }}>
                 {data.handlingCharge !== 0 && data.handlingCharge !== undefined ? parseFloat(data.handlingCharge).toFixed(2) : "-"}
-          
+
                 {data.TransactionDetailCharges !== undefined && data.TransactionDetailCharges !== "[]" ? JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
                   return (
                     <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>

@@ -5,7 +5,6 @@ import { withRouter } from 'react-router'
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import AddIcon from '@mui/icons-material/Add';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Modal from '@mui/material/Modal';
@@ -19,16 +18,12 @@ import Backdrop from '@mui/material/Backdrop';
 import CsvDownloader from 'react-csv-downloader';
 import { getWindowDimensions, isArrayNotEmpty, isStringNullOrEmpty, convertDateTimeToString112Format } from "../../../tools/Helpers";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import DateTimePicker from '@mui/lab/DateTimePicker';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import ResponsiveDatePickers from '../../../components/datePicker/datePicker';
 import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents";
 import TableComponents from "../../../components/TableComponents/TableComponents"
 import SearchBar from "../../../components/SearchBar/SearchBar"
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
-import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
+import { toast, Flip } from 'react-toastify';
 import "./ArchivedTransaction.css";
 
 function mapStateToProps(state) {

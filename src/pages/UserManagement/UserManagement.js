@@ -6,15 +6,11 @@ import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
-import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TableComponents from "../../components/TableComponents/TableComponents"
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import Backdrop from '@mui/material/Backdrop';
-import DeleteIcon from '@mui/icons-material/Delete';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
@@ -22,7 +18,7 @@ import MenuItem from '@mui/material/MenuItem';
 import SearchBar from "../../components/SearchBar/SearchBar"
 import AlertDialog from "../../components/modal/Modal";
 import { ModalPopOut } from "../../components/modal/Modal";
-import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
+import { toast, Flip } from 'react-toastify';
 import CsvDownloader from 'react-csv-downloader';
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
@@ -30,7 +26,7 @@ import PublishIcon from '@mui/icons-material/Publish';
 import ReportIcon from '@mui/icons-material/Report';
 import Dropzone from "../../components/Dropzone/Dropzone"
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty, convertDateTimeToString112Format, extractNumberFromStrings } from "../../tools/Helpers";
+import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty } from "../../tools/Helpers";
 import * as XLSX from 'xlsx';
 
 const style = {
@@ -191,7 +187,7 @@ class UserManagement extends Component {
         // }
 
         if (isArrayNotEmpty(this.props.userManagementApproval)) {
-            if (this.props.userManagementApproval[0].ReturnVal == 1) {
+            if (this.props.userManagementApproval[0].ReturnVal === 1) {
                 this.props.CallResetUserApprovalReturn()
                 toast.success("Data is uploaded successfully", { autoClose: 3000, position: "top-center", transition: Flip, theme: "dark" })
                 this.props.CallUserProfile();
@@ -423,16 +419,6 @@ class UserManagement extends Component {
         this.setState({ selectedRows: item })
     }
 
-    renderTableActionButton = () => {
-        return (
-            <div className="d-flex">
-                {/* <IconButton onClick={(event) => { this.onDeleteButtonClick() }}>
-                    <DeleteIcon color="error" />
-                </IconButton> */}
-            </div>
-        )
-    }
-
     // dropzone -- START
     uploadHandler = (files) => {
         if (isArrayNotEmpty(files)) {
@@ -469,9 +455,9 @@ class UserManagement extends Component {
                 for (let j = 0; j < headers.length; j++) {
                     let d = row[j];
                     if (d.length > 0) {
-                        if (d[0] == '"')
+                        if (d[0] === '"')
                             d = d.substring(1, d.length - 1);
-                        if (d[d.length - 1] == '"')
+                        if (d[d.length - 1] === '"')
                             d = d.substring(d.length - 2, 1);
                     }
                     if (headers[j])
