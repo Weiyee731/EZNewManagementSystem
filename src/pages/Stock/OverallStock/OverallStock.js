@@ -107,7 +107,7 @@ const headCells = [
   },
   {
     id: "UserCode",
-    align: "left",
+    align: "center",
     disablePadding: false,
     label: "Member",
   },
@@ -162,6 +162,7 @@ const INITIAL_STATE = {
     Item: "",
     TrackingStatusID: "",
     ContainerName: "",
+    ContainerDate:"",
     StockDate: "",
 
     TrackingNumber: "",
@@ -221,6 +222,7 @@ class OverallStock extends Component {
     this.onDateChange = this.onDateChange.bind(this)
     // this.onFetchLatestData = this.onFetchLatestData.bind(this)
     this.handleCancel = this.handleCancel.bind(this)
+    // this.onAddButtonClick = onAddButtonClick.bind(this)
     this.onDatabaseSearch = this.onDatabaseSearch.bind(this)
     this.handleSearchfilter = this.handleSearchfilter.bind(this)
     this.onBulkVerifyItems = this.onBulkVerifyItems.bind(this)
@@ -352,13 +354,13 @@ class OverallStock extends Component {
         <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {!isNaN(data.ProductDimensionHeight) ? data.ProductDimensionHeight.toFixed(1) : 0} </TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {((data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight) / 1000000).toFixed(3)} </TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.Item}</TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.UserCode}  </TableCell>
+        <TableCell align="center" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.UserCode} {data.UserID && data.UserID ?'': <div><span style={{color:"red"}}>The user was not register in the system</span></div>} </TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.AreaCode + " - " + data.AreaName} </TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.StockDate} </TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.PackagingDate} </TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.ContainerName}   </TableCell>
         <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {!isStringNullOrEmpty(data.AdditionalCharges) && renderAdditionalCost(data.AdditionalCharges)}  </TableCell>
-        <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.Remark} </TableCell>
+        <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.Remark}</TableCell>
         {
           this.state.approvePage && data.TrackingStatusID === 1 ?
             (
@@ -374,11 +376,14 @@ class OverallStock extends Component {
   }
 
   onTableRowClick = (event, row) => {
+    console.log("wwww2222")
+    console.log(row)
     let tempFormValue = this.state.formValue
     tempFormValue.StockID = row.StockID
     tempFormValue.Item = row.Item
     tempFormValue.TrackingStatusID = row.TrackingStatusID
-    tempFormValue.ContainerName = row.ContainerName
+    tempFormValue.ContainerName = row.EstimatedContainerName
+    tempFormValue.ContainerDate = row.EstimatedContainerDate
     tempFormValue.StockDate = row.StockDate
     tempFormValue.TrackingNumber = row.TrackingNumber
     tempFormValue.TrackingNumberVerified = !isStringNullOrEmpty(row.TrackingNumber)
@@ -471,7 +476,7 @@ class OverallStock extends Component {
       ITEM: isStringNullOrEmpty(formValue.Item) ? "-" : formValue.Item,
       TRACKINGSTATUSID: formValue.TrackingStatusID,
       CONTAINERNAME: !isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : "-",
-      CONTAINERDATE: !isStringNullOrEmpty(formValue.StockDate) ? formValue.StockDate : "-",
+      CONTAINERDATE: !isStringNullOrEmpty(formValue.ContainerDate) ? formValue.ContainerDate : "-",
       REMARK: !isStringNullOrEmpty(formValue.Remark) ? formValue.Remark : "-",
       EXTRACHARGE: extraChangesValue,
     }
@@ -509,17 +514,18 @@ class OverallStock extends Component {
           AreaCode: object.AREACODE,
           UserCode: object.USERCODE,
           Item: object.ITEM,
-          TRACKINGSTATUSID: object.TRACKINGSTATUSID,
+          TRACKINGSTATUSID: 2,
           ContainerName: object.CONTAINERNAME,
           ContainerDate: object.CONTAINERDATE,
           Remark: object.REMARK,
           AdditionalCharges: object.EXTRACHARGE,
         }
         console.log(postObject)
-
+        this.props.CallUpdateStockDetailByPost(postObject)
       }
       else {
         // if this is the overall stock page
+        alert("ww")
         this.props.CallUpdateStockDetailByGet(object)
       }
 
@@ -1258,7 +1264,8 @@ class OverallStock extends Component {
           CallResetSelected={this.state.CallResetSelected}
 
         />
-
+        {console.log("www")}
+        {console.log(formValue)}
         <AlertDialog
           open={this.state.openAddChrgModal} // required, pass the boolean whether modal is open or close
           handleToggleDialog={this.handleAddChrgModal} // required, pass the toggle function of modal
@@ -1276,12 +1283,12 @@ class OverallStock extends Component {
               <div className="col-12" style={{ fontSize: "9pt" }}>
                 <div className="clearfix">
                   <div className="float-start">
-                    <b>Container: </b>
+                    <b>Expected Container: </b>
                     {!isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : " N/A "}
                   </div>
                   <div className="float-end">
-                    <b>Container Date: </b>
-                    {!isStringNullOrEmpty(formValue.StockDate) ? formValue.StockDate : " N/A "}
+                    <b>Expected Container Date: </b>
+                    {!isStringNullOrEmpty(formValue.ContainerDate) ? formValue.ContainerDate : " N/A "}
                   </div>
                 </div>
                 <hr />

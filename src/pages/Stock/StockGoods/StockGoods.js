@@ -483,6 +483,7 @@ class StockGoods extends Component {
           sx={{ fontSize: fontsize }}
         >
           {data.UserCode}
+          
         </TableCell>
         <TableCell
           style={{ backgroundColor: color, color: fontcolor }}

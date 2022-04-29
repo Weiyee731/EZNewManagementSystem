@@ -233,8 +233,10 @@ class InvoiceDetail extends Component {
     if (prevProps.transaction !== this.props.transaction) {
       if (isArrayNotEmpty(this.props.transaction)) {
         let tempArr = []
-
+        console.log(this.props.transaction[0].TransactionDetail)
         !isStringNullOrEmpty(this.props.transaction[0].TransactionDetail) && JSON.parse(this.props.transaction[0].TransactionDetail).map((item) => {
+          console.log(item.AdditionalCharges)
+          console.log(item.AdditionalCharges && item.AdditionalCharges ? item.AdditionalCharges.split(';'):"")
           tempArr.push({
             ...item,
             handlingCharge: 0,
@@ -421,6 +423,7 @@ class InvoiceDetail extends Component {
               </TableCell>
               :
               <TableCell align="left" sx={{ fontSize: fontsize }}>
+                {console.log(data)}
                 {
                   data.Description === "Delivery Fee" || data.Description === undefined ? "" :
                     <>
@@ -429,6 +432,7 @@ class InvoiceDetail extends Component {
                         label=""
                         size="small"
                         name="handlingCharge"
+                        value={this.state.TransactionDetail[index].handlingCharge}
                         type={'number'}
                         inputProps={{
                           style: {
