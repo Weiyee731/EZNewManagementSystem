@@ -25,17 +25,25 @@ import { isArrayNotEmpty, isStringNullOrEmpty, getWindowDimensions, isObjectUnde
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import { toast, Flip } from "react-toastify";
 import { Tooltip } from "@mui/material";
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
 
 function mapStateToProps(state) {
     return {
         stocks: state.counterReducer["stocks"],
         userAreaCode: state.counterReducer["userAreaCode"],
         transactionReturn: state.counterReducer["transactionReturn"],
+        user: state.counterReducer["user"],
+        userAreaCode: state.counterReducer["userAreaCode"],
+        userManagementApproval: state.counterReducer["userManagementApproval"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
+        CallUserProfile: () => dispatch(GitAction.CallUserProfile()),
+        CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
+        CallInsertUserDataByPost: (propData) => dispatch(GitAction.CallInsertUserDataByPost(propData)),
         CallFetchAllStock: (propsData) => dispatch(GitAction.CallFetchAllStock(propsData)),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
         CallCancelTransaction: (propsData) => dispatch(GitAction.CallCancelTransaction(propsData)),
@@ -129,6 +137,7 @@ const INITIAL_STATE = {
     openRemarkModal: false,
     openProformaModal: false,
     openDeliveryModal: false,
+    openAddUsers: false,
     selectedRows: [],
     selectedItems: [],
     selectedProductPrice: [],
@@ -172,7 +181,6 @@ class CreateInvoice extends Component {
 
         this.props.CallFetchAllStock({ TRACKINGSTATUSID: 2 })
         this.props.CallUserAreaCode()
-        this.onAddButtonClick = this.onAddButtonClick.bind(this)
         this.handleRemarkModal = this.handleRemarkModal.bind(this)
         this.handleUpdateRemark = this.handleUpdateRemark.bind(this)
         this.handleFormInput = this.handleFormInput.bind(this)
@@ -263,8 +271,6 @@ class CreateInvoice extends Component {
         })
     }
 
-    onAddButtonClick = () => {
-    }
 
     handleCreateInvoice = () => {
         const { selectedRows } = this.state
@@ -336,9 +342,17 @@ class CreateInvoice extends Component {
     }
 
     handleDeliveryModal = () => {
-        this.setState({
-            openDeliveryModal: !this.state.openDeliveryModal
-        })
+        const { selectedItems, selectedUserID } = this.state
+        console.log(selectedUserID)
+        if (selectedUserID === null || selectedUserID === 0) {
+            this.setState({ openAddUsers: !this.state.openAddUsers })
+        } else {
+            this.setState({ openDeliveryModal: !this.state.openDeliveryModal })
+        }
+    }
+
+    handleAddUsers = () => {
+        this.setState({ openAddUsers: !this.state.openAddUsers })
     }
 
     handleRemarkModal = () => {
@@ -346,6 +360,66 @@ class CreateInvoice extends Component {
     }
 
     handleUpdateRemark = () => {
+    }
+
+    onSubmitNewUser = () => {
+        const { userAreaCode } = this.props
+        const {
+            userCode,
+            userCodeValidated,
+            userAreaId,
+            userAreaIdValidated,
+            userFullname,
+            userFullnameValidated,
+            userContact,
+            userEmail,
+            userAddress,
+            userMinSelfPickup,
+            userMinSelfPickupValidated,
+            userCubicSelfPickup,
+            userCubicSelfPickupValidated,
+            userConslidate,
+            userConslidateValidated,
+            userDeliveryCargo,
+            userDeliveryCargoValidated,
+            userDeliveryOn1stKG,
+            userDeliveryOn1stKGValidated,
+            userDeliveryOnSubKG,
+            userDeliveryOnSubKGValidated,
+        } = this.state
+
+        let selectedAreaCode = userAreaCode.filter(x => x.UserAreaID === userAreaId)
+        let object = {
+            USERCODE: userCode,
+            AREACODE: (selectedAreaCode.length > 0) ? selectedAreaCode[0].AreaCode : "KU",
+            FULLNAME: userFullname,
+            USERCONTACTNO: userContact,
+            USEREMAILADDRESS: userEmail,
+            USERADDRESS: userAddress,
+            MINSELFPICKUPPRICE: userMinSelfPickup,
+            CUBICSELFPICKUPPRICE: userCubicSelfPickup,
+            CONSOLIDATEPRICE: userConslidate,
+            DELIVERYCARGO: userDeliveryCargo,
+            DELIVERYFIRSTPRICE: userDeliveryOn1stKG,
+            DELIVERYSUBPRICE: userDeliveryOnSubKG,
+        }
+
+        const isValidated = (
+            userCodeValidated &&
+            userAreaIdValidated &&
+            userFullnameValidated &&
+            userMinSelfPickupValidated &&
+            userCubicSelfPickupValidated &&
+            userConslidateValidated &&
+            userDeliveryCargoValidated &&
+            userDeliveryOn1stKGValidated &&
+            userDeliveryOnSubKGValidated
+        )
+
+        if (isValidated)
+            this.props.CallInsertUserDataByPost(object)
+        else
+            toast.error("Some of the field is invalid. Please check and resubmit again.", { autoClose: 3000, position: "top-center", theme: 'colored' })
     }
 
     handleFormInput = (e) => {
@@ -626,7 +700,7 @@ class CreateInvoice extends Component {
     }
 
     render() {
-        const { filteredList, formValue, openDeliveryModal, openRemarkModal, searchCategory, searchArea, onSearchText, openCancelModal, } = this.state
+        const { filteredList, formValue, openDeliveryModal, openRemarkModal, searchCategory, searchArea, onSearchText, openCancelModal, openAddUsers } = this.state
         const { userAreaCode, stocks } = this.props
 
         return (
@@ -980,6 +1054,204 @@ class CreateInvoice extends Component {
                             Large Item
                         </Button>
                     </Stack>
+                </AlertDialog>
+
+                <AlertDialog
+                    open={openAddUsers}              // required, pass the boolean whether modal is open or close
+                    handleToggleDialog={this.handleAddUsers}  // required, pass the toggle function of modal
+                    showAction={false}                           // required, to show the footer of modal display
+                    title={"Add New User"}                                  // required, title of the modal
+                    buttonTitle={"Select"}                         // required, title of button
+                    singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
+                    maxWidth={"md"}
+                    fullWidth={false}
+                >
+                    <Box component="form" noValidate sx={{ mt: 3 }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="usercode"
+                                        label="User Code"
+                                        name="usercode"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userCode}
+                                        error={this.state.userCodeValidated !== null && !this.state.userCodeValidated}
+                                        helperText={this.state.userCodeValidated !== null && !this.state.userCodeValidated ? "Required" : ""}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="areaCode">Area Code</InputLabel>
+                                        <Select
+                                            id="areaCode"
+                                            value={this.state.userAreaId}
+                                            label="Area Code"
+                                            name="areaCode"
+                                            required
+                                            placeholder="Select an area code"
+                                            onChange={this.onTextFieldOnChange}
+                                            size="small"
+                                        >
+                                            {
+                                                this.props.userAreaCode.length > 0 && this.props.userAreaCode.map((i, id) => {
+                                                    return (
+                                                        <MenuItem key={id} value={i.UserAreaID} >
+                                                            {i.AreaName} ({i.AreaCode})
+                                                        </MenuItem>
+                                                    )
+                                                })
+                                            }
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} md={12}>
+                                    <TextField
+                                        name="Fullname"
+                                        required
+                                        fullWidth
+                                        id="Fullname"
+                                        label="Fullname"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userFullname}
+                                        error={this.state.userFullnameValidated !== null && !this.state.userFullnameValidated}
+                                        helperText={this.state.userFullnameValidated !== null && !this.state.userFullnameValidated ? "Required" : ""}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        name="Contact"
+                                        fullWidth
+                                        id="Contact"
+                                        label="Contact"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userContact}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
+                                        id="Email"
+                                        label="Email"
+                                        name="Email"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userEmail}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={12}>
+                                    <TextField
+                                        fullWidth
+                                        name="Address"
+                                        label="Address"
+                                        id="Address"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userAddress}
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="MinSelfPickup"
+                                        label="Min Self-Pickup"
+                                        name="MinSelfPickup"
+                                        variant="standard"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userMinSelfPickup}
+                                        error={this.state.userMinSelfPickupValidated !== null && !this.state.userMinSelfPickupValidated}
+                                        helperText={this.state.userMinSelfPickupValidated !== null && !this.state.userMinSelfPickupValidated ? "Required" : ""}
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        name="CubicSelfPickup"
+                                        label="Cubic Self-Pickup"
+                                        id="CubicSelfPickup"
+                                        variant="standard"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userCubicSelfPickup}
+                                        error={this.state.userCubicSelfPickupValidated !== null && !this.state.userCubicSelfPickupValidated}
+                                        helperText={this.state.userCubicSelfPickupValidated !== null && !this.state.userCubicSelfPickupValidated ? "Required" : ""}
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        name="Conslidate"
+                                        label="Conslidate"
+                                        id="Conslidate"
+                                        variant="standard"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userConslidate}
+                                        error={this.state.userConslidateValidated !== null && !this.state.userConslidateValidated}
+                                        helperText={this.state.userConslidateValidated !== null && !this.state.userConslidateValidated ? "Required" : ""}
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="DeliveryCargo"
+                                        label="Delivery Cargo"
+                                        name="DeliveryCargo"
+                                        variant="standard"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userDeliveryCargo}
+                                        error={this.state.userDeliveryCargoValidated !== null && !this.state.userDeliveryCargoValidated}
+                                        helperText={this.state.userDeliveryCargoValidated !== null && !this.state.userDeliveryCargoValidated ? "Required" : "Delivery Cargo"}
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="DeliveryOn1stKG"
+                                        label="Delivery On 1st KG"
+                                        name="DeliveryOn1stKG"
+                                        variant="standard"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userDeliveryOn1stKG}
+                                        error={this.state.userDeliveryOn1stKGValidated !== null && !this.state.userDeliveryOn1stKGValidated}
+                                        helperText={this.state.userDeliveryOn1stKGValidated !== null && !this.state.userDeliveryOn1stKGValidated ? "Required" : "Delivery On 1st KG"}
+                                    />
+                                </Grid>
+                                <Grid item xs={4} md={2}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        name="DeliveryOnSubKG"
+                                        label="Delivery On Sub KG"
+                                        id="DeliveryOnSubKG"
+                                        variant="standard"
+                                        onChange={this.onTextFieldOnChange}
+                                        size="small"
+                                        value={this.state.userDeliveryOnSubKG}
+                                        error={this.state.userDeliveryOnSubKGValidated !== null && !this.state.userDeliveryOnSubKGValidated}
+                                        helperText={this.state.userDeliveryOnSubKGValidated !== null && !this.state.userDeliveryOnSubKGValidated ? "Required" : "Delivery On Sub KG"}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Box>
                 </AlertDialog>
             </div >
         )
