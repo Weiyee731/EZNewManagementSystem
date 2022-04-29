@@ -30,6 +30,7 @@ function PaperComponent(props) {
 }
 
 export default function AlertDialog(props) {
+
   return (
     <Dialog
       fullWidth={typeof props.fullWidth === "undefined" ? true : props.fullWidth}
@@ -40,6 +41,7 @@ export default function AlertDialog(props) {
       aria-describedby="alert-dialog-description"
       PaperComponent={props.draggable ? PaperComponent : null}
     >
+      {console.log("AlertDialog", props)}
       <DialogTitle
         id="alert-dialog-title"
         style={{
@@ -51,9 +53,9 @@ export default function AlertDialog(props) {
         }}
       >
         {props.title}
-        <IconButton sx={{ marginLeft: 'auto' }} onClick={() => props.handleToggleDialog()}>
-          <CloseIcon />
-        </IconButton>
+        {/* <IconButton sx={{ marginLeft: 'auto' }}  onClick={() => console.log("HIHI")} >
+          <CloseIcon   onClick={() => console.log("HIHI")} />
+        </IconButton> */}
       </DialogTitle>
       <DialogContent>
         {props.message ?
@@ -80,7 +82,7 @@ export default function AlertDialog(props) {
             :
             <>
               <Button onClick={() => props.handleToggleDialog()}>No</Button>
-              <Button onClick={() => props.handleConfirmFunc()} variant='contained'>
+              <Button autoFocus type="submit" onClick={() => props.handleConfirmFunc()} variant='contained'>
                 {props.buttonTitle}
               </Button>
             </>
