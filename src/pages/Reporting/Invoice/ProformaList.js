@@ -249,19 +249,27 @@ const ProformaList = (props) => {
     const handleCreateProformaInvoice = () => {
         let productPrices = []
         let stockIds = []
+        let productQuantity = []
+        let productDimension = []
+        let productUnitPrices = []
 
         items.map((item) => {
             productPrices.push(subTotal(item).toFixed(2))
             stockIds.push(item.StockID)
+            productQuantity.push(item.ProductQuantity)
+            productDimension.push(volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight))
+            productUnitPrices.push(selectedType !== 3 ?item.isFollowStandard ? singleUnitPrice(volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)) : item.unitPrice : 1)
         })
-
         props.CallInsertTransaction({
             USERID: userId,
             TYPE: selectedType,
             ORDERTOTALMOUNT: totalPrice(),
             ORDERPAIDMOUNT: 0,
             STOCKID: stockIds,
-            PRODUCTPRICE: productPrices
+            PRODUCTPRICE: productPrices,
+            PRODUCTQUANTITY: productQuantity,
+            PRODUCTDIMENSION: productDimension,
+            PRODUCTUNITPRICE: productUnitPrices
         })
     }
 
