@@ -37,6 +37,7 @@ function mapDispatchToProps(dispatch) {
   return {
     CallFetchAllTransactionByID: (data) => dispatch(GitAction.CallFetchAllTransactionByID(data)),
     CallUpdateTransaction: (data) => dispatch(GitAction.CallUpdateTransaction(data)),
+    CallUpdateTransactionDetailHandling: (data) => dispatch(GitAction.CallUpdateTransactionDetailHandling(data)),
     // CallUpdateStockDetailByPost: (data) => dispatch(GitAction.CallUpdateStockDetailByPost(data)),
     CallUpdateStockDetailByGet: (data) => dispatch(GitAction.CallUpdateStockDetailByGet(data)),
   };
@@ -235,11 +236,11 @@ class InvoiceDetail extends Component {
         let tempArr = []
         console.log(this.props.transaction[0].TransactionDetail)
         !isStringNullOrEmpty(this.props.transaction[0].TransactionDetail) && JSON.parse(this.props.transaction[0].TransactionDetail).map((item) => {
-          console.log(item.AdditionalCharges)
-          console.log(item.AdditionalCharges && item.AdditionalCharges ? item.AdditionalCharges.split(';'):"")
+          console.log(item)
+          // console.log(item.AdditionalCharges && item.AdditionalCharges ? item.AdditionalCharges.split(';'):"")
           tempArr.push({
             ...item,
-            handlingCharge: 0,
+            handlingCharge: item.ProductHandlingPrice,
             totalPrice: item.ProductPrice * item.ProductQuantity
           })
         })
@@ -306,7 +307,10 @@ class InvoiceDetail extends Component {
   handleConfirmhandlingCharge = (e, index) => {
     let tempArr = this.state.TransactionDetail
     let additionalCharge = 0
-
+    console.log(e)
+    console.log(tempArr[index])
+    this.props.CallUpdateTransactionDetailHandling({TransactionDetailID:tempArr[index].TransactionDetailID,ProductHandlingPrice:e})
+    
     tempArr[0].TransactionDetailCharges != null && JSON.parse(tempArr[0].TransactionDetailCharges).map((additionalCharges, index) => {
       additionalCharge = parseFloat(additionalCharge) + parseFloat(additionalCharges.ProductPrice * additionalCharges.ProductQuantity)
     })

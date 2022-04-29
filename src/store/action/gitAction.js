@@ -214,6 +214,16 @@ export class GitAction {
       payload: propsData
     };
   }
+  
+  static UpdateTransactionDetailHandling = "UPDATE_TRANSACTION_DETAIL_HANDLING";
+  static UpdatedTransactionDetailHandling = "TRANSACTION_DETAIL_HANDLING_UPDATEED";
+  static CallUpdateTransactionDetailHandling(propsData) {
+    return {
+      type: GitAction.UpdateTransactionDetailHandling,
+      payload: propsData
+    };
+  }
+
 
   static UpdateTransactionPayment = "UPDATE_TRANSACTION_PAYMENT";
   static UpdatedTransactionPayment = "TRANSACTION_UPDATEED_PAYMENT";

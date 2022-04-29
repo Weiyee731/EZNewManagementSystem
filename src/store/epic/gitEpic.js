@@ -546,7 +546,10 @@ export class GitEpic {
           "&ORDERTOTALMOUNT=" + payload.ORDERTOTALMOUNT +
           "&ORDERPAIDMOUNT=" + payload.ORDERPAIDMOUNT +
           "&STOCKID=" + payload.STOCKID +
-          "&PRODUCTPRICE=" + payload.PRODUCTPRICE
+          "&PRODUCTPRICE=" + payload.PRODUCTPRICE + 
+          "&PRODUCTQUANTITY=" + payload.PRODUCTQUANTITY + 
+          "&PRODUCTDIMENSION=" + payload.PRODUCTDIMENSION + 
+          "&PRODUCTUNITPRICE=" + payload.PRODUCTUNITPRICE 
         );
 
         let json = await response.json();
@@ -591,6 +594,32 @@ export class GitEpic {
         };
       }
     });
+    Transaction_UpdateTransactionDetailHandling = action$ =>
+    action$.ofType(GitAction.UpdateTransactionDetailHandling).switchMap(async ({ payload }) => {
+
+      try {
+        const response = await fetch(url +
+          "Transaction_UpdateTransactionDetailHandling?" +
+          "TRANSACTIONDETAILID=" + payload.TransactionDetailID +
+          "&PRODUCTHANDLINGPRICE=" + payload.ProductHandlingPrice 
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UpdatedTransactionDetailHandling,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Transaction_UpdateTransactionDetailHandling")
+        return {
+          type: GitAction.UpdatedTransaction,
+          payload: [],
+        };
+      }
+    });
+    
 
   Transaction_UpdateTransactionPayment = action$ =>
     action$.ofType(GitAction.UpdateTransactionPayment).switchMap(async ({ payload }) => {
