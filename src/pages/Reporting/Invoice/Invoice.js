@@ -181,7 +181,7 @@ class Invoice extends Component {
         const { selectedRows } = this.state
         let selectedRowId = []
         selectedRows.map((row) => {
-            selectedRowId.push(row.StockID)
+            selectedRowId.push(row.TransactionID)
         })
         this.props.CallCancelTransaction(selectedRowId)
     }
