@@ -181,11 +181,12 @@ class DataManagement extends Component {
                 Item += (isStringNullOrEmpty(DataRows[index]["Item"])) ? "-" : DataRows[index]["Item"].trim();
                 Member += (isStringNullOrEmpty(DataRows[index]["Member"])) ? "-" : DataRows[index]["Member"].trim();
                 Division += (isStringNullOrEmpty(DataRows[index]["Division"])) ? "-" : DataRows[index]["Division"].trim();
-                StockDate += (isStringNullOrEmpty(DataRows[index]["Stock Date"])) ? "-" : moment(DataRows[index]["Packaging Date"].trim(), 'DD/MM/YYYY HH:mm:ss', false).format('YYYY/MM/DD HH:mm:ss')
+                StockDate += (isStringNullOrEmpty(DataRows[index]["Stock Date"])) ? "-" : moment(DataRows[index]["Stock Date"].trim(), 'YYYY-MM-DD HH:mm:ss', false).format('YYYY/MM/DD HH:mm:ss')
                 PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : moment(DataRows[index]["Packaging Date"].trim(), 'DD/MM/YYYY HH:mm:ss', false).format('YYYY/MM/DD HH:mm:ss')
                 AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "-" : DataRows[index]["Additional Cost"].trim();
                 Remarks += (isStringNullOrEmpty(DataRows[index]["Remarks"])) ? "-" : DataRows[index]["Remarks"];
-
+                console.log(StockDate)
+                console.log(PackagingDate)
                 if (index !== DataRows.length - 1) {
                     Courier += ",";
                     TrackingNo += ",";
