@@ -347,7 +347,8 @@ class ArchivedTransaction extends Component {
                             </div>
                         </div>
                         <div className="col-md-11 col-11 m-auto">
-                            <SearchBar onChange={onLocalSearch} value={this.state.searchKeywords} />
+                            <SearchBar onChange={onLocalSearch}  label="Enter Member No, Tracking No or Container No to search"
+                               value={this.state.searchKeywords} />
                         </div>
                         <div className="col-md-1 col-1 m-auto">
                             <CsvDownloader

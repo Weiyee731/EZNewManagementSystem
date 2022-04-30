@@ -492,7 +492,8 @@ class TransactionHistory extends Component {
                                     <div className="pr-1 w-100">
                                         <SearchBar
                                             id=""
-                                            placeholder="Enter Member No, Tracking No or Container No to search"
+                                            placeholder=""
+                                            label="Enter Member No, Tracking No or Container No to search"
                                             buttonOnClick={() => this.onSearch("", "")}
                                             onChange={this.handleSearchInput}
                                             className="searchbar-input mb-auto"

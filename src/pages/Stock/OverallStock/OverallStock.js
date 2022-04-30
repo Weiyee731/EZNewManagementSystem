@@ -37,6 +37,7 @@ import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline"
 import ManageSearchOutlinedIcon from "@mui/icons-material/ManageSearchOutlined"
 import Tooltip from "@mui/material/Tooltip"
 import CheckIcon from "@mui/icons-material/Check"
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import "./OverallStock.css"
 import { Paper } from "@mui/material"
 
@@ -55,6 +56,7 @@ function mapDispatchToProps(dispatch) {
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
         CallFilterInventory: (propsData) => dispatch(GitAction.CallFilterInventory(propsData)),
         CallUpdateStockDetailByGet: (propsData) => dispatch(GitAction.CallUpdateStockDetailByGet(propsData)),
+        CallInsertStockByPost: (propsData) => dispatch(GitAction.CallInsertStockByPost(propsData)),
         CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
         CallResetStocks: () => dispatch(GitAction.CallResetStocks()),
         CallViewContainer: (props) => dispatch(GitAction.CallViewContainer(props)),
@@ -161,6 +163,7 @@ const INITIAL_STATE = {
     formValue: {
         StockID: "",
         Item: "",
+        ItemVerified: null,
         TrackingStatusID: "",
         ContainerName: "",
         ContainerDate: "",
@@ -188,6 +191,10 @@ const INITIAL_STATE = {
         AdditionalCharges: [],
 
         Remark: "",
+
+        NewContainerID: "",
+        NewContainerName: "",
+        NewContainerDate: "",
     },
 
     searchKeywords: "",
@@ -198,6 +205,8 @@ const INITIAL_STATE = {
     totalItem: 0,
     bulkVerificationModalToggled: false,
     CallResetSelected: false, //for table use purposes
+    isAddNewStock: false,
+    autoFocusState: 1
 }
 
 class OverallStock extends Component {
@@ -264,11 +273,11 @@ class OverallStock extends Component {
         if (isArrayNotEmpty(this.props.stockApproval)) {
             this.props.CallResetUpdatedStockDetail()
             this.props.CallResetStocks()
-
             this.props.CallFilterInventoryByDate({ STARTDATE: '-', ENDDATE: '-' })
 
             this.setState({
                 openAddChrgModal: false,
+                isAddNewStock: false,
                 isDataFetching: false,
                 filteredList: null,
                 CallResetSelected: true,
@@ -326,8 +335,8 @@ class OverallStock extends Component {
                 charges.length > 0 && charges.map((el) => {
                     if (!(el.Charges === "[]" || isStringNullOrEmpty(el.Value)))
                         renderStrings = renderStrings + el.Charges + ": " + el.Value + "; "
-                    return renderStrings
                 })
+                return renderStrings
             }
             catch (e) {
                 return renderStrings
@@ -417,6 +426,36 @@ class OverallStock extends Component {
         this.setState({ openAddChrgModal: true, formValue: tempFormValue })
     }
 
+    setAddModalDetails = () => {
+        let tempFormValue = this.state.formValue
+        tempFormValue.StockID = ""
+        tempFormValue.Item = ""
+        tempFormValue.ItemVerified = null
+        tempFormValue.TrackingStatusID = ""
+        tempFormValue.StockDate = ""
+        tempFormValue.TrackingNumber = ""
+        tempFormValue.TrackingNumberVerified = null
+        tempFormValue.UserCode = ""
+        tempFormValue.MemberNumberVerified = null
+        tempFormValue.ProductDimensionDeep = ""
+        tempFormValue.DepthVerified = null
+        tempFormValue.ProductDimensionWidth = ""
+        tempFormValue.WidthVerified = null
+        tempFormValue.ProductDimensionHeight = ""
+        tempFormValue.HeightVerified = null
+        tempFormValue.ProductWeight = ""
+        tempFormValue.WeightVerified = null
+        tempFormValue.UserAreaID = "1"
+        tempFormValue.Remark = ""
+        tempFormValue.AdditionalCharges = []
+
+        tempFormValue.NewContainerID = ""
+        tempFormValue.NewContainerName = ""
+        tempFormValue.NewContainerDate = ""
+
+        this.setState({ openAddChrgModal: true, isAddNewStock: true, formValue: tempFormValue })
+    }
+
     onTableRowClick = (event, row) => {
         this.setModalDetails(row)
     }
@@ -434,11 +473,12 @@ class OverallStock extends Component {
     // }
 
     handleAddChrgModal = () => {
-        this.setState({ openAddChrgModal: !this.state.openAddChrgModal, searchKeywords: "", })
+        this.setState({ openAddChrgModal: !this.state.openAddChrgModal, isAddNewStock: false, searchKeywords: "", })
         if (this.state.approvePage === true) {
             //only show those stock which is not created performa invoice status
             this.setState({
                 filteredList: this.props.stocks.filter((x) => x.TrackingStatusID !== 3),
+
             })
         } else {
             //show all stock history if overall stock
@@ -475,8 +515,8 @@ class OverallStock extends Component {
             AREACODE: selectedAreaCode,
             ITEM: isStringNullOrEmpty(formValue.Item) ? "-" : formValue.Item,
             TRACKINGSTATUSID: formValue.TrackingStatusID,
-            CONTAINERNAME: !isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : "-",
-            CONTAINERDATE: !isStringNullOrEmpty(formValue.ContainerDate) ? formValue.ContainerDate : "-",
+            CONTAINERNAME: this.state.isAddNewStock ? !isStringNullOrEmpty(formValue.NewContainerName) ? formValue.NewContainerName : "-" : !isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : "-",
+            CONTAINERDATE: this.state.isAddNewStock ? !isStringNullOrEmpty(formValue.NewContainerDate) ? formValue.NewContainerDate : "-" : !isStringNullOrEmpty(formValue.ContainerDate) ? formValue.ContainerDate : "-",
             REMARK: !isStringNullOrEmpty(formValue.Remark) ? formValue.Remark : "-",
             EXTRACHARGE: extraChangesValue,
         }
@@ -504,29 +544,71 @@ class OverallStock extends Component {
         if (isNotVerified === 0) {
             if (this.state.approvePage) {
                 // if this is the stockin page
-                let postObject = {
-                    StockID: object.STOCKID,
-                    TrackingNumber: object.TRACKINGNUMBER,
-                    ProductWeight: object.PRODUCTWEIGHT,
-                    ProductDimensionHeight: object.PRODUCTHEIGHT,
-                    ProductDimensionWidth: object.PRODUCTWIDTH,
-                    ProductDimensionDeep: object.PRODUCTDEEP,
-                    AreaCode: object.AREACODE,
-                    UserCode: object.USERCODE,
-                    Item: object.ITEM,
-                    TRACKINGSTATUSID: 2,
-                    ContainerName: object.CONTAINERNAME,
-                    ContainerDate: object.CONTAINERDATE,
-                    Remark: object.REMARK,
-                    AdditionalCharges: object.EXTRACHARGE,
+                if (this.state.isAddNewStock === false) {
+                    let postObject = {
+                        StockID: object.STOCKID,
+                        TrackingNumber: object.TRACKINGNUMBER,
+                        ProductWeight: object.PRODUCTWEIGHT,
+                        ProductDimensionHeight: object.PRODUCTHEIGHT,
+                        ProductDimensionWidth: object.PRODUCTWIDTH,
+                        ProductDimensionDeep: object.PRODUCTDEEP,
+                        AreaCode: object.AREACODE,
+                        UserCode: object.USERCODE,
+                        Item: object.ITEM,
+                        TRACKINGSTATUSID: 2,
+                        ContainerName: object.CONTAINERNAME,
+                        ContainerDate: object.CONTAINERDATE,
+                        Remark: object.REMARK,
+                        AdditionalCharges: object.EXTRACHARGE,
+                    }
+                    this.props.CallUpdateStockDetailByPost(postObject)
                 }
-                console.log(postObject)
-                this.props.CallUpdateStockDetailByPost(postObject)
+
+                else {
+                    let postObject = {
+                        TRACKINGNUMBER: object.TRACKINGNUMBER,
+                        PRODUCTWEIGHT: object.PRODUCTWEIGHT,
+                        PRODUCTHEIGHT: object.PRODUCTHEIGHT,
+                        PRODUCTWIDTH: object.PRODUCTWIDTH,
+                        PRODUCTDEEP: object.PRODUCTDEEP,
+                        AREACODE: object.AREACODE,
+                        USERCODE: object.USERCODE,
+                        ITEM: object.ITEM,
+                        STOCKDATE: "-",
+                        PACKAGINGDATE: "-",
+                        REMARK: object.REMARK,
+                        EXTRACHARGE: object.EXTRACHARGE,
+                        CONTAINERNAME: object.CONTAINERNAME,
+                        CONTAINERDATE: object.CONTAINERDATE,
+                    }
+                    this.props.CallInsertStockByPost(postObject)
+                }
+
             }
             else {
                 // if this is the overall stock page
-                alert("ww")
-                this.props.CallUpdateStockDetailByGet(object)
+                if (this.state.isAddNewStock === false)
+                    this.props.CallUpdateStockDetailByGet(object)
+                else {
+                    let postObject = {
+                        TRACKINGNUMBER: object.TRACKINGNUMBER,
+                        PRODUCTWEIGHT: object.PRODUCTWEIGHT,
+                        PRODUCTHEIGHT: object.PRODUCTHEIGHT,
+                        PRODUCTWIDTH: object.PRODUCTWIDTH,
+                        PRODUCTDEEP: object.PRODUCTDEEP,
+                        AREACODE: object.AREACODE,
+                        USERCODE: object.USERCODE,
+                        ITEM: object.ITEM,
+                        STOCKDATE: "-",
+                        PACKAGINGDATE: "-",
+                        REMARK: object.REMARK,
+                        EXTRACHARGE: object.EXTRACHARGE,
+                        CONTAINERNAME: object.CONTAINERNAME,
+                        CONTAINERDATE: object.CONTAINERDATE,
+                    }
+                    this.props.CallInsertStockByPost(postObject)
+                }
+
             }
 
             toast.loading("Submitting data... Please wait...", {
@@ -552,50 +634,56 @@ class OverallStock extends Component {
         const { value, name } = e.target
         let tempForm = formValue
         switch (name) {
+            case "Item":
+                tempForm.Item = value
+                tempForm.ItemVerified = !isStringNullOrEmpty(value)
+                this.setState({ formValue: tempForm, autoFocusState: 1 })
+                break
+
             case "TrackingNumber":
                 tempForm.TrackingNumber = value
                 tempForm.TrackingNumberVerified = !isStringNullOrEmpty(value)
-                this.setState({ formValue: tempForm })
+                this.setState({ formValue: tempForm, autoFocusState: 2 })
                 break
 
             case "MemberNumber":
                 tempForm.UserCode = value
                 tempForm.MemberNumberVerified = !isStringNullOrEmpty(value)
-                this.setState({ formValue: tempForm })
+                this.setState({ formValue: tempForm, autoFocusState: 3 })
                 break
 
             case "Division":
                 tempForm.UserAreaID = value
-                this.setState({ formValue: tempForm })
+                this.setState({ formValue: tempForm, autoFocusState: 5 })
                 break
 
             case "Depth":
                 tempForm.ProductDimensionDeep = value
                 tempForm.DepthVerified = !isStringNullOrEmpty(value) && !isNaN(value)
-                this.setState({ formValue: tempForm })
+                this.setState({ formValue: tempForm, autoFocusState: 5 })
                 break
 
             case "Width":
                 tempForm.ProductDimensionWidth = value
                 tempForm.WidthVerified = !isStringNullOrEmpty(value) && !isNaN(value)
-                this.setState({ formValue: tempForm })
+                this.setState({ formValue: tempForm, autoFocusState: 6 })
                 break
 
             case "Height":
                 tempForm.ProductDimensionHeight = value
                 tempForm.HeightVerified = !isStringNullOrEmpty(value) && !isNaN(value)
-                this.setState({ formValue: tempForm })
+                this.setState({ formValue: tempForm, autoFocusState: 7 })
                 break
 
             case "Weight":
                 tempForm.ProductWeight = value
                 tempForm.WeightVerified = !isStringNullOrEmpty(value) && !isNaN(value)
-                this.setState({ formValue: tempForm })
+                this.setState({ formValue: tempForm, autoFocusState: 8 })
                 break
 
             case "Remark":
                 tempForm.Remark = value
-                this.setState({ formValue: tempForm })
+                this.setState({ formValue: tempForm, autoFocusState: 0 })
                 break
 
             default:
@@ -894,9 +982,6 @@ class OverallStock extends Component {
                 ENDDATE: searchDates[1] === undefined ? "-" : searchDates[1],
             }
 
-            console.log("loading", object)
-            console.log("loading", searchDates)
-
             this.props.CallFilterInventoryByDate(object)
             toast.loading("Pulling data... Please wait...", {
                 autoClose: false,
@@ -1038,17 +1123,25 @@ class OverallStock extends Component {
         const renderTableTopRightButtons = () => {
             return (
                 <div className="d-flex">
+                    <Tooltip title="Add New Stock">
+                        <IconButton
+                            // aria-label="Add Stock"
+                            size="small"
+                            onClick={() => { this.setAddModalDetails() }}
+                            disabled={this.state.isDataFetching}
+                        >
+                            <AddCircleIcon fontSize="large" />
+                        </IconButton>
+                    </Tooltip>
                     <Tooltip title="Synchronize Data">
-                        <>
-                            <IconButton
-                                aria-label="Pull Data"
-                                size="small"
-                                onClick={() => { this.onDatabaseSearch() }}
-                                disabled={this.state.isDataFetching}
-                            >
-                                <CachedIcon fontSize="large" />
-                            </IconButton>
-                        </>
+                        <IconButton
+                            aria-label="Pull Data"
+                            size="small"
+                            onClick={() => { this.onDatabaseSearch() }}
+                            disabled={this.state.isDataFetching}
+                        >
+                            <CachedIcon fontSize="large" />
+                        </IconButton>
                     </Tooltip>
                     <CsvDownloader
                         filename="overallstock-list"
@@ -1058,15 +1151,13 @@ class OverallStock extends Component {
                         datas={isArrayNotEmpty(this.state.filteredList) ? this.state.filteredList : []}
                     >
                         <Tooltip title="Download">
-                            <>
-                                <IconButton size="small">
-                                    <DownloadForOfflineIcon
-                                        color="primary"
-                                        fontSize="large"
-                                        sx={{}}
-                                    />
-                                </IconButton>
-                            </>
+                            <IconButton size="small">
+                                <DownloadForOfflineIcon
+                                    color="primary"
+                                    fontSize="large"
+                                    sx={{}}
+                                />
+                            </IconButton>
                         </Tooltip>
                     </CsvDownloader>
                 </div>
@@ -1282,7 +1373,7 @@ class OverallStock extends Component {
                     handleConfirmFunc={this.handleSubmitUpdate} // required, pass the confirm function
                     showAction={true} // required, to show the footer of modal display
                     title={this.state.formValue.Item} // required, title of the modal
-                    buttonTitle={"Update"} // required, title of button
+                    buttonTitle={this.state.isAddNewStock ? "Add New" : "Update"} // required, title of button
                     buttonDisabled={!validateForm}
                     singleButton={true} // required, to decide whether to show a single full width button or 2 buttons
                     maxWidth={"md"}
@@ -1294,18 +1385,76 @@ class OverallStock extends Component {
                             <div className="row">
                                 <div className="col-12" style={{ fontSize: "9pt" }}>
                                     <div className="clearfix">
-                                        <div className="float-start">
-                                            <b>Expected Container: </b>
-                                            {!isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : " N/A "}
-                                        </div>
-                                        <div className="float-end">
-                                            <b>Expected Container Date: </b>
-                                            {!isStringNullOrEmpty(formValue.ContainerDate) ? formValue.ContainerDate : " N/A "}
-                                        </div>
+                                        {
+                                            this.state.isAddNewStock === false ?
+                                                <>
+                                                    <div className="float-start">
+                                                        <b>Expected Container: </b>
+                                                        {!isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : " N/A "}
+                                                    </div>
+                                                    <div className="float-end">
+                                                        <b>Expected Container Date: </b>
+                                                        {!isStringNullOrEmpty(formValue.ContainerDate) ? formValue.ContainerDate : " N/A "}
+                                                    </div>
+                                                </>
+                                                :
+                                                <div className="row">
+                                                    <div className="col">
+                                                        <FormControl variant="standard" size="small" fullWidth>
+                                                            <InputLabel id="Container-label">Expected Container Number and Date</InputLabel>
+                                                            <Select
+                                                                labelId="Container"
+                                                                id="Container"
+                                                                name="Container"
+                                                                value={this.state.formValue.NewContainerID}
+                                                                onChange={(e) => {
+                                                                    isArrayNotEmpty(this.props.AllContainer) &&
+                                                                        this.props.AllContainer.map((container) => {
+                                                                            if (container.ContainerID === e.target.value) {
+                                                                                let tempForm = this.state.formValue
+
+                                                                                tempForm.NewContainerName = container.ContainerName
+                                                                                tempForm.NewContainerDate = container.ContainerDate
+                                                                                tempForm.NewContainerID = container.ContainerID
+                                                                                this.setState({ formValue: tempForm })
+                                                                            }
+                                                                        })
+                                                                }}
+                                                                label="Container"
+                                                            >
+                                                                {isArrayNotEmpty(this.props.AllContainer) &&
+                                                                    this.props.AllContainer.map((el, idx) => {
+                                                                        return (
+                                                                            <MenuItem value={el.ContainerID} key={idx}>
+                                                                                {el.ContainerName + " ( " + el.ContainerDate + " )"}
+                                                                            </MenuItem>
+                                                                        )
+                                                                    })}
+                                                            </Select>
+                                                        </FormControl>
+                                                    </div>
+                                                    <div className="col">
+                                                        <TextField
+                                                            variant="standard"
+                                                            size="small"
+                                                            fullWidth
+                                                            label="Item"
+                                                            name="Item"
+                                                            value={formValue.Item}
+                                                            inputRef={input => input && this.state.autoFocusState === 1 && input.focus()}
+                                                            onChange={this.handleFormInput}
+                                                            error={!formValue.ItemVerified}
+                                                            onKeyPress={(event) => event.key === 'Enter' && this.setState({ autoFocusState: 2 })}
+                                                        />
+                                                        {!formValue.ItemVerified && (<FormHelperText sx={{ color: "red" }} id="MemberNumber-error-text"> Invalid</FormHelperText>)}
+                                                    </div>
+                                                </div>
+
+                                        }
+
                                     </div>
                                     <hr />
                                 </div>
-
                                 <div className="col-12 col-md-4">
                                     <TextField
                                         variant="standard"
@@ -1314,6 +1463,8 @@ class OverallStock extends Component {
                                         label="Tracking Number"
                                         name="TrackingNumber"
                                         value={formValue.TrackingNumber}
+                                        inputRef={input => input && this.state.autoFocusState === 2 && input.focus()}
+                                        onKeyPress={(event) => event.key === 'Enter' && this.setState({ autoFocusState: 3 })}
                                         onChange={this.handleFormInput}
                                         error={!formValue.TrackingNumberVerified}
                                     />
@@ -1328,6 +1479,8 @@ class OverallStock extends Component {
                                         name="MemberNumber"
                                         value={formValue.UserCode}
                                         onChange={this.handleFormInput}
+                                        inputRef={input => input && this.state.autoFocusState === 3 && input.focus()}
+                                        onKeyPress={(event) => event.key === 'Enter' && this.setState({ autoFocusState: 5 })}
                                         error={!formValue.MemberNumberVerified}
                                     />
                                     {!formValue.MemberNumberVerified && (<FormHelperText sx={{ color: "red" }} id="MemberNumber-error-text"> Invalid</FormHelperText>)}
@@ -1343,6 +1496,7 @@ class OverallStock extends Component {
                                             onChange={this.handleFormInput}
                                             label="Division"
                                             error={formValue.UserAreaID === 0}
+                                            inputRef={input => input && this.state.autoFocusState === 4 && input.focus()}
                                         >
                                             {isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
                                                 return (
@@ -1367,6 +1521,8 @@ class OverallStock extends Component {
                                             value={formValue.ProductDimensionDeep}
                                             onChange={this.handleFormInput}
                                             endAdornment={<InputAdornment position="start">cm</InputAdornment>}
+                                            inputRef={input => input && this.state.autoFocusState === 5 && input.focus()}
+                                            onKeyPress={(event) => event.key === 'Enter' && this.setState({ autoFocusState: 6 })}
                                             error={!formValue.DepthVerified}
                                         />
                                         {!formValue.DepthVerified && (<FormHelperText sx={{ color: "red" }} id="Depth-error-text">  Invalid </FormHelperText>)}
@@ -1382,6 +1538,8 @@ class OverallStock extends Component {
                                             value={formValue.ProductDimensionWidth}
                                             onChange={this.handleFormInput}
                                             endAdornment={<InputAdornment position="start">cm</InputAdornment>}
+                                            inputRef={input => input && this.state.autoFocusState === 6 && input.focus()}
+                                            onKeyPress={(event) => event.key === 'Enter' && this.setState({ autoFocusState: 7 })}
                                             error={!formValue.WidthVerified}
                                         />
                                         {!formValue.WidthVerified && (<FormHelperText sx={{ color: "red" }} id="Width-error-text">   Invalid </FormHelperText>)}
@@ -1397,6 +1555,8 @@ class OverallStock extends Component {
                                             value={formValue.ProductDimensionHeight}
                                             onChange={this.handleFormInput}
                                             endAdornment={<InputAdornment position="start">cm</InputAdornment>}
+                                            inputRef={input => input && this.state.autoFocusState === 7 && input.focus()}
+                                            onKeyPress={(event) => event.key === 'Enter' && this.setState({ autoFocusState: 8 })}
                                             error={!formValue.HeightVerified}
                                         />
                                         {!formValue.HeightVerified && (<FormHelperText sx={{ color: "red" }} id="Height-error-text" > Invalid </FormHelperText>)}
@@ -1425,6 +1585,7 @@ class OverallStock extends Component {
                                             value={formValue.ProductWeight}
                                             onChange={this.handleFormInput}
                                             endAdornment={<InputAdornment position="start">KG</InputAdornment>}
+                                            inputRef={input => input && this.state.autoFocusState === 8 && input.focus()}
                                             error={!formValue.WeightVerified}
                                         />
                                         {!formValue.WeightVerified && (<FormHelperText sx={{ color: "red" }} id="Weight-error-text"  >   Invalid  </FormHelperText>)}

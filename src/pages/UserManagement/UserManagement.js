@@ -133,6 +133,7 @@ class UserManagement extends Component {
             isSubmit: false,
             errorReportData: [],
             openErrorReport: false,
+            searchArea: "All",
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.onTableRowClick = this.onTableRowClick.bind(this)
@@ -630,18 +631,63 @@ class UserManagement extends Component {
         }
 
         const onChange = (e) => {
-            const FilterArr = this.state.UserListing.filter((searchedItem) => searchedItem.UserCode.toLowerCase().includes(e.target.value))
+            let FilterArr = []
+
+            FilterArr = this.state.UserListing.filter((searchedItem) =>
+                searchedItem.UserCode.toLowerCase().includes(e.target.value) ||
+                searchedItem.Fullname.toLowerCase().includes(e.target.value) ||
+                searchedItem.UserContactNo.toLowerCase().includes(e.target.value) ||
+                searchedItem.UserEmailAddress.toLowerCase().includes(e.target.value)
+            )
+
+            if (this.state.searchArea !== "All")
+                FilterArr = FilterArr.filter((searchedItem) => searchedItem.UserAreaID === this.state.searchArea)
+
             this.setState({ UserListingfiltered: FilterArr, searchKeywords: e.target.value });
+        }
+
+        const handleSearchArea = (e) => {
+            let FilterArr = this.state.UserListing
+            if (e.target.value !== "All")
+                FilterArr = this.state.UserListing.filter((searchedItem) => searchedItem.UserAreaID === e.target.value)
+            this.setState({ UserListingfiltered: FilterArr, searchArea: e.target.value });
         }
 
         return (
             <>
                 <div className="w-100 container-fluid">
                     <div className="row d-flex">
-                        <div className="col-md-10 col-10 m-auto">
-                            <SearchBar onChange={onChange} value={this.state.searchKeywords} />
-                        </div>
                         <div className="col-md-2 col-2 m-auto">
+                            <div className="filter-dropdown row ">
+                                <div className="d-inline-flex w-100">
+                                    <Select
+                                        labelId="search-filter-area"
+                                        id="search-filter-area"
+                                        value={this.state.searchArea}
+                                        label="Area"
+                                        onChange={handleSearchArea}
+                                        size="small"
+                                        fullWidth
+                                        placeholder="filter by"
+                                    >
+                                        <MenuItem key="all_area" value="All"> All </MenuItem>
+                                        {isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
+                                            return (
+                                                <MenuItem key={el.AreaName + "_" + idx} value={el.UserAreaID}  >
+                                                    {el.AreaName + " - " + el.AreaCode}
+                                                </MenuItem>
+                                            )
+                                        })}
+                                    </Select>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-md-9 col-9 m-auto">
+                            <SearchBar onChange={onChange}
+                                label="Enter Member Code / Name / Phone /Email"
+                                value={this.state.searchKeywords} />
+                        </div>
+                        <div className="col-md-1 col-1 m-auto">
                             <div className="d-flex w-100">
                                 <CsvDownloader
                                     filename="user-list"

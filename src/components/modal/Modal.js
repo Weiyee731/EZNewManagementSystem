@@ -41,7 +41,6 @@ export default function AlertDialog(props) {
       aria-describedby="alert-dialog-description"
       PaperComponent={props.draggable ? PaperComponent : null}
     >
-      {console.log("AlertDialog", props)}
       <DialogTitle
         id="alert-dialog-title"
         style={{
@@ -53,9 +52,6 @@ export default function AlertDialog(props) {
         }}
       >
         {props.title}
-        {/* <IconButton sx={{ marginLeft: 'auto' }}  onClick={() => console.log("HIHI")} >
-          <CloseIcon   onClick={() => console.log("HIHI")} />
-        </IconButton> */}
       </DialogTitle>
       <DialogContent>
         {props.message ?
@@ -75,6 +71,7 @@ export default function AlertDialog(props) {
               onClick={() => props.handleConfirmFunc()}
               variant='contained'
               fullWidth
+              autoFocus type="submit"
               disabled={props.buttonDisabled}
             >
               {props.buttonTitle}

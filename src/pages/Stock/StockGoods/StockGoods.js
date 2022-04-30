@@ -1382,7 +1382,8 @@ class StockGoods extends Component {
                     id="searchBar"
                     inputRef={(input) => input && input.focus()}
                     autoFocus={true}
-                    placeholder="Enter Member No, Tracking No or Container No to search"
+                    placeholder=""
+                    label="Enter Member No, Tracking No or Container No to search"
                     buttonOnClick={() => this.onSearch("", "")}
                     onChange={this.handleSearchInput}
                     className="searchbar-input"
