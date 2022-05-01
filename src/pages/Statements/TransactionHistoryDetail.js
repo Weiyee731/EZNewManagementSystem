@@ -755,7 +755,6 @@ class TransactionHistoryDetail extends Component {
 
   generateCashBill() {
     const { cashbillAmount, cashbillRemarks, cashbillRemarksValidated, cashbillSelectedRows } = this.state
-    console.log(cashbillAmount, cashbillRemarks, cashbillRemarksValidated, cashbillSelectedRows)
   }
 
   render() {

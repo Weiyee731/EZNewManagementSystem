@@ -39,7 +39,7 @@ import Tooltip from "@mui/material/Tooltip"
 import CheckIcon from "@mui/icons-material/Check"
 import "./OverallStock.css"
 import { Paper } from "@mui/material"
-
+import moment from 'moment';
 
 function mapStateToProps(state) {
     return {
@@ -404,7 +404,6 @@ class OverallStock extends Component {
             additionalCharges = JSON.parse(additionalCharges)
         }
         catch (e) {
-            console.log(e)
             additionalCharges = []
         }
 
@@ -520,7 +519,6 @@ class OverallStock extends Component {
                     Remark: object.REMARK,
                     AdditionalCharges: object.EXTRACHARGE,
                 }
-                console.log(postObject)
                 this.props.CallUpdateStockDetailByPost(postObject)
             }
             else {
@@ -890,13 +888,10 @@ class OverallStock extends Component {
             //   ENDDATE: convertDateTimeToString112Format(date_range[1], false).replace(/[^0-9 ]/g, ""),
             // }
             const object = {
-                STARTDATE: searchDates[0] === undefined ? "-" : searchDates[0],
-                ENDDATE: searchDates[1] === undefined ? "-" : searchDates[1],
+                STARTDATE: searchDates[0] === undefined ? "-" : moment(searchDates[0], 'DD/MM/YYYY HH:mm:ss', false).format('YYYYMMDD'),
+                ENDDATE: searchDates[1] === undefined ? "-" : moment(searchDates[1], 'DD/MM/YYYY HH:mm:ss', false).format('YYYYMMDD'),
             }
-
-            console.log("loading", object)
-            console.log("loading", searchDates)
-
+            
             this.props.CallFilterInventoryByDate(object)
             toast.loading("Pulling data... Please wait...", {
                 autoClose: false,

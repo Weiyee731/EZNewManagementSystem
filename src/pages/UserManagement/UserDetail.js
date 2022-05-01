@@ -751,20 +751,15 @@ class UserDetail extends Component {
 
     if (payment === totalDebt) {
       pay = pays
-      console.log('equal')
     } else if (payment > totalDebt) {
-      console.log('more')
       var count = 0
       pays.map(el => {
 
         if ((TotalPayment - el) >= 0) {
-          console.log('1 yes')
           if (count <= pays.length - 2) {
             pay.push(Number(el));
-            // console.log('count', count, '+pays', pays.length - 2)
           } else {
             pay.push(Number(TotalPayment));
-            console.log(Number(TotalPayment))
           }
         } else if (TotalPayment - el < 0 && TotalPayment > 0) {
           pay.push(Number(TotalPayment))
@@ -777,7 +772,6 @@ class UserDetail extends Component {
       })
 
     } else if (payment < totalDebt) {
-      console.log('less')
       pays.map(el => {
         if ((TotalPayment - el) >= 0) {
           pay.push(el);
@@ -809,8 +803,6 @@ class UserDetail extends Component {
       this.props.CallUpdateTransactionPayment(object)
     } else {
       console.log('Error occured. Please choose the transaction and key in correct payment');
-      console.log(AllTransactionID.length);
-      console.log(pay.length)
     }
 
   }

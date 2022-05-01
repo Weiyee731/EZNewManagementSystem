@@ -66,10 +66,7 @@ class DataManagement extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(this.state.ContainerDate)
-
         if (isArrayNotEmpty(this.props.stockApproval)) {
-            console.log(this.props.stockApproval)
             if (this.props.stockApproval[0].ReturnVal == 0) {
                 this.props.CallResetUpdatedStockDetail()
                 toast.error(this.props.stockApproval[0].ReturnMsg, { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark", onClose: () => { this.setState(INITIAL_STATE) } })
@@ -185,8 +182,6 @@ class DataManagement extends Component {
                 PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : moment(DataRows[index]["Packaging Date"].trim(), 'DD/MM/YYYY HH:mm:ss', false).format('YYYY/MM/DD HH:mm:ss')
                 AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "-" : DataRows[index]["Additional Cost"].trim();
                 Remarks += (isStringNullOrEmpty(DataRows[index]["Remarks"])) ? "-" : DataRows[index]["Remarks"];
-                console.log(StockDate)
-                console.log(PackagingDate)
                 if (index !== DataRows.length - 1) {
                     Courier += ",";
                     TrackingNo += ",";

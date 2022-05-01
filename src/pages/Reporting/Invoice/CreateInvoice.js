@@ -342,9 +342,8 @@ class CreateInvoice extends Component {
     }
 
     handleDeliveryModal = () => {
-        const { selectedItems, selectedUserID } = this.state
-        console.log(selectedUserID)
-        if (selectedUserID === null || selectedUserID === 0) {
+        const { selectedRows } = this.state
+        if (selectedRows[0].UserID === null || selectedRows[0].UserID === 0) {
             this.setState({ openAddUsers: !this.state.openAddUsers })
         } else {
             this.setState({ openDeliveryModal: !this.state.openDeliveryModal })

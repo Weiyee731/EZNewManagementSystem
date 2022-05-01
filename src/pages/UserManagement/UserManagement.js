@@ -170,21 +170,9 @@ class UserManagement extends Component {
             }
         }
 
-        // console.log(this.state.UserListingfiltered === null)
-        // console.log(isArrayNotEmpty(this.props.user))
         if (isArrayNotEmpty(this.props.user)) {
             toast.dismiss();
         }
-
-        // if (
-        //     !isStringNullOrEmpty(this.props.user[0].ReturnVal) &&
-        //     this.props.user[0].ReturnVal === 0
-        // ) {
-        //     toast.warning("Fetched data is empty. ", {
-        //         autoClose: 3000,
-        //         theme: "dark",
-        //     })
-        // }
 
         if (isArrayNotEmpty(this.props.userManagementApproval)) {
             if (this.props.userManagementApproval[0].ReturnVal === 1) {
@@ -275,7 +263,7 @@ class UserManagement extends Component {
 
     onDeleteButtonClick = () => {
         const { selectedRows } = this.state
-        console.log(selectedRows)
+
     }
 
     onTextFieldOnChange = (e) => {

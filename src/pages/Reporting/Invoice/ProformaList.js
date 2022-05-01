@@ -180,8 +180,8 @@ const ProformaList = (props) => {
             items.map((item) => {
                 totalArr.push(Number(subTotal(item).toFixed(2)))
             })
-            total = !isNaN(roundOffTotal(totalArr.reduce((a, b) => a + b))) ? roundOffTotal(totalArr.reduce((a, b) => a + b)) : 0.00
-            return !isNaN(roundOffTotal(totalArr.reduce((a, b) => a + b))) ? roundOffTotal(totalArr.reduce((a, b) => a + b)) : 0.00
+            total = !isNaN(roundOffTotal(totalArr.reduce((a, b) => a + b))) ? (parseFloat(roundOffTotal(totalArr.reduce((a, b) => a + b))) - parseFloat(totalArr.reduce((a, b) => a + b))) < 0 ? (parseFloat(roundOffTotal(totalArr.reduce((a, b) => a + b))) + 0.1).toFixed(2) : roundOffTotal(totalArr.reduce((a, b) => a + b)) : 0.00
+            return !isNaN(roundOffTotal(totalArr.reduce((a, b) => a + b))) ? (parseFloat(roundOffTotal(totalArr.reduce((a, b) => a + b))) - parseFloat(totalArr.reduce((a, b) => a + b))) < 0 ? (parseFloat(roundOffTotal(totalArr.reduce((a, b) => a + b))) + 0.1).toFixed(2) : roundOffTotal(totalArr.reduce((a, b) => a + b)) : 0.00
         } else {
             let subKg = weightCompare() - 1
             return !isNaN(roundOffTotal(firstKg + (subKg * subsequentKg))) ? roundOffTotal(firstKg + (subKg * subsequentKg)) : 0.00
@@ -258,13 +258,16 @@ const ProformaList = (props) => {
             stockIds.push(item.StockID)
             productQuantity.push(item.ProductQuantity)
             productDimension.push(volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight))
-            productUnitPrices.push(selectedType !== 3 ?item.isFollowStandard ? singleUnitPrice(volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)) : item.unitPrice : 1)
+            productUnitPrices.push(selectedType !== 3 ? item.isFollowStandard ? singleUnitPrice(volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)) : item.unitPrice : 1)
         })
+
         props.CallInsertTransaction({
             USERID: userId,
             TYPE: selectedType,
             ORDERTOTALMOUNT: totalPrice(),
             ORDERPAIDMOUNT: 0,
+            FIRSTKG: selectedType === 3 ? firstKg : 0,
+            SUBSEQUENCEKG: selectedType === 3 ? subsequentKg : 0,
             STOCKID: stockIds,
             PRODUCTPRICE: productPrices,
             PRODUCTQUANTITY: productQuantity,
@@ -475,6 +478,7 @@ const ProformaList = (props) => {
 
     const handleAreaOnChange = (e) => {
         let index = e.target.value
+        console.log(userAreaCode[index])
         setArea(userAreaCode[index].AreaCode)
         setLargeItemMinPrice(userAreaCode[index].AreaCharges)
     }
@@ -575,6 +579,12 @@ const ProformaList = (props) => {
                     <div className='col-2'>
                         RM {totalPrice()}
                     </div>
+                    {console.log(selectedType)}
+                    {console.log(totalVolume)}
+                    {console.log(minCubic)}
+                    {console.log(selectedType === 4 && (totalVolume) < minCubic)}
+                    {console.log((totalVolume) < minCubic)}
+                    {console.log(selectedType === 4 && (totalVolume) < minCubic)}
                     {selectedType === 4 && (totalVolume) < minCubic &&
                         <>
                             <div className='col-10'>

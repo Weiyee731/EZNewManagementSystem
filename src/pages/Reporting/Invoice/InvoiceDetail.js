@@ -221,7 +221,7 @@ class InvoiceDetail extends Component {
     page: [],
     isRemarkValidated: true,
     isDeliveryFeeValidated: true,
-    totalhandlingCharge:0,
+    totalhandlingCharge: 0,
     handlingCharge: '-',
     isPrinting: false,
     detailsIndex: 0,
@@ -250,7 +250,7 @@ class InvoiceDetail extends Component {
           let m3Price = (datalist.ProductPrice / volumeCalc(datalist.ProductDimensionDeep, datalist.ProductDimensionWidth, datalist.ProductDimensionHeight)).toFixed(2)
           let extraFees = (m3Price / 2 - totalPrice).toFixed(2)
 
-          
+
 
           if (actualVolume < 0.50) {
             this.props.CallUpdateTransaction({
@@ -266,6 +266,7 @@ class InvoiceDetail extends Component {
                 ProductDimensionDeep: "-",
                 ProductDimensionWidth: "-",
                 ProductDimensionHeight: "-",
+                handlingCharge:0,
                 ProductPrice: extraFees,
                 totalPrice: extraFees
               })
@@ -284,7 +285,7 @@ class InvoiceDetail extends Component {
           TransactionDetail: tempArr,
           transaction: this.props.transaction,
           actualVolume: actualVolume,
-          TransportationBool: true,
+          TransportationBool: this.props.transaction[0].TransportationTypeInd === 2 ? true : false,
           totalhandlingCharge: tempTotalhandlingCharge
           // TransportationBool: tempArr.filter((x) => x.Description === "Delivery Fee").length > 0 ? true : false
         })
@@ -311,22 +312,21 @@ class InvoiceDetail extends Component {
     })
 
     this.setState({
-      TransactionDetail: tempArr,totalhandlingCharge: tempTotalhandlingCharge
+      TransactionDetail: tempArr, totalhandlingCharge: tempTotalhandlingCharge
     })
   }
 
   handleConfirmhandlingCharge = (e, index) => {
     let tempArr = this.state.TransactionDetail
     let additionalCharge = 0
-    console.log(e)
-    console.log(tempArr[index])
-    this.props.CallUpdateTransactionDetailHandling({TransactionDetailID:tempArr[index].TransactionDetailID,ProductHandlingPrice:e})
-    
+    this.props.CallUpdateTransactionDetailHandling({ TransactionDetailID: tempArr[index].TransactionDetailID, ProductHandlingPrice: e })
+
     tempArr[0].TransactionDetailCharges != null && JSON.parse(tempArr[0].TransactionDetailCharges).map((additionalCharges, index) => {
       additionalCharge = parseFloat(additionalCharge) + parseFloat(additionalCharges.ProductPrice * additionalCharges.ProductQuantity)
     })
 
-    tempArr[index].totalPrice = Number(e) + (tempArr[index].ProductPrice * tempArr[index].ProductQuantity)
+    tempArr[index].totalPrice = (tempArr[index].ProductPrice * tempArr[index].ProductQuantity)
+    // tempArr[index].handlingCharge = 0
 
     let tempArr2 = this.state.transaction
     let total = 0;
@@ -338,7 +338,7 @@ class InvoiceDetail extends Component {
 
     this.setState({
       TransactionDetail: tempArr,
-      transaction: tempArr2
+      transaction: tempArr2,
     })
 
     if (this.state.handlingArray.length > 0) {
@@ -427,13 +427,13 @@ class InvoiceDetail extends Component {
               <TableCell align="left" sx={{ fontSize: fontsize }}>
                 {data.handlingCharge !== 0 && data.handlingCharge !== undefined ? parseFloat(data.handlingCharge).toFixed(2) : "-"}
 
-                {data.TransactionDetailCharges !== undefined && data.TransactionDetailCharges !== "[]" ? JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
+                {/* {data.TransactionDetailCharges !== undefined && data.TransactionDetailCharges !== "[]" ? JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
                   return (
                     <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>
                       {parseFloat(additionalCharges.ProductPrice).toFixed(2)}
                     </div>
                   )
-                }) : "-"}
+                }) : "-"} */}
 
               </TableCell>
               :
@@ -507,7 +507,9 @@ class InvoiceDetail extends Component {
                 }
               </TableCell>
             }
-
+            {/* {console.log(data.ProductPrice)}
+            {console.log(this.state.TransactionDetail[index].handlingCharge)} */}
+            {console.log((parseFloat(data.totalPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2))}
             <TableCell align="right" sx={{ fontSize: fontsize }}>
               {data.Description === "Delivery Fee" ? (parseFloat(data.ProductPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)
                 : this.props.transaction[0].CalculationType === "3" ? "-" : (parseFloat(data.totalPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)}
@@ -558,6 +560,7 @@ class InvoiceDetail extends Component {
             ProductDimensionDeep: "-",
             ProductDimensionWidth: "-",
             ProductDimensionHeight: "-",
+            handlingCharge: 0,
             ProductPrice: this.state.DeliveryFee,
             totalPrice: this.state.DeliveryFee
           })
@@ -574,6 +577,8 @@ class InvoiceDetail extends Component {
           })
         }
       }
+    } else {
+      this.props.CallUpdateTransaction(this.state);
     }
 
     if (this.state.handlingArray.length > 0) {
@@ -698,7 +703,7 @@ class InvoiceDetail extends Component {
       //   }
       // })
       // AdminExtraCharges = AdminChargesArray.length > 0 && AdminChargesArray.reduce((price, item) => price + parseFloat(item), 0)
-      subTotal = ((Math.ceil(finalWeight).toFixed(2) - 1) * 6 + 10 + parseFloat(handlingCharge) + parseFloat(additionalCharges)).toFixed(2) + parseFloat(AdminExtraCharges).toFixed(2)
+      subTotal = ((Math.ceil(finalWeight).toFixed(2) - 1) * (transaction[0].SubSequenceKG) + (transaction[0].FirstKG) + parseFloat(handlingCharge) + parseFloat(additionalCharges)).toFixed(2) + parseFloat(AdminExtraCharges).toFixed(2)
     }
 
     return (
@@ -762,6 +767,7 @@ class InvoiceDetail extends Component {
             </div>
 
             {/* content */}
+            {console.log(arr)}
             <div>
               <div style={companyDetail}>
                 <b>Container Date:</b> {TransactionDetail[0].ContainerDate !== null ? TransactionDetail[0].ContainerDate : " - "} {this.props.transaction[0].CalculationType === "4" && "( Cargo Delivery )"}
@@ -802,7 +808,7 @@ class InvoiceDetail extends Component {
                         Actual Weight : {actualWeight} kg  |  Volume : {actualVolume} m³  |  Volumetric Weight : {m3Weight} kg
                       </div>
                       <div style={tncDiv}>
-                        * First kg : RM 10, Sub. kg : RM 6
+                        * First kg : RM {this.props.transaction[0].FirstKG}, Sub. kg : RM {this.props.transaction[0].SubSequenceKG}
                       </div>
                       <div style={tncDiv}>
                         * Volumetric weight = volume * 1000000 / 6000

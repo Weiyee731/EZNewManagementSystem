@@ -9,7 +9,6 @@ export const isArrayNotEmpty = (list) => {
             return false
     }
     catch (e) {
-        console.log(e)
         return false
     }
 }

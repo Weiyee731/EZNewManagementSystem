@@ -139,15 +139,15 @@ class Statements extends Component {
     }
 
     onTableRowClick = (event, row) => {
-        console.log(row)
+
     }
 
     onAddButtonClick = () => {
-        console.log('add button')
+
     }
 
     onDeleteButtonClick = (items) => {
-        console.log('delete button')
+
     }
 
     render() {
