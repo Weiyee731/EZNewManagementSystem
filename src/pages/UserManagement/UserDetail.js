@@ -770,7 +770,8 @@ class UserDetail extends Component {
         TotalPayment = roundOffTotal(TotalPayment)
         return (pay)
       })
-
+      console.log(pay)
+      console.log(pays)
     } else if (payment < totalDebt) {
       pays.map(el => {
         if ((TotalPayment - el) >= 0) {
@@ -785,11 +786,12 @@ class UserDetail extends Component {
         TotalPayment = roundOffTotal(TotalPayment)
         return (pay)
       })
-
+      console.log(pay)
+      console.log(pays)
       //need to calculate which one to pay
     } else console.log("no payment")
 
-
+    console.log(pay.length)
     if (pay.length === AllTransactionID.length) {
       AllTransactionID = AllTransactionID.join(';')
       pay = pay.join(';')
@@ -828,8 +830,8 @@ class UserDetail extends Component {
         <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.UserCode}</TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.AreaCode}</TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.Fullname}</TableCell>
-        <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderTotalAmount}</Box></TableCell>
-        <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount}</Box></TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderTotalAmount.toFixed(2)}</Box></TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderPaidAmount.toFixed(2)}</Box></TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)} align="center"><Box color={data.OrderColor}>{data.OrderStatus}</Box></TableCell>
         {/* {
           data.OrderStatus === "Unpaid" && <TableCell onClick={(event) => this.onAddButtonClick(event, data, index)} align="center"><CheckCircleIcon color="grey" sx={{ fontSize: 30 }}></CheckCircleIcon></TableCell>
@@ -843,7 +845,7 @@ class UserDetail extends Component {
         <TableCell onClick={(event) => this.onTableRowClick(event, data)} component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{data.ReferenceNo}</TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.Type}</TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.PaymentMethod}</TableCell>
-        <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.PaymentAmount}</TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.PaymentAmount.toFixed(2)}</TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.PaymentDatetime}</TableCell>
       </>
     )
@@ -858,7 +860,11 @@ class UserDetail extends Component {
   }
 
   onAddButtonClick = (event, row, index) => {
-    this.setState({ AddModalOpen: true, selectedRow: row, selectedindex: index });
+    if(row.length > 0){
+      this.setState({ AddModalOpen: true, selectedRow: row, selectedindex: index });
+    }else{
+      toast.error("Please, Select at least one Invoice.")
+    }
   }
 
   changeTab = (key) => {

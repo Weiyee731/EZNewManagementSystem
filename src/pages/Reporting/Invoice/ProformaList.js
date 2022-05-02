@@ -264,7 +264,8 @@ const ProformaList = (props) => {
         props.CallInsertTransaction({
             USERID: userId,
             TYPE: selectedType,
-            ORDERTOTALMOUNT: totalPrice(),
+            ORDERSUBTOTALMOUNT: selectedType === 4 ? (LargeItemMinPrice / 2 - totalPrice()).toFixed(2) : totalPrice(),
+            ORDERTOTALMOUNT: selectedType === 4 ? (LargeItemMinPrice / 2).toFixed(2) : totalPrice(),
             ORDERPAIDMOUNT: 0,
             FIRSTKG: selectedType === 3 ? firstKg : 0,
             SUBSEQUENCEKG: selectedType === 3 ? subsequentKg : 0,

@@ -540,10 +540,15 @@ class OverallStock extends Component {
             isNotVerified++
         }
 
+        console.log(isNotVerified)
+
         if (isNotVerified === 0) {
+            console.log("www")
             if (this.state.approvePage) {
                 // if this is the stockin page
+                console.log("www1")
                 if (this.state.isAddNewStock === false) {
+                    console.log("www2")
                     let postObject = {
                         StockID: object.STOCKID,
                         TrackingNumber: object.TRACKINGNUMBER,
@@ -562,8 +567,8 @@ class OverallStock extends Component {
                     }
                     this.props.CallUpdateStockDetailByPost(postObject)
                 }
-
                 else {
+                    console.log("www3")
                     let postObject = {
                         TRACKINGNUMBER: object.TRACKINGNUMBER,
                         PRODUCTWEIGHT: object.PRODUCTWEIGHT,
@@ -585,6 +590,7 @@ class OverallStock extends Component {
 
             }
             else {
+                console.log("www4")
                 // if this is the overall stock page
                 if (this.state.isAddNewStock === false)
                     this.props.CallUpdateStockDetailByGet(object)

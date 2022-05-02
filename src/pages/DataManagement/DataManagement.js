@@ -227,7 +227,7 @@ class DataManagement extends Component {
                 toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
                 this.setState({ isSubmit: true })
                 console.log("object", object)
-                // this.props.CallInsertStockByPost(object)
+                this.props.CallInsertStockByPost(object)
             }
         }
     }

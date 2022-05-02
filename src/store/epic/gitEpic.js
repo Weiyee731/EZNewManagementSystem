@@ -524,6 +524,7 @@ export class GitEpic {
           "Transaction_InsertTransaction?" +
           "USERID=" + payload.USERID +
           "&CALCULATIONTYPE=" + payload.TYPE +
+          "&ORDERSUBTOTALMOUNT=" + payload.ORDERSUBTOTALMOUNT +
           "&ORDERTOTALMOUNT=" + payload.ORDERTOTALMOUNT +
           "&ORDERPAIDMOUNT=" + payload.ORDERPAIDMOUNT +
           "&FIRSTKG=" + payload.FIRSTKG +
@@ -583,7 +584,10 @@ export class GitEpic {
     });
     Transaction_UpdateTransactionDetailHandling = action$ =>
     action$.ofType(GitAction.UpdateTransactionDetailHandling).switchMap(async ({ payload }) => {
-
+      console.log(url +
+        "Transaction_UpdateTransactionDetailHandling?" +
+        "TRANSACTIONDETAILID=" + payload.TransactionDetailID +
+        "&PRODUCTHANDLINGPRICE=" + payload.ProductHandlingPrice )
       try {
         const response = await fetch(url +
           "Transaction_UpdateTransactionDetailHandling?" +
@@ -610,6 +614,13 @@ export class GitEpic {
 
   Transaction_UpdateTransactionPayment = action$ =>
     action$.ofType(GitAction.UpdateTransactionPayment).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Transaction_UpdateTransactionPayment?" +
+        "TRANSACTIONID=" + payload.TransactionID +
+        "&PAYMENTAMMOUNT=" + payload.PaymentAmmount +
+        "&PAYMENTMETHOD=" + payload.PaymentMethod +
+        "&REFERENCENO=" + payload.ReferenceNo +
+        "&DATETIME=" + payload.Datetime)
       try {
         const response = await fetch(url +
           "Transaction_UpdateTransactionPayment?" +

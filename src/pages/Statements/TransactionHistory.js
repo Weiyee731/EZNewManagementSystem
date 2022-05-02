@@ -152,7 +152,8 @@ class TransactionHistory extends Component {
     componentDidMount() {
         if (this.props.transactions !== this.state.TransactionListing) {
             if (this.props.transactions !== undefined && this.props.transactions[0] !== undefined) {
-                this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
+                if(this.props.transactions[0].ReturnVal !== "0")
+                    this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
             }
         }
     }
@@ -160,11 +161,13 @@ class TransactionHistory extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.transactions !== this.props.transactions) {
             if (this.props.transactions !== undefined && this.props.transactions[0] !== undefined) {
-                this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
+                if(this.props.transactions[0].ReturnVal !== "0")
+                    this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
             }
         } else {
             if (prevProps.transactions !== this.state.TransactionListing) {
-                this.setState({ TransactionListing: prevProps.transactions, TransactionListingFiltered: prevProps.transactions });
+                if(this.props.transactions[0].ReturnVal !== "0")
+                    this.setState({ TransactionListing: prevProps.transactions, TransactionListingFiltered: prevProps.transactions });
             }
         }
 
@@ -189,6 +192,7 @@ class TransactionHistory extends Component {
     }
 
     renderTableRows = (data, index) => {
+        console.log(data)
         return (
             <>
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)} component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{data.OrderDate}</TableCell>

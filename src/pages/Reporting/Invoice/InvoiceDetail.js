@@ -280,12 +280,12 @@ class InvoiceDetail extends Component {
         tempArr.map((item) => {
           tempTotalhandlingCharge += item.handlingCharge
         })
-
+        console.log(this.props.transaction)
         this.setState({
           TransactionDetail: tempArr,
           transaction: this.props.transaction,
           actualVolume: actualVolume,
-          TransportationBool: this.props.transaction[0].TransportationTypeInd === 2 ? true : false,
+          // TransportationBool: this.props.transaction[0].TransportationTypeInd === 2 ? true : false,
           totalhandlingCharge: tempTotalhandlingCharge
           // TransportationBool: tempArr.filter((x) => x.Description === "Delivery Fee").length > 0 ? true : false
         })
@@ -328,18 +328,18 @@ class InvoiceDetail extends Component {
     tempArr[index].totalPrice = (tempArr[index].ProductPrice * tempArr[index].ProductQuantity)
     // tempArr[index].handlingCharge = 0
 
-    let tempArr2 = this.state.transaction
-    let total = 0;
-    tempArr.map((item) => {
-      total += item.totalPrice
-    })
-    tempArr2[0].OrderSubTotalAmount = total + additionalCharge
-    tempArr2[0].OrderTotalAmount = total + additionalCharge
+    // let tempArr2 = this.state.transaction
+    // let total = 0;
+    // tempArr.map((item) => {
+    //   total += item.totalPrice
+    // })
+    // tempArr2[0].OrderSubTotalAmount = total + additionalCharge
+    // tempArr2[0].OrderTotalAmount = total + additionalCharge
 
-    this.setState({
-      TransactionDetail: tempArr,
-      transaction: tempArr2,
-    })
+    // this.setState({
+    //   TransactionDetail: tempArr,
+    //   transaction: tempArr2,
+    // })
 
     if (this.state.handlingArray.length > 0) {
       if (this.state.handlingArray.filter((data) => parseInt(data.TransactionDetailID) === parseInt(tempArr[index].TransactionDetailID)).length > 0) {
@@ -507,9 +507,6 @@ class InvoiceDetail extends Component {
                 }
               </TableCell>
             }
-            {/* {console.log(data.ProductPrice)}
-            {console.log(this.state.TransactionDetail[index].handlingCharge)} */}
-            {console.log((parseFloat(data.totalPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2))}
             <TableCell align="right" sx={{ fontSize: fontsize }}>
               {data.Description === "Delivery Fee" ? (parseFloat(data.ProductPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)
                 : this.props.transaction[0].CalculationType === "3" ? "-" : (parseFloat(data.totalPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)}
@@ -767,7 +764,7 @@ class InvoiceDetail extends Component {
             </div>
 
             {/* content */}
-            {console.log(arr)}
+
             <div>
               <div style={companyDetail}>
                 <b>Container Date:</b> {TransactionDetail[0].ContainerDate !== null ? TransactionDetail[0].ContainerDate : " - "} {this.props.transaction[0].CalculationType === "4" && "( Cargo Delivery )"}
@@ -860,6 +857,13 @@ class InvoiceDetail extends Component {
                       <span style={total}>{TransactionDetail.filter((el) => el.TrackingNumber === "Delivery Fee").length > 0 ? TransactionDetail.length - 1 : TransactionDetail.length}</span>
                       <br />
                       Sub Total (RM) :
+                      {console.log("1",parseFloat(transaction[0].OrderSubTotalAmount))}
+                      {console.log("2",parseFloat(this.state.totalhandlingCharge))}
+                      {console.log("3",parseFloat(DeliveryFee))}
+                      {console.log("4",parseFloat(parseFloat(AdminExtraCharges)))}
+                      
+                      {console.log(parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee))}
+                      
                       {this.props.transaction[0].CalculationType === "3" ?
                         <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) : parseFloat(this.state.totalhandlingCharge) + parseFloat(subTotal))}</span>
                         :
