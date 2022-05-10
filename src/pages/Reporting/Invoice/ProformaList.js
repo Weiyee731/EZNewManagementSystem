@@ -39,7 +39,6 @@ function mapDispatchToProps(dispatch) {
 const ProformaList = (props) => {
     const { selectedType, state, userId, totalVolume, totalWeight } = props.location
     const { userProfile, userAreaCode, transactionReturn, loading } = props
-
     const [unitPrice, setUnitPrice] = useState(0)
     const [consolidatePrice, setConsolidatePrice] = useState(0)
     const [selfPickupPrice, setSelfPickupPrice] = useState(0)
@@ -64,6 +63,7 @@ const ProformaList = (props) => {
         if (userId !== undefined && typeof userId !== 'undefined') {
             localStorage.setItem('proformaUserId', userId)
         }
+        console.log(userId)
         props.CallUserProfileByID({ UserID: userId !== undefined && typeof userId !== 'undefined' ? userId : localStorage.getItem('proformaUserId') })
 
         let tempArr = []
@@ -134,11 +134,18 @@ const ProformaList = (props) => {
             label: 'Volume (m³)',
         },
         {
+            id: 'additional',
+            align: 'left',
+            disablePadding: false,
+            label: 'Additional Charges',
+        },
+        {
             id: 'unitPrice',
             align: 'left',
             disablePadding: false,
             label: 'Unit Price',
         },
+
         {
             id: 'price',
             align: 'left',
@@ -186,6 +193,24 @@ const ProformaList = (props) => {
             let subKg = weightCompare() - 1
             return !isNaN(roundOffTotal(firstKg + (subKg * subsequentKg))) ? roundOffTotal(firstKg + (subKg * subsequentKg)) : 0.00
         }
+    }
+
+    const AddTotalPrice = () => {
+        let totalArr = 0
+        items.map((item) => {
+            let addprice = 0;
+            if (JSON.parse(item.AdditionalCharges).length > 0) {
+                JSON.parse(item.AdditionalCharges).map((addcharge) => {
+                    if (addcharge.Charges !== "[]") {
+                        addprice = parseFloat(addprice) + parseFloat(addcharge.Value)
+                    } else {
+                        addprice = parseFloat(addprice) + parseFloat("0")
+                    }
+                })
+            }
+            totalArr = parseFloat(totalArr) + parseFloat(addprice)
+        })
+        return totalArr
     }
 
     const handleChangeSingleUnitPrice = (value, data) => {
@@ -252,8 +277,20 @@ const ProformaList = (props) => {
         let productQuantity = []
         let productDimension = []
         let productUnitPrices = []
+        let TotalAddPrice = 0;
 
         items.map((item) => {
+            let addprice = 0;
+            if (JSON.parse(item.AdditionalCharges).length > 0) {
+                JSON.parse(item.AdditionalCharges).map((addcharge) => {
+                    if (addcharge.Charges !== "[]") {
+                        addprice = parseFloat(addprice) + parseFloat(addcharge.Value)
+                    } else {
+                        addprice = parseFloat(addprice) + parseFloat("0")
+                    }
+                })
+            }
+            TotalAddPrice = parseFloat(TotalAddPrice) + parseFloat(addprice)
             productPrices.push(subTotal(item).toFixed(2))
             stockIds.push(item.StockID)
             productQuantity.push(item.ProductQuantity)
@@ -264,8 +301,9 @@ const ProformaList = (props) => {
         props.CallInsertTransaction({
             USERID: userId,
             TYPE: selectedType,
-            ORDERSUBTOTALMOUNT: selectedType === 4 ? (LargeItemMinPrice / 2 - totalPrice()).toFixed(2) : totalPrice(),
-            ORDERTOTALMOUNT: selectedType === 4 ? (LargeItemMinPrice / 2).toFixed(2) : totalPrice(),
+            DELIVERYFEE: selectedType === 4 && (totalVolume) < minCubic ? (parseFloat(LargeItemMinPrice / 2 - totalPrice())).toFixed(2) : parseFloat("0").toFixed(2),
+            ORDERSUBTOTALMOUNT: (parseFloat(totalPrice()) + parseFloat(TotalAddPrice)).toFixed(2),
+            ORDERTOTALMOUNT: selectedType === 4 && (totalVolume) < minCubic ? (parseFloat(LargeItemMinPrice / 2) + parseFloat(TotalAddPrice)).toFixed(2) : (parseFloat(totalPrice()) + parseFloat(TotalAddPrice)).toFixed(2),
             ORDERPAIDMOUNT: 0,
             FIRSTKG: selectedType === 3 ? firstKg : 0,
             SUBSEQUENCEKG: selectedType === 3 ? subsequentKg : 0,
@@ -331,8 +369,19 @@ const ProformaList = (props) => {
     }
 
     const renderTableRows = (data, index) => {
+        console.log(data)
         let fontsize = '9pt'
         let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
+        let addprice = 0;
+        if (JSON.parse(data.AdditionalCharges).length > 0) {
+            JSON.parse(data.AdditionalCharges).map((addcharge) => {
+                if (addcharge.Charges !== "[]") {
+                    addprice = parseFloat(addprice) + parseFloat(addcharge.Value)
+                } else {
+                    addprice = parseFloat(addprice) + parseFloat("0")
+                }
+            })
+        }
 
         return (
             <>
@@ -347,6 +396,7 @@ const ProformaList = (props) => {
                 </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{volume}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{addprice.toFixed(2)}</TableCell>
                 {selectedType !== 3 &&
                     <>
                         <TableCell align="left" sx={{ fontSize: fontsize }}>
@@ -359,7 +409,7 @@ const ProformaList = (props) => {
                                 onChange={(e) => handleChangeSingleUnitPrice(e.target.value, data)}
                             />
                         </TableCell>
-                        <TableCell align="left" sx={{ fontSize: fontsize }}>{subTotal(data).toFixed(2)}</TableCell>
+                        <TableCell align="left" sx={{ fontSize: fontsize }}>{(parseFloat(subTotal(data)) + parseFloat(addprice)).toFixed(2)} </TableCell>
                     </>
                 }
             </>
@@ -369,7 +419,7 @@ const ProformaList = (props) => {
     const renderTableTopLeft = () => {
         return (
             <div className='d-flex'>
-                {selectedType == 1 &&
+                {selectedType === 1 &&
                     <>
                         <TextField
                             variant="standard"
@@ -385,7 +435,21 @@ const ProformaList = (props) => {
                     </>
 
                 }
-                {selectedType != 3 && selectedType != 4 && (isArrayNotEmpty(items) && items.filter(x => volumeCalc(x.ProductDimensionDeep, x.ProductDimensionWidth, x.ProductDimensionHeight) > 0.013).length > 0) &&
+                {selectedType === 1 && (isArrayNotEmpty(items) && items.filter(x => volumeCalc(x.ProductDimensionDeep, x.ProductDimensionWidth, x.ProductDimensionHeight) > 0.013).length > 0) &&
+                    <TextField
+                        className="mx-3"
+                        variant="standard"
+                        size="small"
+                        type={'number'}
+                        label="Unit Price per m³"
+                        name="unitPrice"
+                        value={selectedType == 2 ? consolidatePrice : unitPrice}
+                        onChange={(e) => handleChangeAllUnitPrice(e)}
+                        error={selectedType == 2 ? !consolidatePriceValidated : !unitPriceValidated}
+                        helperText={selectedType == 2 ? !consolidatePriceValidated ? "It should be a valid digit" : "" : !unitPriceValidated ? "It should be a valid digit" : ""}
+                    />
+                }
+                {selectedType === 2 &&
                     <TextField
                         className="mx-3"
                         variant="standard"
@@ -428,7 +492,7 @@ const ProformaList = (props) => {
                         />
                     </>
                 }
-                {selectedType == 4 &&
+                {selectedType === 4 &&
                     <TextField
                         className="mx-3"
                         variant="standard"
@@ -578,14 +642,8 @@ const ProformaList = (props) => {
                         Sub total:
                     </div>
                     <div className='col-2'>
-                        RM {totalPrice()}
+                        RM {(parseFloat(totalPrice()) + parseFloat(AddTotalPrice())).toFixed(2)}
                     </div>
-                    {console.log(selectedType)}
-                    {console.log(totalVolume)}
-                    {console.log(minCubic)}
-                    {console.log(selectedType === 4 && (totalVolume) < minCubic)}
-                    {console.log((totalVolume) < minCubic)}
-                    {console.log(selectedType === 4 && (totalVolume) < minCubic)}
                     {selectedType === 4 && (totalVolume) < minCubic &&
                         <>
                             <div className='col-10'>
@@ -602,11 +660,11 @@ const ProformaList = (props) => {
                     <div className='col-2'>
                         {selectedType === 4 && (totalVolume) < minCubic ?
                             <>
-                                RM {(LargeItemMinPrice / 2).toFixed(2)}
+                                RM {(LargeItemMinPrice / 2 + parseFloat(AddTotalPrice())).toFixed(2)}
                             </>
                             :
                             <>
-                                RM {totalPrice()}
+                                RM {(parseFloat(totalPrice()) + parseFloat(AddTotalPrice())).toFixed(2)}
                             </>
                         }
                     </div>

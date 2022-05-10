@@ -37,6 +37,7 @@ function mapDispatchToProps(dispatch) {
   return {
     CallFetchAllTransactionByID: (data) => dispatch(GitAction.CallFetchAllTransactionByID(data)),
     CallUpdateTransaction: (data) => dispatch(GitAction.CallUpdateTransaction(data)),
+    CallUpdateTransactionWithoutStatus: (data) => dispatch(GitAction.CallUpdateTransaction(data)),
     CallUpdateTransactionDetailHandling: (data) => dispatch(GitAction.CallUpdateTransactionDetailHandling(data)),
     // CallUpdateStockDetailByPost: (data) => dispatch(GitAction.CallUpdateStockDetailByPost(data)),
     CallUpdateStockDetailByGet: (data) => dispatch(GitAction.CallUpdateStockDetailByGet(data)),
@@ -253,7 +254,7 @@ class InvoiceDetail extends Component {
 
 
           if (actualVolume < 0.50) {
-            this.props.CallUpdateTransaction({
+            this.props.CallUpdateTransactionWithoutStatus({
               TransactionID: this.state.TransactionID,
               TransportationType: 2,
               DeliveryFee: this.props.transaction && this.props.transaction[0].DeliveryFee ? this.props.transaction[0].DeliveryFee : extraFees
@@ -285,7 +286,7 @@ class InvoiceDetail extends Component {
           TransactionDetail: tempArr,
           transaction: this.props.transaction,
           actualVolume: actualVolume,
-          // TransportationBool: this.props.transaction[0].TransportationTypeInd === 2 ? true : false,
+          TransportationBool: this.props.transaction[0].TransportationTypeInd === 2 ? true : false,
           totalhandlingCharge: tempTotalhandlingCharge
           // TransportationBool: tempArr.filter((x) => x.Description === "Delivery Fee").length > 0 ? true : false
         })
@@ -353,6 +354,7 @@ class InvoiceDetail extends Component {
   }
 
   renderTableRows = (data, index) => {
+    console.log(data)
     const fontsize = '9pt'
     let DBextraCharge = []
     let charges = data.TransactionDetailCharges !== "[]" && data.TransactionDetailCharges !== undefined ? JSON.parse(data.TransactionDetailCharges).reduce((price, item) => price + parseFloat(item.ProductPrice), 0).toFixed(2) : 0
@@ -508,7 +510,7 @@ class InvoiceDetail extends Component {
               </TableCell>
             }
             <TableCell align="right" sx={{ fontSize: fontsize }}>
-              {data.Description === "Delivery Fee" ? (parseFloat(data.ProductPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)
+            {data.Description === "Delivery Fee" ? (parseFloat(data.ProductPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)
                 : this.props.transaction[0].CalculationType === "3" ? "-" : (parseFloat(data.totalPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)}
 
               {/* {data.Description === "Delivery Fee" ? parseFloat(data.ProductPrice) === undefined ? "-" : parseFloat(data.ProductPrice).toFixed(2)
@@ -916,6 +918,35 @@ class InvoiceDetail extends Component {
       AddModalOpen2,
     } = this.state
 
+    const { transaction } = this.props
+
+    let actualWeight = 0
+    let actualVolume = 0
+    let m3Weight = 0
+    let finalWeight = 0
+    let subTotal = 0
+    let handlingCharge = 0
+    let additionalCharges = 0
+    let AdminChargesArray = []
+    let AdminExtraCharges = 0
+
+    if (isArrayNotEmpty(transaction) && transaction[0].TransactionDetail !== null) {
+      actualWeight = JSON.parse(transaction[0].TransactionDetail).reduce((weight, item) => weight + item.ProductWeight, 0).toFixed(2)
+      actualVolume = JSON.parse(transaction[0].TransactionDetail).reduce((dimension, item) => dimension + ((item.ProductDimensionDeep * item.ProductDimensionHeight * item.ProductDimensionWidth) / 1000000), 0)
+      actualVolume = (Math.ceil(actualVolume * 1000) / 1000).toFixed(3)
+      m3Weight = Math.ceil(actualVolume * 1000000 / 6000)
+
+      // if (actualWeight > m3Weight)
+      //   finalWeight = actualWeight
+      // else
+      //   finalWeight = m3Weight
+
+      // handlingCharge = this.state.TransactionDetail.reduce((charges, item) => charges + item.handlingCharge, 0)
+      // handlingCharge = !isNaN(handlingCharge) ? handlingCharge : 0
+      // additionalCharges = this.state.TransactionDetail[0].TransactionDetailCharges != null && JSON.parse(this.state.TransactionDetail[0].TransactionDetailCharges).reduce((additionalCharge, item) => additionalCharge + parseFloat(item.ProductPrice), 0).toFixed(2)
+      // subTotal = ((Math.ceil(finalWeight).toFixed(2) - 1) * (transaction[0].SubSequenceKG) + (transaction[0].FirstKG) + parseFloat(handlingCharge) + parseFloat(additionalCharges)).toFixed(2) + parseFloat(AdminExtraCharges).toFixed(2)
+    }
+    console.log(actualVolume)
     return (
       <Card>
         <CardContent>
@@ -968,7 +999,7 @@ class InvoiceDetail extends Component {
                               checked={TransportationBool}
                               onChange={(e) => { this.handleChange(e) }}
                               value="checkedA"
-                              disabled={this.props.transaction.length > 0 && this.props.transaction[0].CalculationType === "4" ? true : false}
+                              disabled={this.props.transaction.length > 0 && this.props.transaction[0].CalculationType === "4" && actualVolume < 0.5 ? true : false}
                             />
                           </Grid>
                           <Grid item style={{ display: "inline-grid" }}>Delivery</Grid>

@@ -152,7 +152,7 @@ class TransactionHistory extends Component {
     componentDidMount() {
         if (this.props.transactions !== this.state.TransactionListing) {
             if (this.props.transactions !== undefined && this.props.transactions[0] !== undefined) {
-                if(this.props.transactions[0].ReturnVal !== "0")
+                if (this.props.transactions[0].ReturnVal !== "0")
                     this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
             }
         }
@@ -161,13 +161,15 @@ class TransactionHistory extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.transactions !== this.props.transactions) {
             if (this.props.transactions !== undefined && this.props.transactions[0] !== undefined) {
-                if(this.props.transactions[0].ReturnVal !== "0")
+                if (this.props.transactions[0].ReturnVal !== "0")
                     this.setState({ TransactionListing: this.props.transactions, TransactionListingFiltered: this.props.transactions });
             }
         } else {
             if (prevProps.transactions !== this.state.TransactionListing) {
-                if(this.props.transactions[0].ReturnVal !== "0")
-                    this.setState({ TransactionListing: prevProps.transactions, TransactionListingFiltered: prevProps.transactions });
+                if (this.props.transactions !== undefined && this.props.transactions[0] !== undefined) {
+                    if (this.props.transactions[0].ReturnVal !== "0")
+                        this.setState({ TransactionListing: prevProps.transactions, TransactionListingFiltered: prevProps.transactions });
+                }
             }
         }
 

@@ -324,6 +324,7 @@ class CreateInvoice extends Component {
             weight += item.ProductWeight
             mCube += volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
         })
+
         if (!isStringNullOrEmpty(selectedUserID)) {
             this.handleDeliveryModal()
             this.props.history.push({

@@ -214,7 +214,18 @@ export class GitAction {
       payload: propsData
     };
   }
+
+  static UpdateTransactionWithoutStatus = "UPDATE_TRANSACTIONWITHOUTSTATUS";
+  static UpdatedTransactionWithoutStatus = "TRANSACTIONWITHOUTSTATUS_UPDATEED";
+  static CallUpdateTransactionWithoutStatus(propsData) {
+    return {
+      type: GitAction.UpdateTransactionWithoutStatus,
+      payload: propsData
+    };
+  }
   
+  
+
   static UpdateTransactionDetailHandling = "UPDATE_TRANSACTION_DETAIL_HANDLING";
   static UpdatedTransactionDetailHandling = "TRANSACTION_DETAIL_HANDLING_UPDATEED";
   static CallUpdateTransactionDetailHandling(propsData) {

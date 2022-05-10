@@ -178,7 +178,12 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, {
         loading: false
       });
-
+    case GitAction.UpdateTransactionWithoutStatus:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.UpdatedTransactionWithoutStatus:
+      return Object.assign({}, state, {
+        loading: false
+      });
     case GitAction.UpdateTransactionDetailHandling:
       return Object.assign({}, state, { loading: true });
     case GitAction.UpdatedTransactionDetailHandling:
