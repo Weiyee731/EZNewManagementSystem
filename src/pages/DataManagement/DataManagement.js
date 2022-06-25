@@ -179,7 +179,7 @@ class DataManagement extends Component {
                 Member += (isStringNullOrEmpty(DataRows[index]["Member"])) ? "-" : DataRows[index]["Member"].trim();
                 Division += (isStringNullOrEmpty(DataRows[index]["Division"])) ? "-" : DataRows[index]["Division"].trim();
                 StockDate += (isStringNullOrEmpty(DataRows[index]["Stock Date"])) ? "-" : moment(DataRows[index]["Stock Date"].trim(), 'YYYY-MM-DD HH:mm:ss', false).format('YYYY/MM/DD HH:mm:ss')
-                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : moment(DataRows[index]["Packaging Date"].trim(), 'DD/MM/YYYY HH:mm:ss', false).format('YYYY/MM/DD HH:mm:ss')
+                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : moment(DataRows[index]["Packaging Date"].trim(), 'YYYY-MM-DD', false).format('YYYY/MM/DD HH:mm:ss')
                 AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "-" : DataRows[index]["Additional Cost"].trim();
                 Remarks += (isStringNullOrEmpty(DataRows[index]["Remarks"])) ? "-" : DataRows[index]["Remarks"];
                 if (index !== DataRows.length - 1) {
@@ -227,7 +227,7 @@ class DataManagement extends Component {
                 toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
                 this.setState({ isSubmit: true })
                 console.log("object", object)
-                this.props.CallInsertStockByPost(object)
+                // this.props.CallInsertStockByPost(object)
             }
         }
     }
