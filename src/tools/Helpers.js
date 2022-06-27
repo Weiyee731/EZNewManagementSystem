@@ -1,3 +1,4 @@
+const month = ['']
 // validation functions
 export const isStringNullOrEmpty = (value) => { return (typeof value === 'undefined') ? true : (value === null || value == null) ? true : (typeof value === "string" && value.trim() === "") ? true : false }
 export const isObjectUndefinedOrNull = (obj) => { return (typeof obj === 'undefined' || obj === null) ? true : false }
@@ -22,12 +23,45 @@ export const isNumber = (number) => { return (!isStringNullOrEmpty(number) && !i
 export const convertDateTimeToString112Format = (date, fetchTime) => {
     try {
         let date112 = typeof date !== "undefined" && date !== "" ? new Date(date) : new Date();
+        console.log(date112)
         let dd = (date112.getDate().toString().length <= 1) ? "0" + date112.getDate() : date112.getDate().toString()
         let mm = ((date112.getMonth() + 1).toString().length <= 1) ? "0" + (date112.getMonth() + 1) : (date112.getMonth() + 1).toString()
         let yyyy = date112.getFullYear();
         let HH = (date112.getHours().toString().length <= 1) ? "0" + date112.getHours() : date112.getHours().toString()
         let MM = (date112.getMinutes().toString().length <= 1) ? "0" + date112.getMinutes() : date112.getMinutes().toString()
         let ss = (date112.getSeconds().toString().length <= 1) ? "0" + date112.getSeconds() : date112.getSeconds().toString()
+
+        return (fetchTime === true) ? (yyyy.toString() + "/" + mm + "/" + dd + " " + HH + ":" + MM + ":" + ss) : (yyyy.toString() + "/" + mm + "/" + dd)
+    }
+    catch (e) {
+        let date112 = new Date();
+        let dd = (date112.getDate().toString().length <= 1) ? "0" + date112.getDate() : date112.getDate().toString()
+        let mm = ((date112.getMonth() + 1).toString().length <= 1) ? "0" + (date112.getMonth() + 1) : (date112.getMonth() + 1).toString()
+        let yyyy = date112.getFullYear();
+        let HH = (date112.getHours().toString().length <= 1) ? "0" + date112.getHours() : date112.getHours().toString()
+        let MM = (date112.getMinutes().toString().length <= 1) ? "0" + date112.getMinutes() : date112.getMinutes().toString()
+        let ss = (date112.getSeconds().toString().length <= 1) ? "0" + date112.getSeconds() : date112.getSeconds().toString()
+
+        return (fetchTime === true) ? (yyyy.toString() + "/" + mm + "/" + dd + " " + HH + ":" + MM + ":" + ss) : (yyyy.toString() + "/" + mm + "/" + dd)
+    }
+}
+// May 10 2022 12:00AM
+var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+export const convertDateTimeToString_103To112Format = (date, fetchTime) => {
+    try {
+        let date103 = date.split(' ')
+
+        if (typeof date !== "undefined" && date !== "") 
+            date103 = new Date(date103[2], months.indexOf(date103[0]), date103[1])
+        else
+            date103 = new Date()
+
+        let dd = (date103.getDate().toString().length <= 1) ? "0" + date103.getDate() : date103.getDate().toString()
+        let mm = ((date103.getMonth() + 1).toString().length <= 1) ? "0" + (date103.getMonth() + 1) : (date103.getMonth() + 1).toString()
+        let yyyy = date103.getFullYear();
+        let HH = (date103.getHours().toString().length <= 1) ? "0" + date103.getHours() : date103.getHours().toString()
+        let MM = (date103.getMinutes().toString().length <= 1) ? "0" + date103.getMinutes() : date103.getMinutes().toString()
+        let ss = (date103.getSeconds().toString().length <= 1) ? "0" + date103.getSeconds() : date103.getSeconds().toString()
 
         return (fetchTime === true) ? (yyyy.toString() + "/" + mm + "/" + dd + " " + HH + ":" + MM + ":" + ss) : (yyyy.toString() + "/" + mm + "/" + dd)
     }
@@ -69,7 +103,7 @@ export const convertArrayToStringWithSpecialCharacter = (list, sc) => {
     }
 }
 export const extractNumberFromStrings = (text) => { return (typeof text === "string") ? Number("5g".replace(/[^0-9\.]+/g, "")) : 0 }
- 
+
 // image utilities functions
 export const getImageOrientationType = (imageWidth, imageHeight) => {
     if (Number(imageWidth) > Number(imageHeight))

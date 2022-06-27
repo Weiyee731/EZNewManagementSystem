@@ -311,7 +311,6 @@ export class GitEpic {
             ITEM: payload.Item,
             TRACKINGSTATUSID: payload.TRACKINGSTATUSID,
             CONTAINERNAME: payload.ContainerName,
-
             CONTAINERDATE: payload.ContainerDate,
             REMARK: payload.Remark,
             EXTRACHARGE: payload.AdditionalCharges
@@ -320,6 +319,7 @@ export class GitEpic {
       )
         .then(response => response.json())
         .then(json => {
+          console.log(json)
           if (json !== "fail") {
             json = json;
             toast.success("Successfully update stock. Fetching the latest data..", { autoClose: 3000 })
@@ -752,31 +752,6 @@ export class GitEpic {
         const response = await fetch(url +
           "Inventory_ViewArchiveStockListByDate?" +
           "&STARTDATE=" + payload.STARTDATE +
-          "&ENDDATE=" + payload.ENDDATE
-        );
-
-        let json = await response.json();
-        json = JSON.parse(json)
-        return {
-          type: GitAction.ArchivedStocksFetched,
-          payload: json,
-        };
-      }
-      catch (error) {
-        toast.error("Error Code: Inventory_ViewArchiveStockListByDate")
-        return {
-          type: GitAction.ArchivedStocksFetched,
-          payload: [],
-        };
-      }
-    });
-
-  Inventory_ViewArchiveStockListByDate = action$ =>
-    action$.ofType(GitAction.FetchArchivedStocks).switchMap(async ({ payload }) => {
-      try {
-        const response = await fetch(url +
-          "Inventory_ViewArchiveStockListByDate?" +
-          "STARTDATE=" + payload.STARTDATE +
           "&ENDDATE=" + payload.ENDDATE
         );
 
