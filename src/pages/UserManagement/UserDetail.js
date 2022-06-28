@@ -129,6 +129,12 @@ const headCells = [
 
 const PaymentHeadCells = [
   {
+    id: 'PaymentID',
+    align: 'left',
+    disablePadding: false,
+    label: '#',
+  },
+  {
     id: 'ReferenceNo',
     align: 'left',
     disablePadding: false,
@@ -842,7 +848,8 @@ class UserDetail extends Component {
   renderPaymentTableRows = (data, index) => {
     return (
       <>
-        <TableCell onClick={(event) => this.onTableRowClick(event, data)} component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{data.ReferenceNo}</TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)} component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{index + 1}</TableCell>
+        <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.ReferenceNo}</TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.Type}</TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.PaymentMethod}</TableCell>
         <TableCell onClick={(event) => this.onTableRowClick(event, data)}>{data.PaymentAmount.toFixed(2)}</TableCell>
@@ -852,7 +859,8 @@ class UserDetail extends Component {
   }
 
   onTableRowClick = (event, row) => {
-    this.props.history.push(`/TransactionHistoryDetail/${row.TransactionID}`)
+    console.log(row)
+    // this.props.history.push(`/TransactionHistoryDetail/${row.TransactionID}`)
   }
 
   handleClose = () => {
@@ -860,9 +868,9 @@ class UserDetail extends Component {
   }
 
   onAddButtonClick = (event, row, index) => {
-    if(row.length > 0){
+    if (row.length > 0) {
       this.setState({ AddModalOpen: true, selectedRow: row, selectedindex: index });
-    }else{
+    } else {
       toast.error("Please, Select at least one Invoice.")
     }
   }
@@ -1289,35 +1297,38 @@ class UserDetail extends Component {
           <Card>
             <CardContent>
               <div className="row ">
-                <div className="col-12 col-md-6">
-                  <ResponsiveContainer height={getWindowDimensions().screenHeight * .5} width="100%">
-                    <PieChart>
-                      <Pie
-                        data={this.state.PieChartData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={true}
-                        label={this.renderCustomizedLabel}
-                        outerRadius={100}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {isArrayNotEmpty(this.state.PieChartData) && this.state.PieChartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
-                  {
-                    this.state.isPieChartNoData && <p className="text-center text-secondary"><i>There are no paid or unpaid amount.</i></p>
-                  }
+                <div className="col-12 col-md-4">
+                  <div style={{ width: '100%', height: getWindowDimensions().screenHeight * .35 }}>
+                    <ResponsiveContainer height="100%" width="100%">
+                      <PieChart>
+                        <Pie
+                          data={this.state.PieChartData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={true}
+                          label={this.renderCustomizedLabel}
+                          outerRadius={100}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {isArrayNotEmpty(this.state.PieChartData) && this.state.PieChartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                    {
+                      this.state.isPieChartNoData && <p className="text-center text-secondary"><i>There are no paid or unpaid amount.</i></p>
+                    }
+                  </div>
+
                 </div>
-                <div className="col-12 col-md-6">
+                <div className="col-12 col-md-8">
                   <TableComponents
                     tableOptions={{
                       dense: true,
-                      tableOrderBy: 'asc',
-                      sortingIndex: "ReferenceNo",
+                      tableOrderBy: 'desc',
+                      sortingIndex: "PaymentID",
                       stickyTableHeader: false,
                       stickyTableHeight: 400,
                     }}

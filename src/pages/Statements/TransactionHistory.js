@@ -131,7 +131,6 @@ class TransactionHistory extends Component {
             isPayAmountValid: false,
             isDateValid: false,
             isReferenceValid: false,
-            searchCategory: "All",
             searchArea: "All",
             onSearchText: "",
             searchKeys: "",
@@ -145,6 +144,7 @@ class TransactionHistory extends Component {
         this.handleSearchCategory = this.handleSearchCategory.bind(this)
         this.handleSearchArea = this.handleSearchArea.bind(this)
         this.renderAreaCodeName = this.renderAreaCodeName.bind(this)
+        this.OnEnterToUpdatePayment = this.OnEnterToUpdatePayment.bind(this)
         this.props.CallFetchAllTransaction(this.state);
         this.props.CallUserAreaCode();
     }
@@ -194,7 +194,6 @@ class TransactionHistory extends Component {
     }
 
     renderTableRows = (data, index) => {
-        console.log(data)
         return (
             <>
                 <TableCell onClick={(event) => this.onTableRowClick(event, data)} component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{data.OrderDate}</TableCell>
@@ -234,11 +233,32 @@ class TransactionHistory extends Component {
     }
 
     handleClose = () => {
-        this.setState({ AddModalOpen: false });
+        this.setState({
+            AddModalOpen: false,
+            Payment: "",
+            isPayAmountValid: false,
+            ReferenceNo: "",
+            isReferenceValid: false,
+            Datetime: new Date()
+        });
     }
 
     onAddButtonClick = (event, row) => {
-        this.setState({ AddModalOpen: true, selectedRow: row, TransactionID: row.TransactionID });
+        this.setState({
+            AddModalOpen: true,
+            selectedRow: row,
+            TransactionID: row.TransactionID,
+            Payment: "",
+            isPayAmountValid: false,
+            ReferenceNo: "",
+            isReferenceValid: false,
+            Datetime: new Date()
+        });
+    }
+
+    OnEnterToUpdatePayment = (e) => {
+        if (e.key === 'Enter' || e.keyCode === 13)
+            this.onUpdateTransactionPayment()
     }
 
     onDeleteButtonClick = (items) => {
@@ -246,15 +266,19 @@ class TransactionHistory extends Component {
     }
 
     onUpdateTransactionPayment = () => {
-        const { TransactionID, Payment, searchCategory, ReferenceNo, Datetime } = this.state
+        const { TransactionID, Payment, PaymentMethod, ReferenceNo, Datetime } = this.state
         let object = {
             TransactionID: TransactionID,
             PaymentAmmount: Payment,
-            PaymentMethod: searchCategory,
+            PaymentMethod: PaymentMethod,
             ReferenceNo: ReferenceNo,
             Datetime: convertDateTimeToString112Format(Datetime),
         }
-        this.props.CallUpdateTransactionPayment(object)
+
+        if (!isStringNullOrEmpty(this.state.Payment) && !isStringNullOrEmpty(this.state.ReferenceNo))
+            this.props.CallUpdateTransactionPayment(object)
+        else
+            toast.error("Please fill in all the fields.")
     }
 
     handleInputChange = (e) => {
@@ -301,6 +325,7 @@ class TransactionHistory extends Component {
     }
 
     handlePaymentCategoryCategory(e) {
+        console.log(e.target.value)
         this.setState({ PaymentMethod: e.target.value })
     }
 
@@ -571,7 +596,7 @@ class TransactionHistory extends Component {
                                                 Trans. No: <b>{selectedRow.TransactionName}</b>
                                             </div>
                                             <div className="float-end">
-                                                Unpaid(RM): <b className="text-danger" style={{ fontSize: '14pt', marginRight: 15 }}>{selectedRow.OrderTotalAmount}</b>
+                                                Unpaid(RM): <b className="text-danger" style={{ fontSize: '14pt', marginRight: 15 }}>{(selectedRow.OrderTotalAmount - selectedRow.OrderPaidAmount).toFixed(2)}</b>
                                                 Paid(RM): <b className="text-success" style={{ fontSize: '14pt' }}>{selectedRow.OrderPaidAmount}</b>
                                             </div>
                                         </div>
@@ -582,8 +607,8 @@ class TransactionHistory extends Component {
                                     <Grid item xs={12} sm={12}>
                                         <label className="my-auto col-3">Payment Method:</label>
                                         <Select
-                                            labelId="search-filter-category"
-                                            id="search-filter-category"
+                                            labelId="search-filter-payment"
+                                            id="search-filter-payment"
                                             value={this.state.PaymentMethod}
                                             label="Search By"
                                             onChange={this.handlePaymentCategoryCategory}
@@ -591,10 +616,10 @@ class TransactionHistory extends Component {
                                             className="col-9"
                                             placeholder="filter by"
                                         >
-                                            <MenuItem key="search_all" value="Cash">Cash</MenuItem>
-                                            <MenuItem key="search_tracking" value="Tracking">Bank Transfer</MenuItem>
-                                            <MenuItem key="search_member" value={"Member"}>Boost</MenuItem>
-                                            <MenuItem key="search_container" value={"Container"}>S Pay Global</MenuItem>
+                                            <MenuItem key="cash_payment" value="Cash">Cash</MenuItem>
+                                            <MenuItem key="bank_payment" value="Bank Transfer">Bank Transfer</MenuItem>
+                                            <MenuItem key="boost_payment" value="Boost">Boost</MenuItem>
+                                            <MenuItem key="spay_payment" value="SPay">S Pay Global</MenuItem>
                                         </Select>
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -605,6 +630,7 @@ class TransactionHistory extends Component {
                                             type="number"
                                             fullWidth
                                             onChange={(e) => this.handleInputChange(e)}
+                                            onKeyDown={(e) => { this.OnEnterToUpdatePayment(e) }}
                                             id="payment"
                                             label="Pay Amount(RM)"
                                             autoFocus
@@ -631,6 +657,7 @@ class TransactionHistory extends Component {
                                             label="Reference"
                                             id="reference"
                                             onChange={(e) => this.handleInputChange(e)}
+                                            onKeyDown={(e) => { this.OnEnterToUpdatePayment(e) }}
                                             autoComplete="reference"
                                             error={this.state.isReferenceValid}
                                             helperText={this.state.isReferenceValid ? "Invalid reference" : ""}

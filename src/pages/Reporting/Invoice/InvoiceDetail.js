@@ -843,7 +843,7 @@ class InvoiceDetail extends Component {
                     </div>
                     <div style={tncDiv} className="col-3 mt-4">
                       <div >Payment can be make through SPay Global</div>
-                      <img style={img} src="https://tourism.denoo.my/Ez/spay.jpeg" ></img>
+                      <img style={img} src={`https://tourism.denoo.my/Ez/spay.jpeg`} alt="SPAY_QR" ></img>
                     </div>
                     <div style={tncDiv} className="col-3 offset-1">
                       {this.props.transaction[0].CalculationType === "3" &&
@@ -955,7 +955,7 @@ class InvoiceDetail extends Component {
               color="primary"
               aria-label="back"
               component="span"
-              onClick={() => this.props.history.push('/Invoice')}>
+              onClick={() => this.props.history.goBack()}>
               <ArrowBackIcon />
             </IconButton>
             <IconButton

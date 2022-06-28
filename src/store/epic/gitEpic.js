@@ -113,11 +113,7 @@ export class GitEpic {
     });
 
   User_ProfileByID = action$ =>
-
     action$.ofType(GitAction.GetUserProfileByID).switchMap(async ({ payload }) => {
-      console.log(url +
-        "User_ViewProfileByID?" +
-        "USERID=" + payload.UserID)
       try {
         const response = await fetch(url +
           "User_ViewProfileByID?" +
@@ -775,6 +771,11 @@ export class GitEpic {
 
   Transaction_ViewArchiveTransaction = action$ =>
     action$.ofType(GitAction.FetchArchivedTransaction).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Transaction_ViewArchiveTransaction?" +
+        "STARTDATE=" + payload.STARTDATE +
+        "&ENDDATE=" + payload.ENDDATE
+      )
       try {
         const response = await fetch(url +
           "Transaction_ViewArchiveTransaction?" +

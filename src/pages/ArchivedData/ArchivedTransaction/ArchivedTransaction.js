@@ -347,8 +347,8 @@ class ArchivedTransaction extends Component {
                             </div>
                         </div>
                         <div className="col-md-11 col-11 m-auto">
-                            <SearchBar onChange={onLocalSearch}  label="Enter Member No, Tracking No or Container No to search"
-                               value={this.state.searchKeywords} />
+                            <SearchBar onChange={onLocalSearch} label="Enter Member No, Tracking No or Container No to search"
+                                value={this.state.searchKeywords} />
                         </div>
                         <div className="col-md-1 col-1 m-auto">
                             <CsvDownloader
@@ -383,7 +383,7 @@ class ArchivedTransaction extends Component {
                             headerColor: 'rgb(200, 200, 200)'
                         }}
                         selectedIndexKey={"pid"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
-                        Data={this.state.TransactionListingFiltered}                                  // required, the data that listing in the table
+                        Data={isArrayNotEmpty(this.state.TransactionListingFiltered) ? this.state.TransactionListingFiltered : []}                                  // required, the data that listing in the table
                         // onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                         onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                         onDeleteButtonClick={this.onDeleteButtonClick}  // required, onDeleteButtonClick = (items) => { }. The function should follow the one shown, as it will return the lists of selected items
@@ -454,16 +454,6 @@ class ArchivedTransaction extends Component {
                                             autoComplete="reference"
                                         />
                                     </Grid>
-                                    {/*<Grid item xs={12}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="Address"
-                      label="Address"
-                      id="address"
-                      autoComplete="address"
-                    />
-                  </Grid> */}
                                 </Grid>
                                 <Button
                                     type="submit"

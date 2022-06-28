@@ -179,6 +179,12 @@ const ProformaList = (props) => {
             disablePadding: false,
             label: 'Volume (m³)',
         },
+        {
+            id: 'price',
+            align: 'left',
+            disablePadding: false,
+            label: 'Price (RM)',
+        },
     ];
 
     const totalPrice = () => {
