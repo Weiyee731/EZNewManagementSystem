@@ -37,6 +37,7 @@ function mapDispatchToProps(dispatch) {
         CallFetchAllTransaction: (data) => dispatch(GitAction.CallFetchAllTransaction(data)),
         CallCancelTransaction: (propsData) => dispatch(GitAction.CallCancelTransaction(propsData)),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
+        CallResetTransaction: () => dispatch(GitAction.CallResetTransaction()),
     };
 }
 
@@ -139,6 +140,9 @@ class Invoice extends Component {
         if (prevProps.transactionReturn !== transactionReturn) {
             if (transactionReturn[0].ReturnVal == 1) {
                 toast.success(transactionReturn[0].ReturnMsg)
+                this.props.CallResetTransaction()
+                this.props.CallFetchAllTransaction(this.state);
+
             } else {
                 toast.error("Something went wrong. Please try again")
             }

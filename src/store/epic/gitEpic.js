@@ -46,7 +46,7 @@ export class GitEpic {
             type: GitAction.LoginSuccess,
             payload: json,
           };
-        } 
+        }
         else {
           // alert("Invalid credential")
           return {
@@ -592,7 +592,7 @@ export class GitEpic {
       }
     });
 
-    Transaction_UpdateTransactionWithoutStatus = action$ =>
+  Transaction_UpdateTransactionWithoutStatus = action$ =>
     action$.ofType(GitAction.UpdateTransactionWithoutStatus).switchMap(async ({ payload }) => {
       console.log(url +
         "Transaction_UpdateTransactionWithoutStatus?" +
@@ -623,7 +623,7 @@ export class GitEpic {
       }
     });
 
-  
+
 
   Transaction_UpdateTransactionDetailHandling = action$ =>
     action$.ofType(GitAction.UpdateTransactionDetailHandling).switchMap(async ({ payload }) => {
@@ -692,6 +692,11 @@ export class GitEpic {
 
   Transaction_DeleteTransaction = action$ =>
     action$.ofType(GitAction.CancelTransaction).switchMap(async ({ payload }) => {
+      console.log(url +
+        "Transaction_DeleteTransaction?" +
+        "TRANSACTIONID=" + payload
+      )
+
       try {
         const response = await fetch(url +
           "Transaction_DeleteTransaction?" +
