@@ -325,7 +325,6 @@ class TransactionHistory extends Component {
     }
 
     handlePaymentCategoryCategory(e) {
-        console.log(e.target.value)
         this.setState({ PaymentMethod: e.target.value })
     }
 

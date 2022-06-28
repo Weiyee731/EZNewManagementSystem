@@ -207,10 +207,10 @@ class UserDetail extends Component {
       userDeliveryOn1stKGValidated: null,
       userDeliveryOnSubKG: "",
       userDeliveryOnSubKGValidated: null,
-      PaymentMethod: '',
+      PaymentMethod: "Cash",
       TransactionID: [],
       ReferenceNo: '',
-      Datetime: '',
+      Datetime: new Date(),
       // userDeliveryOnSubKG: "",
       // userDeliveryOnSubKGValidated: null,
 
@@ -236,6 +236,8 @@ class UserDetail extends Component {
     this.handlePaymentCategoryCategory = this.handlePaymentCategoryCategory.bind(this)
     this.onSelectRow = this.onSelectRow.bind(this)
     this.onSelectAllRow = this.onSelectAllRow.bind(this)
+    this.OnEnterToUpdatePayment = this.OnEnterToUpdatePayment.bind(this)
+
   }
 
   componentDidMount() {
@@ -486,6 +488,7 @@ class UserDetail extends Component {
       this.setState({ selectedindex: this.state.selectedindex.filter(index => index !== i) })
     }
     if (isArrayNotEmpty(sorted)) {
+      console.log(sorted)
       sorted.map(el => {
         var debt = el.OrderTotalAmount - el.OrderPaidAmount
         totalDebt += debt
@@ -497,11 +500,17 @@ class UserDetail extends Component {
 
   onSelectAllRow(rows) {
     var index = []
+    var totalDebt = 0;
+
     if (isArrayNotEmpty(rows)) {
       for (var x = 0; x < rows.length; x++) {
         index.push(x)
+
+        // calculate the total debts
+        var debt = rows[x].OrderTotalAmount - rows[x].OrderPaidAmount
+        totalDebt += debt
       }
-      this.setState({ selectedRow: rows, selectedindex: index })
+      this.setState({ selectedRow: rows, selectedindex: index, totalDebt: totalDebt.toFixed(2) })
     }
   }
 
@@ -741,12 +750,18 @@ class UserDetail extends Component {
     }
   }
 
+  OnEnterToUpdatePayment = (e) => {
+    if (e.key === 'Enter' || e.keyCode === 13)
+      this.onUpdateTransactionPayment()
+  }
+
   onUpdateTransactionPayment = async (event, row) => {
-    const { TransactionID, payment, totalDebt, selectedRow, PaymentMethod, ReferenceNo, Datetime } = this.state
+    const { payment, totalDebt, selectedRow, PaymentMethod, ReferenceNo, Datetime } = this.state
     var TotalPayment = payment
-    var AllTransactionID = TransactionID
+    var AllTransactionID = []
     var pays = [];
     var pay = []
+
     if (isArrayNotEmpty(selectedRow)) {
       selectedRow.map(el => {
         AllTransactionID.push(el.TransactionID)
@@ -757,47 +772,45 @@ class UserDetail extends Component {
 
     if (payment === totalDebt) {
       pay = pays
-    } else if (payment > totalDebt) {
+    }
+    else if (payment > totalDebt) {
       var count = 0
       pays.map(el => {
 
         if ((TotalPayment - el) >= 0) {
-          if (count <= pays.length - 2) {
+          if (count <= pays.length - 2)
             pay.push(Number(el));
-          } else {
+          else
             pay.push(Number(TotalPayment));
-          }
-        } else if (TotalPayment - el < 0 && TotalPayment > 0) {
+        }
+        else if (TotalPayment - el < 0 && TotalPayment > 0)
           pay.push(Number(TotalPayment))
-        } else pay.push(0)
+        else
+          pay.push(0)
 
         TotalPayment -= el
         count += 1
         TotalPayment = roundOffTotal(TotalPayment)
         return (pay)
       })
-      console.log(pay)
-      console.log(pays)
-    } else if (payment < totalDebt) {
+
+    }
+    else if (payment < totalDebt) {
       pays.map(el => {
-        if ((TotalPayment - el) >= 0) {
+        if ((TotalPayment - el) >= 0)
           pay.push(el);
-        } else if (TotalPayment - el < 0 && TotalPayment > 0) {
-
+        else if (TotalPayment - el < 0 && TotalPayment > 0)
           pay.push(Number(TotalPayment))
-
-        } else pay.push(0)
+        else
+          pay.push(0)
 
         TotalPayment -= el
         TotalPayment = roundOffTotal(TotalPayment)
         return (pay)
       })
-      console.log(pay)
-      console.log(pays)
       //need to calculate which one to pay
-    } else console.log("no payment")
+    }
 
-    console.log(pay.length)
     if (pay.length === AllTransactionID.length) {
       AllTransactionID = AllTransactionID.join(';')
       pay = pay.join(';')
@@ -808,9 +821,14 @@ class UserDetail extends Component {
         ReferenceNo: ReferenceNo,
         Datetime: convertDateTimeToString112Format(Datetime),
       }
-      this.props.CallUpdateTransactionPayment(object)
+
+      if (!isStringNullOrEmpty(object.PaymentAmmount) && !isStringNullOrEmpty(object.ReferenceNo))
+        this.props.CallUpdateTransactionPayment(object)
+      else
+        toast.error("Please fill in all the fields.")
+
     } else {
-      console.log('Error occured. Please choose the transaction and key in correct payment');
+      toast.error('Error occured. Please choose the transaction and key in correct payment');
     }
 
   }
@@ -859,7 +877,7 @@ class UserDetail extends Component {
   }
 
   onTableRowClick = (event, row) => {
-    console.log(row)
+    // console.log(row)
     // this.props.history.push(`/TransactionHistoryDetail/${row.TransactionID}`)
   }
 
@@ -869,7 +887,17 @@ class UserDetail extends Component {
 
   onAddButtonClick = (event, row, index) => {
     if (row.length > 0) {
-      this.setState({ AddModalOpen: true, selectedRow: row, selectedindex: index });
+      this.setState({
+        selectedindex: index,
+        AddModalOpen: true,
+        selectedRow: row,
+        TransactionID: row.TransactionID,
+        Payment: "",
+        isPayAmountValid: false,
+        ReferenceNo: "",
+        isReferenceValid: false,
+        Datetime: new Date()
+      });
     } else {
       toast.error("Please, Select at least one Invoice.")
     }
@@ -1435,10 +1463,10 @@ class UserDetail extends Component {
                       className="col-9"
                       placeholder="filter by"
                     >
-                      <MenuItem key="search_all" value="Cash">Cash</MenuItem>
-                      <MenuItem key="search_tracking" value="Tracking">Bank Transfer</MenuItem>
-                      <MenuItem key="search_member" value={"Member"}>Boost</MenuItem>
-                      <MenuItem key="search_container" value={"Container"}>S Pay Global</MenuItem>
+                      <MenuItem key="cash_payment" value="Cash">Cash</MenuItem>
+                      <MenuItem key="bank_payment" value="Bank Transfer">Bank Transfer</MenuItem>
+                      <MenuItem key="boost_payment" value="Boost">Boost</MenuItem>
+                      <MenuItem key="spay_payment" value="SPay">S Pay Global</MenuItem>
                     </Select>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -1449,6 +1477,7 @@ class UserDetail extends Component {
                       type="number"
                       fullWidth
                       onChange={(e) => this.handleInputChange(e)}
+                      onKeyDown={(e) => { this.OnEnterToUpdatePayment(e) }}
                       id="payment"
                       label="Pay Amount(RM)"
                       autoFocus
@@ -1475,6 +1504,7 @@ class UserDetail extends Component {
                       label="Reference"
                       id="reference"
                       onChange={(e) => this.handleInputChange(e)}
+                      onKeyDown={(e) => { this.OnEnterToUpdatePayment(e) }}
                       autoComplete="reference"
                       error={this.state.isReferenceValid}
                       helperText={this.state.isReferenceValid ? "Invalid reference" : ""}
@@ -1487,7 +1517,7 @@ class UserDetail extends Component {
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
                   onClick={() => this.onUpdateTransactionPayment()}
-                  disabled={this.state.Payment === "" || this.state.ReferenceNo === "" || this.state.Datetime === "" || this.state.PaymentMethod === ""}
+                  disabled={this.state.PaymentMethod === "" || this.state.ReferenceNo === "" || this.state.Datetime === "" || this.state.PaymentMethod === ""}
                 >
                   Update Payment
                 </Button>
