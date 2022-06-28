@@ -18,7 +18,7 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import IconButton from '@mui/material/IconButton';
-
+import { toast } from "react-toastify";
 // import css
 import "./Login.css"
 
@@ -33,6 +33,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         CallUserLogin: (data) => dispatch(GitAction.CallUserLogin(data)),
+        CallClearLogonUserCache: () => dispatch(GitAction.CallClearLogonUserCache()),
     };
 }
 
@@ -42,6 +43,7 @@ const INITIAL_STATE = {
     username: "",
     password: "",
     showPassword: false,
+    isSubmitting: false,
 }
 
 class Dashboard extends Component {
@@ -56,10 +58,15 @@ class Dashboard extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (!this.props.loading && isArrayNotEmpty(this.props.logonUser)) {
-            setLogonUser(this.props.logonUser, this.props.sidebars)
-        }
-        else {
-            //failure
+            this.setState(({ isSubmitting: false }))
+            if(this.props.logonUser[0].ReturnVal === "0" || this.props.logonUser[0].ReturnVal === 0 ){
+                toast.error("Authentication Failed.")
+                this.props.CallClearLogonUserCache();
+            }
+            else{
+                // failed
+                setLogonUser(this.props.logonUser, this.props.sidebars)
+            }
         }
     }
 
@@ -90,12 +97,13 @@ class Dashboard extends Component {
                 username: this.state.username,
                 password: this.state.password,
             }
+            this.setState(({ isSubmitting: true }))
             this.props.CallUserLogin(object)
         }
     }
 
     OnEnterToSubmitLogin = (e) => {
-        if (e.key === 'Enter' || e.keyCode === 13) 
+        if (e.key === 'Enter' || e.keyCode === 13)
             this.OnSubmitLogin()
     }
 
@@ -154,6 +162,7 @@ class Dashboard extends Component {
                             className="w-100"
                             variant="contained"
                             onClick={() => this.OnSubmitLogin()}
+                            disabled={this.state.isSubmitting === true}
                         >
                             Login
                         </Button>

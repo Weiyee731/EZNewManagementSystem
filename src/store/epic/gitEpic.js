@@ -32,6 +32,7 @@ export class GitEpic {
 
         let json = await response.json();
         json = JSON.parse(json)
+
         if (json[0].ReturnVal !== "0") {
           const response2 = await fetch(url +
             "User_ViewPage?" +
@@ -45,12 +46,13 @@ export class GitEpic {
             type: GitAction.LoginSuccess,
             payload: json,
           };
-        } else {
-          alert("Invalid credential")
+        } 
+        else {
+          // alert("Invalid credential")
           return {
             payload2: [],
             type: GitAction.LoginSuccess,
-            payload: [],
+            payload: json,
           };
         }
       }

@@ -23,7 +23,6 @@ export const isNumber = (number) => { return (!isStringNullOrEmpty(number) && !i
 export const convertDateTimeToString112Format = (date, fetchTime) => {
     try {
         let date112 = typeof date !== "undefined" && date !== "" ? new Date(date) : new Date();
-        console.log(date112)
         let dd = (date112.getDate().toString().length <= 1) ? "0" + date112.getDate() : date112.getDate().toString()
         let mm = ((date112.getMonth() + 1).toString().length <= 1) ? "0" + (date112.getMonth() + 1) : (date112.getMonth() + 1).toString()
         let yyyy = date112.getFullYear();

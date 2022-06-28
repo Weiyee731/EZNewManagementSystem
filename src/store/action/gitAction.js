@@ -12,11 +12,17 @@ export class GitAction {
 
   static Logout = "USER_LOGOUT";
   static LoggedOutSuccess = "USER_LOGGED_OUT_SUCCESS";
+  static ClearLogonUser = "USER_CLEAR_CACHE";
   static CallUserLogout(propsData) {
-
     return {
       type: GitAction.Logout,
       payload: propsData
+    };
+  }
+
+  static CallClearLogonUserCache() {
+    return {
+      type: GitAction.ClearLogonUser,
     };
   }
 

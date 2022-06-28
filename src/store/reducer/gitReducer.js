@@ -38,6 +38,11 @@ export function counterReducer(state = INITIAL_STATE, action) {
         loading: false,
         logonUser: action.payload
       });
+    case GitAction.ClearLogonUser:
+      return Object.assign({}, state, {
+        loading: false,
+        logonUser: []
+      });
 
     case GitAction.GetUserProfile:
       return Object.assign({}, state, { loading: true });
