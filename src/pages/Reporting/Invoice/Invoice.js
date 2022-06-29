@@ -127,24 +127,30 @@ class Invoice extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         const { transactions, transactionReturn } = this.props
-        if (prevProps.transactions.length !== transactions.length) {
+        if (prevProps.transactions !== transactions) {
             if (transactions !== undefined && transactions[0] !== undefined) {
-                this.setState({ TransactionListing: transactions, TransactionListingFiltered: transactions });
-            }
-        } else {
-            if (prevProps.transactions.length !== this.state.TransactionListing.length) {
-                this.setState({ TransactionListing: prevProps.transactions, TransactionListingFiltered: prevProps.transactions });
+                if (transactions[0].ReturnVal == "0")
+                    this.setState({ TransactionListing: [], TransactionListingFiltered: [] });
+                else
+                    this.setState({ TransactionListing: transactions, TransactionListingFiltered: transactions });
             }
         }
 
-        if (prevProps.transactionReturn !== transactionReturn) {
-            if (transactionReturn[0].ReturnVal == 1) {
-                toast.success(transactionReturn[0].ReturnMsg)
-                this.props.CallResetTransaction()
-                this.props.CallFetchAllTransaction(this.state);
+        if (isArrayNotEmpty(transactionReturn)) {
+            console.log(transactionReturn)
+            try {
+                if (transactionReturn[0].ReturnVal == 1) {
+                    toast.success(transactionReturn[0].ReturnMsg, { autoClose: 2000, position: "top-right" })
+                    this.props.CallResetTransaction()
+                    this.props.CallFetchAllTransaction(this.state);
+                    this.onCancelModalPop()
+                } else {
+                    toast.error("Something went wrong. Please try again")
+                    this.onCancelModalPop()
+                }
+            }
+            catch (err) {
 
-            } else {
-                toast.error("Something went wrong. Please try again")
             }
         }
     }
