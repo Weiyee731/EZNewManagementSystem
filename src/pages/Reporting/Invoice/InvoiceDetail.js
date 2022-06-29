@@ -267,7 +267,7 @@ class InvoiceDetail extends Component {
                 ProductDimensionDeep: "-",
                 ProductDimensionWidth: "-",
                 ProductDimensionHeight: "-",
-                handlingCharge:0,
+                handlingCharge: 0,
                 ProductPrice: extraFees,
                 totalPrice: extraFees
               })
@@ -510,7 +510,7 @@ class InvoiceDetail extends Component {
               </TableCell>
             }
             <TableCell align="right" sx={{ fontSize: fontsize }}>
-            {data.Description === "Delivery Fee" ? (parseFloat(data.ProductPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)
+              {data.Description === "Delivery Fee" ? (parseFloat(data.ProductPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)
                 : this.props.transaction[0].CalculationType === "3" ? "-" : (parseFloat(data.totalPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)}
 
               {/* {data.Description === "Delivery Fee" ? parseFloat(data.ProductPrice) === undefined ? "-" : parseFloat(data.ProductPrice).toFixed(2)
@@ -859,13 +859,13 @@ class InvoiceDetail extends Component {
                       <span style={total}>{TransactionDetail.filter((el) => el.TrackingNumber === "Delivery Fee").length > 0 ? TransactionDetail.length - 1 : TransactionDetail.length}</span>
                       <br />
                       Sub Total (RM) :
-                      {console.log("1",parseFloat(transaction[0].OrderSubTotalAmount))}
-                      {console.log("2",parseFloat(this.state.totalhandlingCharge))}
-                      {console.log("3",parseFloat(DeliveryFee))}
-                      {console.log("4",parseFloat(parseFloat(AdminExtraCharges)))}
-                      
+                      {console.log("1", parseFloat(transaction[0].OrderSubTotalAmount))}
+                      {console.log("2", parseFloat(this.state.totalhandlingCharge))}
+                      {console.log("3", parseFloat(DeliveryFee))}
+                      {console.log("4", parseFloat(parseFloat(AdminExtraCharges)))}
+
                       {console.log(parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee))}
-                      
+
                       {this.props.transaction[0].CalculationType === "3" ?
                         <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) : parseFloat(this.state.totalhandlingCharge) + parseFloat(subTotal))}</span>
                         :
@@ -1074,6 +1074,7 @@ class InvoiceDetail extends Component {
                   </h4>
                 </div>
                 <ReactToPrint
+                  removeAfterPrint={true}
                   style={{ width: "100%", display: "inline" }}
                   trigger={(e) => {
                     return (
@@ -1085,6 +1086,13 @@ class InvoiceDetail extends Component {
                     );
                   }}
                   content={() => this.componentRef}
+                  onAfterPrint={() => {
+                    console.log(this.state.TransactionDetail)
+                    this.handleClose2()
+                    setTimeout(() => {
+                      window.location.href = "Invoice"
+                    }, 1000)
+                  }}
                 />
               </Box>
             </Box>

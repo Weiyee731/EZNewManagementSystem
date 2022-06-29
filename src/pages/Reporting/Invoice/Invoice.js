@@ -137,16 +137,14 @@ class Invoice extends Component {
         }
 
         if (isArrayNotEmpty(transactionReturn)) {
-            console.log(transactionReturn)
             try {
                 if (transactionReturn[0].ReturnVal == 1) {
                     toast.success(transactionReturn[0].ReturnMsg, { autoClose: 2000, position: "top-right" })
                     this.props.CallResetTransaction()
                     this.props.CallFetchAllTransaction(this.state);
-                    this.onCancelModalPop()
+                    this.setState({ openCancelModal: false, })
                 } else {
                     toast.error("Something went wrong. Please try again")
-                    this.onCancelModalPop()
                 }
             }
             catch (err) {

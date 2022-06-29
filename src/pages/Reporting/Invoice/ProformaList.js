@@ -102,7 +102,7 @@ const ProformaList = (props) => {
     useEffect(() => {
         if (ref.current !== transactionReturn) {
             if (isArrayNotEmpty(transactionReturn) && transactionReturn[0].ReturnVal == 1) {
-                toast.success(transactionReturn[0].ReturnMsg)
+                toast.success(transactionReturn[0].ReturnMsg, { autoClose: 2000, position: "top-center" })
                 props.history.push(`/InvoiceDetail/${transactionReturn[0].TransactionID}`)
             }
         }
