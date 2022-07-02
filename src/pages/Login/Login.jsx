@@ -21,6 +21,7 @@ import IconButton from '@mui/material/IconButton';
 import { toast } from "react-toastify";
 // import css
 import "./Login.css"
+import EZLogo from "../../assets/logos/android-chrome-192x192.png"
 
 function mapStateToProps(state) {
     return {
@@ -59,11 +60,11 @@ class Dashboard extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (!this.props.loading && isArrayNotEmpty(this.props.logonUser)) {
             this.setState(({ isSubmitting: false }))
-            if(this.props.logonUser[0].ReturnVal === "0" || this.props.logonUser[0].ReturnVal === 0 ){
+            if (this.props.logonUser[0].ReturnVal === "0" || this.props.logonUser[0].ReturnVal === 0) {
                 toast.error("Authentication Failed.")
                 this.props.CallClearLogonUserCache();
             }
-            else{
+            else {
                 // failed
                 setLogonUser(this.props.logonUser, this.props.sidebars)
             }
@@ -109,13 +110,15 @@ class Dashboard extends Component {
 
     render() {
         return (
-            <div style={{ display: 'flex', width: '100%', height: '100vh', }}>
+            <div style={{ display: 'flex', width: '100%', height: '100vh', backgroundColor: "#f6ecc4", backgroundImage: "linear-gradient(315deg, #f6ecc4 0%, #f7d4d4 74%)" }}>
                 <div className="container login-container m-auto">
                     <div className="logo-container w-100">
-                        <img src="" alt="System Logo" width='100%' height='100%' onError={event => { event.target.src = GetDefaultImage(); event.onerror = null }} />
+                        <div style={{ width: '120px', height: '120px', marginLeft: 'auto', marginRight: 'auto', }}>
+                            <img style={{ borderRadius: '50%', }} src={EZLogo} alt="System Logo" width='100%' height='100%' onError={event => { event.target.src = GetDefaultImage(); event.onerror = null }} />
+                        </div>
                     </div>
                     <div className="login-inputs-group">
-                        <FormControl sx={{ m: 1, width: '100%' }} variant="standard">
+                        <FormControl sx={{ m: 1, marginTop: 5, width: '100%' }} variant="standard">
                             <InputLabel htmlFor="login-username">Username</InputLabel>
                             <Input
                                 id="login-username"
@@ -167,7 +170,7 @@ class Dashboard extends Component {
                             Login
                         </Button>
 
-                        <a href="#" title="Forget Password?" style={{ marginLeft: '0.5em', fontSize: '11pt' }}>Problem on login?</a>
+                        {/* <a href="#" title="Forget Password?" style={{ marginLeft: '0.5em', fontSize: '11pt' }}>Problem on login?</a> */}
                     </div>
                 </div>
             </div >

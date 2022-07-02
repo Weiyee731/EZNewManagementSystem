@@ -1,4 +1,5 @@
 import { toast } from "react-toastify";
+import { isStringNullOrEmpty } from "../../tools/Helpers";
 
 /**
  *   Documentation of this class methods
@@ -13,6 +14,7 @@ export const setLogonUser = (loginUser, sidebarItem) => {
             localStorage.setItem("userToken", true);
             localStorage.setItem("loginUser", JSON.stringify(loginUser));
             localStorage.setItem("sidebarItem", JSON.stringify(sidebarItem));
+            localStorage.setItem("systemInfo", "EZLogistic");
             window.location.href = "/Ez/Dashboard"
         }
         catch (e) {
@@ -29,7 +31,10 @@ export const getSidebaritems = () => {
 }
 
 export const isUserLogon = () => {
-    return localStorage.getItem("userToken")
+    if (!isStringNullOrEmpty(localStorage.getItem("systemInfo")) && localStorage.getItem("systemInfo") !== "EZLogistic")
+        resetLogonUser();
+    else
+        return localStorage.getItem("userToken")
 }
 
 export const resetLogonUser = () => {

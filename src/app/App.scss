@@ -1,26 +1,20 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
-$sidebar-bg-color: #0c1e35;
-$submenu-bg-color: rgba(255,
-255,
-255,
-0.05);
-$submenu-bg-color-collapsed: rgba(#0c1e35,
-0.95);
-$sidebar-color: #b3b8d4;
+@import url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
+$sidebar-bg-color: linear-gradient(315deg, #000000 0%, #958e69 74%);;
+$submenu-bg-color: rgba(255, 255, 255, 0.05);
+$submenu-bg-color-collapsed: rgba(#0c1e35, 0.95);
+$sidebar-color: rgba(255, 255, 255, .9);
 $highlight-color: #dee2ec;
-$icon-bg-color: rgba(255,
-255,
-255,
-0.05);
+$icon-bg-color: rgba(255, 255, 255, 0.05);
 $icon-size: 35px;
-@import '~react-pro-sidebar/dist/scss/styles.scss';
+@import "~react-pro-sidebar/dist/scss/styles.scss";
 body {
     margin: 0;
     height: 100vh;
     color: #353535;
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
 }
-
+// background-color: #000000;
+// background-image: linear-gradient(315deg, #000000 0%, #958e69 74%);
 #root {
     height: 100%;
 }
@@ -84,7 +78,7 @@ body {
         display: flex;
         flex-direction: column;
         overflow-y: auto;
-        background-color: #F9FBFD;
+        background-color: #f9fbfd;
         header {
             margin-bottom: 40px;
             border-bottom: 1px solid #efefef;
@@ -118,7 +112,7 @@ body {
         margin-bottom: 24px;
         font-size: 14px;
         color: #545454;
-        >span {
+        > span {
             margin-left: 10px;
         }
     }
@@ -132,7 +126,7 @@ body {
         }
         .block {
             direction: rtl;
-            >span {
+            > span {
                 margin-left: 0;
                 margin-right: 10px;
             }
@@ -184,7 +178,6 @@ body {
         background: #ffd331;
     }
 }
-
 
 /* Handle print invoice */
 
