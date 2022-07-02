@@ -1,4 +1,5 @@
 import React from 'react';
+import EZLogo from "../../assets/logos/android-chrome-512x512.png"
 
 export default function Profile(props) {
     return (
@@ -12,8 +13,12 @@ export default function Profile(props) {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
+                textAlign: 'center'
             }}
         >
+            <div style={{ width: '100px', height: '100px', margin: 'auto', marginBottom: '30px' }}>
+                <img style={{borderRadius: ' 50%'}} src={EZLogo} alt="EZ Logistics" width="100%" height="100%" />
+            </div>
             EZ TRANSIT AND LOGISTICS
         </div>
     )
