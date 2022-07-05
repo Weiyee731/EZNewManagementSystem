@@ -110,7 +110,7 @@ class Dashboard extends Component {
 
     render() {
         return (
-            <div style={{ display: 'flex', width: '100%', height: '100vh', backgroundColor: "#f6ecc4", backgroundImage: "linear-gradient(315deg, #f6ecc4 0%, #f7d4d4 74%)" }}>
+            <div style={{ display: 'flex', width: '100%', height: '100vh', }}>
                 <div className="container login-container m-auto">
                     <div className="logo-container w-100">
                         <div style={{ width: '120px', height: '120px', marginLeft: 'auto', marginRight: 'auto', }}>

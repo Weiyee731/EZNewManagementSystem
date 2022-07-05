@@ -25,7 +25,7 @@ import Input from '@mui/material/Input';
 import Switch from '@mui/material/Switch';
 import ReactToPrint from "react-to-print";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-
+import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined';
 function mapStateToProps(state) {
   return {
     loading: state.counterReducer["loading"],
@@ -204,6 +204,7 @@ class InvoiceDetail extends Component {
     super(props);
     this.handleInputChange = this.handleInputChange.bind(this)
     this.handleChange = this.handleChange.bind(this)
+    this.onGenerateInvoice = this.onGenerateInvoice.bind(this)
     this.onClickConfirmInvoice = this.onClickConfirmInvoice.bind(this)
     this.props.CallFetchAllTransactionByID({ TransactionID: this.props.match.params.transactionid })
   }
@@ -228,7 +229,8 @@ class InvoiceDetail extends Component {
     detailsIndex: 0,
     actualVolume: 0,
     minDelivery: 0,
-    handlingArray: []
+    handlingArray: [],
+    printMode: "PrintProforma", //print proforma invoice or generat invoice
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -400,7 +402,7 @@ class InvoiceDetail extends Component {
               }
               {/* {data.TransactionDetailCharges !== "[]" &&
                 JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
-                 console.log("additionalCharges11", additionalCharges)
+                console.log("additionalCharges11", additionalCharges)
                 })
               } */}
               {/* {
@@ -525,8 +527,8 @@ class InvoiceDetail extends Component {
     )
   }
 
-  onPrintButtonClick = () => {
-    this.setState({ AddModalOpen: true });
+  onGenerateInvoice = (printMode) => {
+    this.setState({ AddModalOpen: true, printMode: printMode });
   }
 
   handleClose = () => {
@@ -544,7 +546,10 @@ class InvoiceDetail extends Component {
     if (this.state.TransportationBool === true) {
       this.state.TransactionDetail.map((search) => {
         if (search.Description === "Delivery Fee" || search.TrackingNumber === "Delivery Fee") {
-          this.props.CallUpdateTransaction(this.state);
+
+          if (this.state.printMode === "GenerateInvoice")
+            this.props.CallUpdateTransaction(this.state);
+
           search.ProductPrice = this.state.DeliveryFee
           search.totalPrice = this.state.DeliveryFee
           isDeliveryExist = true
@@ -563,13 +568,17 @@ class InvoiceDetail extends Component {
             ProductPrice: this.state.DeliveryFee,
             totalPrice: this.state.DeliveryFee
           })
-          this.props.CallUpdateTransaction(this.state);
-        }
 
+          if (this.state.printMode === "GenerateInvoice")
+            this.props.CallUpdateTransaction(this.state);
+        }
         else if (this.state.TransportationBool && minDelivery > 0) {
           this.state.TransactionDetail.map((search) => {
             if (search.TrackingNumber === "Delivery Min 0.5m³") {
-              this.props.CallUpdateTransaction(this.state);
+
+              if (this.state.printMode === "GenerateInvoice")
+                this.props.CallUpdateTransaction(this.state);
+
               search.ProductPrice = this.state.DeliveryFee
               search.totalPrice = this.state.DeliveryFee
             }
@@ -577,7 +586,8 @@ class InvoiceDetail extends Component {
         }
       }
     } else {
-      this.props.CallUpdateTransaction(this.state);
+      if (this.state.printMode === "GenerateInvoice")
+        this.props.CallUpdateTransaction(this.state);
     }
 
     if (this.state.handlingArray.length > 0) {
@@ -946,7 +956,7 @@ class InvoiceDetail extends Component {
       // additionalCharges = this.state.TransactionDetail[0].TransactionDetailCharges != null && JSON.parse(this.state.TransactionDetail[0].TransactionDetailCharges).reduce((additionalCharge, item) => additionalCharge + parseFloat(item.ProductPrice), 0).toFixed(2)
       // subTotal = ((Math.ceil(finalWeight).toFixed(2) - 1) * (transaction[0].SubSequenceKG) + (transaction[0].FirstKG) + parseFloat(handlingCharge) + parseFloat(additionalCharges)).toFixed(2) + parseFloat(AdminExtraCharges).toFixed(2)
     }
-    console.log(actualVolume)
+
     return (
       <Card>
         <CardContent>
@@ -958,13 +968,14 @@ class InvoiceDetail extends Component {
               onClick={() => this.props.history.goBack()}>
               <ArrowBackIcon />
             </IconButton>
-            <IconButton
-              color="primary"
-              aria-label="back"
-              component="span"
-              onClick={this.onPrintButtonClick}>
-              <PrintIcon />
-            </IconButton>
+            <div className="d-flex">
+              <Button startIcon={<PrintIcon />} variant="outlined" color="primary" onClick={() => this.onGenerateInvoice("PrintProforma")} >
+                Print Proforma
+              </Button>
+              <Button startIcon={<ReceiptOutlinedIcon />} variant="contained" color="primary" onClick={() => this.onGenerateInvoice("GenerateInvoice")} sx={{ ml: 2 }}>
+                Create Invoice
+              </Button>
+            </div>
           </div>
           <div ref={(el) => (this.componentRef = el)}>
             {splitArray(TransactionDetail, noOfArrShow).map((arr, index) => {
@@ -1078,20 +1089,20 @@ class InvoiceDetail extends Component {
                   style={{ width: "100%", display: "inline" }}
                   trigger={(e) => {
                     return (
-                      <Button
-                        variant="contained"
-                      >
+                      <Button variant="contained" >
                         Print this invoice
                       </Button>
                     );
                   }}
                   content={() => this.componentRef}
                   onAfterPrint={() => {
-                    console.log(this.state.TransactionDetail)
                     this.handleClose2()
-                    setTimeout(() => {
-                      window.location.href = "Invoice"
-                    }, 1000)
+
+                    if (this.state.printMode === "GenerateInvoice") {
+                      setTimeout(() => {
+                        window.location.href = "Invoice"
+                      }, 1000)
+                    }
                   }}
                 />
               </Box>
