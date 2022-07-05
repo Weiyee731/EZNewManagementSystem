@@ -488,7 +488,7 @@ class OverallStock extends Component {
     handleSubmitUpdate = () => {
         const { formValue } = this.state
         let extraChangesValue = "", isNotVerified = 0
-
+        console.log('formValue', this.state.formValue)
         if (formValue.AdditionalCharges.length > 0) {
             for (var i = 0; i < formValue.AdditionalCharges.length; i++) {
                 extraChangesValue += formValue.AdditionalCharges[i].Charges + "=" + formValue.AdditionalCharges[i].Value
@@ -986,7 +986,7 @@ class OverallStock extends Component {
                 STARTDATE: searchDates[0] === undefined ? "-" : moment(searchDates[0], 'DD/MM/YYYY HH:mm:ss', false).format('YYYYMMDD'),
                 ENDDATE: searchDates[1] === undefined ? "-" : moment(searchDates[1], 'DD/MM/YYYY HH:mm:ss', false).format('YYYYMMDD'),
             }
-            
+
             this.props.CallFilterInventoryByDate(object)
             toast.loading("Pulling data... Please wait...", {
                 autoClose: false,
@@ -1383,7 +1383,6 @@ class OverallStock extends Component {
                     singleButton={true} // required, to decide whether to show a single full width button or 2 buttons
                     maxWidth={"md"}
                     draggable={true}
-
                 >
                     <div className="py-md-3 py-1">
                         <FormControl >
@@ -1659,6 +1658,7 @@ class OverallStock extends Component {
                                     </div>
                                 )
                             })}
+                            {console.log(formValue)}
                             {isArrayNotEmpty(formValue.AdditionalCharges) && (
                                 <div className="mt-3 col-12">
                                     <Button

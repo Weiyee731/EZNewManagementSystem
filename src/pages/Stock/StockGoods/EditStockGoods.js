@@ -31,7 +31,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 const INITIAL_STATE = {
-
     TrackingNumberVerified: null,
     MemberNumberVerified: null,
     DepthVerified: null,
@@ -377,6 +376,7 @@ class EditStockGoods extends Component {
                             )
                         })
                     }
+                    {console.log(formValue)}
                     {
                         isArrayNotEmpty(formValue.AdditionalCost) &&
                         <div className="mt-3 col-12">

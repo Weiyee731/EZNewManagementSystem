@@ -148,6 +148,7 @@ const INITIAL_STATE = {
     searchCategory: "All",
     searchArea: "All",
     onSearchText: "",
+    searchKeywords: "",
 
     formValue: {
         TrackingNumber: "",
@@ -808,7 +809,7 @@ class CreateInvoice extends Component {
                             extension=".xls"
                             separator=","
                             columns={headCells}
-                            datas={searchCategory == "All" && searchArea == "All" && onSearchText == "" ?
+                            datas={searchCategory === "All" && searchArea === "All" && onSearchText === "" ?
                                 this.state.selectedRows.length > 0 ? this.state.selectedRows : stocks
                                 :
                                 this.state.selectedRows.length > 0 ? this.state.selectedRows : filteredList}

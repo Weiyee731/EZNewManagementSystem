@@ -188,7 +188,7 @@ const ProformaList = (props) => {
     ];
 
     const totalPrice = () => {
-        if (selectedType != 3) {
+        if (selectedType !== 3) {
             let totalArr = []
             items.map((item) => {
                 totalArr.push(Number(subTotal(item).toFixed(2)))
@@ -203,18 +203,28 @@ const ProformaList = (props) => {
 
     const AddTotalPrice = () => {
         let totalArr = 0
+        // console.log('items', items)
         items.map((item) => {
+            console.log('items', item.AdditionalCharges)
             let addprice = 0;
-            if (JSON.parse(item.AdditionalCharges).length > 0) {
-                JSON.parse(item.AdditionalCharges).map((addcharge) => {
-                    if (addcharge.Charges !== "[]") {
-                        addprice = parseFloat(addprice) + parseFloat(addcharge.Value)
-                    } else {
-                        addprice = parseFloat(addprice) + parseFloat("0")
-                    }
-                })
+            try {
+                if (JSON.parse(item.AdditionalCharges).length > 0) {
+                    JSON.parse(item.AdditionalCharges).map((addcharge) => {
+                        if (addcharge.Charges !== "[]") {
+                            addprice = parseFloat(addprice) + parseFloat(addcharge.Value)
+                        } else {
+                            addprice = parseFloat(addprice) + parseFloat("0")
+                        }
+                    })
+                }
+                totalArr = parseFloat(totalArr) + parseFloat(addprice)
             }
-            totalArr = parseFloat(totalArr) + parseFloat(addprice)
+            catch (e) {
+                console.log('error', e)
+                totalArr = parseFloat(totalArr) + parseFloat(addprice)
+            }
+
+
         })
         return totalArr
     }
@@ -245,7 +255,7 @@ const ProformaList = (props) => {
         })
         setItems(newItems)
 
-        if (selectedType == 2) {
+        if (selectedType === 2) {
             setConsolidatePriceValidated(isNumber(e.target.value))
             setConsolidatePrice(e.target.value)
         }
@@ -256,7 +266,7 @@ const ProformaList = (props) => {
     }
 
     const singleUnitPrice = (volume) => {
-        if (selectedType == 1) {
+        if (selectedType === 1) {
             if (totalVolume < 5) {
                 if (volume < 0.013) {
                     return selfPickupPrice
@@ -270,9 +280,9 @@ const ProformaList = (props) => {
                     return unitPrice
                 }
             }
-        } else if (selectedType == 2) {
+        } else if (selectedType === 2) {
             return consolidatePrice
-        } else if (selectedType == 4) {
+        } else if (selectedType === 4) {
             return LargeItemMinPrice
         }
     }
@@ -284,18 +294,25 @@ const ProformaList = (props) => {
         let productDimension = []
         let productUnitPrices = []
         let TotalAddPrice = 0;
-
+        console.log(items)
         items.map((item) => {
             let addprice = 0;
-            if (JSON.parse(item.AdditionalCharges).length > 0) {
-                JSON.parse(item.AdditionalCharges).map((addcharge) => {
-                    if (addcharge.Charges !== "[]") {
-                        addprice = parseFloat(addprice) + parseFloat(addcharge.Value)
-                    } else {
-                        addprice = parseFloat(addprice) + parseFloat("0")
-                    }
-                })
+
+            try {
+                if (JSON.parse(item.AdditionalCharges).length > 0) {
+                    JSON.parse(item.AdditionalCharges).map((addcharge) => {
+                        if (addcharge.Charges !== "[]") {
+                            addprice = parseFloat(addprice) + parseFloat(addcharge.Value)
+                        } else {
+                            addprice = parseFloat(addprice) + parseFloat("0")
+                        }
+                    })
+                }
             }
+            catch (e) {
+                console.log('error', e)
+            }
+
             TotalAddPrice = parseFloat(TotalAddPrice) + parseFloat(addprice)
             productPrices.push(subTotal(item).toFixed(2))
             stockIds.push(item.StockID)
@@ -336,9 +353,9 @@ const ProformaList = (props) => {
     const subTotal = (data) => {
         let price = 0
         let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
-        if (selectedType == 1) {
+        if (selectedType === 1) {
             if (volume < 0.013) {
-                if (data.isFollowStandard && selfPickupPrice != "") {
+                if (data.isFollowStandard && selfPickupPrice !== "") {
                     return Number(selfPickupPrice)
                 } else if (!data.isFollowStandard) {
                     return Number(data.unitPrice)
@@ -353,7 +370,7 @@ const ProformaList = (props) => {
                 }
                 return price
             }
-        } else if (selectedType == 2) {
+        } else if (selectedType === 2) {
             if (data.isFollowStandard) {
                 price = volume * consolidatePrice
                 return price
@@ -361,7 +378,7 @@ const ProformaList = (props) => {
                 price = volume * data.unitPrice
                 return price
             }
-        } else if (selectedType == 4) {
+        } else if (selectedType === 4) {
             if (data.isFollowStandard) {
                 price = volume * LargeItemMinPrice
                 return price
@@ -375,18 +392,24 @@ const ProformaList = (props) => {
     }
 
     const renderTableRows = (data, index) => {
-        console.log(data)
+
         let fontsize = '9pt'
         let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
         let addprice = 0;
-        if (JSON.parse(data.AdditionalCharges).length > 0) {
-            JSON.parse(data.AdditionalCharges).map((addcharge) => {
-                if (addcharge.Charges !== "[]") {
-                    addprice = parseFloat(addprice) + parseFloat(addcharge.Value)
-                } else {
-                    addprice = parseFloat(addprice) + parseFloat("0")
-                }
-            })
+        console.log('data', data)
+        try {
+            if (JSON.parse(data.AdditionalCharges).length > 0) {
+                JSON.parse(data.AdditionalCharges).map((addcharge) => {
+                    if (addcharge.Charges !== "[]") {
+                        addprice = parseFloat(addprice) + parseFloat(addcharge.Value)
+                    } else {
+                        addprice = parseFloat(addprice) + parseFloat("0")
+                    }
+                })
+            }
+        }
+        catch (e) {
+            console.log('error', e)
         }
 
         return (
@@ -449,10 +472,10 @@ const ProformaList = (props) => {
                         type={'number'}
                         label="Unit Price per m³"
                         name="unitPrice"
-                        value={selectedType == 2 ? consolidatePrice : unitPrice}
+                        value={selectedType === 2 ? consolidatePrice : unitPrice}
                         onChange={(e) => handleChangeAllUnitPrice(e)}
-                        error={selectedType == 2 ? !consolidatePriceValidated : !unitPriceValidated}
-                        helperText={selectedType == 2 ? !consolidatePriceValidated ? "It should be a valid digit" : "" : !unitPriceValidated ? "It should be a valid digit" : ""}
+                        error={selectedType === 2 ? !consolidatePriceValidated : !unitPriceValidated}
+                        helperText={selectedType === 2 ? !consolidatePriceValidated ? "It should be a valid digit" : "" : !unitPriceValidated ? "It should be a valid digit" : ""}
                     />
                 }
                 {selectedType === 2 &&
@@ -463,13 +486,13 @@ const ProformaList = (props) => {
                         type={'number'}
                         label="Unit Price per m³"
                         name="unitPrice"
-                        value={selectedType == 2 ? consolidatePrice : unitPrice}
+                        value={selectedType === 2 ? consolidatePrice : unitPrice}
                         onChange={(e) => handleChangeAllUnitPrice(e)}
-                        error={selectedType == 2 ? !consolidatePriceValidated : !unitPriceValidated}
-                        helperText={selectedType == 2 ? !consolidatePriceValidated ? "It should be a valid digit" : "" : !unitPriceValidated ? "It should be a valid digit" : ""}
+                        error={selectedType === 2 ? !consolidatePriceValidated : !unitPriceValidated}
+                        helperText={selectedType === 2 ? !consolidatePriceValidated ? "It should be a valid digit" : "" : !unitPriceValidated ? "It should be a valid digit" : ""}
                     />
                 }
-                {selectedType == 3 &&
+                {selectedType === 3 &&
                     <>
                         <TextField
                             className="mx-3"
@@ -527,7 +550,7 @@ const ProformaList = (props) => {
 
         return (
             <>
-                {selectedType == 4 &&
+                {selectedType === 4 &&
                     <Select
                         labelId="search-filter-category"
                         id="search-filter-category"
@@ -622,7 +645,7 @@ const ProformaList = (props) => {
                 />
                 <hr />
                 <div className='row text-end mb-3'>
-                    {selectedType == 3 &&
+                    {selectedType === 3 &&
                         <>
                             <div className='col-10'>
                                 Actual Weight (kg):

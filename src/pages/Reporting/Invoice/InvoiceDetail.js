@@ -863,6 +863,7 @@ class InvoiceDetail extends Component {
                       {console.log("2", parseFloat(this.state.totalhandlingCharge))}
                       {console.log("3", parseFloat(DeliveryFee))}
                       {console.log("4", parseFloat(parseFloat(AdminExtraCharges)))}
+                      {console.log('12', this.props.transaction)}
 
                       {console.log(parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee))}
 
@@ -876,7 +877,7 @@ class InvoiceDetail extends Component {
                       {this.props.transaction[0].CalculationType === "3" ?
                         <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) : parseFloat(this.state.totalhandlingCharge) + parseFloat(subTotal))}</span>
                         :
-                        <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) + parseFloat(AdminExtraCharges) : parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(AdminExtraCharges))}</span>
+                        <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(transaction[0].OrderTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) + parseFloat(AdminExtraCharges) : parseFloat(transaction[0].OrderTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(AdminExtraCharges))}</span>
                       }
                     </div>
                   </div>
