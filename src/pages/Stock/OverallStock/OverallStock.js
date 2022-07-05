@@ -29,6 +29,7 @@ import {
     getWindowDimensions,
     isObjectUndefinedOrNull,
     convertDateTimeToString112Format,
+    volumeCalc
 } from "../../../tools/Helpers"
 import ResponsiveDatePickers from "../../../components/datePicker/datePicker"
 import { toast, Flip } from "react-toastify"
@@ -354,7 +355,7 @@ class OverallStock extends Component {
             color = "#009B77"
             fontcolor = "#FFF4EF"
         }
-
+        let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
         return (
             <>
                 <TableCell component="th" id={`table-checkbox-${index}`} scope="row" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} >{data.TrackingNumber} </TableCell>
@@ -362,7 +363,7 @@ class OverallStock extends Component {
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {!isNaN(data.ProductDimensionDeep) ? data.ProductDimensionDeep.toFixed(1) : 0} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {!isNaN(data.ProductDimensionWidth) ? data.ProductDimensionWidth.toFixed(1) : 0} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {!isNaN(data.ProductDimensionHeight) ? data.ProductDimensionHeight.toFixed(1) : 0} </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {((data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight) / 1000000).toFixed(3)} </TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {volume} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.Item}</TableCell>
                 <TableCell align="center" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.UserCode} {data.UserID && data.UserID ? '' : <div><span style={{ color: "red" }}>The user was not register in the system</span></div>} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.AreaCode + " - " + data.AreaName} </TableCell>

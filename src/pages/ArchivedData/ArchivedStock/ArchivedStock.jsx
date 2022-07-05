@@ -36,7 +36,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-
+import { volumeCalc } from "../../../tools/Helpers";
 
 import "./ArchivedStock.css";
 
@@ -226,7 +226,7 @@ class ArchivedStock extends Component {
                 return renderStrings
             }
         }
-
+        let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
         return (
             <>
                 <TableCell
@@ -241,7 +241,7 @@ class ArchivedStock extends Component {
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionDeep) ? data.ProductDimensionDeep.toFixed(1) : 0} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionWidth) ? data.ProductDimensionWidth.toFixed(1) : 0} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionHeight) ? data.ProductDimensionHeight.toFixed(1) : 0} </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{(data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight / 1000000).toFixed(3)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{volume}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>
@@ -449,6 +449,7 @@ class ArchivedStock extends Component {
             { children: "Unchecked", key: "Unchecked" },
             { children: "Checked", key: "Checked" },
         ]
+
 
         const { filteredList, selectedRow, searchCategory, searchArea } = this.state
         const renderTableTopRightButtons = () => {

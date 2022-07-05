@@ -216,6 +216,7 @@ class CreateInvoice extends Component {
     }
 
     renderTableRows = (data, index) => {
+        let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
         const fontsize = '9pt'
         return (
             <>
@@ -227,12 +228,15 @@ class CreateInvoice extends Component {
                 >
                     {data.TrackingNumber}
                 </TableCell>
+                {/* <TableCell>
+                    {(0.000374).toFixed(3)}
+                </TableCell> */}
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight ? data.ProductWeight.toFixed(2) : ""}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionDeep) ? data.ProductDimensionDeep.toFixed(0) : 0} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionWidth) ? data.ProductDimensionWidth.toFixed(0) : 0} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionHeight) ? data.ProductDimensionHeight.toFixed(0) : 0} </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{((data.ProductDimensionDeep * data.ProductDimensionWidth * data.ProductDimensionHeight) / 1000000).toFixed(3)}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{volume}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Item}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.AreaCode + " - " + data.AreaName}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.StockDate}</TableCell>
@@ -469,6 +473,83 @@ class CreateInvoice extends Component {
                 this.setState({ formValue: tempForm })
                 break;
 
+            default:
+                break;
+        }
+    }
+
+    onTextFieldOnChange = (e) => {
+        const { name, value } = e.target
+        switch (name) {
+            case "usercode":
+                this.setState({
+                    userCode: value,
+                    userCodeValidated: !isStringNullOrEmpty(value)
+                })
+                break;
+            case "areaCode":
+                this.setState({
+                    userAreaId: value,
+                    userAreaIdValidated: !isStringNullOrEmpty(value)
+                })
+                break;
+            case "Fullname":
+                this.setState({
+                    userFullname: value,
+                    userFullnameValidated: !isStringNullOrEmpty(value)
+                })
+                break;
+            case "Contact":
+                this.setState({
+                    userContact: value,
+                })
+                break;
+            case "Email":
+                this.setState({
+                    userEmail: value,
+                })
+                break;
+            case "Address":
+                this.setState({
+                    userAddress: value,
+                })
+                break;
+            case "MinSelfPickup":
+                this.setState({
+                    userMinSelfPickup: value,
+                    userMinSelfPickupValidated: !isStringNullOrEmpty(value)
+                })
+                break;
+            case "CubicSelfPickup":
+                this.setState({
+                    userCubicSelfPickup: value,
+                    userCubicSelfPickupValidated: !isStringNullOrEmpty(value)
+                })
+                break;
+            case "Conslidate":
+                this.setState({
+                    userConslidate: value,
+                    userConslidateValidated: !isStringNullOrEmpty(value)
+                })
+                break;
+            case "DeliveryCargo":
+                this.setState({
+                    userDeliveryCargo: value,
+                    userDeliveryCargoValidated: !isStringNullOrEmpty(value)
+                })
+                break;
+            case "DeliveryOn1stKG":
+                this.setState({
+                    userDeliveryOn1stKG: value,
+                    userDeliveryOn1stKGValidated: !isStringNullOrEmpty(value)
+                })
+                break;
+            case "DeliveryOnSubKG":
+                this.setState({
+                    userDeliveryOnSubKG: value,
+                    userDeliveryOnSubKGValidated: !isStringNullOrEmpty(value)
+                })
+                break;
             default:
                 break;
         }
@@ -1058,15 +1139,17 @@ class CreateInvoice extends Component {
                     </Stack>
                 </AlertDialog>
 
+
                 <AlertDialog
                     open={openAddUsers}              // required, pass the boolean whether modal is open or close
                     handleToggleDialog={this.handleAddUsers}  // required, pass the toggle function of modal
-                    showAction={false}                           // required, to show the footer of modal display
+                    showAction={true}                           // required, to show the footer of modal display
                     title={"Add New User"}                                  // required, title of the modal
-                    buttonTitle={"Select"}                         // required, title of button
+                    buttonTitle={"Add User"}                         // required, title of button
                     singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
                     maxWidth={"md"}
                     fullWidth={false}
+                    handleConfirmFunc={this.onSubmitNewUser}
                     onClose={() => this.setState(({ openAddUsers: false }))}
                 >
                     <Box component="form" noValidate sx={{ mt: 3 }}>

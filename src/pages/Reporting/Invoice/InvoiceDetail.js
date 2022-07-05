@@ -480,7 +480,7 @@ class InvoiceDetail extends Component {
                       </IconButton>
                     </>
                 }
-                {data.TransactionDetailCharges != undefined && data.TransactionDetailCharges !== "[]" && JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
+                {data.TransactionDetailCharges !== undefined && data.TransactionDetailCharges !== "[]" && JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
                   return (
                     <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>
                       {(additionalCharges.ProductPrice).toFixed(2)}
@@ -869,23 +869,30 @@ class InvoiceDetail extends Component {
                       <span style={total}>{TransactionDetail.filter((el) => el.TrackingNumber === "Delivery Fee").length > 0 ? TransactionDetail.length - 1 : TransactionDetail.length}</span>
                       <br />
                       Sub Total (RM) :
+                      {console.log('0a', parseFloat(this.state.TransportationBool === true ? '101' : '010'))}
+                      {console.log('0a', parseFloat(this.state.TransportationBool === true))}
+                      {console.log('0a', parseFloat(this.state.TransportationBool))}
+
                       {console.log("1", parseFloat(transaction[0].OrderSubTotalAmount))}
+                      {console.log("1", parseFloat(subTotal))}
                       {console.log("2", parseFloat(this.state.totalhandlingCharge))}
                       {console.log("3", parseFloat(DeliveryFee))}
-                      {console.log("4", parseFloat(parseFloat(AdminExtraCharges)))}
+                      {/* {console.log("4", parseFloat(parseFloat(AdminExtraCharges)))} */}
                       {console.log('12', this.props.transaction)}
 
                       {console.log(parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee))}
 
                       {this.props.transaction[0].CalculationType === "3" ?
-                        <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) : parseFloat(this.state.totalhandlingCharge) + parseFloat(subTotal))}</span>
+                        // <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) : parseFloat(this.state.totalhandlingCharge) + parseFloat(subTotal))}</span>
+                        <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(DeliveryFee) : parseFloat(subTotal))}</span>
                         :
                         <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) + parseFloat(AdminExtraCharges) : parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(AdminExtraCharges))}</span>
                       }
                       <br />
                       Total (RM) :
                       {this.props.transaction[0].CalculationType === "3" ?
-                        <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) : parseFloat(this.state.totalhandlingCharge) + parseFloat(subTotal))}</span>
+                        <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(DeliveryFee) : parseFloat(subTotal))}</span>
+                        // <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) : parseFloat(this.state.totalhandlingCharge) + parseFloat(subTotal))}</span>
                         :
                         <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(transaction[0].OrderTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) + parseFloat(AdminExtraCharges) : parseFloat(transaction[0].OrderTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(AdminExtraCharges))}</span>
                       }

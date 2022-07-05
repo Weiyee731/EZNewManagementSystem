@@ -26,7 +26,8 @@ import {
   isObjectUndefinedOrNull,
   isArrayNotEmpty,
   isStringNullOrEmpty,
-  round
+  round,
+  volumeCalc
 } from "../../tools/Helpers";
 
 function descendingComparator(a, b, orderBy) {
@@ -156,10 +157,11 @@ const EnhancedTableToolbar = (props) => {
     selectedRows.map((item) => {
       weight = weight + item.ProductWeight;
 
-      itemDimension = ((item.ProductDimensionDeep *
-        item.ProductDimensionWidth *
-        item.ProductDimensionHeight) /
-        1000000).toFixed(3)
+      itemDimension = volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)
+      // itemDimension = ((item.ProductDimensionDeep *
+      //   item.ProductDimensionWidth *
+      //   item.ProductDimensionHeight) /
+      //   1000000).toFixed(3)
 
       mCube = parseFloat(mCube) + parseFloat(itemDimension)
     });
