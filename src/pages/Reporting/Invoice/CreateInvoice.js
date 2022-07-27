@@ -34,7 +34,6 @@ function mapStateToProps(state) {
         userAreaCode: state.counterReducer["userAreaCode"],
         transactionReturn: state.counterReducer["transactionReturn"],
         user: state.counterReducer["user"],
-        userAreaCode: state.counterReducer["userAreaCode"],
         userManagementApproval: state.counterReducer["userManagementApproval"],
     };
 }
@@ -45,7 +44,7 @@ function mapDispatchToProps(dispatch) {
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
         CallInsertUserDataByPost: (propData) => dispatch(GitAction.CallInsertUserDataByPost(propData)),
         CallFetchAllStock: (propsData) => dispatch(GitAction.CallFetchAllStock(propsData)),
-        CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
+        CallResetUserApprovalReturn: () => dispatch(GitAction.CallResetUserApprovalReturn()),
         CallCancelTransaction: (propsData) => dispatch(GitAction.CallCancelTransaction(propsData)),
     };
 }
@@ -199,7 +198,7 @@ class CreateInvoice extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { stocks, transactionReturn } = this.props
+        const { stocks, transactionReturn, userManagementApproval } = this.props
         if (this.state.filteredList === null && isArrayNotEmpty(stocks)) {
             this.setState({
                 filteredList: stocks[0].ReturnVal == '0' ? [] : stocks
@@ -211,6 +210,19 @@ class CreateInvoice extends Component {
                 toast.success(transactionReturn[0].ReturnMsg)
             } else {
                 toast.error("Something went wrong. Please try again")
+            }
+        }
+
+        if (prevProps.userManagementApproval !== userManagementApproval) {
+            if (userManagementApproval[0] !== undefined) {
+                if (userManagementApproval[0].ReturnVal == 1) {
+                    this.setState({ openAddUsers: !this.state.openAddUsers })
+                    toast.success(userManagementApproval[0].ReturnMsg)
+                    this.props.CallResetUserApprovalReturn()
+                    window.location.reload();
+                }
+                else
+                    toast.error(userManagementApproval[0].ReturnMsg)
             }
         }
     }
@@ -397,10 +409,10 @@ class CreateInvoice extends Component {
         let object = {
             USERCODE: userCode,
             AREACODE: (selectedAreaCode.length > 0) ? selectedAreaCode[0].AreaCode : "KU",
-            FULLNAME: userFullname,
-            USERCONTACTNO: userContact,
-            USEREMAILADDRESS: userEmail,
-            USERADDRESS: userAddress,
+            FULLNAME: userFullname === "" ? "-" : userFullname,
+            USERCONTACTNO: userContact === "" ? "-" : userContact,
+            USEREMAILADDRESS: userEmail === "" ? "-" : userEmail,
+            USERADDRESS: userAddress === "" ? "-" : userAddress,
             MINSELFPICKUPPRICE: userMinSelfPickup,
             CUBICSELFPICKUPPRICE: userCubicSelfPickup,
             CONSOLIDATEPRICE: userConslidate,
@@ -421,8 +433,10 @@ class CreateInvoice extends Component {
             userDeliveryOnSubKGValidated
         )
 
-        if (isValidated)
+        if (isValidated) {
             this.props.CallInsertUserDataByPost(object)
+        }
+
         else
             toast.error("Some of the field is invalid. Please check and resubmit again.", { autoClose: 3000, position: "top-center", theme: 'colored' })
     }
