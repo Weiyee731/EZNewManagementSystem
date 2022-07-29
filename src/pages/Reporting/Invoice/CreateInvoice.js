@@ -179,7 +179,7 @@ class CreateInvoice extends Component {
         super(props);
         this.state = INITIAL_STATE
 
-        this.props.CallFetchAllStock({ TRACKINGSTATUSID: 2 })
+        // this.props.CallFetchAllStock({ TRACKINGSTATUSID: 2 })
         this.props.CallUserAreaCode()
         this.handleRemarkModal = this.handleRemarkModal.bind(this)
         this.handleUpdateRemark = this.handleUpdateRemark.bind(this)
@@ -195,10 +195,18 @@ class CreateInvoice extends Component {
     }
 
     componentDidMount() {
+        this.props.CallFetchAllStock({ TRACKINGSTATUSID: 2 })
     }
 
     componentDidUpdate(prevProps, prevState) {
         const { stocks, transactionReturn, userManagementApproval } = this.props
+
+        if (prevProps.stocks !== stocks) {
+            this.setState({
+                filteredList: stocks
+            })
+        }
+
         if (this.state.filteredList === null && isArrayNotEmpty(stocks)) {
             this.setState({
                 filteredList: stocks[0].ReturnVal == '0' ? [] : stocks
@@ -244,7 +252,7 @@ class CreateInvoice extends Component {
                     {(0.000374).toFixed(3)}
                 </TableCell> */}
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{data.UserCode}</TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight ? data.ProductWeight.toFixed(2) : ""}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.ProductWeight.toFixed(2)}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionDeep) ? data.ProductDimensionDeep.toFixed(0) : 0} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionWidth) ? data.ProductDimensionWidth.toFixed(0) : 0} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionHeight) ? data.ProductDimensionHeight.toFixed(0) : 0} </TableCell>
@@ -934,11 +942,11 @@ class CreateInvoice extends Component {
                         renderTableRows: this.renderTableRows,   // required, it is a function, please refer to the example I have done in Table Components
                         checkbox: true,                          // optional, by default is true
                         checkboxColor: "primary",                // optional, by default is primary, as followed the MUI documentation
-                        onRowClickSelect: true,                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
+                        onRowClickSelect: false,                  // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                         headerColor: 'rgb(200, 200, 200)'
                     }}
                     selectedIndexKey={"StockID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
-                    Data={filteredList === null ? [] : filteredList}                                  // required, the data that listing in the table
+                    Data={filteredList === null ? stocks : filteredList}                                  // required, the data that listing in the table
                     // onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
                     onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                     actionIcon={this.renderTableActionButton()}
