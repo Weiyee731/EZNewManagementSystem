@@ -1,4 +1,5 @@
 import Dashboard from "../../../pages/Dashboard/Dashboard";
+import Login from "../../../pages/Login/Login";
 import UserManagement from '../../../pages/UserManagement/UserManagement';
 import OverallStock from "../../../pages/Stock/OverallStock/OverallStock";
 import StockGoods from "../../../pages/Stock/StockGoods/StockGoods";
@@ -24,10 +25,10 @@ const routes = [
     {
         path: "/",
         exact: true,
-        element: <Dashboard />,
+        element: <Login />,
     },
     {
-        path: "/EZ",
+        path: "/Dashboard",
         exact: true,
         element: <Dashboard />,
     },
