@@ -317,7 +317,6 @@ export class GitEpic {
       )
         .then(response => response.json())
         .then(json => {
-          console.log(json)
           if (json !== "fail") {
             json = json;
             toast.success("Successfully update stock. Fetching the latest data..", { autoClose: 3000 })
@@ -433,10 +432,6 @@ export class GitEpic {
   Inventory_ViewStockListByDate = action$ =>
     action$.ofType(GitAction.GetFilteredInventoryByDate).switchMap(async ({ payload }) => {
       try {
-        console.log(url +
-          "Inventory_ViewStockListByDate?" +
-          "STARTDATE=" + payload.STARTDATE +
-          "&ENDDATE=" + payload.ENDDATE)
         const response = await fetch(url +
           "Inventory_ViewStockListByDate?" +
           "STARTDATE=" + payload.STARTDATE +
@@ -467,8 +462,6 @@ export class GitEpic {
 
   Transaction_ViewTransaction = action$ =>
     action$.ofType(GitAction.FetchTransaction).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Transaction_ViewTransaction?TrackingStatusID=" + payload.TrackingStatusID)
       try {
         const response = await fetch(url +
           "Transaction_ViewTransaction?TrackingStatusID=" + payload.TrackingStatusID
@@ -513,20 +506,6 @@ export class GitEpic {
 
   Transaction_InsertTransaction = action$ =>
     action$.ofType(GitAction.InsertNewTransaction).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Transaction_InsertTransaction?" +
-        "USERID=" + payload.USERID +
-        "&CALCULATIONTYPE=" + payload.TYPE +
-        "&DELIVERYFEE=" + payload.DELIVERYFEE +
-        "&ORDERTOTALMOUNT=" + payload.ORDERTOTALMOUNT +
-        "&ORDERPAIDMOUNT=" + payload.ORDERPAIDMOUNT +
-        "&FIRSTKG=" + payload.FIRSTKG +
-        "&SUBSEQUENCEKG=" + payload.SUBSEQUENCEKG +
-        "&STOCKID=" + payload.STOCKID +
-        "&PRODUCTPRICE=" + payload.PRODUCTPRICE +
-        "&PRODUCTQUANTITY=" + payload.PRODUCTQUANTITY +
-        "&PRODUCTDIMENSION=" + payload.PRODUCTDIMENSION +
-        "&PRODUCTUNITPRICE=" + payload.PRODUCTUNITPRICE)
       try {
         const response = await fetch(url +
           "Transaction_InsertTransaction?" +
@@ -563,11 +542,6 @@ export class GitEpic {
 
   Transaction_UpdateTransactionStatus = action$ =>
     action$.ofType(GitAction.UpdateTransaction).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Transaction_UpdateTransactionStatus?" +
-        "TRANSACTIONID=" + payload.TransactionID +
-        "&TRANSPORTATIONTYPE=" + payload.TransportationType +
-        "&DELIVERYFEE=" + payload.DeliveryFee)
       try {
         const response = await fetch(url +
           "Transaction_UpdateTransactionStatus?" +
@@ -594,11 +568,6 @@ export class GitEpic {
 
   Transaction_UpdateTransactionWithoutStatus = action$ =>
     action$.ofType(GitAction.UpdateTransactionWithoutStatus).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Transaction_UpdateTransactionWithoutStatus?" +
-        "TRANSACTIONID=" + payload.TransactionID +
-        "&TRANSPORTATIONTYPE=" + payload.TransportationType +
-        "&DELIVERYFEE=" + payload.DeliveryFee)
       try {
         const response = await fetch(url +
           "Transaction_UpdateTransactionWithoutStatus?" +
@@ -627,10 +596,6 @@ export class GitEpic {
 
   Transaction_UpdateTransactionDetailHandling = action$ =>
     action$.ofType(GitAction.UpdateTransactionDetailHandling).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Transaction_UpdateTransactionDetailHandling?" +
-        "TRANSACTIONDETAILID=" + payload.TransactionDetailID +
-        "&PRODUCTHANDLINGPRICE=" + payload.ProductHandlingPrice)
       try {
         const response = await fetch(url +
           "Transaction_UpdateTransactionDetailHandling?" +
@@ -639,7 +604,7 @@ export class GitEpic {
         );
 
         let json = await response.json();
-        json = JSON.parse(json)
+        json = JSON.parse(json)[0]
         return {
           type: GitAction.UpdatedTransactionDetailHandling,
           payload: json,
@@ -685,11 +650,6 @@ export class GitEpic {
 
   Transaction_DeleteTransaction = action$ =>
     action$.ofType(GitAction.CancelTransaction).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Transaction_DeleteTransaction?" +
-        "TRANSACTIONID=" + payload
-      )
-
       try {
         const response = await fetch(url +
           "Transaction_DeleteTransaction?" +
@@ -769,11 +729,6 @@ export class GitEpic {
 
   Transaction_ViewArchiveTransaction = action$ =>
     action$.ofType(GitAction.FetchArchivedTransaction).switchMap(async ({ payload }) => {
-      console.log(url +
-        "Transaction_ViewArchiveTransaction?" +
-        "STARTDATE=" + payload.STARTDATE +
-        "&ENDDATE=" + payload.ENDDATE
-      )
       try {
         const response = await fetch(url +
           "Transaction_ViewArchiveTransaction?" +

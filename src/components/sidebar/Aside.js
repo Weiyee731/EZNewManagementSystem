@@ -65,7 +65,6 @@ const Aside = ({ rtl, toggled, handleToggleSidebar, sidebar }) => {
         <Menu iconShape="circle" innerSubMenuArrows={false} popperArrow={false} subMenuBullets={false}>
           {
             sidebar.length > 0 && sidebar.map((item, index) => {
-
               return (
                 typeof item.submenus === "undefined" || item.submenus === null || item.submenus === "null" ?
                   <MenuItem

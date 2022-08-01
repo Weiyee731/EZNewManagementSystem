@@ -262,7 +262,7 @@ export default function TableComponents(props) {
 
   //pagination settings
   const [rowsPerPage, setRowsPerPage] = React.useState(
-    isArrayNotEmpty(props.paginationOptions) ? props.paginationOptions[0] : 25
+    isArrayNotEmpty(props.paginationOptions) ? props.paginationOptions[0] : props.Data.length
   );
   const [pagePaginationOptions, setPagePaginationOptions] = React.useState(
     isArrayNotEmpty(props.paginationOptions) ? props.paginationOptions : []
@@ -336,8 +336,13 @@ export default function TableComponents(props) {
   };
 
   const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = rows.map((n) => n);
+    if (event.target.checked && !isArrayNotEmpty(selected)) {
+      let newSelecteds;
+      if (typeof rows[0].ProductDimensionDeep !== "undefined") {
+        newSelecteds = rows.map((n) => n).filter(el => el.ProductDimensionDeep > 0 && el.ProductDimensionWidth > 0 && el.ProductDimensionHeight > 0 && el.ProductWeight > 0);
+      } else {
+        newSelecteds = rows.map((n) => n);
+      }
       setSelected(newSelecteds);
       if (typeof props.onSelectAllClick === "function")
         props.onSelectAllClick(newSelecteds)
@@ -446,6 +451,8 @@ export default function TableComponents(props) {
                 TableData.map((row, index) => {
                   const isItemSelected = isSelected(row);
                   const labelId = `enhanced-table-checkbox-${index}`;
+                  const volume = volumeCalc(row.ProductDimensionDeep, row.ProductDimensionWidth, row.ProductDimensionHeight)
+                  const errorData = (!isObjectUndefinedOrNull(row.ProductWeight) && row.ProductWeight === 0) || (!isObjectUndefinedOrNull(volume) && volume === 0)
 
                   return (
                     <TableRow
@@ -455,6 +462,7 @@ export default function TableComponents(props) {
                       tabIndex={-1}
                       key={"row_" + index}
                       selected={isItemSelected}
+                      style={{ cursor: "pointer", backgroundColor: errorData ? '#FF9494' : '' }}
                     >
                       {renderCheckbox && (
                         <TableCell padding="checkbox">
@@ -462,7 +470,7 @@ export default function TableComponents(props) {
                             color={checkboxColor}
                             checked={isItemSelected}
                             inputProps={{ "aria-labelledby": labelId }}
-                            onClick={(event) => handleSelectItem(event, row, index)}
+                            onClick={(event) => !errorData && handleSelectItem(event, row, index)}
                           />
                         </TableCell>
                       )}
@@ -512,6 +520,7 @@ TablePaginationActions.propTypes = {
 function TablePaginationActions(props) {
   const theme = useTheme();
   const { count, page, rowsPerPage, onPageChange } = props;
+
   const handleFirstPageButtonClick = (event) => {
     onPageChange(event, 0);
   };

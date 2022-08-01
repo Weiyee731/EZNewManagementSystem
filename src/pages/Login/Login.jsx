@@ -47,7 +47,7 @@ const INITIAL_STATE = {
     isSubmitting: false,
 }
 
-class Dashboard extends Component {
+class Login extends Component {
     constructor(props) {
         super(props);
         this.state = INITIAL_STATE
@@ -179,4 +179,4 @@ class Dashboard extends Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

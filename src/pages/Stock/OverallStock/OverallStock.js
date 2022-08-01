@@ -344,7 +344,7 @@ class OverallStock extends Component {
             }
         }
 
-        var color = "#ffffff"
+        var color = ""
         var fontcolor = "#000000"
         if (data.AreaCode === null || data.AreaName === null) {
             color = "#f44336"
@@ -489,7 +489,6 @@ class OverallStock extends Component {
     handleSubmitUpdate = () => {
         const { formValue } = this.state
         let extraChangesValue = "", isNotVerified = 0
-        console.log('formValue', this.state.formValue)
         if (formValue.AdditionalCharges.length > 0) {
             for (var i = 0; i < formValue.AdditionalCharges.length; i++) {
                 extraChangesValue += formValue.AdditionalCharges[i].Charges + "=" + formValue.AdditionalCharges[i].Value
@@ -541,15 +540,10 @@ class OverallStock extends Component {
             isNotVerified++
         }
 
-        console.log(isNotVerified)
-
         if (isNotVerified === 0) {
-            console.log("www")
             if (this.state.approvePage) {
                 // if this is the stockin page
-                console.log("www1")
                 if (this.state.isAddNewStock === false) {
-                    console.log("www2")
                     let postObject = {
                         StockID: object.STOCKID,
                         TrackingNumber: object.TRACKINGNUMBER,
@@ -567,9 +561,7 @@ class OverallStock extends Component {
                         AdditionalCharges: object.EXTRACHARGE,
                     }
                     this.props.CallUpdateStockDetailByPost(postObject)
-                }
-                else {
-                    console.log("www3")
+                } else {
                     let postObject = {
                         TRACKINGNUMBER: object.TRACKINGNUMBER,
                         PRODUCTWEIGHT: object.PRODUCTWEIGHT,
@@ -588,10 +580,7 @@ class OverallStock extends Component {
                     }
                     this.props.CallInsertStockByPost(postObject)
                 }
-
-            }
-            else {
-                console.log("www4")
+            } else {
                 // if this is the overall stock page
                 if (this.state.isAddNewStock === false)
                     this.props.CallUpdateStockDetailByGet(object)
@@ -614,7 +603,6 @@ class OverallStock extends Component {
                     }
                     this.props.CallInsertStockByPost(postObject)
                 }
-
             }
 
             toast.loading("Submitting data... Please wait...", {
@@ -624,8 +612,7 @@ class OverallStock extends Component {
                 theme: "dark",
             })
             this.setState({ isDataFetching: false })
-        }
-        else {
+        } else {
             toast.error("Invalid to update data!", {
                 autoClose: 3000,
                 position: "top-center",
@@ -665,25 +652,25 @@ class OverallStock extends Component {
 
             case "Depth":
                 tempForm.ProductDimensionDeep = value
-                tempForm.DepthVerified = !isStringNullOrEmpty(value) && !isNaN(value)
+                tempForm.DepthVerified = !isStringNullOrEmpty(value) && !isNaN(value) && value > 0
                 this.setState({ formValue: tempForm, autoFocusState: 5 })
                 break
 
             case "Width":
                 tempForm.ProductDimensionWidth = value
-                tempForm.WidthVerified = !isStringNullOrEmpty(value) && !isNaN(value)
+                tempForm.WidthVerified = !isStringNullOrEmpty(value) && !isNaN(value) && value > 0
                 this.setState({ formValue: tempForm, autoFocusState: 6 })
                 break
 
             case "Height":
                 tempForm.ProductDimensionHeight = value
-                tempForm.HeightVerified = !isStringNullOrEmpty(value) && !isNaN(value)
+                tempForm.HeightVerified = !isStringNullOrEmpty(value) && !isNaN(value) && value > 0
                 this.setState({ formValue: tempForm, autoFocusState: 7 })
                 break
 
             case "Weight":
                 tempForm.ProductWeight = value
-                tempForm.WeightVerified = !isStringNullOrEmpty(value) && !isNaN(value)
+                tempForm.WeightVerified = !isStringNullOrEmpty(value) && !isNaN(value) && value > 0
                 this.setState({ formValue: tempForm, autoFocusState: 8 })
                 break
 
@@ -962,7 +949,6 @@ class OverallStock extends Component {
                         additionalCharges = []
                     }
                 }
-                else console.log(typeof additionalCharges)
 
                 tempList[0].AdditionalCharges = isObjectUndefinedOrNull(additionalCharges) ? [] : additionalCharges
                 tempList[0].AdditionalCharges.length > 0 && tempList[0].AdditionalCharges.map((el, idx) => {
@@ -1124,6 +1110,8 @@ class OverallStock extends Component {
             this.state.formValue.WidthVerified &&
             this.state.formValue.HeightVerified &&
             this.state.formValue.WeightVerified
+
+        const initial = this.state.formValue.ProductDimensionDeep !== 0 && this.state.formValue.ProductDimensionHeight !== 0 && this.state.formValue.ProductDimensionWidth !== 0 && this.state.formValue.ProductWeight !== 0
 
         const { filteredList, formValue, searchCategory, searchArea } = this.state
         const renderTableTopRightButtons = () => {
@@ -1380,7 +1368,7 @@ class OverallStock extends Component {
                     showAction={true} // required, to show the footer of modal display
                     title={this.state.formValue.Item} // required, title of the modal
                     buttonTitle={this.state.isAddNewStock ? "Add New" : "Update"} // required, title of button
-                    buttonDisabled={!validateForm}
+                    buttonDisabled={!validateForm || !initial}
                     singleButton={true} // required, to decide whether to show a single full width button or 2 buttons
                     maxWidth={"md"}
                     draggable={true}
@@ -1574,7 +1562,7 @@ class OverallStock extends Component {
                                             variant="standard"
                                             size="small"
                                             name="Dimension"
-                                            value={((formValue.ProductDimensionWidth * formValue.ProductDimensionHeight * formValue.ProductDimensionDeep) / 1000000).toFixed(3)}
+                                            value={volumeCalc(formValue.ProductDimensionDeep, formValue.ProductDimensionWidth, formValue.ProductDimensionHeight)}
                                             endAdornment={<InputAdornment position="start">  m <sup>3</sup>  </InputAdornment>}
                                             disabled
                                         />
@@ -1659,7 +1647,6 @@ class OverallStock extends Component {
                                     </div>
                                 )
                             })}
-                            {console.log(formValue)}
                             {isArrayNotEmpty(formValue.AdditionalCharges) && (
                                 <div className="mt-3 col-12">
                                     <Button

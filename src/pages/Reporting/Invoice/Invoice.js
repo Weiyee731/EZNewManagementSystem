@@ -178,7 +178,12 @@ class Invoice extends Component {
     }
 
     onTableRowClick = (event, row) => {
-        this.props.history.push(`/InvoiceDetail/${row.TransactionID}`)
+        this.props.history.push({
+            pathname: `/InvoiceDetail/${row.TransactionID}`,
+            state: {
+                ind: 'invoice'
+            }
+        })
     }
 
     handleClose = () => {

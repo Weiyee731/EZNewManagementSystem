@@ -17,6 +17,7 @@ const INITIAL_STATE = {
   dashboard: [],
   archivedData: [],
   userManagementApproval: [],
+  handlingChargeReturn: [],
 };
 
 export function counterReducer(state = INITIAL_STATE, action) {
@@ -193,7 +194,8 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, { loading: true });
     case GitAction.UpdatedTransactionDetailHandling:
       return Object.assign({}, state, {
-        loading: false
+        loading: false,
+        handlingChargeReturn: action.payload
       });
     case GitAction.CancelTransaction:
       return Object.assign({}, state, { loading: true });

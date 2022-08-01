@@ -63,7 +63,7 @@ const ProformaList = (props) => {
         if (userId !== undefined && typeof userId !== 'undefined') {
             localStorage.setItem('proformaUserId', userId)
         }
-        console.log(userId)
+
         props.CallUserProfileByID({ UserID: userId !== undefined && typeof userId !== 'undefined' ? userId : localStorage.getItem('proformaUserId') })
 
         let tempArr = []
@@ -103,7 +103,12 @@ const ProformaList = (props) => {
         if (ref.current !== transactionReturn) {
             if (isArrayNotEmpty(transactionReturn) && transactionReturn[0].ReturnVal == 1) {
                 toast.success(transactionReturn[0].ReturnMsg, { autoClose: 2000, position: "top-center" })
-                props.history.push(`/InvoiceDetail/${transactionReturn[0].TransactionID}`)
+                props.history.push({
+                    pathname: `/InvoiceDetail/${transactionReturn[0].TransactionID}`,
+                    state: {
+                        ind: 'proforma'
+                    }
+                })
             }
         }
     }, [ref, transactionReturn])
@@ -203,14 +208,12 @@ const ProformaList = (props) => {
 
     const AddTotalPrice = () => {
         let totalArr = 0
-        // console.log('items', items)
         items.map((item) => {
-            console.log('items', item.AdditionalCharges)
             let addprice = 0;
             try {
                 if (JSON.parse(item.AdditionalCharges).length > 0) {
                     JSON.parse(item.AdditionalCharges).map((addcharge) => {
-                        if (addcharge.Charges !== "[]") {
+                        if (addcharge.Charges !== "[]" && addcharge.Charges !== '-') {
                             addprice = parseFloat(addprice) + parseFloat(addcharge.Value)
                         } else {
                             addprice = parseFloat(addprice) + parseFloat("0")
@@ -223,8 +226,6 @@ const ProformaList = (props) => {
                 console.log('error', e)
                 totalArr = parseFloat(totalArr) + parseFloat(addprice)
             }
-
-
         })
         return totalArr
     }
@@ -294,14 +295,13 @@ const ProformaList = (props) => {
         let productDimension = []
         let productUnitPrices = []
         let TotalAddPrice = 0;
-        console.log(items)
         items.map((item) => {
             let addprice = 0;
 
             try {
                 if (JSON.parse(item.AdditionalCharges).length > 0) {
                     JSON.parse(item.AdditionalCharges).map((addcharge) => {
-                        if (addcharge.Charges !== "[]") {
+                        if (addcharge.Charges !== "[]" && addcharge.Charges !== '-') {
                             addprice = parseFloat(addprice) + parseFloat(addcharge.Value)
                         } else {
                             addprice = parseFloat(addprice) + parseFloat("0")
@@ -321,7 +321,7 @@ const ProformaList = (props) => {
             productUnitPrices.push(selectedType !== 3 ? item.isFollowStandard ? singleUnitPrice(volumeCalc(item.ProductDimensionDeep, item.ProductDimensionWidth, item.ProductDimensionHeight)) : item.unitPrice : 1)
         })
 
-        props.CallInsertTransaction({
+        let object = {
             USERID: userId,
             TYPE: selectedType,
             DELIVERYFEE: selectedType === 4 && (totalVolume) < minCubic ? (parseFloat(LargeItemMinPrice / 2 - totalPrice())).toFixed(2) : parseFloat("0").toFixed(2),
@@ -335,7 +335,9 @@ const ProformaList = (props) => {
             PRODUCTQUANTITY: productQuantity,
             PRODUCTDIMENSION: productDimension,
             PRODUCTUNITPRICE: productUnitPrices
-        })
+        }
+
+        props.CallInsertTransaction(object)
     }
 
     const volumeWeight = () => {
@@ -392,15 +394,13 @@ const ProformaList = (props) => {
     }
 
     const renderTableRows = (data, index) => {
-
         let fontsize = '9pt'
         let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
         let addprice = 0;
-        console.log('data', data)
         try {
             if (JSON.parse(data.AdditionalCharges).length > 0) {
                 JSON.parse(data.AdditionalCharges).map((addcharge) => {
-                    if (addcharge.Charges !== "[]") {
+                    if (addcharge.Charges !== "[]" && addcharge.Charges !== '-') {
                         addprice = parseFloat(addprice) + parseFloat(addcharge.Value)
                     } else {
                         addprice = parseFloat(addprice) + parseFloat("0")
@@ -448,7 +448,7 @@ const ProformaList = (props) => {
     const renderTableTopLeft = () => {
         return (
             <div className='d-flex'>
-                {selectedType === 1 &&
+                {selectedType === 1 && (isArrayNotEmpty(items) && items.filter(x => volumeCalc(x.ProductDimensionDeep, x.ProductDimensionWidth, x.ProductDimensionHeight) < 0.013).length > 0) &&
                     <>
                         <TextField
                             variant="standard"
@@ -464,7 +464,7 @@ const ProformaList = (props) => {
                     </>
 
                 }
-                {selectedType === 1 && (isArrayNotEmpty(items) && items.filter(x => volumeCalc(x.ProductDimensionDeep, x.ProductDimensionWidth, x.ProductDimensionHeight) > 0.013).length > 0) &&
+                {selectedType === 1 && (isArrayNotEmpty(items) && items.filter(x => volumeCalc(x.ProductDimensionDeep, x.ProductDimensionWidth, x.ProductDimensionHeight) >= 0.013).length > 0) &&
                     <TextField
                         className="mx-3"
                         variant="standard"
@@ -572,7 +572,6 @@ const ProformaList = (props) => {
 
     const handleAreaOnChange = (e) => {
         let index = e.target.value
-        console.log(userAreaCode[index])
         setArea(userAreaCode[index].AreaCode)
         setLargeItemMinPrice(userAreaCode[index].AreaCharges)
     }
