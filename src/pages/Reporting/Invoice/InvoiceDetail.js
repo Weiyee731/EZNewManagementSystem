@@ -37,7 +37,7 @@ function mapDispatchToProps(dispatch) {
   return {
     CallFetchAllTransactionByID: (data) => dispatch(GitAction.CallFetchAllTransactionByID(data)),
     CallUpdateTransaction: (data) => dispatch(GitAction.CallUpdateTransaction(data)),
-    CallUpdateTransactionWithoutStatus: (data) => dispatch(GitAction.CallUpdateTransaction(data)),
+    CallUpdateTransactionWithoutStatus: (data) => dispatch(GitAction.CallUpdateTransactionWithoutStatus(data)),
     CallUpdateTransactionDetailHandling: (data) => dispatch(GitAction.CallUpdateTransactionDetailHandling(data)),
     // CallUpdateStockDetailByPost: (data) => dispatch(GitAction.CallUpdateStockDetailByPost(data)),
     CallUpdateStockDetailByGet: (data) => dispatch(GitAction.CallUpdateStockDetailByGet(data)),
@@ -547,8 +547,10 @@ class InvoiceDetail extends Component {
       this.state.TransactionDetail.map((search) => {
         if (search.Description === "Delivery Fee" || search.TrackingNumber === "Delivery Fee") {
 
-          if (this.state.printMode === "GenerateInvoice")
+          if (this.state.printMode === "GenerateInvoice"){
             this.props.CallUpdateTransaction(this.state);
+          }
+            
 
           search.ProductPrice = this.state.DeliveryFee
           search.totalPrice = this.state.DeliveryFee
@@ -569,15 +571,19 @@ class InvoiceDetail extends Component {
             totalPrice: this.state.DeliveryFee
           })
 
-          if (this.state.printMode === "GenerateInvoice")
+          if (this.state.printMode === "GenerateInvoice"){
             this.props.CallUpdateTransaction(this.state);
+          }
+            
         }
         else if (this.state.TransportationBool && minDelivery > 0) {
           this.state.TransactionDetail.map((search) => {
             if (search.TrackingNumber === "Delivery Min 0.5m³") {
 
-              if (this.state.printMode === "GenerateInvoice")
+              if (this.state.printMode === "GenerateInvoice"){
                 this.props.CallUpdateTransaction(this.state);
+              }
+                
 
               search.ProductPrice = this.state.DeliveryFee
               search.totalPrice = this.state.DeliveryFee
@@ -586,8 +592,10 @@ class InvoiceDetail extends Component {
         }
       }
     } else {
-      if (this.state.printMode === "GenerateInvoice")
+      if (this.state.printMode === "GenerateInvoice"){
         this.props.CallUpdateTransaction(this.state);
+      }
+        
     }
 
     if (this.state.handlingArray.length > 0) {
