@@ -452,7 +452,11 @@ export default function TableComponents(props) {
                   const isItemSelected = isSelected(row);
                   const labelId = `enhanced-table-checkbox-${index}`;
                   const volume = volumeCalc(row.ProductDimensionDeep, row.ProductDimensionWidth, row.ProductDimensionHeight)
-                  const errorData = (!isObjectUndefinedOrNull(row.ProductWeight) && row.ProductWeight === 0) || (!isObjectUndefinedOrNull(volume) && volume === 0)
+                  let errorData = (!isObjectUndefinedOrNull(row.ProductWeight) && row.ProductWeight === 0) || (!isObjectUndefinedOrNull(volume) && volume === 0)
+
+                  if (!isObjectUndefinedOrNull(row.Description) && row.Description === 'Delivery Fee') {
+                    errorData = false
+                  }
 
                   return (
                     <TableRow

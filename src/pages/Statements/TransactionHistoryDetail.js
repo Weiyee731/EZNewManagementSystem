@@ -274,7 +274,7 @@ class TransactionHistoryDetail extends Component {
         tempArr.map((item) => {
           tempTotalhandlingCharge += item.handlingCharge
         })
-        console.log(this.props.transaction)
+
         this.setState({
           TransactionDetail: tempArr,
           transaction: this.props.transaction,
@@ -332,7 +332,6 @@ class TransactionHistoryDetail extends Component {
   }
 
   renderTableRows = (data, index) => {
-    console.log(data)
     const fontsize = '9pt'
     let DBextraCharge = []
     let charges = data.TransactionDetailCharges !== "[]" && data.TransactionDetailCharges !== undefined ? JSON.parse(data.TransactionDetailCharges).reduce((price, item) => price + parseFloat(item.ProductPrice), 0).toFixed(2) : 0

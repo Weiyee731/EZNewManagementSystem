@@ -638,7 +638,6 @@ class CreateInvoice extends Component {
             additionalCostItems.splice(index, 1)
             this.setState({ formValue: tempFormValue })
         }
-
     }
 
     removeAllAdditionalCost() {
@@ -742,15 +741,12 @@ class CreateInvoice extends Component {
                 if (areaSearchKeys !== "All" && searchCategory === "All") {
                     // if area is not empty
                     tempList = stocks.filter(x => (!isStringNullOrEmpty(x.UserAreaID) && x.UserAreaID.includes(areaSearchKeys)) && (x.TrackingNumber.includes(searchKeys) || x.UserCode.includes(searchKeys)))
-                }
-                else if (areaSearchKeys === "All" && searchCategory !== "All") {
+                } else if (areaSearchKeys === "All" && searchCategory !== "All") {
                     // if category is not empty
                     tempList = this.onCategoryFilter(stocks, searchCategory, searchKeys)
-                }
-                else if (areaSearchKeys !== "All" && searchCategory !== "All") {
+                } else if (areaSearchKeys !== "All" && searchCategory !== "All") {
                     tempList = this.onCategoryAndAreaFilter(stocks, searchCategory, areaSearchKeys, searchKeys)
-                }
-                else {
+                } else {
                     // if want to search with all options
                     tempList = stocks.filter(x =>
                         (!isStringNullOrEmpty(x.TrackingNumber) && x.TrackingNumber.includes(searchKeys)) ||
@@ -761,18 +757,15 @@ class CreateInvoice extends Component {
                 }
             }
             this.setState({ filteredList: tempList })
-        }
-        else {
+        } else {
             if (searchCategory === "All" && areaSearchKeys !== "All") {
                 // if area is not empty but search string is empty
                 this.setState({ searchCategory: "All", filteredList: stocks.filter(x => !isStringNullOrEmpty(x.UserAreaID) && parseInt(x.UserAreaID) === parseInt(areaSearchKeys)) })
-            }
-            else if (searchCategory !== "All" && areaSearchKeys === "All") {
+            } else if (searchCategory !== "All" && areaSearchKeys === "All") {
                 // if category is not empty but search string is empty
                 // no point to search with category if there are no searching keywords
                 this.setState({ areaSearchKeys: "All", filteredList: stocks })
-            }
-            else {
+            } else {
                 this.setState({ searchCategory: "All", areaSearchKeys: "All", filteredList: stocks })
             }
         }
@@ -810,36 +803,6 @@ class CreateInvoice extends Component {
         return (
             <div className="container-fluid">
                 <div className="row">
-                    {/* <div className="col-2">
-                        <div className="w-100 filter-dropdown">
-                            <Select
-                                labelId="search-filter-category"
-                                id="search-filter-category"
-                                value={searchCategory}
-                                label="Search By"
-                                onChange={(e) => this.handleSearchCategory(e)}
-                                size="small"
-                                IconComponent={FilterListOutlinedIcon}
-                                className="w-75"
-                                placeholder="filter by"
-                            >
-                                <MenuItem value="All">All</MenuItem>
-                                {userAreaCode.map((data, index) => {
-                                    return (
-                                        <MenuItem key={`area_${index}`} value={data.AreaCode}>{data.AreaCode}</MenuItem>
-                                    )
-                                })}
-                            </Select>
-                        </div>
-
-                    </div>
-                    <div className="col-9">
-                        <SearchBar
-                            id=""
-                            placeholder="Search by Member No. or Tracking No."
-                            onChange={(e) => this.onSearch(e)}
-                        />
-                    </div> */}
                     <div className="col-11">
                         <div className="row">
                             <div className="col-md-6 col-12 mb-2">
