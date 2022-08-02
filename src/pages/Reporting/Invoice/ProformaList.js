@@ -336,8 +336,7 @@ const ProformaList = (props) => {
             PRODUCTDIMENSION: productDimension,
             PRODUCTUNITPRICE: productUnitPrices
         }
-        console.log(object)
-        // props.CallInsertTransaction(object)
+        props.CallInsertTransaction(object)
     }
 
     const volumeWeight = () => {
