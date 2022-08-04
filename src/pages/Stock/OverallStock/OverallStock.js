@@ -560,6 +560,7 @@ class OverallStock extends Component {
                         Remark: object.REMARK,
                         AdditionalCharges: object.EXTRACHARGE,
                     }
+                    
                     this.props.CallUpdateStockDetailByPost(postObject)
                 } else {
                     let postObject = {
@@ -578,6 +579,7 @@ class OverallStock extends Component {
                         CONTAINERNAME: object.CONTAINERNAME,
                         CONTAINERDATE: object.CONTAINERDATE,
                     }
+                    
                     this.props.CallInsertStockByPost(postObject)
                 }
             } else {
@@ -1037,6 +1039,7 @@ class OverallStock extends Component {
         let ContainerDate = []
         let Remark = []
         let AdditionalCharges = []
+        console.log(AdditionalCharges)
 
         isArrayNotEmpty(selectedStocks) && selectedStocks.map((row) => {
             StockID.push(row.StockID)
@@ -1052,8 +1055,10 @@ class OverallStock extends Component {
             ContainerName.push(this.state.ContainerName)
             ContainerDate.push(this.state.ContainerDate)
             Remark.push(row.Remark)
-            AdditionalCharges.push(row.AdditionalCharges)
+            AdditionalCharges.push(row.AdditionalChargesOrig)
         })
+
+        console.log(AdditionalCharges)
 
         this.props.CallUpdateStockDetailByPost({
             StockID: StockID.join(","),

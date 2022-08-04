@@ -40,6 +40,7 @@ function mapDispatchToProps(dispatch) {
     CallUpdateTransaction: (data) => dispatch(GitAction.CallUpdateTransaction(data)),
     CallUpdateTransactionWithoutStatus: (data) => dispatch(GitAction.CallUpdateTransactionWithoutStatus(data)),
     CallUpdateTransactionDetailHandling: (data) => dispatch(GitAction.CallUpdateTransactionDetailHandling(data)),
+    // CallUpdateStockDetailByPost: (data) => dispatch(GitAction.CallUpdateStockDetailByPost(data)),
     CallUpdateStockDetailByGet: (data) => dispatch(GitAction.CallUpdateStockDetailByGet(data)),
   };
 }
@@ -245,7 +246,7 @@ class InvoiceDetail extends Component {
           })
         })
 
-        let actualVolume = JSON.parse(this.props.transaction[0].TransactionDetail).reduce((dimension, item) => dimension + ((item.ProductDimensionDeep * item.ProductDimensionHeight * item.ProductDimensionWidth) / 1000000), 0).toFixed(3)
+        let actualVolume = JSON.parse(this.props.transaction[0].TransactionDetail).reduce((dimension, item) => dimension + volumeCalc(item.ProductDimensionDeep,item.ProductDimensionHeight,item.ProductDimensionWidth), 0).toFixed(3)
 
         if (this.props.transaction[0].CalculationType === "4") {
           let totalPrice = JSON.parse(this.props.transaction[0].TransactionDetail).filter((data) => data.Description !== "Delivery Fee").reduce((price, item) => price + item.ProductPrice, 0)
@@ -259,10 +260,9 @@ class InvoiceDetail extends Component {
               TransportationType: 2,
               DeliveryFee: this.props.transaction && this.props.transaction[0].DeliveryFee ? this.props.transaction[0].DeliveryFee : extraFees
             });
-            this.setState({ TransportationBool: true, Remark: "Delivery Min 0.5m³", isDeliveryFeeValidated: true, DeliveryFee: extraFees },)
+            this.setState({ TransportationBool: true, Remark: "Delivery Min 0.5m³", isDeliveryFeeValidated: true, DeliveryFee: extraFees })
             if (tempArr.filter((data) => data.Description === "Delivery Fee").length === 0) {
               tempArr.push({
-                TransactionDetailID: null,
                 TrackingNumber: "Delivery Min 0.5m³",
                 ProductQuantity: 1,
                 ProductDimensionDeep: "-",
@@ -278,14 +278,15 @@ class InvoiceDetail extends Component {
         }
 
         let tempTotalhandlingCharge = 0
+
         tempArr.map((item) => {
           tempTotalhandlingCharge += item.handlingCharge
         })
-
         this.setState({
           TransactionDetail: tempArr,
           transaction: this.props.transaction,
           actualVolume: actualVolume,
+          TransportationBool: this.props.transaction[0].TransportationTypeInd === 2 ? true : false,
           totalhandlingCharge: tempTotalhandlingCharge
         })
 
@@ -326,14 +327,13 @@ class InvoiceDetail extends Component {
     let id = []
     let charge = []
     tempArr.map((item) => {
-      if (!isObjectUndefinedOrNull(item.TransactionDetailID)) {
-        id.push(item.TransactionDetailID)
-        charge.push(item.handlingCharge)
-      }
+      id.push(item.TransactionDetailID)
+      charge.push(item.handlingCharge)
     })
     let object = {
       TransactionDetailID: id, ProductHandlingPrice: charge
     }
+    // console.log(object)
     this.props.CallUpdateTransactionDetailHandling(object)
 
     // tempArr[0].TransactionDetailCharges != null && JSON.parse(tempArr[0].TransactionDetailCharges).map((additionalCharges, index) => {
@@ -355,16 +355,16 @@ class InvoiceDetail extends Component {
 
   renderTableRows = (data, index) => {
     const fontsize = '9pt'
+    let DBextraCharge = []
     let charges = data.TransactionDetailCharges !== "[]" && data.TransactionDetailCharges !== undefined ? JSON.parse(data.TransactionDetailCharges).reduce((price, item) => price + parseFloat(item.ProductPrice), 0).toFixed(2) : 0
 
-    // let dataIndex = this.state.TransactionDetail.findIndex(x => parseInt(x.TransactionDetailID) === parseInt(data.TransactionDetailID))
-    // console.log(dataIndex)
-    // let existDelivery = this.state.TransactionDetail.filter(x => x.Description === "Delivery Fee").length
-    // if (this.state.TransportationBool === true && data.TransactionDetailID === undefined) {
-    //   if (existDelivery === 0) {
-    //     dataIndex = this.state.TransactionDetail.length - 1
-    //   }
-    // }
+    let dataIndex = this.state.TransactionDetail.findIndex(x => parseInt(x.TransactionDetailID) === parseInt(data.TransactionDetailID))
+    let existDelivery = this.state.TransactionDetail.filter(x => x.Description === "Delivery Fee").length
+    if (this.state.TransportationBool === true && data.TransactionDetailID === undefined) {
+      if (existDelivery === 0) {
+        dataIndex = this.state.TransactionDetail.length - 1
+      }
+    }
 
     return (
       (data.Description === "Delivery Fee" && this.state.TransportationBool === false) || (data.TrackingNumber === "Delivery Fee" && this.state.TransportationBool === false && this.props.transaction[0].CalculationType !== "4") ? "" :
@@ -376,7 +376,7 @@ class InvoiceDetail extends Component {
               scope="row"
               sx={{ fontSize: fontsize }}
             >
-              {index + 1}
+              {dataIndex + 1}
             </TableCell>
             <TableCell align="left" sx={{ fontSize: fontsize }}>{this.props.transaction[0].CalculationType === "4" && data.Description === "Delivery Fee" || this.props.transaction[0].CalculationType === "4" && data.Description === undefined ? "Delivery Min 0.5m³" : data.TrackingNumber}
               {data.TransactionDetailCharges !== "[]" && data.TransactionDetailCharges !== undefined &&
@@ -388,6 +388,20 @@ class InvoiceDetail extends Component {
                   )
                 })
               }
+              {/* {data.TransactionDetailCharges !== "[]" &&
+                JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
+                console.log("additionalCharges11", additionalCharges)
+                })
+              } */}
+              {/* {
+                data.AdditionalCharges !== "[]" && data.AdditionalCharges.split(";").map((x) => {
+                  return (
+                    <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px" }}>
+                      {x.split("=")[0]}
+                    </div>
+                  )
+                })
+              } */}
             </TableCell>
             <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? "-" : data.ProductQuantity}</TableCell>
             {
@@ -443,15 +457,25 @@ class InvoiceDetail extends Component {
                     </div>
                   )
                 })}
+                {/* {
+                  data.AdditionalCharges !== "[]" && data.AdditionalCharges.split(";").map((x) => {
+                    return (
+                      <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px" }}>
+                        {parseFloat(x.split("=")[1]).toFixed(2)}
+                      </div>
+                    )
+                  })
+                } */}
               </TableCell>
             }
+
             {/* Only Show price when not using small item calculation */}
             {
               this.props.transaction[0].CalculationType !== "3" &&
               <TableCell align="left" sx={{ fontSize: fontsize }}>
                 {
                   this.props.transaction[0].CalculationType === "1" ?
-                    volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) >= 0.013 ? (data.ProductPrice / volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)).toFixed(2) : parseFloat(data.ProductPrice).toFixed(2)
+                    volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) > 0.013 ? (data.ProductPrice / volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)).toFixed(2) : parseFloat(data.ProductPrice).toFixed(2)
                     :
                     volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) > 0 ? (data.ProductPrice / volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)).toFixed(2) : data.Description === "Delivery Fee" || data.Description === undefined ? "-" : <p style={{ color: "red" }}>0 m³</p>
                 }
@@ -493,9 +517,12 @@ class InvoiceDetail extends Component {
     if (this.state.TransportationBool === true) {
       this.state.TransactionDetail.map((search) => {
         if (search.Description === "Delivery Fee" || search.TrackingNumber === "Delivery Fee") {
-          if (this.state.printMode === "GenerateInvoice") {
+
+          if (this.state.printMode === "GenerateInvoice"){
             this.props.CallUpdateTransaction(this.state);
           }
+            
+
           search.ProductPrice = this.state.DeliveryFee
           search.totalPrice = this.state.DeliveryFee
           isDeliveryExist = true
@@ -514,16 +541,21 @@ class InvoiceDetail extends Component {
             ProductPrice: this.state.DeliveryFee,
             totalPrice: this.state.DeliveryFee
           })
-          if (this.state.printMode === "GenerateInvoice") {
+
+          if (this.state.printMode === "GenerateInvoice"){
             this.props.CallUpdateTransaction(this.state);
           }
+            
         }
         else if (this.state.TransportationBool && minDelivery > 0) {
           this.state.TransactionDetail.map((search) => {
             if (search.TrackingNumber === "Delivery Min 0.5m³") {
-              if (this.state.printMode === "GenerateInvoice") {
+
+              if (this.state.printMode === "GenerateInvoice"){
                 this.props.CallUpdateTransaction(this.state);
               }
+                
+
               search.ProductPrice = this.state.DeliveryFee
               search.totalPrice = this.state.DeliveryFee
             }
@@ -531,9 +563,10 @@ class InvoiceDetail extends Component {
         }
       }
     } else {
-      if (this.state.printMode === "GenerateInvoice") {
+      if (this.state.printMode === "GenerateInvoice"){
         this.props.CallUpdateTransaction(this.state);
       }
+        
     }
 
     if (this.state.handlingArray.length > 0) {
@@ -598,9 +631,10 @@ class InvoiceDetail extends Component {
     const {
       DeliveryFee,
       transaction,
-      TransactionDetail
     } = this.state
 
+
+    let TransactionDetail = isArrayNotEmpty(transaction) ? JSON.parse(transaction[0].TransactionDetail) : transaction
     let actualWeight = 0
     let actualVolume = 0
     let m3Weight = 0
@@ -608,12 +642,12 @@ class InvoiceDetail extends Component {
     let subTotal = 0
     let handlingCharge = 0
     let additionalCharges = 0
+    let AdminChargesArray = []
     let AdminExtraCharges = 0
 
     if (isArrayNotEmpty(transaction) && transaction[0].TransactionDetail !== null) {
       actualWeight = JSON.parse(transaction[0].TransactionDetail).reduce((weight, item) => weight + item.ProductWeight, 0).toFixed(2)
-      actualVolume = JSON.parse(transaction[0].TransactionDetail).reduce((dimension, item) => dimension + ((item.ProductDimensionDeep * item.ProductDimensionHeight * item.ProductDimensionWidth) / 1000000), 0)
-      actualVolume = (Math.ceil(actualVolume * 1000) / 1000).toFixed(3)
+      actualVolume = JSON.parse(transaction[0].TransactionDetail).reduce((dimension, item) => dimension + volumeCalc(item.ProductDimensionDeep,item.ProductDimensionHeight,item.ProductDimensionWidth), 0).toFixed(3)
       m3Weight = Math.ceil(actualVolume * 1000000 / 6000)
 
       if (actualWeight > m3Weight)
@@ -621,9 +655,9 @@ class InvoiceDetail extends Component {
       else
         finalWeight = m3Weight
 
-      handlingCharge = TransactionDetail.reduce((charges, item) => charges + item.handlingCharge, 0)
+      handlingCharge = this.state.TransactionDetail.reduce((charges, item) => charges + item.handlingCharge, 0)
       handlingCharge = !isNaN(handlingCharge) ? handlingCharge : 0
-      additionalCharges = TransactionDetail[0].TransactionDetailCharges != null && JSON.parse(TransactionDetail[0].TransactionDetailCharges).reduce((additionalCharge, item) => additionalCharge + parseFloat(item.ProductPrice), 0).toFixed(2)
+      additionalCharges = this.state.TransactionDetail[0].TransactionDetailCharges != null && JSON.parse(this.state.TransactionDetail[0].TransactionDetailCharges).reduce((additionalCharge, item) => additionalCharge + parseFloat(item.ProductPrice), 0).toFixed(2)
 
       // this.state.TransactionDetail.map((data) => {
       //   if (data.AdditionalCharges !== "[]") {
@@ -757,21 +791,25 @@ class InvoiceDetail extends Component {
                   <br />
                   Sub Total (RM) :
                   {this.props.transaction[0].CalculationType === "3" ?
+                    // <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) : parseFloat(this.state.totalhandlingCharge) + parseFloat(subTotal))}</span>
                     <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(DeliveryFee) : parseFloat(subTotal))}</span>
                     :
-                    <span style={total}>{roundOffTotal(parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + (this.state.TransportationBool ? parseFloat(DeliveryFee) : 0) + parseFloat(AdminExtraCharges))}
-                    </span>
+                    <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) + parseFloat(AdminExtraCharges) : parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(AdminExtraCharges))}</span>
                   }
                   <br />
                   Total (RM) :
                   {transaction[0].CalculationType === "3" ?
                     <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(DeliveryFee) : parseFloat(subTotal))}</span>
+                    // <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) : parseFloat(this.state.totalhandlingCharge) + parseFloat(subTotal))}</span>
                     :
                     <span style={total}>{
-                      roundOffTotal(parseFloat(transaction[0].OrderSubTotalAmount) +
+                      roundOffTotal(this.state.TransportationBool === true ?
+                        parseFloat(transaction[0].OrderSubTotalAmount) +
                         parseFloat(this.state.totalhandlingCharge) +
-                        (this.state.TransportationBool ? parseFloat(DeliveryFee) : 0) + parseFloat(AdminExtraCharges)
-                      )
+                        parseFloat(DeliveryFee) + parseFloat(AdminExtraCharges)
+                        : parseFloat(transaction[0].OrderSubTotalAmount) +
+                        parseFloat(this.state.totalhandlingCharge) +
+                        parseFloat(AdminExtraCharges))
                     }</span>
                   }
                 </div>
@@ -842,21 +880,25 @@ class InvoiceDetail extends Component {
                       <br />
                       Sub Total (RM) :
                       {this.props.transaction[0].CalculationType === "3" ?
+                        // <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) : parseFloat(this.state.totalhandlingCharge) + parseFloat(subTotal))}</span>
                         <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(DeliveryFee) : parseFloat(subTotal))}</span>
                         :
-                        <span style={total}>{roundOffTotal(parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + (this.state.TransportationBool ? parseFloat(DeliveryFee) : 0) + parseFloat(AdminExtraCharges))}
-                        </span>
+                        <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) + parseFloat(AdminExtraCharges) : parseFloat(transaction[0].OrderSubTotalAmount) + parseFloat(this.state.totalhandlingCharge) + parseFloat(AdminExtraCharges))}</span>
                       }
                       <br />
                       Total (RM) :
                       {transaction[0].CalculationType === "3" ?
                         <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(DeliveryFee) : parseFloat(subTotal))}</span>
+                        // <span style={total}>{roundOffTotal(this.state.TransportationBool === true ? parseFloat(subTotal) + parseFloat(this.state.totalhandlingCharge) + parseFloat(DeliveryFee) : parseFloat(this.state.totalhandlingCharge) + parseFloat(subTotal))}</span>
                         :
                         <span style={total}>{
-                          roundOffTotal(parseFloat(transaction[0].OrderSubTotalAmount) +
+                          roundOffTotal(this.state.TransportationBool === true ?
+                            parseFloat(transaction[0].OrderSubTotalAmount) +
                             parseFloat(this.state.totalhandlingCharge) +
-                            (this.state.TransportationBool ? parseFloat(DeliveryFee) : 0) + parseFloat(AdminExtraCharges)
-                          )
+                            parseFloat(DeliveryFee) + parseFloat(AdminExtraCharges)
+                            : parseFloat(transaction[0].OrderSubTotalAmount) +
+                            parseFloat(this.state.totalhandlingCharge) +
+                            parseFloat(AdminExtraCharges))
                         }</span>
                       }
                     </div>
@@ -898,10 +940,18 @@ class InvoiceDetail extends Component {
       DeliveryFee,
       AddModalOpen2,
     } = this.state
+
     const { transaction } = this.props
+
     let actualWeight = 0
     let actualVolume = 0
     let m3Weight = 0
+    let finalWeight = 0
+    let subTotal = 0
+    let handlingCharge = 0
+    let additionalCharges = 0
+    let AdminChargesArray = []
+    let AdminExtraCharges = 0
 
     if (isArrayNotEmpty(transaction) && transaction[0].TransactionDetail !== null) {
       actualWeight = JSON.parse(transaction[0].TransactionDetail).reduce((weight, item) => weight + item.ProductWeight, 0).toFixed(2)
