@@ -33,6 +33,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    CallUpdateTransactionWithoutStatus: (data) => dispatch(GitAction.CallUpdateTransactionWithoutStatus(data)),
     CallFetchAllTransactionByID: (data) => dispatch(GitAction.CallFetchAllTransactionByID(data)),
     CallUpdateTransaction: (data) => dispatch(GitAction.CallUpdateTransaction(data)),
   };
@@ -236,7 +237,7 @@ class TransactionHistoryDetail extends Component {
           })
         })
 
-        let actualVolume = JSON.parse(this.props.transaction[0].TransactionDetail).reduce((dimension, item) => dimension + ((item.ProductDimensionDeep * item.ProductDimensionHeight * item.ProductDimensionWidth) / 1000000), 0).toFixed(3)
+        let actualVolume = JSON.parse(this.props.transaction[0].TransactionDetail).reduce((dimension, item) => dimension + volumeCalc(item.ProductDimensionDeep,item.ProductDimensionHeight,item.ProductDimensionWidth), 0).toFixed(3)
 
         if (this.props.transaction[0].CalculationType === "4") {
           let totalPrice = JSON.parse(this.props.transaction[0].TransactionDetail).filter((data) => data.Description !== "Delivery Fee").reduce((price, item) => price + item.ProductPrice, 0)
@@ -247,11 +248,11 @@ class TransactionHistoryDetail extends Component {
 
 
           if (actualVolume < 0.50) {
-            this.props.CallUpdateTransaction({
-              TransactionID: this.state.TransactionID,
-              TransportationType: 2,
-              DeliveryFee: this.props.transaction && this.props.transaction[0].DeliveryFee ? this.props.transaction[0].DeliveryFee : extraFees
-            });
+            // this.props.CallUpdateTransactionWithoutStatus({
+            //   TransactionID: this.state.TransactionID,
+            //   TransportationType: 2,
+            //   DeliveryFee: this.props.transaction && this.props.transaction[0].DeliveryFee ? this.props.transaction[0].DeliveryFee : extraFees
+            // });
             this.setState({ TransportationBool: true, Remark: "Delivery Min 0.5m³", isDeliveryFeeValidated: true, DeliveryFee: extraFees })
             if (tempArr.filter((data) => data.Description === "Delivery Fee").length === 0) {
               tempArr.push({
