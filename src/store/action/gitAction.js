@@ -49,13 +49,7 @@ export class GitAction {
     };
   }
 
-  static GetUserAreaCode = "GET_USER_AREA_CODE";
-  static GotUserAreaCode = "GOT_USER_AREA_CODE";
-  static CallUserAreaCode() {
-    return {
-      type: GitAction.GetUserAreaCode
-    };
-  }
+
 
   static UpdateUserAccountPassword = "UPDATE_USER_ACCOUNT_PASSWORD";
   static UserAccountPasswordUpdated = "USER_ACCOUNT_PASSWORD_UPDATED";
@@ -494,6 +488,38 @@ export class GitAction {
     };
   }
 
+  /////////////////////////////////////////////////// Area Code  Management ///////////////////////////////////////////////////
 
+  static GetUserAreaCode = "GET_USER_AREA_CODE";
+  static GotUserAreaCode = "GOT_USER_AREA_CODE";
+  static CallUserAreaCode() {
+    return {
+      type: GitAction.GetUserAreaCode
+    };
+  }
+
+  static AddAreaCode = "AddAreaCode";
+  static AddedAreaCode = "AddedAreaCode";
+  static CallUserAddAreaCode() {
+    return {
+      type: GitAction.AddAreaCode
+    };
+  }
+
+  static UpdateAreaCode = "UpdateAreaCode";
+  static UpdatedAreaCode = "UpdatedAreaCode";
+  static CallUserUpdateAreaCode() {
+    return {
+      type: GitAction.UpdateAreaCode
+    };
+  }
+
+  static DeleteAreaCode = "DeleteAreaCode";
+  static DeletedAreaCode = "DeletedAreaCode";
+  static CallUserDeleteAreaCode() {
+    return {
+      type: GitAction.DeletedAreaCode
+    };
+  }
 }
 

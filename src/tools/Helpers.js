@@ -50,7 +50,7 @@ export const convertDateTimeToString_103To112Format = (date, fetchTime) => {
     try {
         let date103 = date.split(' ')
 
-        if (typeof date !== "undefined" && date !== "") 
+        if (typeof date !== "undefined" && date !== "")
             date103 = new Date(date103[2], months.indexOf(date103[0]), date103[1])
         else
             date103 = new Date()

@@ -5,7 +5,7 @@ const INITIAL_STATE = {
   logonUser: [],
   user: [],
   userProfile: [],
-  userAreaCode: [],
+
   sidebars: [],
   stocks: [],
   stockReturn: [],
@@ -26,7 +26,9 @@ const INITIAL_STATE = {
   inventoryStockAction: [],
   courier: [],
   notificationAction: [],
-  notification: []
+  notification: [],
+  userAreaCode: [],
+  userAreaCodeAction :[]
 };
 
 export function counterReducer(state = INITIAL_STATE, action) {
@@ -74,13 +76,6 @@ export function counterReducer(state = INITIAL_STATE, action) {
     case GitAction.ResetUserProfileByID:
       return Object.assign({}, state, { userProfile: [] });
 
-    case GitAction.GetUserAreaCode:
-      return Object.assign({}, state, { loading: true });
-    case GitAction.GotUserAreaCode:
-      return Object.assign({}, state, {
-        loading: false,
-        userAreaCode: action.payload
-      });
 
     ///////////////////////////////////////////////////  sidebar configuration ///////////////////////////////////////////////////
 
@@ -429,6 +424,42 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, {
         loading: false,
         notificationAction: action.payload
+      });
+
+      
+    case GitAction.GetUserAreaCode:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.GotUserAreaCode:
+      return Object.assign({}, state, {
+        loading: false,
+        userAreaCode: action.payload
+      });
+
+      
+    case GitAction.AddAreaCode:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.AddedAreaCode:
+      return Object.assign({}, state, {
+        loading: false,
+        userAreaCodeAction: action.payload
+      });
+
+      
+    case GitAction.UpdateAreaCode:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.UpdatedAreaCode:
+      return Object.assign({}, state, {
+        loading: false,
+        userAreaCodeAction: action.payload
+      });
+
+      
+    case GitAction.DeleteAreaCode:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.DeletedAreaCode:
+      return Object.assign({}, state, {
+        loading: false,
+        userAreaCodeAction: action.payload
       });
 
 

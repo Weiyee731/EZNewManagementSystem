@@ -8,7 +8,6 @@ const rootEpic = combineEpics(
   gitEpic.User_Logout,
   gitEpic.User_Profile,
   gitEpic.User_ProfileByID,
-  gitEpic.User_ViewAreaCode,
   gitEpic.User_ViewPage,
   gitEpic.Inventory_ViewStockList,
   gitEpic.Inventory_InsertStock,
@@ -32,7 +31,6 @@ const rootEpic = combineEpics(
   gitEpic.User_UpdateUserProfile,
   gitEpic.User_DeleteUserProfile,
 
-
   gitEpic.Container_ViewContainer,
   gitEpic.Container_ViewContainerStatus,
   gitEpic.Container_AddContainer,
@@ -49,6 +47,12 @@ const rootEpic = combineEpics(
   gitEpic.Notification_AddNotification,
   gitEpic.Notification_UpdateNotification,
   gitEpic.Notification_DeleteNotification,
+
+  
+  gitEpic.User_ViewAreaCode,
+  gitEpic.User_AddUserAreaCode,
+  gitEpic.User_UpdateUserAreaCode,
+  gitEpic.User_DeleteUserAreaCode,
 
 
 );

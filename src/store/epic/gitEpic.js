@@ -136,28 +136,7 @@ export class GitEpic {
       }
     });
 
-  User_ViewAreaCode = action$ =>
-    action$.ofType(GitAction.GetUserAreaCode).switchMap(async ({ payload }) => {
-      try {
-        const response = await fetch(url +
-          "User_ViewAreaCode"
-        );
 
-        let json = await response.json();
-        json = JSON.parse(json)
-        return {
-          type: GitAction.GotUserAreaCode,
-          payload: json,
-        };
-      }
-      catch (error) {
-        toast.error("Error Code: GotUserAreaCode")
-        return {
-          type: GitAction.GotUserAreaCode,
-          payload: [],
-        };
-      }
-    });
 
   ///////////////////////////////////////////////////  user account credentials ///////////////////////////////////////////////////
 
@@ -1180,7 +1159,7 @@ export class GitEpic {
       }
     });
 
-    Notification_AddNotification = action$ =>
+  Notification_AddNotification = action$ =>
     action$.ofType(GitAction.Notification_Add).switchMap(async ({ payload }) => {
       try {
         const response = await fetch(url +
@@ -1206,7 +1185,7 @@ export class GitEpic {
       }
     });
 
-    Notification_UpdateNotification = action$ =>
+  Notification_UpdateNotification = action$ =>
     action$.ofType(GitAction.Notification_Update).switchMap(async ({ payload }) => {
       try {
         const response = await fetch(url +
@@ -1233,7 +1212,7 @@ export class GitEpic {
       }
     });
 
-    Notification_DeleteNotification = action$ =>
+  Notification_DeleteNotification = action$ =>
     action$.ofType(GitAction.Notification_Delete).switchMap(async ({ payload }) => {
       try {
         const response = await fetch(url +
@@ -1258,11 +1237,90 @@ export class GitEpic {
       }
     });
 
-    User_Register = action$ =>
-    action$.ofType(GitAction.Register_User).switchMap(async ({ payload }) => {
+  ///////////////////////////////////////////////////   Area Code Management  ///////////////////////////////////////////////////
+
+
+  User_ViewAreaCode = action$ =>
+    action$.ofType(GitAction.GetUserAreaCode).switchMap(async ({ payload }) => {
       try {
         const response = await fetch(url +
-          "User_Register?" +
+          "User_ViewAreaCode"
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.GotUserAreaCode,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: GotUserAreaCode")
+        return {
+          type: GitAction.GotUserAreaCode,
+          payload: [],
+        };
+      }
+    });
+
+    User_AddUserAreaCode = action$ =>
+    action$.ofType(GitAction.AddAreaCode).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "User_AddUserAreaCode?" +
+          "AREACODE=" + payload.AreaCode +
+          "&AREANAME=" + payload.AreaName +
+          "&MODIFY=" + payload.ModifyBy
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.AddedAreaCode,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: User_AddUserAreaCode")
+        return {
+          type: GitAction.AddedAreaCode,
+          payload: [],
+        };
+      }
+    });
+
+    User_UpdateUserAreaCode = action$ =>
+    action$.ofType(GitAction.UpdateAreaCode).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "User_UpdateUserAreaCode?" +
+          "USERAREAID=" + payload.UserAreaID +
+          "&AREACODE=" + payload.AreaCode +
+          "&AREANAME=" + payload.AreaName +
+          "&MODIFY=" + payload.ModifyBy
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.UpdatedAreaCode,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: User_UpdateUserAreaCode")
+        return {
+          type: GitAction.UpdatedAreaCode,
+          payload: [],
+        };
+      }
+    });
+
+    User_DeleteUserAreaCode = action$ =>
+    action$.ofType(GitAction.DeleteAreaCode).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "User_DeleteUserAreaCode?" +
           "USERAREAID=" + payload.UserAreaID +
           "&MODIFY=" + payload.ModifyBy
         );
@@ -1270,14 +1328,14 @@ export class GitEpic {
         let json = await response.json();
         json = JSON.parse(json)
         return {
-          type: GitAction.Registered_User,
+          type: GitAction.DeletedAreaCode,
           payload: json,
         };
       }
       catch (error) {
-        toast.error("Error Code: User_Register")
+        toast.error("Error Code: User_DeleteUserAreaCode")
         return {
-          type: GitAction.Registered_User,
+          type: GitAction.DeletedAreaCode,
           payload: [],
         };
       }
