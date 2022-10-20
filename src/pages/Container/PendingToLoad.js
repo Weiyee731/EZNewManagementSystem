@@ -8,22 +8,18 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { withRouter } from "react-router";
 import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
-import { isArrayNotEmpty, isStringNullOrEmpty, isObjectUndefinedOrNull, getWindowDimensions } from "../../tools/Helpers";
+import { isArrayNotEmpty } from "../../tools/Helpers";
 import CsvDownloader from "react-csv-downloader"
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline"
 import Tooltip from "@mui/material/Tooltip"
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import Button from "@mui/material/Button"
 import IconButton from "@mui/material/IconButton"
 import AlertDialog from "../../components/modal/Modal"
 import { Paper, TextField } from "@mui/material"
 import { toast, Flip } from "react-toastify"
-import OverallStock from "../Stock/OverallStock/OverallStock";
 
 
 function mapStateToProps(state) {
     return {
-        dashboard: state.counterReducer["dashboard"],
         userAreaCode: state.counterReducer["userAreaCode"],
     };
 }
@@ -37,7 +33,6 @@ function mapDispatchToProps(dispatch) {
 
 
 const INITIAL_STATE = {
-
     searchKeywords: "",
     searchCategory: "Tracking",
     searchArea: "",
@@ -146,7 +141,7 @@ const headCells = [
 ];
 
 
-class Dashboard extends Component {
+class PendingToLoad extends Component {
     constructor(props) {
         super(props);
         this.state = INITIAL_STATE
@@ -157,7 +152,7 @@ class Dashboard extends Component {
         this.addNewContainer = this.addNewContainer.bind(this)
         this.renderAreaCodeName = this.renderAreaCodeName.bind(this)
         this.props.CallUserAreaCode()
-        this.props.CallViewInventoryByFilter({ FilterColumn: "container=0" })
+        this.props.CallViewInventoryByFilter({ FilterColumn: "and T_Container.containerID=0" })
     }
 
     componentDidMount() { }
@@ -316,28 +311,6 @@ class Dashboard extends Component {
                                     <MenuItem key="search_member" value="Member">Member</MenuItem>
                                 </Select>
                             </div>
-                            {/* <div className="col-md-6 col-12">
-                                <div className="d-inline-block w-100">
-                                    <label className="my-auto col-3">Area:</label>
-                                    <Select
-                                        labelId="search-filter-area"
-                                        id="search-filter-area"
-                                        value={searchArea}
-                                        label="Area"
-                                        onChange={this.handleSearchArea}
-                                        size="small"
-                                        className="col-9"
-                                        placeholder="filter by"
-                                    >
-                                        <MenuItem key="all_area" value="All">All</MenuItem>
-                                        {
-                                            isArrayNotEmpty(this.props.userAreaCode) && this.props.userAreaCode.map((el, idx) => {
-                                                return <MenuItem key={el.AreaName + "_" + idx} value={el.UserAreaID}>{el.AreaName + " - " + el.AreaCode}</MenuItem>
-                                            })
-                                        }
-                                    </Select>
-                                </div>
-                            </div> */}
                         </div>
                     </div>
                     <div className="col-md-9 col-6 d-flex">
@@ -359,7 +332,7 @@ class Dashboard extends Component {
                 <hr />
                 <TableComponents
                     // table settings 
-                    tableTopLeft={<h3 style={{ fontWeight: 700 }}>Pending Load Tracking Number</h3>}  // optional, it can pass as string or as children elements
+                    tableTopLeft={<h3 style={{ fontWeight: 700 }}>未装箱包裹</h3>}  // optional, it can pass as string or as children elements
                     tableTopRight={renderTableTopRightButtons()}
                     tableOptions={{
                         dense: true,                // optional, default is false
@@ -381,51 +354,9 @@ class Dashboard extends Component {
                     selectedIndexKey={"pid"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
                     Data={isFiltered === true ? filteredProduct : OveralStock}                                  // required, the data that listing in the table
                 />
-                <AlertDialog
-                    open={this.state.openModal} // required, pass the boolean whether modal is open or close
-                    handleToggleDialog={() => this.setState({ openModal: false, containerNo: "", containerDate: "" })} // required, pass the toggle function of modal
-                    handleConfirmFunc={() => this.addNewContainer()} // required, pass the confirm function
-                    showAction={true} // required, to show the footer of modal display
-                    title={"New Container"} // required, title of the modal
-                    buttonTitle={"Confirm"} // required, title of button
-                    singleButton={false} // required, to decide whether to show a single full width button or 2 buttons
-                    maxWidth={"md"}
-                    draggable={true}
-                >
-                    <div className="container-fluid">
-                        <Paper elevation={2} sx={{ padding: 2, marginBottom: 1 }}>
-                            <div className="row">
-                                <TextField
-                                    variant="outlined"
-                                    style={{ width: "100%" }}
-                                    label="Container Number"
-                                    value={this.state.containerNo}
-                                    size="small"
-                                    required
-                                    onChange={(e) => this.setState({ containerNo: e.target.value })}
-                                />
-                            </div>
-                            <div className="row" style={{ paddingTop: "10pt" }}>
-                                <TextField
-                                    variant="outlined"
-                                    type="date"
-                                    style={{ width: "100%" }}
-                                    label="Container Number"
-                                    value={this.state.containerDate}
-                                    size="small"
-                                    required
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                    onChange={(e) => this.setState({ containerDate: e.target.value })}
-                                />
-                            </div>
-                        </Paper>
-                    </div>
-                </AlertDialog>
             </div>
         )
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Dashboard));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PendingToLoad));

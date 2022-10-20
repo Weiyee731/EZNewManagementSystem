@@ -374,15 +374,6 @@ export class GitAction {
     };
   }
 
-  static Container_View = "Container_View";
-  static Container_Viewed = "Container_Viewed";
-  static CallViewContainer(propsData) {
-    return {
-      type: GitAction.Container_View,
-      payload: propsData
-    };
-  }
-
   static Container_Add = "Container_Add";
   static Container_Added = "Container_Added";
   static CallAddContainer(propsData) {

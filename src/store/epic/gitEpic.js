@@ -1258,5 +1258,30 @@ export class GitEpic {
       }
     });
 
+    User_Register = action$ =>
+    action$.ofType(GitAction.Register_User).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "User_Register?" +
+          "USERAREAID=" + payload.UserAreaID +
+          "&MODIFY=" + payload.ModifyBy
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Registered_User,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: User_Register")
+        return {
+          type: GitAction.Registered_User,
+          payload: [],
+        };
+      }
+    });
+
 }
 export let gitEpic = new GitEpic();

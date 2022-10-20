@@ -21,6 +21,7 @@ import ProformaList from "../../../pages/Reporting/Invoice/ProformaList";
 import ArchivedStock from "../../../pages/ArchivedData/ArchivedStock/ArchivedStock.jsx";
 import ArchivedTransaction from "../../../pages/ArchivedData/ArchivedTransaction/ArchivedTransaction.js";
 import PendingToLoad from "../../../pages/Container/PendingToLoad";
+import WarehouseStockManagement from "../../../pages/Stock/WarehouseStockManagement";
 
 const routes = [
     {
@@ -139,6 +140,13 @@ const routes = [
         exact: true,
         element: <PendingToLoad />,
     },
+    {
+        path: "/WarehouseStockManagement",
+        exact: true,
+        element: <WarehouseStockManagement />,
+    },
+
+    
 
 ]
 
