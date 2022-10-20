@@ -329,6 +329,8 @@ class Invoice extends Component {
 
     render() {
         const { openCancelModal, searchCategory, searchArea } = this.state
+
+ 
         return (
             <div>
                 <div className="row">

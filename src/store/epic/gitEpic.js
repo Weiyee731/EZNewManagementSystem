@@ -856,7 +856,304 @@ export class GitEpic {
       }
     });
 
-  ///////////////////////////////////////////////////   User Management  ///////////////////////////////////////////////////
+
+
+  ///////////////////////////////////////////////////   Container Management  ///////////////////////////////////////////////////
+
+  Container_ViewContainer = action$ =>
+    action$.ofType(GitAction.Container_View).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Container_ViewContainer"
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Container_Viewed,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Container_ViewContainer")
+        return {
+          type: GitAction.Container_Viewed,
+          payload: [],
+        };
+      }
+    });
+
+  Container_ViewContainerStatus = action$ =>
+    action$.ofType(GitAction.Container_ViewStatus).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Container_ViewContainerStatus"
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Container_ViewedStatus,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Container_ViewContainerStatus")
+        return {
+          type: GitAction.Container_ViewedStatus,
+          payload: [],
+        };
+      }
+    });
+
+  Container_AddContainer = action$ =>
+    action$.ofType(GitAction.Container_Add).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Container_AddContainer?" +
+          "CONTAINERNAME=" + payload.ContainerName +
+          "&CONTAINERDATE=" + payload.ContainerDate +
+          "&MODIFY=" + payload.ModifyBy
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Container_Added,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Container_AddContainer")
+        return {
+          type: GitAction.Container_Added,
+          payload: [],
+        };
+      }
+    });
+
+  Container_UpdateContainer = action$ =>
+    action$.ofType(GitAction.Container_Update).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Container_UpdateContainer?" +
+          "CONTAINERID=" + payload.ContainerID +
+          "&CONTAINERNAME=" + payload.ContainerName +
+          "&CONTAINERDATE=" + payload.ContainerDate +
+          "&MODIFY=" + payload.ModifyBy
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Container_Updated,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Container_UpdateContainer")
+        return {
+          type: GitAction.Container_Updated,
+          payload: [],
+        };
+      }
+    });
+
+  Container_DeleteContainer = action$ =>
+    action$.ofType(GitAction.Container_Delete).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Container_DeleteContainer?" +
+          "CONTAINERID=" + payload.ContainerID +
+          "&MODIFY=" + payload.ModifyBy
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Container_Deleted,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Container_DeleteContainer")
+        return {
+          type: GitAction.Container_Deleted,
+          payload: [],
+        };
+      }
+    });
+
+
+  ///////////////////////////////////////////////////   Stock Inventory Management  ///////////////////////////////////////////////////
+
+  Inventory_ViewStockByFilter = action$ =>
+    action$.ofType(GitAction.Inventory_ViewByFilter).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Inventory_ViewStockByFilter?" +
+          "FILTERCOLUMN=" + payload.FilterColumn
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Inventory_ViewedByFilter,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_ViewStockByFilter")
+        return {
+          type: GitAction.Inventory_ViewedByFilter,
+          payload: [],
+        };
+      }
+    });
+
+  Inventory_AddStock = action$ =>
+    action$.ofType(GitAction.Inventory_Add).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Inventory_AddStock?" +
+          "USERCODE=" + payload.UserCode +
+          "&TRACKINGNUMBER=" + payload.TrackingNumber +
+          "&PRODUCTWEIGHT=" + payload.ProductWeight +
+          "&PRODUCTHEIGHT=" + payload.ProductHeight +
+          "&PRODUCTWIDTH=" + payload.ProductWidth +
+          "&PRODUCTDEEP=" + payload.ProductDeep +
+          "&COURIERID=" + payload.CourierID +
+          "&ITEM=" + payload.Item +
+          "&REMARK=" + payload.Remark +
+          "&MODIFY=" + payload.ModifyBy
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Inventory_Added,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_AddStock")
+        return {
+          type: GitAction.Inventory_Added,
+          payload: [],
+        };
+      }
+    });
+
+  Inventory_UpdateStock = action$ =>
+    action$.ofType(GitAction.Inventory_Update).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Inventory_UpdateStock?" +
+          "STOCKID=" + payload.StockID +
+          "USERCODE=" + payload.UserCode +
+          "&TRACKINGNUMBER=" + payload.TrackingNumber +
+          "&PRODUCTWEIGHT=" + payload.ProductWeight +
+          "&PRODUCTHEIGHT=" + payload.ProductHeight +
+          "&PRODUCTWIDTH=" + payload.ProductWidth +
+          "&PRODUCTDEEP=" + payload.ProductDeep +
+          "&COURIERID=" + payload.CourierID +
+          "&ITEM=" + payload.Item +
+          "&REMARK=" + payload.Remark +
+          "&MODIFY=" + payload.ModifyBy
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Inventory_Updated,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_UpdateStock")
+        return {
+          type: GitAction.Inventory_Updated,
+          payload: [],
+        };
+      }
+    });
+
+  Inventory_DeleteStock = action$ =>
+    action$.ofType(GitAction.Inventory_Delete).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Inventory_DeleteStock?" +
+          "STOCKID=" + payload.StockID +
+          "&MODIFY=" + payload.ModifyBy
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Inventory_Deleted,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_DeleteStock")
+        return {
+          type: GitAction.Inventory_Deleted,
+          payload: [],
+        };
+      }
+    });
+
+  Inventory_UpdateStockContainer = action$ =>
+    action$.ofType(GitAction.Inventory_UpdateContainer).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Inventory_UpdateStockContainer?" +
+          "STOCKID=" + payload.StockID +
+          "&CONTAINERID=" + payload.ContainerID
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Inventory_UpdatedContainer,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Inventory_DeleteStock")
+        return {
+          type: GitAction.Inventory_UpdatedContainer,
+          payload: [],
+        };
+      }
+    });
+
+
+
+  ///////////////////////////////////////////////////   Courier Management  ///////////////////////////////////////////////////
+
+  Courier_ViewCourier = action$ =>
+    action$.ofType(GitAction.Courier_View).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Courier_ViewCourier"
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Courier_Viewed,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Courier_ViewCourier")
+        return {
+          type: GitAction.Courier_Viewed,
+          payload: [],
+        };
+      }
+    });
 
 }
 export let gitEpic = new GitEpic();

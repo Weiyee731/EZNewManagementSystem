@@ -18,6 +18,13 @@ const INITIAL_STATE = {
   archivedData: [],
   userManagementApproval: [],
   handlingChargeReturn: [],
+
+  container: [],
+  containerAction: [],
+  containerStatus: [],
+  inventoryStock: [],
+  inventoryStockAction: [],
+  courier: [],
 };
 
 export function counterReducer(state = INITIAL_STATE, action) {
@@ -290,6 +297,105 @@ export function counterReducer(state = INITIAL_STATE, action) {
         loading: false,
         userManagementApproval: []
       });
+
+    /////////////////////////////////////////////////// Container Management ///////////////////////////////////////////////////
+    case GitAction.Container_View:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Container_Viewed:
+      return Object.assign({}, state, {
+        loading: false,
+        container: action.payload
+      });
+
+    case GitAction.Container_ViewStatus:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Container_ViewedStatus:
+      return Object.assign({}, state, {
+        loading: false,
+        containerStatus: action.payload
+      });
+
+    case GitAction.Container_Add:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Container_Added:
+      return Object.assign({}, state, {
+        loading: false,
+        containerAction: action.payload
+      });
+
+
+    case GitAction.Container_Update:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Container_Updated:
+      return Object.assign({}, state, {
+        loading: false,
+        containerAction: action.payload
+      });
+
+    case GitAction.Container_Delete:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Container_Deleted:
+      return Object.assign({}, state, {
+        loading: false,
+        containerAction: action.payload
+      });
+
+
+
+    /////////////////////////////////////////////////// Stock Inventory Management ///////////////////////////////////////////////////
+
+    case GitAction.Inventory_ViewByFilter:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Inventory_ViewedByFilter:
+      return Object.assign({}, state, {
+        loading: false,
+        inventoryStock: action.payload
+      });
+
+    case GitAction.Inventory_Add:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Inventory_Added:
+      return Object.assign({}, state, {
+        loading: false,
+        inventoryStockAction: action.payload
+      });
+
+    case GitAction.Inventory_Update:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Inventory_Updated:
+      return Object.assign({}, state, {
+        loading: false,
+        inventoryStockAction: action.payload
+      });
+
+    case GitAction.Inventory_Delete:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Inventory_Deleted:
+      return Object.assign({}, state, {
+        loading: false,
+        inventoryStockAction: action.payload
+      });
+
+    case GitAction.Inventory_UpdateContainer:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Inventory_UpdatedContainer:
+      return Object.assign({}, state, {
+        loading: false,
+        inventoryStock: action.payload
+      });
+
+
+    /////////////////////////////////////////////////// Stock Inventory Management ///////////////////////////////////////////////////
+
+    case GitAction.Courier_View:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Courier_Viewed:
+      return Object.assign({}, state, {
+        loading: false,
+        courier: action.payload
+      });
+
+
 
     /////////////////////////////////////////////////// Default ///////////////////////////////////////////////////
     default:

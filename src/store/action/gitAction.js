@@ -229,8 +229,8 @@ export class GitAction {
       payload: propsData
     };
   }
-  
-  
+
+
 
   static UpdateTransactionDetailHandling = "UPDATE_TRANSACTION_DETAIL_HANDLING";
   static UpdatedTransactionDetailHandling = "TRANSACTION_DETAIL_HANDLING_UPDATEED";
@@ -354,6 +354,117 @@ export class GitAction {
       type: GitAction.ResetUserApprovalReturn,
     };
   }
+
+  /////////////////////////////////////////////////// Container Management ///////////////////////////////////////////////////
+  static Container_View = "Container_View";
+  static Container_Viewed = "Container_Viewed";
+  static CallViewContainer(propsData) {
+    return {
+      type: GitAction.Container_View,
+      payload: propsData
+    };
+  }
+
+  static Container_ViewStatus = "Container_ViewStatus";
+  static Container_ViewedStatus = "Container_ViewedStatus";
+  static CallViewContainerStatus(propsData) {
+    return {
+      type: GitAction.Container_ViewStatus,
+      payload: propsData
+    };
+  }
+
+  static Container_View = "Container_View";
+  static Container_Viewed = "Container_Viewed";
+  static CallViewContainer(propsData) {
+    return {
+      type: GitAction.Container_View,
+      payload: propsData
+    };
+  }
+
+  static Container_Add = "Container_Add";
+  static Container_Added = "Container_Added";
+  static CallAddContainer(propsData) {
+    return {
+      type: GitAction.Container_Add,
+      payload: propsData
+    };
+  }
+
+  static Container_Update = "Container_Update";
+  static Container_Updated = "Container_Updated";
+  static CallUpdateContainer(propsData) {
+    return {
+      type: GitAction.Container_Update,
+      payload: propsData
+    };
+  }
+
+  static Container_Delete = "Container_Delete";
+  static Container_Deleted = "Container_Deleted";
+  static CallDeleteContainer(propsData) {
+    return {
+      type: GitAction.Container_Delete,
+      payload: propsData
+    };
+  }
+
+  /////////////////////////////////////////////////// Stock Inventory  Management ///////////////////////////////////////////////////
+  static Inventory_ViewByFilter = "Inventory_ViewByFilter";
+  static Inventory_ViewedByFilter = "Inventory_ViewedByFilter";
+  static CallViewInventoryByFilter(propsData) {
+    return {
+      type: GitAction.Inventory_ViewByFilter,
+      payload: propsData
+    };
+  }
+
+  static Inventory_Add = "Inventory_Add";
+  static Inventory_Added = "Inventory_Added";
+  static CallAddInventory(propsData) {
+    return {
+      type: GitAction.Inventory_Add,
+      payload: propsData
+    };
+  }
+
+  static Inventory_Update = "Inventory_Update";
+  static Inventory_Updated = "Inventory_Updated";
+  static CallUpdateInventory(propsData) {
+    return {
+      type: GitAction.Inventory_Update,
+      payload: propsData
+    };
+  }
+
+  static Inventory_Delete = "Inventory_Delete";
+  static Inventory_Deleted = "Inventory_Deleted";
+  static CallDeleteInventory(propsData) {
+    return {
+      type: GitAction.Inventory_Delete,
+      payload: propsData
+    };
+  }
+
+  static Inventory_UpdateContainer = "Inventory_UpdateContainer";
+  static Inventory_UpdatedContainer = "Inventory_UpdatedContainer";
+  static CallUpdateContainerInventory(propsData) {
+    return {
+      type: GitAction.Inventory_UpdateContainer,
+      payload: propsData
+    };
+  }
+
+  static Courier_View = "Courier_View";
+  static Courier_Viewed = "Courier_Viewed";
+  static CallViewCourier(propsData) {
+    return {
+      type: GitAction.Courier_View,
+      payload: propsData
+    };
+  }
+
 
 }
 

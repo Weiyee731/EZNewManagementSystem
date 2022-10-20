@@ -31,6 +31,22 @@ const rootEpic = combineEpics(
   gitEpic.User_RegisterUsersByPost,
   gitEpic.User_UpdateUserProfile,
   gitEpic.User_DeleteUserProfile,
+
+
+  gitEpic.Container_ViewContainer,
+  gitEpic.Container_ViewContainerStatus,
+  gitEpic.Container_AddContainer,
+  gitEpic.Container_UpdateContainer,
+  gitEpic.Container_DeleteContainer,
+  gitEpic.Inventory_ViewStockByFilter,
+  gitEpic.Inventory_AddStock,
+  gitEpic.Inventory_UpdateStock,
+  gitEpic.Inventory_DeleteStock,
+  gitEpic.Inventory_UpdateStockContainer,
+
+  gitEpic.Courier_ViewCourier,
+
+
 );
 
 const rootReducer = combineReducers({ counterReducer });

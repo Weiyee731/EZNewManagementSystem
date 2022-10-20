@@ -1109,6 +1109,8 @@ class OverallStock extends Component {
             { children: "Checked", key: "Checked" },
         ]
 
+        console.log("dsadda", this.props)
+        
         const validateForm = this.state.formValue.TrackingNumberVerified &&
             this.state.formValue.MemberNumberVerified &&
             this.state.formValue.DepthVerified &&
