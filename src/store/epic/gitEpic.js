@@ -1155,5 +1155,108 @@ export class GitEpic {
       }
     });
 
+  ///////////////////////////////////////////////////   Notification Management  ///////////////////////////////////////////////////
+
+  Notification_ViewNotification = action$ =>
+    action$.ofType(GitAction.Notification_View).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Notification_ViewNotification"
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Notification_Viewed,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Notification_ViewNotification")
+        return {
+          type: GitAction.Notification_Viewed,
+          payload: [],
+        };
+      }
+    });
+
+    Notification_AddNotification = action$ =>
+    action$.ofType(GitAction.Notification_Add).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Notification_AddNotification?" +
+          "NOTIFICATIONTITLE=" + payload.NotificationTitle +
+          "&NOTIFICATIONDESC=" + payload.NotificationDesc +
+          "&MODIFY=" + payload.ModifyBy
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Notification_Added,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Notification_AddNotification")
+        return {
+          type: GitAction.Notification_Added,
+          payload: [],
+        };
+      }
+    });
+
+    Notification_UpdateNotification = action$ =>
+    action$.ofType(GitAction.Notification_Update).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Notification_UpdateNotification?" +
+          "NOTIFICATIONTITLE=" + payload.NotificationTitle +
+          "&NOTIFICATIONID=" + payload.NotificationID +
+          "&NOTIFICATIONDESC=" + payload.NotificationDesc +
+          "&MODIFY=" + payload.ModifyBy
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Notification_Updated,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Notification_UpdateNotification")
+        return {
+          type: GitAction.Notification_Updated,
+          payload: [],
+        };
+      }
+    });
+
+    Notification_DeleteNotification = action$ =>
+    action$.ofType(GitAction.Notification_Delete).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Notification_DeleteNotification?" +
+          "NOTIFICATIONID=" + payload.NotificationID +
+          "&MODIFY=" + payload.ModifyBy
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Notification_Deleted,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Notification_DeleteNotification")
+        return {
+          type: GitAction.Notification_Deleted,
+          payload: [],
+        };
+      }
+    });
+
 }
 export let gitEpic = new GitEpic();

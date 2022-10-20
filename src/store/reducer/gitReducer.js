@@ -25,6 +25,8 @@ const INITIAL_STATE = {
   inventoryStock: [],
   inventoryStockAction: [],
   courier: [],
+  notificationAction: [],
+  notification: []
 };
 
 export function counterReducer(state = INITIAL_STATE, action) {
@@ -395,6 +397,39 @@ export function counterReducer(state = INITIAL_STATE, action) {
         courier: action.payload
       });
 
+    /////////////////////////////////////////////////// Notification Management ///////////////////////////////////////////////////
+
+    case GitAction.Notification_View:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Notification_Viewed:
+      return Object.assign({}, state, {
+        loading: false,
+        notification: action.payload
+      });
+
+    case GitAction.Notification_Add:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Notification_Added:
+      return Object.assign({}, state, {
+        loading: false,
+        notificationAction: action.payload
+      });
+
+    case GitAction.Notification_Update:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Notification_Updated:
+      return Object.assign({}, state, {
+        loading: false,
+        notificationAction: action.payload
+      });
+
+    case GitAction.Notification_Delete:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Notification_Deleted:
+      return Object.assign({}, state, {
+        loading: false,
+        notificationAction: action.payload
+      });
 
 
     /////////////////////////////////////////////////// Default ///////////////////////////////////////////////////

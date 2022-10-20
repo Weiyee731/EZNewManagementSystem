@@ -465,6 +465,44 @@ export class GitAction {
     };
   }
 
+  /////////////////////////////////////////////////// Notification  Management ///////////////////////////////////////////////////
+
+  static Notification_View = "Notification_View";
+  static Notification_Viewed = "Notification_Viewed";
+  static CallViewINotificationr(propsData) {
+    return {
+      type: GitAction.Notification_View,
+      payload: propsData
+    };
+  }
+
+  static Notification_Add = "Notification_Add";
+  static Notification_Added = "Notification_Added";
+  static CallAddNotification(propsData) {
+    return {
+      type: GitAction.Notification_Add,
+      payload: propsData
+    };
+  }
+
+  static Notification_Update = "Notification_Update";
+  static Notification_Updated = "Notification_Updated";
+  static CallUpdateNotification(propsData) {
+    return {
+      type: GitAction.Notification_Update,
+      payload: propsData
+    };
+  }
+
+  static Notification_Delete = "Notification_Delete";
+  static Notification_Deleted = "Notification_Deleted";
+  static CallDeleteNotification(propsData) {
+    return {
+      type: GitAction.Notification_Delete,
+      payload: propsData
+    };
+  }
+
 
 }
 

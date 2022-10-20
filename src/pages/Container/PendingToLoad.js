@@ -31,6 +31,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
+        CallViewInventoryByFilter: (propsData) => dispatch(GitAction.CallViewInventoryByFilter(propsData)),
     };
 }
 
@@ -156,6 +157,7 @@ class Dashboard extends Component {
         this.addNewContainer = this.addNewContainer.bind(this)
         this.renderAreaCodeName = this.renderAreaCodeName.bind(this)
         this.props.CallUserAreaCode()
+        this.props.CallViewInventoryByFilter({ FilterColumn: "container=0" })
     }
 
     componentDidMount() { }

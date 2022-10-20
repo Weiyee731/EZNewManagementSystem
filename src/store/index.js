@@ -45,6 +45,10 @@ const rootEpic = combineEpics(
   gitEpic.Inventory_UpdateStockContainer,
 
   gitEpic.Courier_ViewCourier,
+  gitEpic.Notification_ViewNotification,
+  gitEpic.Notification_AddNotification,
+  gitEpic.Notification_UpdateNotification,
+  gitEpic.Notification_DeleteNotification,
 
 
 );
