@@ -5,6 +5,7 @@ const INITIAL_STATE = {
   logonUser: [],
   user: [],
   userProfile: [],
+  userData: [],
 
   sidebars: [],
   stocks: [],
@@ -28,7 +29,7 @@ const INITIAL_STATE = {
   notificationAction: [],
   notification: [],
   userAreaCode: [],
-  userAreaCodeAction :[]
+  userAreaCodeAction: []
 };
 
 export function counterReducer(state = INITIAL_STATE, action) {
@@ -381,6 +382,10 @@ export function counterReducer(state = INITIAL_STATE, action) {
         inventoryStock: action.payload
       });
 
+    case GitAction.Inventory_ClearAction:
+      return Object.assign({}, state, {
+        inventoryStockAction: []
+      });
 
     /////////////////////////////////////////////////// Stock Inventory Management ///////////////////////////////////////////////////
 
@@ -426,7 +431,7 @@ export function counterReducer(state = INITIAL_STATE, action) {
         notificationAction: action.payload
       });
 
-      
+
     case GitAction.GetUserAreaCode:
       return Object.assign({}, state, { loading: true });
     case GitAction.GotUserAreaCode:
@@ -435,7 +440,7 @@ export function counterReducer(state = INITIAL_STATE, action) {
         userAreaCode: action.payload
       });
 
-      
+
     case GitAction.AddAreaCode:
       return Object.assign({}, state, { loading: true });
     case GitAction.AddedAreaCode:
@@ -444,7 +449,7 @@ export function counterReducer(state = INITIAL_STATE, action) {
         userAreaCodeAction: action.payload
       });
 
-      
+
     case GitAction.UpdateAreaCode:
       return Object.assign({}, state, { loading: true });
     case GitAction.UpdatedAreaCode:
@@ -453,7 +458,7 @@ export function counterReducer(state = INITIAL_STATE, action) {
         userAreaCodeAction: action.payload
       });
 
-      
+
     case GitAction.DeleteAreaCode:
       return Object.assign({}, state, { loading: true });
     case GitAction.DeletedAreaCode:
@@ -462,6 +467,18 @@ export function counterReducer(state = INITIAL_STATE, action) {
         userAreaCodeAction: action.payload
       });
 
+    case GitAction.User_ViewByUserCode:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.User_ViewedByUserCode:
+      return Object.assign({}, state, {
+        loading: false,
+        userData: action.payload
+      });
+
+    case GitAction.User_ClearUserCode:
+      return Object.assign({}, state, {
+        userData: []
+      });
 
     /////////////////////////////////////////////////// Default ///////////////////////////////////////////////////
     default:

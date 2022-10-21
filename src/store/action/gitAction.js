@@ -432,6 +432,13 @@ export class GitAction {
     };
   }
 
+  static Inventory_ClearAction = "Inventory_ClearAction";
+  static ClearInventoryAction() {
+    return {
+      type: GitAction.Inventory_ClearAction,
+    };
+  }
+
   static Inventory_UpdateContainer = "Inventory_UpdateContainer";
   static Inventory_UpdatedContainer = "Inventory_UpdatedContainer";
   static CallUpdateContainerInventory(propsData) {
@@ -492,34 +499,56 @@ export class GitAction {
 
   static GetUserAreaCode = "GET_USER_AREA_CODE";
   static GotUserAreaCode = "GOT_USER_AREA_CODE";
-  static CallUserAreaCode() {
+  static CallUserAreaCode(propsData) {
     return {
-      type: GitAction.GetUserAreaCode
+      type: GitAction.GetUserAreaCode,
+      payload: propsData
     };
   }
 
   static AddAreaCode = "AddAreaCode";
   static AddedAreaCode = "AddedAreaCode";
-  static CallUserAddAreaCode() {
+  static CallUserAddAreaCode(propsData) {
     return {
-      type: GitAction.AddAreaCode
+      type: GitAction.AddAreaCode,
+      payload: propsData
     };
   }
 
   static UpdateAreaCode = "UpdateAreaCode";
   static UpdatedAreaCode = "UpdatedAreaCode";
-  static CallUserUpdateAreaCode() {
+  static CallUserUpdateAreaCode(propsData) {
     return {
-      type: GitAction.UpdateAreaCode
+      type: GitAction.UpdateAreaCode,
+      payload: propsData
     };
   }
 
   static DeleteAreaCode = "DeleteAreaCode";
   static DeletedAreaCode = "DeletedAreaCode";
-  static CallUserDeleteAreaCode() {
+  static CallUserDeleteAreaCode(propsData) {
     return {
-      type: GitAction.DeletedAreaCode
+      type: GitAction.DeletedAreaCode,
+      payload: propsData
     };
   }
+
+  static User_ViewByUserCode = "User_ViewByUserCode";
+  static User_ViewedByUserCode = "User_ViewedByUserCode";
+  static CallViewProfileByUserCode(propsData) {
+    return {
+      type: GitAction.User_ViewByUserCode,
+      payload: propsData
+    };
+  }
+
+  static User_ClearUserCode = "User_ClearUserCode";
+  static ClearUserCodeData() {
+    return {
+      type: GitAction.User_ClearUserCode,
+    };
+  }
+
+
 }
 
