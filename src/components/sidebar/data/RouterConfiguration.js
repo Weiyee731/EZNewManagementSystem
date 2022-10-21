@@ -22,6 +22,7 @@ import ArchivedStock from "../../../pages/ArchivedData/ArchivedStock/ArchivedSto
 import ArchivedTransaction from "../../../pages/ArchivedData/ArchivedTransaction/ArchivedTransaction.js";
 import PendingToLoad from "../../../pages/Container/PendingToLoad";
 import WarehouseStockManagement from "../../../pages/Stock/WarehouseStockManagement";
+import ContainerListing from "../../../pages/Container/ContainerListing/ContainerListing.js";
 
 const routes = [
     {
@@ -39,11 +40,11 @@ const routes = [
         exact: true,
         element: <UserManagement />,
     },
-    {
-        path: "/OverallStock",
-        exact: true,
-        element: <OverallStock typeIndicator="overall" />,
-    },
+    // {
+    //     path: "/OverallStock",
+    //     exact: true,
+    //     element: <OverallStock typeIndicator="overall" />,
+    // },
     {
         path: "/StockGoods",
         exact: true,
@@ -148,6 +149,11 @@ const routes = [
 
     
 
+    {
+        path: "/OverallStock",
+        exact: true,
+        element: <ContainerListing typeIndicator="overall" />,
+    },
 ]
 
 export default routes

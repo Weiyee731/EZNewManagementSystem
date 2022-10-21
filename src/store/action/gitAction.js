@@ -147,20 +147,20 @@ export class GitAction {
     };
   }
 
-  static ViewContainer = "VIEW-CONTAINER";
-  static ViewedContainer = "VIEWED-CONTAINER";
-  static ResetViewedContainer = "RESET-VIEWED-CONTAINER";
-  static CallViewContainer(propsData) {
-    return {
-      type: GitAction.ViewContainer,
-      payload: propsData
-    };
-  }
-  static CallResetViewedContainerReturn() {
-    return {
-      type: GitAction.ResetViewedContainer,
-    };
-  }
+  // static ViewContainer = "VIEW-CONTAINER";
+  // static ViewedContainer = "VIEWED-CONTAINER";
+  // static ResetViewedContainer = "RESET-VIEWED-CONTAINER";
+  // static CallViewContainer(propsData) {
+  //   return {
+  //     type: GitAction.ViewContainer,
+  //     payload: propsData
+  //   };
+  // }
+  // static CallResetViewedContainerReturn() {
+  //   return {
+  //     type: GitAction.ResetViewedContainer,
+  //   };
+  // }
 
   static InsertStockByPost = "INSERT-STOCK-BY-POST";
   static StockInsertedByPost = "STOCK-INSERTED-BY-POST";
