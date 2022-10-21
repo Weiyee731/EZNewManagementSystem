@@ -1173,10 +1173,31 @@ export class GitEpic {
 
         let json = await response.json();
         json = JSON.parse(json)
-        return {
-          type: GitAction.Notification_Added,
-          payload: json,
-        };
+        // return {
+        //   type: GitAction.Notification_Added,
+        //   payload: json,
+        // };
+
+        try {
+          const response = await fetch(url +
+            "Notification_ViewNotification"
+          );
+
+          let json = await response.json();
+          json = JSON.parse(json)
+          return {
+            type: GitAction.Notification_Viewed,
+            payload: json,
+          };
+        }
+        catch (error) {
+          toast.error("Error Code: Notification_ViewNotification")
+          return {
+            type: GitAction.Notification_Viewed,
+            payload: [],
+          };
+        }
+
       }
       catch (error) {
         toast.error("Error Code: Notification_AddNotification")
@@ -1200,10 +1221,30 @@ export class GitEpic {
 
         let json = await response.json();
         json = JSON.parse(json)
-        return {
-          type: GitAction.Notification_Updated,
-          payload: json,
-        };
+        // return {
+        //   type: GitAction.Notification_Updated,
+        //   payload: json,
+        // };
+
+        try {
+          const response = await fetch(url +
+            "Notification_ViewNotification"
+          );
+
+          let json = await response.json();
+          json = JSON.parse(json)
+          return {
+            type: GitAction.Notification_Viewed,
+            payload: json,
+          };
+        }
+        catch (error) {
+          toast.error("Error Code: Notification_ViewNotification")
+          return {
+            type: GitAction.Notification_Viewed,
+            payload: [],
+          };
+        }
       }
       catch (error) {
         toast.error("Error Code: Notification_UpdateNotification")
@@ -1225,10 +1266,29 @@ export class GitEpic {
 
         let json = await response.json();
         json = JSON.parse(json)
-        return {
-          type: GitAction.Notification_Deleted,
-          payload: json,
-        };
+        // return {
+        //   type: GitAction.Notification_Deleted,
+        //   payload: json,
+        // };
+        try {
+          const response = await fetch(url +
+            "Notification_ViewNotification"
+          );
+
+          let json = await response.json();
+          json = JSON.parse(json)
+          return {
+            type: GitAction.Notification_Viewed,
+            payload: json,
+          };
+        }
+        catch (error) {
+          toast.error("Error Code: Notification_ViewNotification")
+          return {
+            type: GitAction.Notification_Viewed,
+            payload: [],
+          };
+        }
       }
       catch (error) {
         toast.error("Error Code: Notification_DeleteNotification")
