@@ -6,6 +6,7 @@ import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
+import CancelIcon from '@mui/icons-material/Cancel';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TableComponents from "../../components/TableComponents/TableComponents"
@@ -28,6 +29,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty } from "../../tools/Helpers";
 import * as XLSX from 'xlsx';
 import DescriptionFunction from "../../components/editor/editor";
+import { RowingRounded } from "@mui/icons-material";
 
 const style = {
   position: 'absolute',
@@ -52,7 +54,8 @@ function mapDispatchToProps(dispatch) {
   return {
     CallViewINotification: () => dispatch(GitAction.CallViewINotification({})),
     CallAddNotification: (props) => dispatch(GitAction.CallAddNotification(props)),
-    CallUpdateNotification: (props) => dispatch(GitAction.CallUpdateNotification(props))
+    CallUpdateNotification: (props) => dispatch(GitAction.CallUpdateNotification(props)),
+    CallDeleteNotification: (props) => dispatch(GitAction.CallDeleteNotification(props))
   };
 }
 
@@ -74,6 +77,12 @@ const headCells = [
     align: 'center',
     disablePadding: false,
     label: 'Content',
+  },
+  {
+    id: 'DeleteButton',
+    align: 'center',
+    disablePadding: false,
+    label: '',
   }
 ];
 class NotificationList extends Component {
@@ -100,6 +109,7 @@ class NotificationList extends Component {
     this.renderTableRows = this.renderTableRows.bind(this)
     this.onTableRowClick = this.onTableRowClick.bind(this)
     this.onAddButtonClick = this.onAddButtonClick.bind(this)
+    this.onDeleteButtonClick = this.onDeleteButtonClick.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.renderDropzoneTableHeaders = this.renderDropzoneTableHeaders.bind(this)
     this.renderDropzoneTableRows = this.renderDropzoneTableRows.bind(this)
@@ -117,9 +127,10 @@ class NotificationList extends Component {
   renderTableRows = (data, index) => {
     return (
       <>
-        <TableCell align="left">{(index + 1)}</TableCell>
-        <TableCell align="left">{data.NotificationTitle}</TableCell>
-        <TableCell align="center">{data.NotificationDesc}</TableCell>
+        <TableCell onClick={(e) => this.onTableRowClick(e, data)} align="left">{(index + 1)}</TableCell>
+        <TableCell onClick={(e) => this.onTableRowClick(e, data)} align="left">{data.NotificationTitle}</TableCell>
+        <TableCell onClick={(e) => this.onTableRowClick(e, data)} align="center"><div dangerouslySetInnerHTML={{ __html: data.NotificationDesc }}></div></TableCell>
+        <TableCell align="left"><Tooltip sx={{ marginLeft: 5 }} title={"Delete " + data.NotificationTitle} ><IconButton onClick={(e) => this.onDeleteButtonClick(e, data)} ><CancelIcon /></IconButton></Tooltip></TableCell>
       </>
     )
   }
@@ -136,7 +147,7 @@ class NotificationList extends Component {
     )
   }
 
-  onTableRowClick = (event, row) => {
+  onTableRowClick = (e, row) => {
     this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen, NotificationTitle: row.NotificationTitle, NotificationDesc: row.NotificationDesc, NotificationID: row.NotificationID, ButtonTitle: "UPDATE", selectedRows: row, NotificationTitleValidated: !isStringNullOrEmpty(row.NotificationDesc), NotificationDescValidated: !isStringNullOrEmpty(row.NotificationTitle) });
   }
 
@@ -144,9 +155,11 @@ class NotificationList extends Component {
     this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen, NotificationTitle: "", NotificationDesc: "", NotificationID: 0, ButtonTitle: "ADD", selectedRows: [], NotificationTitleValidated: false, NotificationDescValidated: false });
   }
 
-  onDeleteButtonClick = () => {
-    const { selectedRows } = this.state
-
+  onDeleteButtonClick = (event, row) => {
+    this.props.CallDeleteNotification({
+      NotificationID: row.NotificationID,
+      ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
+    })
   }
 
   onTextFieldOnChange = (e) => {
@@ -192,7 +205,7 @@ class NotificationList extends Component {
         this.props.CallAddNotification({
           NotificationTitle: NotificationTitle,
           NotificationDesc: NotificationDesc,
-          ModifyBy: localStorage.getItem("UserID")
+          ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
         })
       } else if (ButtonTitle === "UPDATE") {
 
@@ -200,11 +213,12 @@ class NotificationList extends Component {
           NotificationID: NotificationID,
           NotificationTitle: NotificationTitle,
           NotificationDesc: NotificationDesc,
-          ModifyBy: localStorage.getItem("UserID")
+          ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
         })
       }
-
+      this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen })
     }
+
   }
 
   onSelectItem = (item) => {
@@ -290,8 +304,7 @@ class NotificationList extends Component {
               headerColor: 'rgb(200, 200, 200)'
             }}
             selectedIndexKey={"UserID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
-            Data={this.props.notification}                                  // required, the data that listing in the table
-            onTableRowClick={this.onTableRowClick}       // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
+            Data={this.props.notification}                                  // required, the data that listing in the table// optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
             onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
             actionIcon={this.renderTableActionButton()}
             onSelectRow={this.onSelectItem}
@@ -331,7 +344,7 @@ class NotificationList extends Component {
                     postId={this.state.NewsId}
                     handleChange={this.handleChange}
                     content={this.state.NotificationDesc}
-                    imageFileUrl="notice/"
+                    imageFileUrl="notice"
                   />
                 </Grid>
               </Grid>

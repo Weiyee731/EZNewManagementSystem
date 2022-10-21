@@ -56,7 +56,7 @@ const DescriptionFunction = (props) => {
 
                         const formData = new FormData();
                         let imagename = new Date().valueOf();
-                        formData.append("directory", "images/" + imageFileUrl + + postId);
+                        formData.append("directory", imageFileUrl);
                         formData.append("imageFile", file);
                         formData.append("imageName", imagename);
                         let url = ServerConfiguration.filesUrl + "upload.php";
@@ -80,7 +80,7 @@ const DescriptionFunction = (props) => {
                   
                     xhr = new XMLHttpRequest();
                     xhr.withCredentials = false;
-                    xhr.open('POST', 'https://tourism.denoo.my/TourismAPI/upload.php');
+                    xhr.open('POST', ServerConfiguration.filesUrl + "upload.php");
                     let imagename = new Date().valueOf();
                     xhr.upload.onprogress = function (e) {
                       progress(e.loaded / e.total * 100);
@@ -97,7 +97,7 @@ const DescriptionFunction = (props) => {
                         failure('HTTP Error: ' + xhr.status);
                         return;
                       }
-                      let link = "https://tourism.denoo.my/TourismAPI/images/" + imageFileUrl + postId + "/" + imagename + "." + blobInfo.filename().split(".").pop()
+                      let link = ServerConfiguration.mediaUrl + imageFileUrl + "/" + imagename + "." + blobInfo.filename().split(".").pop()
                     //   if (xhr.status === 200) {
                     //     var reader = new FileReader();
                     //     reader.readAsDataURL(blobInfo.blob());
@@ -123,7 +123,7 @@ const DescriptionFunction = (props) => {
                   
                     formData = new FormData();
                     formData.append('file', blobInfo.blob(), blobInfo.filename());
-                    formData.append("directory", "images/" + imageFileUrl + + postId);
+                    formData.append("directory", imageFileUrl);
                     formData.append("imageFile", blobInfo.blob());
                     formData.append("imageName", imagename);
                     xhr.send(formData);
