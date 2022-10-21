@@ -192,7 +192,7 @@ class NotificationList extends Component {
         this.props.CallAddNotification({
           NotificationTitle: NotificationTitle,
           NotificationDesc: NotificationDesc,
-          ModifyBy: localStorage.getItem("UserID")
+          ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
         })
       } else if (ButtonTitle === "UPDATE") {
 
@@ -200,7 +200,7 @@ class NotificationList extends Component {
           NotificationID: NotificationID,
           NotificationTitle: NotificationTitle,
           NotificationDesc: NotificationDesc,
-          ModifyBy: localStorage.getItem("UserID")
+          ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
         })
       }
 
