@@ -48,12 +48,12 @@ const rootEpic = combineEpics(
   gitEpic.Notification_UpdateNotification,
   gitEpic.Notification_DeleteNotification,
 
-  
+
   gitEpic.User_ViewAreaCode,
   gitEpic.User_AddUserAreaCode,
   gitEpic.User_UpdateUserAreaCode,
   gitEpic.User_DeleteUserAreaCode,
-
+  gitEpic.User_ViewProfileByUserCode,
 
 );
 

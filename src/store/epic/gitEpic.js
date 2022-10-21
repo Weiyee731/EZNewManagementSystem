@@ -1009,6 +1009,8 @@ export class GitEpic {
 
         let json = await response.json();
         json = JSON.parse(json)
+
+        console.log("Inventory_AddStock", json)
         return {
           type: GitAction.Inventory_Added,
           payload: json,
@@ -1263,7 +1265,7 @@ export class GitEpic {
       }
     });
 
-    User_AddUserAreaCode = action$ =>
+  User_AddUserAreaCode = action$ =>
     action$.ofType(GitAction.AddAreaCode).switchMap(async ({ payload }) => {
       try {
         const response = await fetch(url +
@@ -1289,7 +1291,7 @@ export class GitEpic {
       }
     });
 
-    User_UpdateUserAreaCode = action$ =>
+  User_UpdateUserAreaCode = action$ =>
     action$.ofType(GitAction.UpdateAreaCode).switchMap(async ({ payload }) => {
       try {
         const response = await fetch(url +
@@ -1316,7 +1318,7 @@ export class GitEpic {
       }
     });
 
-    User_DeleteUserAreaCode = action$ =>
+  User_DeleteUserAreaCode = action$ =>
     action$.ofType(GitAction.DeleteAreaCode).switchMap(async ({ payload }) => {
       try {
         const response = await fetch(url +
@@ -1336,6 +1338,30 @@ export class GitEpic {
         toast.error("Error Code: User_DeleteUserAreaCode")
         return {
           type: GitAction.DeletedAreaCode,
+          payload: [],
+        };
+      }
+    });
+
+  User_ViewProfileByUserCode = action$ =>
+    action$.ofType(GitAction.User_ViewByUserCode).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "User_ViewProfileByUserCode?" +
+          "USERCODE=" + payload.UserCode
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.User_ViewedByUserCode,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: User_ViewProfileByUserCode")
+        return {
+          type: GitAction.User_ViewedByUserCode,
           payload: [],
         };
       }

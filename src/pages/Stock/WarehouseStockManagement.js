@@ -19,11 +19,15 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import ReactToPrint, { PrintContextConsumer } from 'react-to-print';
 import PrintIcon from '@mui/icons-material/Print';
+import moment from 'moment';
 
 function mapStateToProps(state) {
     return {
         courier: state.counterReducer["courier"],
         userAreaCode: state.counterReducer["userAreaCode"],
+        inventoryStockAction: state.counterReducer["inventoryStockAction"],
+        inventoryStock: state.counterReducer["inventoryStock"],
+        userData: state.counterReducer["userData"],
     };
 }
 
@@ -32,6 +36,12 @@ function mapDispatchToProps(dispatch) {
         CallViewInventoryByFilter: (propsData) => dispatch(GitAction.CallViewInventoryByFilter(propsData)),
         CallViewCourier: () => dispatch(GitAction.CallViewCourier()),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
+        ClearInventoryAction: () => dispatch(GitAction.ClearInventoryAction()),
+        CallAddInventory: (propsData) => dispatch(GitAction.CallAddInventory(propsData)),
+        CallUpdateInventory: (propsData) => dispatch(GitAction.CallUpdateInventory(propsData)),
+        CallDeleteInventory: (propsData) => dispatch(GitAction.CallDeleteInventory(propsData)),
+        CallViewProfileByUserCode: (propsData) => dispatch(GitAction.CallViewProfileByUserCode(propsData)),
+        ClearUserCodeData: (propsData) => dispatch(GitAction.ClearUserCodeData(propsData)),
     }
 }
 
@@ -47,9 +57,10 @@ const INITIAL_STATE = {
     filteredProduct: [],
     isFiltered: false,
 
-    requiredCheck: false,
-    requiredCheck2: false,
+    isCheckUser: false,
+    isCheckDatabase: false,
     currentVolume: 60.5,
+    isSubmitAdd: false,
 
     stockData: [{
         TrackingNumber: "",
@@ -79,27 +90,11 @@ const INITIAL_STATE = {
         Remark: "",
         isRemarkError: false,
         areaCode: "KU",
-        createdDate: "10-10-2022",
-    }],
-
-    stockData2: [{
-        TrackingNumber: "Sf256878787878dfd",
-        CourierID: "2",
-        UserCode: "1001",
-        UserData: "12345",
-        UserAlias: "sdsddds",
-        Item: "日用品",
-        Quantity: 1,
-        ProductWeight: "10",
-        ProductVolumetricWeight: "",
-        ProductHeight: "20",
-        ProductWidth: "30",
-        ProductDeep: "40.5",
-        Remark: "",
+        createdDate: "",
+        StockID: "",
     }],
 
     isSubmitData: [],
-    UserDetails: [{ UserID: 1, UserAreaID: 1, UserAlias: "123", UserCode: "1001" }]
 }
 
 
@@ -109,36 +104,62 @@ class WarehouseStock extends Component {
         this.state = INITIAL_STATE
 
         this.props.CallViewCourier()
+        this.props.CallUserAreaCode()
     }
 
     componentDidMount() { }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.state.requiredCheck === true && this.state.UserDetails.length > 0) {
+
+        console.log("sdadsaadsa", this.props.userAreaCode)
+        if (this.state.isCheckUser === true && this.props.userData.length > 0) {
+            let listing = this.props.userData[0]
             let arr = this.state.stockData
-            arr[0].UserAlias = this.state.UserDetails[0].UserAlias
-            this.setState({ requiredCheck: false, stockData: arr })
+            if (this.props.userData[0].ReturnVal !== "0") {
+                arr[0].UserAlias = listing.Username
+                arr[0].areaCode = this.verifyAreaCode(listing.UserAreaID)
+            } else {
+                arr[0].UserAlias = ""
+                arr[0].areaCode = ""
+                toast.warning("没有此会员记录，请确输入正确会员号")
+            }
+            this.setState({ isCheckUser: false, stockData: arr })
+            this.props.ClearUserCodeData()
         }
 
-        if (this.state.requiredCheck2 === true && this.state.stockData2.length > 0) {
+        if (this.props.inventoryStock.length > 0 && this.state.isCheckDatabase === true) {
             let arr = this.state.stockData
-            let listing = this.state.stockData2[0]
-            arr[0].CourierID = listing.CourierID
-            arr[0].UserCode = listing.UserCode
-            arr[0].UserData = listing.UserData
-            arr[0].UserAlias = listing.UserAlias
-            arr[0].Item = listing.Item
-            arr[0].Quantity = listing.Quantity
-            arr[0].ProductWeight = listing.ProductWeight
-            arr[0].CourierID = listing.CourierID
-            arr[0].ProductHeight = listing.ProductHeight
-            arr[0].ProductWidth = listing.ProductWidth
-            arr[0].ProductDeep = listing.ProductDeep
-            arr[0].Remark = listing.Remark
-
-            this.setState({ requiredCheck2: false, stockData: arr })
+            let listing = this.props.inventoryStock[0]
+            if (this.props.inventoryStock[0].ReturnVal !== "0") {
+                arr[0].CourierID = listing.CourierID
+                arr[0].UserCode = listing.UserCode
+                arr[0].UserAlias = listing.Username
+                arr[0].Item = listing.Item
+                arr[0].Quantity = listing.ProductQuantity
+                arr[0].ProductWeight = listing.ProductWeight
+                arr[0].CourierID = listing.CourierID
+                arr[0].ProductHeight = listing.ProductDimensionHeight
+                arr[0].ProductWidth = listing.ProductDimensionWidth
+                arr[0].ProductDeep = listing.ProductDimensionDeep
+                arr[0].Remark = listing.Remark
+                arr[0].StockID = listing.StockID
+                arr[0].createdDate = moment(listing.StockDate).format('DD-MM-YYYY, h:mm:ss a')
+            }
+            this.setState({ isCheckDatabase: false, stockData: arr })
         }
 
+        if (this.props.inventoryStockAction.length > 0 && this.state.isSubmitAdd == true) {
+            if (this.props.inventoryStockAction[0].ReturnVal === 1) {
+                toast.success("已成功入库")
+                window.reload("false")
+            } else {
+                toast.error("包裹未入库成功")
+            }
+            this.props.ClearInventoryAction()
+        }
+
+
+        console.log("dsdsadasdas", this.props)
     }
 
     handleChange(data, title) {
@@ -152,8 +173,8 @@ class WarehouseStock extends Component {
                 if (isStringNullOrEmpty(data))
                     arr.isTrackingError = true
                 arr.TrackingNumber = data
-                this.props.CallViewInventoryByFilter({ FILTERCOLUMN: "and TrackingNumber=" + data })
-                this.setState({ requiredCheck2: true })
+                this.props.CallViewInventoryByFilter({ FilterColumn: "and TrackingNumber='" + data + "'" })
+                this.setState({ isCheckDatabase: true })
                 break;
 
             case "快递公司":
@@ -169,8 +190,11 @@ class WarehouseStock extends Component {
                     arr.isUserCodeError = true
                 arr.UserCode = data
 
-                if (data.length === 4)
-                    this.setState({ requiredCheck: true })
+                console.log("dsadadas", data)
+                if (data.length === 4 && this.state.isCheckUser === false) {
+                    this.props.CallViewProfileByUserCode({ UserCode: arr.UserCode })
+                    this.setState({ isCheckUser: true })
+                }
                 break;
 
             case "货物信息":
@@ -250,8 +274,22 @@ class WarehouseStock extends Component {
         return error
     }
 
+    verifyAreaCode = (id) => {
+        let listing = this.props.userAreaCode
+        let data = ""
+
+        if (listing.length > 0 && listing[0].ReturnVal === '0') {
+            listing.filter((x) => x.UserAreaID === id).map((y) => {
+                data = y.AreaCode
+            })
+        }
+        return data
+    }
+
 
     createObject = () => {
+        console.log("sdsadadada", this.state.stockData[0])
+
         let listing = this.state.stockData[0]
         let UserCode = ""
         let TrackingNumber = ""
@@ -267,16 +305,17 @@ class WarehouseStock extends Component {
         let areaCode = ""
         let createdDate = ""
 
+
         for (let index = 0; index < listing.Quantity; index++) {
             UserCode += listing.UserCode;
-            TrackingNumber += listing.Quantity > 1 ? listing.TrackingNumber + "00" + parseInt(index + 1) : listing.TrackingNumber;
+            TrackingNumber += listing.Quantity > 1 ? listing.TrackingNumber.trim() + "00" + parseInt(index + 1) : listing.TrackingNumber.trim();
             ProductWeight += (isStringNullOrEmpty(listing.ProductWeight)) ? "0" : listing.ProductWeight;
             ProductHeight += (isStringNullOrEmpty(listing.ProductHeight)) ? "0" : listing.ProductHeight;
             ProductDeep += (isStringNullOrEmpty(listing.ProductDeep)) ? "0" : listing.ProductDeep;
             ProductWidth += (isStringNullOrEmpty(listing.ProductWidth)) ? "0" : listing.ProductWidth;
             CourierID += (isStringNullOrEmpty(listing.CourierID)) ? "0" : listing.CourierID;
-            Item += (isStringNullOrEmpty(listing.Item)) ? "-" : listing.Item;
-            Remark += (isStringNullOrEmpty(listing.Remark)) ? "-" : listing.Remark;
+            Item += (isStringNullOrEmpty(listing.Item)) ? "-" : listing.Item.trim();
+            Remark += (isStringNullOrEmpty(listing.Remark)) ? "-" : listing.Remark.trim();
             areaCode += (isStringNullOrEmpty(listing.areaCode)) ? "-" : listing.areaCode;
             createdDate += (isStringNullOrEmpty(listing.createdDate)) ? "-" : listing.createdDate;
 
@@ -296,14 +335,14 @@ class WarehouseStock extends Component {
 
             data.push({
                 UserCode: listing.UserCode,
-                TrackingNumber: listing.Quantity > 1 ? listing.TrackingNumber + "00" + parseInt(index + 1) : listing.TrackingNumber,
+                TrackingNumber: listing.Quantity > 1 ? listing.TrackingNumber.trim() + "00" + parseInt(index + 1) : listing.TrackingNumber.trim(),
                 ProductWeight: (isStringNullOrEmpty(listing.ProductWeight)) ? "0" : listing.ProductWeight,
                 ProductHeight: (isStringNullOrEmpty(listing.ProductHeight)) ? "0" : listing.ProductHeight,
                 ProductDeep: (isStringNullOrEmpty(listing.ProductDeep)) ? "0" : listing.ProductDeep,
                 ProductWidth: (isStringNullOrEmpty(listing.ProductWidth)) ? "0" : listing.ProductWidth,
                 CourierID: (isStringNullOrEmpty(listing.CourierID)) ? "0" : listing.CourierID,
-                Item: (isStringNullOrEmpty(listing.Item)) ? "-" : listing.Item,
-                Remark: (isStringNullOrEmpty(listing.Remark)) ? "-" : listing.Remark,
+                Item: (isStringNullOrEmpty(listing.Item)) ? "-" : listing.Item.trim(),
+                Remark: (isStringNullOrEmpty(listing.Remark)) ? "-" : listing.Remark.trim(),
                 areaCode: (isStringNullOrEmpty(listing.areaCode)) ? "-" : listing.areaCode,
                 createdDate: (isStringNullOrEmpty(listing.createdDate)) ? "-" : listing.createdDate
             })
@@ -320,10 +359,10 @@ class WarehouseStock extends Component {
             Remark: Remark,
             areaCode: areaCode,
             createdDate: createdDate,
-            ModifyBy: localStorage.getItem("UserID")
+            ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID === null ? 1 : JSON.parse(localStorage.getItem("loginUser"))[0].UserID
         }
-
         this.setState({ isSubmitData: data })
+        return Obj
     }
 
     render() {
@@ -353,7 +392,7 @@ class WarehouseStock extends Component {
 
         const listingLayout = (title, value, error, type) => {
             return (
-                <div className="row" style={{ paddingTop: "20pt" }}>
+                <div className="row" style={{ paddingTop: "20pt" }} key={title}>
                     <div className="col-2" >
                         <Typography style={{ fontWeight: "600", fontSize: "15pt", color: "#253949", letterSpacing: 1 }}>{title} :</Typography>
                     </div>
@@ -382,6 +421,7 @@ class WarehouseStock extends Component {
                                 value={value}
                                 required
                                 size="small"
+                                inputProps={{ maxLength: title === "会员号" && 4 }}
                                 disabled={title === "会员信息" ? true : false}
                                 onChange={(e) => this.handleChange(e.target.value, title)}
                             />
@@ -404,6 +444,15 @@ class WarehouseStock extends Component {
                             {stockData[0].isQuantityError && <div><label style={{ color: "red", fontSize: "10pt" }}>请输入对的整数</label></div>}
                         </div>
                     }
+                    {
+                        title === "会员信息" && this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== "0" &&
+                        <div className="col-4" >
+                            <div className="row" style={{ textAlign: "center", border: "2px solid", padding: "5pt" }}>
+                                <Typography style={{ fontWeight: "600", fontSize: "15pt", color: "#253949", letterSpacing: 1 }}>入库时间：</Typography>
+                                <Typography style={{ fontWeight: "600", fontSize: "15pt", color: "#253949", letterSpacing: 1 }}>{stockData[0].createdDate}</Typography>
+                            </div>
+                        </div>
+                    }
                 </div>
             )
         }
@@ -414,7 +463,7 @@ class WarehouseStock extends Component {
                     {
                         data.length > 0 && data.map((x) => {
                             return (
-                                <div className="col-4" >
+                                <div className="col-4" key={x.title}>
                                     <TextField
                                         variant="outlined"
                                         style={{ width: "100%" }}
@@ -437,10 +486,13 @@ class WarehouseStock extends Component {
 
 
         const handleButton = (type) => {
+            console.log("handleButton", type)
             switch (type) {
                 case "Save":
                     if (!this.verifyError()) {
-                        this.createObject()
+                        let Obj = this.createObject()
+                        this.props.CallAddInventory(Obj)
+                        this.setState({ isSubmitAdd: true })
                     }
                     else
                         toast.error("请确保正确填写所有包裹资料")
@@ -448,10 +500,18 @@ class WarehouseStock extends Component {
 
                 case "Print":
                     if (!this.verifyError()) {
-                        this.createObject()
+                        let Obj = this.createObject()
+                        this.props.CallAddInventory(Obj)
+                        this.setState({ isSubmitAdd: true })
                     }
                     else
                         toast.error("请确保正确填写所有包裹资料")
+                    break;
+
+                case "RePrint":
+                    console.log("ReprintReprint")
+                    let Obj = this.createObject()
+                    console.log("ReprinthandleButton Obj", Obj)
                     break;
 
                 default:
@@ -464,21 +524,35 @@ class WarehouseStock extends Component {
             return (
                 data.length > 0 && data.map((x) => {
                     return (
-                        <div className="row" style={{ padding: "20pt" }} onClick={() => handleButton(x.type)} >
-                            <ReactToPrint
-                                style={{ width: "100%", display: "inline" }}
-                                pageStyle={pageStyle}
-                                trigger={(e) => {
-                                    return (
-                                        <Button style={{ paddingTop: "40pt", paddingBottom: "40pt", borderRadius: "20pt", backgroundColor: this.verifyError() ? "grey" : "#0362fc", color: "white", fontWeight: "bold" }}
-                                            disabled={this.verifyError() ? true : false}
-                                        >
-                                            {x.title}
-                                        </Button>
-                                    );
-                                }}
-                                content={() => this.componentRef}
-                            />
+                        <div className="row" style={{ padding: "15pt" }} onClick={() => handleButton(x.type)} key={x.item} >
+                            {
+                                x.type === "Save" || x.type === "Delete" ?
+                                    <Button style={{
+                                        paddingTop: "40pt", paddingBottom: "40pt", borderRadius: "20pt", color: "white", fontWeight: "bold", fontSize: "20pt",
+                                        backgroundColor: this.verifyError() ? "grey" : "#0362fc"
+                                    }} disabled={this.verifyError() ? true : false}
+                                    >
+                                        {x.title}
+                                    </Button>
+                                    :
+                                    <ReactToPrint
+                                        style={{ width: "100%", display: "inline" }}
+                                        pageStyle={pageStyle}
+                                        trigger={(e) => {
+                                            return (
+                                                <Button style={{
+                                                    paddingTop: "40pt", paddingBottom: "40pt", borderRadius: "20pt", color: "white", fontWeight: "bold", fontSize: "20pt",
+                                                    backgroundColor: this.verifyError() ? "grey" : "#0362fc"
+                                                }} disabled={this.verifyError() ? true : false}
+                                                >
+                                                    {x.title}
+                                                </Button>
+                                            );
+                                        }}
+                                        content={() => this.componentRef}
+                                    />
+                            }
+
                         </div >
                     )
                 })
@@ -487,15 +561,17 @@ class WarehouseStock extends Component {
 
         const renderPrintListing = (data) => {
             let listing = data
+
+            console.log("sdasadsas renderPrintListing", data)
             return (
-                <div>
+                <div key={listing.TrackingNumber} style={{ display: "block" }}>
                     <div style={{ textAlign: "center" }}>
                         <Typography style={{ fontWeight: "600", fontSize: "15pt", color: "#253949", letterSpacing: 1 }}>{listing.areaCode}</Typography>
                         <Barcode value={listing.TrackingNumber} />
                         <div className="row" style={{ textAlign: "left" }}>
-                            <Typography style={{ fontWeight: "600", fontSize: "10pt", color: "#253949", letterSpacing: 1 }}>会员： {listing.UserCode}</Typography>
-                            <Typography style={{ fontWeight: "600", fontSize: "10pt", color: "#253949", letterSpacing: 1 }}>名称： {listing.UserAlias}</Typography>
-                            <Typography style={{ fontWeight: "600", fontSize: "10pt", color: "#253949", letterSpacing: 1 }}>入库：{listing.createdDate}</Typography>
+                            <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>会员： {listing.UserCode}</Typography>
+                            <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>名称： {listing.UserAlias}</Typography>
+                            <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>入库：{listing.createdDate}</Typography>
                         </div>
                     </div>
                     <br />
@@ -558,29 +634,28 @@ class WarehouseStock extends Component {
 
                     </div>
 
-                    <div className="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-xs-12" style={{ paddingTop: "30pt" }}>
+                    <div className="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-xs-12" >
                         <div className="row" style={{ textAlign: "center" }}>
                             <Typography style={{ fontWeight: "600", fontSize: "15pt", color: "#253949", letterSpacing: 1 }}>未装箱包裹 : {this.state.currentVolume}</Typography>
                         </div>
                         {buttonLayout([
                             { title: "打印", type: "Print" },
                             { title: "重印", type: "RePrint" },
-                            { title: "保存", type: "Save" }
-
+                            { title: "仅保存", type: "Save" },
+                            { title: "删除", type: "Delete" }
                         ])}
                     </div>
-                    {
-                        this.state.isSubmitData.length > 0 &&
-                        <div style={{ display: "none" }} >
-                            <div ref={(el) => (this.componentRef = el)}>
-                                {
-                                    this.state.isSubmitData.map((data) => {
-                                        return (renderPrintListing(data))
-                                    })
-                                }
-                            </div>
+                    {console.log("sdasadsas", this.state.isSubmitData)}
+
+                    <div style={{ display: "none" }} >
+                        <div ref={(el) => (this.componentRef = el)}>
+                            {
+                                this.state.isSubmitData.length > 0 && this.state.isSubmitData.map((data) => {
+                                    return (renderPrintListing(data))
+                                })
+                            }
                         </div>
-                    }
+                    </div>
                 </div>
             </div >
         )
