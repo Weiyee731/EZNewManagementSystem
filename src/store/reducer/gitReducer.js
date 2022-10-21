@@ -11,7 +11,7 @@ const INITIAL_STATE = {
   stocks: [],
   stockReturn: [],
   stockApproval: [],
-  AllContainer: [],
+  // AllContainer: [],
   transactions: [],
   transaction: [],
   transactionReturn: [],
@@ -154,15 +154,15 @@ export function counterReducer(state = INITIAL_STATE, action) {
     case GitAction.ResetUpdatedStockDetail:
       return Object.assign({}, state, { stockApproval: [] });
 
-    case GitAction.ViewContainer:
-      return Object.assign({}, state, { loading: true });
-    case GitAction.ViewedContainer:
-      return Object.assign({}, state, {
-        loading: false,
-        AllContainer: action.payload
-      });
-    case GitAction.ResetViewedContainer:
-      return Object.assign({}, state, { stockReturn: [] });
+    // case GitAction.ViewContainer:
+    //   return Object.assign({}, state, { loading: true });
+    // case GitAction.ViewedContainer:
+    //   return Object.assign({}, state, {
+    //     loading: false,
+    //     AllContainer: action.payload
+    //   });
+    // case GitAction.ResetViewedContainer:
+    //   return Object.assign({}, state, { stockReturn: [] });
 
     case GitAction.InsertStockByPost:
       return Object.assign({}, state, { loading: true });

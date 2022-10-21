@@ -16,8 +16,8 @@ import { ServerConfiguration } from "../serverConf";
 //           options          //
 //   1. testing server url    //
 //   2. live server url       // 
-const url = ServerConfiguration.testingServerUrl;
-const postUrl = ServerConfiguration.postUrl;
+const url = ServerConfiguration.LiveServerUrl;
+const postUrl = ServerConfiguration.LiveServerUrl;
 export class GitEpic {
   ///////////////////////////////////////////////////  user account credentials ///////////////////////////////////////////////////
 
@@ -310,28 +310,28 @@ export class GitEpic {
         .catch(error => toast.error("Error code: 8003"));
     });
 
-  Container_ViewContainer = action$ =>
-    action$.ofType(GitAction.ViewContainer).switchMap(async ({ payload }) => {
-      try {
-        const response = await fetch(url +
-          "Container_ViewContainer"
-        );
+  // Container_ViewContainer = action$ =>
+  //   action$.ofType(GitAction.ViewContainer).switchMap(async ({ payload }) => {
+  //     try {
+  //       const response = await fetch(url +
+  //         "Container_ViewContainer"
+  //       );
 
-        let json = await response.json();
-        json = JSON.parse(json)
-        return {
-          type: GitAction.ViewedContainer,
-          payload: json,
-        };
-      }
-      catch (error) {
-        toast.error("Error Code: Inventory_InsertStock")
-        return {
-          type: GitAction.ViewedContainer,
-          payload: [],
-        };
-      }
-    });
+  //       let json = await response.json();
+  //       json = JSON.parse(json)
+  //       return {
+  //         type: GitAction.ViewedContainer,
+  //         payload: json,
+  //       };
+  //     }
+  //     catch (error) {
+  //       toast.error("Error Code: Inventory_InsertStock")
+  //       return {
+  //         type: GitAction.ViewedContainer,
+  //         payload: [],
+  //       };
+  //     }
+  //   });
 
   Inventory_InsertStockByPost = action$ =>
     action$.ofType(GitAction.InsertStockByPost).switchMap(async ({ payload }) => {
