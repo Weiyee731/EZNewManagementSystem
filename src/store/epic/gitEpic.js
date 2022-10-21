@@ -16,8 +16,8 @@ import { ServerConfiguration } from "../serverConf";
 //           options          //
 //   1. testing server url    //
 //   2. live server url       // 
-const url = ServerConfiguration.testingServerUrl;
-const postUrl = ServerConfiguration.postUrl;
+const url = ServerConfiguration.LiveServerUrl;
+const postUrl = ServerConfiguration.LiveServerUrl;
 export class GitEpic {
   ///////////////////////////////////////////////////  user account credentials ///////////////////////////////////////////////////
 

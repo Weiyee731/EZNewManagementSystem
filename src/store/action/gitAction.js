@@ -454,7 +454,7 @@ export class GitAction {
 
   static Notification_View = "Notification_View";
   static Notification_Viewed = "Notification_Viewed";
-  static CallViewINotificationr(propsData) {
+  static CallViewINotification(propsData) {
     return {
       type: GitAction.Notification_View,
       payload: propsData

@@ -22,7 +22,7 @@ import ArchivedStock from "../../../pages/ArchivedData/ArchivedStock/ArchivedSto
 import ArchivedTransaction from "../../../pages/ArchivedData/ArchivedTransaction/ArchivedTransaction.js";
 import PendingToLoad from "../../../pages/Container/PendingToLoad";
 import WarehouseStockManagement from "../../../pages/Stock/WarehouseStockManagement";
-
+import NotificationList from "../../../pages/Notification/NotificationList"
 const routes = [
     {
         path: "/",
@@ -115,11 +115,6 @@ const routes = [
         exact: true,
         element: <UserDetail />,
     },
-    // {
-    //     path: "/AddUser",
-    //     exact: true,
-    //     element: <AddUser />,
-    // },
     {
         path: "/ProformaList",
         exact: true,
@@ -145,7 +140,11 @@ const routes = [
         exact: true,
         element: <WarehouseStockManagement />,
     },
-
+    {
+        path: "/notification",
+        exact: true,
+        element: <NotificationList />,
+    },
     
 
 ]
