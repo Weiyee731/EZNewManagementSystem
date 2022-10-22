@@ -25,8 +25,11 @@ import { Paper } from "@mui/material"
 import TextField from "@mui/material/TextField"
 import MenuItem from "@mui/material/MenuItem"
 import Select from "@mui/material/Select"
+import DataManagement from "../../DataManagement/DataManagement"
+import { ModalPopOut } from "../../../components/modal/Modal";
 
 import "./ContainerListing.css"
+
 
 function mapStateToProps(state) {
     return {
@@ -160,12 +163,14 @@ const INITIAL_STATE = {
     isDataFetching: false,
     filteredList: null,
     openModal: false,
+    openDataManagementModal: false,
     containerNo: "",
     containerDate: "",
     container: null,
     containerAction: null,
     ContainerStatus: "All",
-    containerStatusReturn: ""
+    containerStatusReturn: "",
+    ClickedRow: null
 }
 
 class ContainerListing extends Component {
@@ -290,8 +295,10 @@ class ContainerListing extends Component {
         )
     }
 
-    onTableRowClick = (data, index) => {
-
+    onTableRowClick = (event, row) => {
+        // TODO: SHOW SMALL DIALOG , 2 SELECTION , EDIT CONTAINER OR ADD STOCK INTO CONTAINER
+        console.log(event, row)
+        this.setState({openDataManagementModal: !this.state.openDataManagementModal , ClickedRow: row})
     }
 
     setAddModalDetails = () => {
@@ -376,12 +383,12 @@ class ContainerListing extends Component {
                         renderTableRows: this.renderTableRows, // required, it is a function, please refer to the example I have done in Table Components
                         checkbox: (this.state.approvePage === true) ? true : false, // optional, by default is true
                         checkboxColor: "primary", // optional, by default is primary, as followed the MUI documentation
-                        onRowClickSelect: true, // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
+                        onRowClickSelect: false, // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                         headerColor: "rgb(200, 200, 200)",
                     }}
                     selectedIndexKey={"StockID"} // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click.
                     Data={isArrayNotEmpty(this.state.filteredList) ? this.state.filteredList : []} // required, the data that listing in the table
-                    onTableRowClick={this.onTableRowClick()} // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row
+                    onTableRowClick={this.onTableRowClick} // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row
                     onActionButtonClick={this.onAddButtonClick} // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                     tableTopRight={renderTableTopRightButtons()}
                     onSelectRow={this.onSelectRow}
@@ -434,6 +441,21 @@ class ContainerListing extends Component {
                         </div>
                     </div>
                 </AlertDialog>
+                <ModalPopOut fullScreen={true}
+                    open={this.state.openDataManagementModal} // required, pass the boolean whether modal is open or close
+                    handleToggleDialog={() => this.setState({ openDataManagementModal: false})} // required, pass the toggle function of modal
+                    handleConfirmFunc={() => this.addNewContainer()} // required, pass the confirm function
+                    showAction={true} // required, to show the footer of modal display
+                    title={"Create New Container"} // required, title of the modal
+                    buttonTitle={"Confirm"} // required, title of button
+                    singleButton={false} // required, to decide whether to show a single full width button or 2 buttons
+                    maxWidth={"md"}
+                    draggable={true}
+                >
+                    <div className="container-fluid">
+                    <DataManagement/>
+                    </div>
+                </ModalPopOut>
             </div>
         )
     }
