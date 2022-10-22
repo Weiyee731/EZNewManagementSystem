@@ -1142,7 +1142,8 @@ export class GitEpic {
     action$.ofType(GitAction.Notification_View).switchMap(async ({ payload }) => {
       try {
         const response = await fetch(url +
-          "Notification_ViewNotification"
+          "Notification_ViewNotification?" +
+          "&NOTIFICATIONSTATUSID=" + payload.NotificationStatusID
         );
 
         let json = await response.json();
@@ -1168,6 +1169,7 @@ export class GitEpic {
           "Notification_AddNotification?" +
           "NOTIFICATIONTITLE=" + payload.NotificationTitle +
           "&NOTIFICATIONDESC=" + payload.NotificationDesc +
+          "&NOTIFICATIONSTATUSID=" + payload.NotificationStatusID +
           "&MODIFY=" + payload.ModifyBy
         );
 
@@ -1180,7 +1182,8 @@ export class GitEpic {
 
         try {
           const response = await fetch(url +
-            "Notification_ViewNotification"
+            "Notification_ViewNotification?" +
+            "&NOTIFICATIONSTATUSID=0"
           );
 
           let json = await response.json();
@@ -1214,6 +1217,7 @@ export class GitEpic {
         const response = await fetch(url +
           "Notification_UpdateNotification?" +
           "NOTIFICATIONTITLE=" + payload.NotificationTitle +
+          "&NOTIFICATIONSTATUSID=" + payload.NotificationStatusID +
           "&NOTIFICATIONID=" + payload.NotificationID +
           "&NOTIFICATIONDESC=" + payload.NotificationDesc +
           "&MODIFY=" + payload.ModifyBy
@@ -1228,7 +1232,8 @@ export class GitEpic {
 
         try {
           const response = await fetch(url +
-            "Notification_ViewNotification"
+            "Notification_ViewNotification?" +
+            "&NOTIFICATIONSTATUSID=0"
           );
 
           let json = await response.json();
@@ -1272,7 +1277,8 @@ export class GitEpic {
         // };
         try {
           const response = await fetch(url +
-            "Notification_ViewNotification"
+            "Notification_ViewNotification?" +
+            "&NOTIFICATIONSTATUSID=0"
           );
 
           let json = await response.json();
