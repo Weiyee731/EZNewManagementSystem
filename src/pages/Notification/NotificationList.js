@@ -52,7 +52,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    CallViewINotification: () => dispatch(GitAction.CallViewINotification({})),
+    CallViewINotification: (props) => dispatch(GitAction.CallViewINotification(props)),
     CallAddNotification: (props) => dispatch(GitAction.CallAddNotification(props)),
     CallUpdateNotification: (props) => dispatch(GitAction.CallUpdateNotification(props)),
     CallDeleteNotification: (props) => dispatch(GitAction.CallDeleteNotification(props))
@@ -73,10 +73,22 @@ const headCells = [
     label: 'Title',
   },
   {
+    id: 'NotificationStatus',
+    align: 'center',
+    disablePadding: false,
+    label: 'Status',
+  },
+  {
     id: 'NotificationDesc',
     align: 'center',
     disablePadding: false,
     label: 'Content',
+  },
+  {
+    id: 'CreatedDate',
+    align: 'center',
+    disablePadding: false,
+    label: 'Date',
   },
   {
     id: 'DeleteButton',
@@ -99,8 +111,9 @@ class NotificationList extends Component {
       errorReportData: [],
       openErrorReport: false,
       searchArea: "All",
-      ButtonTitle: "ADD",
+      ButtonTitle: "PUBLISH",
       NotificationID: 0,
+      NotificationStatusID: 0,
       NotificationTitle: "",
       NotificationTitleValidated: false,
       NotificationDesc: "",
@@ -113,7 +126,7 @@ class NotificationList extends Component {
     this.handleChange = this.handleChange.bind(this)
     this.renderDropzoneTableHeaders = this.renderDropzoneTableHeaders.bind(this)
     this.renderDropzoneTableRows = this.renderDropzoneTableRows.bind(this)
-    this.props.CallViewINotification()
+    this.props.CallViewINotification({ NotificationStatusID: 0 })
   }
 
   componentDidMount() {
@@ -129,7 +142,9 @@ class NotificationList extends Component {
       <>
         <TableCell onClick={(e) => this.onTableRowClick(e, data)} align="left">{(index + 1)}</TableCell>
         <TableCell onClick={(e) => this.onTableRowClick(e, data)} align="left">{data.NotificationTitle}</TableCell>
+        <TableCell onClick={(e) => this.onTableRowClick(e, data)} align="left"><div dangerouslySetInnerHTML={{ __html: data.NotificationStatus }}></div></TableCell>
         <TableCell onClick={(e) => this.onTableRowClick(e, data)} align="center"><div dangerouslySetInnerHTML={{ __html: data.NotificationDesc }}></div></TableCell>
+        <TableCell onClick={(e) => this.onTableRowClick(e, data)} align="left">{data.CreatedDate}</TableCell>
         <TableCell align="left"><Tooltip sx={{ marginLeft: 5 }} title={"Delete " + data.NotificationTitle} ><IconButton onClick={(e) => this.onDeleteButtonClick(e, data)} ><CancelIcon /></IconButton></Tooltip></TableCell>
       </>
     )
@@ -148,11 +163,11 @@ class NotificationList extends Component {
   }
 
   onTableRowClick = (e, row) => {
-    this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen, NotificationTitle: row.NotificationTitle, NotificationDesc: row.NotificationDesc, NotificationID: row.NotificationID, ButtonTitle: "UPDATE", selectedRows: row, NotificationTitleValidated: !isStringNullOrEmpty(row.NotificationDesc), NotificationDescValidated: !isStringNullOrEmpty(row.NotificationTitle) });
+    this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen, NotificationTitle: row.NotificationTitle, NotificationDesc: row.NotificationDesc, NotificationID: row.NotificationID, ButtonTitle: "UPDATE", selectedRows: row, NotificationTitleValidated: !isStringNullOrEmpty(row.NotificationDesc), NotificationDescValidated: !isStringNullOrEmpty(row.NotificationTitle), NotificationStatusID: row.NotificationStatusID });
   }
 
   onAddButtonClick = () => {
-    this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen, NotificationTitle: "", NotificationDesc: "", NotificationID: 0, ButtonTitle: "ADD", selectedRows: [], NotificationTitleValidated: false, NotificationDescValidated: false });
+    this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen, NotificationTitle: "", NotificationDesc: "", NotificationID: 0, ButtonTitle: "PUBLISH", selectedRows: [], NotificationTitleValidated: false, NotificationDescValidated: false, NotificationStatusID: 0 });
   }
 
   onDeleteButtonClick = (event, row) => {
@@ -199,12 +214,11 @@ class NotificationList extends Component {
       NotificationDescValidated
     )
     if (isValidated) {
-      console.log(ButtonTitle)
-      console.log(ButtonTitle === "UPDATE")
-      if (ButtonTitle === "ADD") {
+      if (ButtonTitle === "PUBLISH") {
         this.props.CallAddNotification({
           NotificationTitle: NotificationTitle,
           NotificationDesc: NotificationDesc,
+          NotificationStatusID: 2,
           ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
         })
       } else if (ButtonTitle === "UPDATE") {
@@ -213,9 +227,41 @@ class NotificationList extends Component {
           NotificationID: NotificationID,
           NotificationTitle: NotificationTitle,
           NotificationDesc: NotificationDesc,
+          NotificationStatusID: 2,
           ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
         })
       }
+      this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen })
+    }
+
+  }
+
+  onSave = () => {
+    const { userAreaCode } = this.props
+    const {
+      NotificationID,
+      NotificationTitle,
+      NotificationDesc,
+      NotificationTitleValidated,
+      NotificationDescValidated,
+      ButtonTitle,
+      selectedRows
+    } = this.state
+
+    const isValidated = (
+      NotificationTitleValidated &&
+      NotificationDescValidated
+    )
+    if (isValidated) {
+
+      this.props.CallUpdateNotification({
+        NotificationID: NotificationID,
+        NotificationTitle: NotificationTitle,
+        NotificationDesc: NotificationDesc,
+        NotificationStatusID: 1,
+        ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
+      })
+
       this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen })
     }
 
@@ -315,9 +361,12 @@ class NotificationList extends Component {
             open={this.state.AddModalOpen}              // required, pass the boolean whether modal is open or close
             handleToggleDialog={() => this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen })}  // required, pass the toggle function of modal
             handleConfirmFunc={this.onSubmit}    // required, pass the confirm function 
+            handleSaveFunc={this.onSave}
+            DraftInd={this.state.NotificationStatusID === 0 ? true : false}
             showAction={true}                           // required, to show the footer of modal display
             title={this.state.ButtonTitle + " NOTICE"}                      // required, title of the modal
-            buttonTitle={this.state.ButtonTitle}                         // required, title of button
+            buttonTitle={this.state.NotificationStatusID === 0 ? "PUBLISH" : this.state.ButtonTitle}
+            buttonSaveTitle={"SAVE"}                         // required, title of button
             singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
             maxWidth={"md"}
           >

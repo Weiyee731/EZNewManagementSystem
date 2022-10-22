@@ -368,6 +368,15 @@ export class GitAction {
     };
   }
 
+  static Container_UpdateStatus = "Container_UpdateStatus";
+  static Container_UpdatedStatus = "Container_UpdatedStatus";
+  static CallUpdateContainerStatus(propsData) {
+    return {
+      type: GitAction.Container_UpdateStatus,
+      payload: propsData
+    };
+  }
+
   static Container_Add = "Container_Add";
   static Container_Added = "Container_Added";
   static CallAddContainer(propsData) {

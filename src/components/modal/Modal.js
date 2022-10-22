@@ -66,6 +66,15 @@ export default function AlertDialog(props) {
       </DialogContent>
       {props.showAction &&
         <DialogActions>
+          {props.DraftInd ? <Button
+            onClick={() => props.handleSaveFunc()}
+            variant='contained'
+            fullWidth
+            autoFocus type="submit"
+            disabled={props.buttonDisabled}
+          >
+            {props.buttonSaveTitle}
+          </Button> : <></>}
           {props.singleButton ?
             <Button
               onClick={() => props.handleConfirmFunc()}

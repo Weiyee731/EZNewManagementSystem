@@ -36,6 +36,7 @@ function mapStateToProps(state) {
         container: state.counterReducer["container"],
         containerAction: state.counterReducer["containerAction"],
         containerStatus: state.counterReducer["containerStatus"],
+        containerStatusUpdate: state.counterReducer["containerStatusUpdate"],
     }
 }
 
@@ -52,6 +53,7 @@ function mapDispatchToProps(dispatch) {
         CallUpdateStockDetailByPost: (props) => dispatch(GitAction.CallUpdateStockDetailByPost(props)),
         CallAddContainer: (props) => dispatch(GitAction.CallAddContainer(props)),
         CallViewContainerStatus: (props) => dispatch(GitAction.CallViewContainerStatus(props)),
+        CallUpdateContainerStatus: (props) => dispatch(GitAction.CallUpdateContainerStatus(props)),
     }
 }
 
@@ -181,17 +183,18 @@ class ContainerListing extends Component {
         // } else {
         //     this.setState({ approvePage: false })
         // }
-        // this.onDatabaseSearch()
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.state.container === null && isArrayNotEmpty(this.props.container)) {
+        if (isArrayNotEmpty(this.props.container) && (prevProps.container !== this.props.container)) {
+            console.log("call ghere")
             let list = !isStringNullOrEmpty(this.props.container[0].ReturnVal) && this.props.container[0].ReturnVal == 0 ? [] : this.props.container
+            console.log("list", list)
             this.setState({
                 filteredList: list,
                 isDataFetching: false,
                 totalItem: list.length,
-                container: list
+                // container: list
             })
 
             toast.dismiss()
@@ -201,25 +204,31 @@ class ContainerListing extends Component {
                     theme: "dark",
                 })
             }
-
         }
-        // console.log("this.containerAction1q412", this.props.containerAction)
-        if (this.state.containerAction === null && isArrayNotEmpty(this.props.containerAction)) {
-            console.log("this.containerAction", this.props.containerAction)
-            if (this.props.containerAction[0].ReturnVal = 1) {
-                console.log("this.", this.props.containerAction)
+
+        if (isArrayNotEmpty(this.props.containerStatusUpdate)) {
+            if (!isStringNullOrEmpty(this.props.containerStatusUpdate[0].ReturnVal) && this.props.containerStatusUpdate[0].ReturnVal == 0) {
+                console.log("upadte containerstatus fail", this.props.containerStatusUpdate[0].ReturnMsg)
+            } else {
+                console.log("upadte containerstatus success", this.props.containerStatusUpdate[0].ReturnMsg)
             }
         }
 
-        // if (this.state.containerStatusReturn === null && isArrayNotEmpty(this.props.containerStatus)) {
-        //     this.setState({
-        //         containerStatusReturn: this.props.containerStatus
-        //     })
-        // }
+        if (this.state.containerAction === null && isArrayNotEmpty(this.props.containerAction) && (prevProps.containerAction !== this.props.containerAction)) {
+            if (this.props.containerAction[0].ReturnVal = 1) {
+                console.log("this.", this.props.containerAction[0].ReturnMsg)
+                this.props.CallViewContainer()
+                this.setState({
+                    openModal: false
+                })
+            } else {
+                console.log("fail", this.props.containerAction[0].ReturnMsg)
+            }
+        }
+
     }
 
     handleChangeStatus = (data, index, e) => {
-
         data.ContainerStatusID = e.target.value
         data.ContainerStatus = this.props.containerStatus.find((x) => !isStringNullOrEmpty(x.ContainerStatusID) && x.ContainerStatusID === e.target.value).ContainerStatus
 
@@ -229,6 +238,14 @@ class ContainerListing extends Component {
         this.setState({
             filteredList: latestDataSet
         })
+
+        var obj = {
+            CONTAINERID: data.ContainerID,
+            CONTAINERSTATUSID: e.target.value,
+            MODIFY: 1
+
+        }
+        this.props.CallUpdateContainerStatus(obj)
     }
 
     renderTableActionButton = () => {
@@ -258,7 +275,7 @@ class ContainerListing extends Component {
                         label="Search By"
                         onChange={(e) => this.handleChangeStatus(data, index, e)}
                         size="small"
-                        className="col-9"
+                        className="col-12"
                         placeholder="filter by"
                     >
                         {this.props.containerStatus.map((status, ind) => {
@@ -273,50 +290,20 @@ class ContainerListing extends Component {
         )
     }
 
+    onTableRowClick = (data, index) => {
+
+    }
+
     setAddModalDetails = () => {
         this.setState({ openModal: !this.state.openModal })
     }
 
-    onDatabaseSearch() {
-        // const { searchDates } = this.state
-        // let date_range = typeof searchDates === "string" && !Array.isArray(searchDates) ? JSON.parse(searchDates) : searchDates
-        // if (!date_range.includes(null)) {
-        //     this.props.CallResetStocks()
-
-        //     const object = {
-        //         STARTDATE: searchDates[0] === undefined ? "-" : moment(searchDates[0], 'DD/MM/YYYY HH:mm:ss', false).format('YYYYMMDD'),
-        //         ENDDATE: searchDates[1] === undefined ? "-" : moment(searchDates[1], 'DD/MM/YYYY HH:mm:ss', false).format('YYYYMMDD'),
-        //     }
-
-        //     this.props.CallFilterInventoryByDate(object)
-        //     toast.loading("Pulling data... Please wait...", {
-        //         autoClose: false,
-        //         position: "top-center",
-        //         transition: Flip,
-        //         theme: "dark",
-        //     })
-        //     this.setState({ isDataFetching: true, filteredList: null })
-        //     this.forceUpdate()
-        // }
-        // else {
-        //     if (date_range[0] === null || date_range[1] === null)
-        //         toast.error("Require valid begin dates", {
-        //             autoClose: 2000,
-        //             position: "top-center",
-        //             transition: Flip,
-        //             theme: "dark",
-        //         })
-        // }
-    }
-
     addNewContainer = () => {
-        console.log("!243")
         var obj = {
             ContainerName: this.state.containerNo,
             ContainerDate: this.state.containerDate,
             ModifyBy: 1
         }
-        console.log(obj)
         this.props.CallAddContainer(obj)
     }
 
@@ -345,7 +332,7 @@ class ContainerListing extends Component {
                         <IconButton
                             aria-label="Pull Data"
                             size="small"
-                            onClick={() => { this.onDatabaseSearch() }}
+                            // onClick={() => { this.onDatabaseSearch() }}
                             disabled={this.state.isDataFetching}
                         >
                             <CachedIcon fontSize="large" />
@@ -389,12 +376,12 @@ class ContainerListing extends Component {
                         renderTableRows: this.renderTableRows, // required, it is a function, please refer to the example I have done in Table Components
                         checkbox: (this.state.approvePage === true) ? true : false, // optional, by default is true
                         checkboxColor: "primary", // optional, by default is primary, as followed the MUI documentation
-                        onRowClickSelect: false, // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
+                        onRowClickSelect: true, // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                         headerColor: "rgb(200, 200, 200)",
                     }}
                     selectedIndexKey={"StockID"} // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click.
                     Data={isArrayNotEmpty(this.state.filteredList) ? this.state.filteredList : []} // required, the data that listing in the table
-                    onTableRowClick={this.onTableRowClick} // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row
+                    onTableRowClick={this.onTableRowClick()} // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row
                     onActionButtonClick={this.onAddButtonClick} // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                     tableTopRight={renderTableTopRightButtons()}
                     onSelectRow={this.onSelectRow}

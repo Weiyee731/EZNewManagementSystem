@@ -33,6 +33,7 @@ const rootEpic = combineEpics(
 
   gitEpic.Container_ViewContainer,
   gitEpic.Container_ViewContainerStatus,
+  gitEpic.Container_UpdateContainerStatus,
   gitEpic.Container_AddContainer,
   gitEpic.Container_UpdateContainer,
   gitEpic.Container_DeleteContainer,
