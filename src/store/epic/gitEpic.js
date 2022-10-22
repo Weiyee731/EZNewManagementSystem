@@ -885,6 +885,34 @@ export class GitEpic {
       }
     });
 
+
+  Container_UpdateContainerStatus = action$ =>
+    action$.ofType(GitAction.Container_UpdateStatus).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Container_UpdateContainerStatus?" +
+          "&CONTAINERID=" + payload.CONTAINERID +
+          "&CONTAINERSTATUSID=" + payload.CONTAINERSTATUSID +
+          "&MODIFY=" + payload.MODIFY
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.Container_UpdatedStatus,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: Container_UpdateContainerStatus")
+        return {
+          type: GitAction.Container_UpdatedStatus,
+          payload: [],
+        };
+      }
+    });
+
+
   Container_AddContainer = action$ =>
     action$.ofType(GitAction.Container_Add).switchMap(async ({ payload }) => {
       try {

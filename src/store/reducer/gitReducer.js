@@ -23,6 +23,7 @@ const INITIAL_STATE = {
   container: [],
   containerAction: [],
   containerStatus: [],
+  containerStatusUpdate: [],
   inventoryStock: [],
   inventoryStockAction: [],
   courier: [],
@@ -311,6 +312,14 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, {
         loading: false,
         containerStatus: action.payload
+      });
+      
+    case GitAction.Container_UpdateStatus:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Container_UpdatedStatus:
+      return Object.assign({}, state, {
+        loading: false,
+        containerStatusUpdate: action.payload
       });
 
     case GitAction.Container_Add:
