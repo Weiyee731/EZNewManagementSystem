@@ -439,6 +439,14 @@ export class GitAction {
     };
   }
 
+  static Inventory_ClearStock = "Inventory_ClearStock";
+  static ClearInventoryStock() {
+    return {
+      type: GitAction.Inventory_ClearStock,
+    };
+  }
+
+  
   static Inventory_UpdateContainer = "Inventory_UpdateContainer";
   static Inventory_UpdatedContainer = "Inventory_UpdatedContainer";
   static CallUpdateContainerInventory(propsData) {
@@ -548,6 +556,7 @@ export class GitAction {
       type: GitAction.User_ClearUserCode,
     };
   }
+
 
 
 }

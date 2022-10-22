@@ -20,6 +20,8 @@ import FormControl from '@mui/material/FormControl';
 import ReactToPrint, { PrintContextConsumer } from 'react-to-print';
 import PrintIcon from '@mui/icons-material/Print';
 import moment from 'moment';
+import { getDate } from "date-fns";
+import { IfObservable } from "rxjs/observable/IfObservable";
 
 function mapStateToProps(state) {
     return {
@@ -36,32 +38,24 @@ function mapDispatchToProps(dispatch) {
         CallViewInventoryByFilter: (propsData) => dispatch(GitAction.CallViewInventoryByFilter(propsData)),
         CallViewCourier: () => dispatch(GitAction.CallViewCourier()),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
-        ClearInventoryAction: () => dispatch(GitAction.ClearInventoryAction()),
         CallAddInventory: (propsData) => dispatch(GitAction.CallAddInventory(propsData)),
         CallUpdateInventory: (propsData) => dispatch(GitAction.CallUpdateInventory(propsData)),
         CallDeleteInventory: (propsData) => dispatch(GitAction.CallDeleteInventory(propsData)),
         CallViewProfileByUserCode: (propsData) => dispatch(GitAction.CallViewProfileByUserCode(propsData)),
-        ClearUserCodeData: (propsData) => dispatch(GitAction.ClearUserCodeData(propsData)),
+        ClearInventoryAction: () => dispatch(GitAction.ClearInventoryAction()),
+        ClearInventoryStock: () => dispatch(GitAction.ClearInventoryStock()),
+        ClearUserCodeData: () => dispatch(GitAction.ClearUserCodeData()),
     }
 }
 
 const INITIAL_STATE = {
-    searchKeywords: "",
-    searchCategory: "Tracking",
-    searchArea: "",
-
-    openModal: false,
-    containerNo: "",
-    containerDate: "",
-
-    filteredProduct: [],
-    isFiltered: false,
 
     isCheckUser: false,
     isCheckDatabase: false,
-    currentVolume: 60.5,
+    currentVolume: 65.5,
     isSubmitAdd: false,
     isSubmitDelete: false,
+    isSubmitData: [],
 
     stockData: [{
         TrackingNumber: "",
@@ -93,7 +87,6 @@ const INITIAL_STATE = {
         StockID: "",
     }],
 
-    isSubmitData: [],
 }
 
 
@@ -110,11 +103,10 @@ class WarehouseStock extends Component {
 
     componentDidUpdate(prevProps, prevState) {
 
-        console.log("sdadsaadsa", this.props.userAreaCode)
         if (this.state.isCheckUser === true && this.props.userData.length > 0) {
             let listing = this.props.userData[0]
             let arr = this.state.stockData
-            if (this.props.userData[0].ReturnVal !== "0") {
+            if (this.props.userData[0].ReturnVal !== 0) {
                 arr[0].UserData = listing.Username
                 arr[0].areaCode = this.verifyAreaCode(listing.UserAreaID)
             } else {
@@ -126,10 +118,12 @@ class WarehouseStock extends Component {
             this.props.ClearUserCodeData()
         }
 
-        if (this.props.inventoryStock.length > 0 && this.state.isCheckDatabase === true) {
+        console.log("sdsadadad", this.props)
+
+        if (this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== 0 && this.state.isCheckDatabase === true) {
             let arr = this.state.stockData
             let listing = this.props.inventoryStock[0]
-            if (this.props.inventoryStock[0].ReturnVal !== "0") {
+            if (this.props.inventoryStock[0].ReturnVal !== 0) {
                 arr[0].CourierID = listing.CourierID
                 arr[0].UserCode = listing.UserCode
                 arr[0].UserData = listing.Username
@@ -142,9 +136,19 @@ class WarehouseStock extends Component {
                 arr[0].ProductDeep = listing.ProductDimensionDeep
                 arr[0].Remark = listing.Remark
                 arr[0].StockID = listing.StockID
-                arr[0].createdDate = moment(listing.StockDate).format('DD-MM-YYYY, h:mm:ss a')
+                arr[0].createdDate = moment(listing.StockDate).format('DD-MM-YYYY, hh:mm:ss ')
             }
             this.setState({ isCheckDatabase: false, stockData: arr })
+        }
+        else {
+            console.log("componentDidUpdatecomponentDidUpdate", this.props.inventoryStock)
+            console.log("componentDidUpdatecomponentDidUpdate this.state.isCheckDatabase", this.state.isCheckDatabase)
+            if (this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal === 0 && this.state.isCheckDatabase === true) {
+                // console.log("HEREEEE")
+                this.props.ClearInventoryStock()
+                this.setState({ StockID: "" })
+                // this.setInital()
+            }
         }
 
         if (this.props.inventoryStockAction.length > 0 && this.state.isSubmitAdd == true) {
@@ -153,7 +157,9 @@ class WarehouseStock extends Component {
                     toast.success("已成功删除")
                 else
                     toast.success("已成功入库")
-                // window.location.reload("false")
+
+                this.setState({ TrackingNumber: "" })
+                this.setInital()
             } else {
                 if (this.state.isSubmitDelete === true)
                     toast.error("包裹未删除成功, 请联系系统管理")
@@ -162,6 +168,18 @@ class WarehouseStock extends Component {
             }
             this.props.ClearInventoryAction()
         }
+    }
+
+    setInital() {
+        this.setState({
+            stockData: [{
+                TrackingNumber: "",
+                isTrackingError: false, CourierID: "", isCourierError: false, UserCode: "", isUserCodeError: false,
+                UserData: "", isUserDataError: false, Item: "", isItemError: false, Quantity: 1, isQuantityError: false, ProductWeight: "", isProductWeightError: false,
+                ProductVolumetricWeight: "", isProductVolumetricWeightError: false, ProductHeight: "", isProductHeightError: false, ProductWidth: "",
+                isProductWidthError: false, ProductDeep: "", isProductDeepError: false, Remark: "", isRemarkError: false, areaCode: "KU", createdDate: "", StockID: "",
+            }]
+        })
     }
 
     handleChange(data, title) {
@@ -280,7 +298,7 @@ class WarehouseStock extends Component {
         let listing = this.props.userAreaCode
         let data = ""
 
-        if (listing.length > 0 && listing[0].ReturnVal === '0') {
+        if (listing.length > 0 && listing[0].ReturnVal !== 0) {
             listing.filter((x) => x.UserAreaID === id).map((y) => {
                 data = y.AreaCode
             })
@@ -451,7 +469,7 @@ class WarehouseStock extends Component {
                         </div>
                     }
                     {
-                        title === "会员信息" && this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== "0" &&
+                        title === "会员信息" && this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== 0 &&
                         <div className="col-4" >
                             <div className="row" style={{ textAlign: "center", border: "2px solid", padding: "5pt" }}>
                                 <Typography style={{ fontWeight: "600", fontSize: "15pt", color: "#253949", letterSpacing: 1 }}>入库时间：</Typography>
@@ -505,8 +523,17 @@ class WarehouseStock extends Component {
                     break;
 
                 case "Print":
+                    if (!this.verifyError()) {
+                        let Obj = this.createObject()
+                        this.props.CallAddInventory(Obj)
+                        this.setState({ isSubmitAdd: true })
+                    }
+                    else
+                        toast.error("请确保正确填写所有包裹资料")
+                    break;
+
+                case "RePrint":
                     this.createObject()
-                    // window.location.reload("false")
                     break;
 
                 case "Delete":
@@ -519,7 +546,6 @@ class WarehouseStock extends Component {
                     } else {
                         toast.error("未入库单号不可删除")
                     }
-
 
                 default:
                     break;
@@ -538,7 +564,7 @@ class WarehouseStock extends Component {
                                         paddingTop: "40pt", paddingBottom: "40pt", borderRadius: "20pt", color: "white", fontWeight: "bold", fontSize: "20pt",
                                         backgroundColor: this.verifyError() ? "grey" : "#0362fc"
                                     }} disabled={
-                                        x.type === "Delete" ? this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== "0" ? true : false :
+                                        x.type === "Delete" ? this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal === 0 ? true : false :
                                             this.verifyError() ? true : false}
                                     >
                                         {x.title}
@@ -568,20 +594,43 @@ class WarehouseStock extends Component {
             )
         }
 
-        const renderPrintListing = (data) => {
-            let listing = data
+        const renderPrintListing = () => {
+            let listing = this.state.stockData[0]
+            let data = []
+            if (listing.length > 0) {
+                for (let index = 0; index < listing.Quantity; index++) {
+                    data.push({
+                        UserCode: listing.UserCode,
+                        TrackingNumber: listing.Quantity > 1 ? listing.TrackingNumber.replace(/ /g, '') + "00" + parseInt(index + 1) : listing.TrackingNumber.replace(/ /g, ''),
+                        ProductWeight: (isStringNullOrEmpty(listing.ProductWeight)) ? "0" : listing.ProductWeight,
+                        ProductHeight: (isStringNullOrEmpty(listing.ProductHeight)) ? "0" : listing.ProductHeight,
+                        ProductDeep: (isStringNullOrEmpty(listing.ProductDeep)) ? "0" : listing.ProductDeep,
+                        ProductWidth: (isStringNullOrEmpty(listing.ProductWidth)) ? "0" : listing.ProductWidth,
+                        CourierID: (isStringNullOrEmpty(listing.CourierID)) ? "0" : listing.CourierID,
+                        Item: (isStringNullOrEmpty(listing.Item)) ? "-" : listing.Item.replace(/ /g, ''),
+                        Remark: (isStringNullOrEmpty(listing.Remark)) ? "-" : listing.Remark.replace(/ /g, ''),
+                        areaCode: (isStringNullOrEmpty(listing.areaCode)) ? "-" : listing.areaCode,
+                        UserData: (isStringNullOrEmpty(listing.UserData)) ? "-" : listing.UserData,
+                    })
+                }
+            }
             return (
-                <div key={listing.TrackingNumber} style={{ display: "block" }}>
-                    <div style={{ textAlign: "center" }}>
-                        <Typography style={{ fontWeight: "600", fontSize: "14pt", color: "#253949", letterSpacing: 1 }}>{listing.areaCode}</Typography>
-                        <Barcode value={listing.TrackingNumber} height='80pt' />
-                        <div className="row" style={{ textAlign: "left" }}>
-                            <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>会员： {listing.UserCode}</Typography>
-                            <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>名称： {listing.UserData}</Typography>
-                            <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>入库：{listing.createdDate}</Typography>
+                data.length > 0 && data.map((x) => {
+                    return (
+                        <div className="row" key={x.TrackingNumber} style={{ display: "block" }}>
+                            <div style={{ textAlign: "center" }}>
+                                <Typography style={{ fontWeight: "600", fontSize: "14pt", color: "#253949", letterSpacing: 1 }}>{x.areaCode}</Typography>
+                                <Barcode value={x.TrackingNumber} height='80pt' />
+                                <div className="row" style={{ textAlign: "left" }}>
+                                    <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>会员： {x.UserCode}</Typography>
+                                    <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>名称： {x.UserData}</Typography>
+                                    <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, hh:mm:ss')}</Typography>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    )
+                })
+
             )
         }
 
@@ -640,6 +689,7 @@ class WarehouseStock extends Component {
                         }
 
                     </div>
+                    {console.log("statstatsasa", this.state)}
 
                     <div className="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-xs-12" >
                         <div className="row" style={{ textAlign: "center" }}>
@@ -647,7 +697,8 @@ class WarehouseStock extends Component {
                         </div>
                         {buttonLayout([
                             { title: "打印", type: "Print" },
-                            { title: "保存", type: "Save" },
+                            { title: "重印", type: "RePrint" },
+                            { title: "仅保存", type: "Save" },
                             { title: "删除", type: "Delete" }
                         ])}
                     </div>
@@ -655,11 +706,7 @@ class WarehouseStock extends Component {
 
                     <div style={{ display: "none" }} >
                         <div ref={(el) => (this.componentRef = el)}>
-                            {
-                                this.state.isSubmitData.length > 0 && this.state.isSubmitData.map((data) => {
-                                    return (renderPrintListing(data))
-                                })
-                            }
+                            {renderPrintListing()}
                         </div>
                     </div>
                 </div>

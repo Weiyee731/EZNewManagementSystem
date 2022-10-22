@@ -13,24 +13,21 @@ import CsvDownloader from "react-csv-downloader"
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline"
 import Tooltip from "@mui/material/Tooltip"
 import IconButton from "@mui/material/IconButton"
-import AlertDialog from "../../components/modal/Modal"
-import { Paper, TextField } from "@mui/material"
+import { Typography } from "@mui/material"
 import { toast, Flip } from "react-toastify"
-
+import AddIcon from '@mui/icons-material/AddCircle';
 
 function mapStateToProps(state) {
     return {
-        userAreaCode: state.counterReducer["userAreaCode"],
+        inventoryStock: state.counterReducer["inventoryStock"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
         CallViewInventoryByFilter: (propsData) => dispatch(GitAction.CallViewInventoryByFilter(propsData)),
     };
 }
-
 
 const INITIAL_STATE = {
     searchKeywords: "",
@@ -43,17 +40,8 @@ const INITIAL_STATE = {
 
     filteredProduct: [],
     isFiltered: false,
-    OveralStock: [
-        { StockID: 1, TrackingNumber: "75828532490431", Courier: "顺丰", UserID: "14", UserAreaID: 1, UserCode: "1003", AreaCode: "KU", ProductDimensionDeep: "18", ProductDimensionHeight: "16", ProductDimensionWidth: "26", ProductWeight: "0.4", ProductQuantity: "1", Item: "日用品", CreatedDate: "10/10/2022" },
-        { StockID: 2, TrackingNumber: "75828532490432", Courier: "顺丰", UserID: "14", UserAreaID: 1, UserCode: "1003", AreaCode: "KU", ProductDimensionDeep: "18", ProductDimensionHeight: "16", ProductDimensionWidth: "26", ProductWeight: "0.4", ProductQuantity: "1", Item: "日用品", CreatedDate: "10/10/2022" },
-        { StockID: 3, TrackingNumber: "75828532490433", Courier: "顺丰", UserID: "14", UserAreaID: 1, UserCode: "1004", AreaCode: "SU", ProductDimensionDeep: "18", ProductDimensionHeight: "16", ProductDimensionWidth: "26", ProductWeight: "0.4", ProductQuantity: "1", Item: "日用品", CreatedDate: "10/10/2022" },
-        { StockID: 4, TrackingNumber: "75828532490434", Courier: "顺丰", UserID: "14", UserAreaID: 1, UserCode: "1005", AreaCode: "ZKU", ProductDimensionDeep: "18", ProductDimensionHeight: "16", ProductDimensionWidth: "26", ProductWeight: "0.4", ProductQuantity: "1", Item: "日用品", CreatedDate: "10/10/2022" },
-        { StockID: 5, TrackingNumber: "75828532490435", Courier: "顺丰", UserID: "14", UserAreaID: 1, UserCode: "1007", AreaCode: "KU", ProductDimensionDeep: "18", ProductDimensionHeight: "16", ProductDimensionWidth: "26", ProductWeight: "0.4", ProductQuantity: "1", Item: "日用品", CreatedDate: "10/10/2022" },
-        { StockID: 6, TrackingNumber: "75828532490436", Courier: "顺丰", UserID: "14", UserAreaID: 1, UserCode: "1003", AreaCode: "KU", ProductDimensionDeep: "18", ProductDimensionHeight: "16", ProductDimensionWidth: "26", ProductWeight: "0.4", ProductQuantity: "1", Item: "日用品", CreatedDate: "10/10/2022" },
-        { StockID: 7, TrackingNumber: "75828532490437", Courier: "顺丰", UserID: "14", UserAreaID: 1, UserCode: "1007", AreaCode: "KU", ProductDimensionDeep: "18", ProductDimensionHeight: "16", ProductDimensionWidth: "26", ProductWeight: "0.4", ProductQuantity: "1", Item: "日用品", CreatedDate: "10/10/2022" },
-        { StockID: 8, TrackingNumber: "75828532490438", Courier: "顺丰", UserID: "14", UserAreaID: 1, UserCode: "1008", AreaCode: "KU", ProductDimensionDeep: "18", ProductDimensionHeight: "16", ProductDimensionWidth: "26", ProductWeight: "0.4", ProductQuantity: "1", Item: "日用品", CreatedDate: "10/10/2022" },
-
-    ]
+    isDataSet: false,
+    OveralStock: []
 }
 
 const headCells = [
@@ -76,7 +64,7 @@ const headCells = [
         label: '分区',
     },
     {
-        id: 'Courier',
+        id: 'CourierName',
         align: 'center',
         disablePadding: false,
         label: '快递',
@@ -119,7 +107,7 @@ const headCells = [
     },
 
     {
-        id: 'ProductVolume',
+        id: 'Volume',
         align: 'left',
         disablePadding: false,
         label: '体积',
@@ -149,29 +137,16 @@ class PendingToLoad extends Component {
         this.handleSearchInput = this.handleSearchInput.bind(this)
         this.handleSearchCategory = this.handleSearchCategory.bind(this)
         this.handleSearchArea = this.handleSearchArea.bind(this)
-        this.addNewContainer = this.addNewContainer.bind(this)
-        this.renderAreaCodeName = this.renderAreaCodeName.bind(this)
-        this.props.CallUserAreaCode()
-        this.props.CallViewInventoryByFilter({ FilterColumn: "and T_Container.containerID=0" })
+        this.props.CallViewInventoryByFilter({ FilterColumn: "and T_Inventory_Stock.ContainerID=0" })
     }
 
     componentDidMount() { }
 
     componentDidUpdate(prevProps, prevState) {
 
-    }
-
-    // redirectToPage = (pageName) => {
-    //     this.props.history.push(`/${pageName}`)
-    // }
-
-    renderAreaCodeName = (areacodeId) => {
-        if (isArrayNotEmpty(this.props.userAreaCode)) {
-            const AreaCode = this.props.userAreaCode.filter(x => x.UserAreaID == areacodeId)
-            return isArrayNotEmpty(AreaCode) ? AreaCode[0].AreaCode + " - " + AreaCode[0].AreaName : " - "
+        if (this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== "0" && this.state.isDataSet === false) {
+            this.setState({ OveralStock: this.props.inventoryStock, isDataSet: true })
         }
-        else
-            return " - "
     }
 
     renderTableRows = (data, index) => {
@@ -179,15 +154,15 @@ class PendingToLoad extends Component {
             <>
                 <TableCell component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{index + 1}</TableCell>
                 <TableCell>{data.UserCode}</TableCell>
-                <TableCell>{this.renderAreaCodeName(data.UserAreaID)}</TableCell>
-                <TableCell>{data.Courier}</TableCell>
+                <TableCell>{data.AreaCode}</TableCell>
+                <TableCell>{data.CourierName}</TableCell>
                 <TableCell >{data.TrackingNumber}</TableCell>
                 <TableCell >{data.ProductQuantity}</TableCell>
                 <TableCell >{data.ProductWeight}</TableCell>
                 <TableCell>{data.ProductDimensionDeep}</TableCell>
                 <TableCell>{data.ProductDimensionWidth}</TableCell>
                 <TableCell>{data.ProductDimensionHeight}</TableCell>
-                <TableCell >{parseFloat((data.ProductDimensionDeep * data.ProductDimensionHeight * data.ProductDimensionWidth / 1000000)).toFixed(3)}</TableCell>
+                <TableCell >{data.Volume}</TableCell>
                 <TableCell >{data.Item}</TableCell>
                 <TableCell>{data.CreatedDate}</TableCell>
             </>
@@ -233,43 +208,34 @@ class PendingToLoad extends Component {
     }
 
     handleSearchArea(e) {
-        console.log("sadadasda", e.target.value)
         this.onSearch("", e.target.value)
         this.setState({ searchArea: e.target.value })
     }
 
-    addNewContainer() {
-        if (this.state.containerDate === "" || this.state.containerNo === "") {
-            toast.warning("Please fill in all required data. ", {
-                autoClose: 3000,
-                theme: "dark",
-            })
-        }
-        else {
-            let object = {
-                ContainerDate: this.state.containerDate,
-                ContainerName: this.state.containerNo
-            }
-        }
-    }
+    renderTotal() {
+        let listing = this.props.inventoryStock
+        let data = 0.00
 
+        if (listing.length > 0)
+            data = listing.reduce((volume, item) => volume + item.Volume, 0)
+
+        return data
+    }
 
     render() {
         const { searchCategory, searchArea, isFiltered, filteredProduct, OveralStock } = this.state
         const renderTableTopRightButtons = () => {
             return (
                 <div className="d-flex">
-                    {/* <Tooltip title="Add New Container">
-                        <IconButton
-                            size="small"
-                            onClick={() => { this.setState({ openModal: true }) }}
-                        >
-                            <AddCircleIcon fontSize="large" />
+                    <Tooltip title="Add Stock">
+                        <IconButton size="large">
+                            <AddIcon onClick={() => window.location.href = "./WarehouseStockManagement"} />
                         </IconButton>
-                    </Tooltip> */}
+                    </Tooltip>
                     <CsvDownloader
-                        filename="overallstock-list"
+                        filename="未装箱包裹资料"
                         extension=".xls"
+                        wrapColumnChar="'"
                         separator=","
                         columns={headCells}
                         datas={isArrayNotEmpty(OveralStock) ? OveralStock : []}
@@ -288,7 +254,6 @@ class PendingToLoad extends Component {
             )
         }
 
-        console.log("Sdsdasa", this.state)
         return (
             <div className="container-fluid" >
                 <div className="row">
@@ -329,10 +294,18 @@ class PendingToLoad extends Component {
                         </div>
                     </div>
                 </div>
+                <div className="row" style={{ paddingTop: "5pt" }} >
+                    <div className="col-2">
+                        <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>总数量 : {this.props.inventoryStock.length}</Typography>
+                    </div>
+                    <div className="col-2">
+                        <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>总立方 : {parseFloat(this.renderTotal()).toFixed(3)}</Typography>
+                    </div>
+                </div>
                 <hr />
                 <TableComponents
                     // table settings 
-                    tableTopLeft={<h3 style={{ fontWeight: 700 }}>未装箱包裹</h3>}  // optional, it can pass as string or as children elements
+                    tableTopLeft={<h3 style={{ fontWeight: 700 }}>未装箱包裹资料</h3>}  // optional, it can pass as string or as children elements
                     tableTopRight={renderTableTopRightButtons()}
                     tableOptions={{
                         dense: true,                // optional, default is false
