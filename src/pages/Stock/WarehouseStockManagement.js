@@ -195,7 +195,7 @@ class WarehouseStock extends Component {
                     arr.isUserCodeError = true
                 arr.UserCode = data
 
-                if (data.length === 4 && this.state.isCheckUser === false) {
+                if (data.length === 5 && this.state.isCheckUser === false) {
                     this.props.CallViewProfileByUserCode({ UserCode: arr.UserCode })
                     this.setState({ isCheckUser: true })
                 }
@@ -406,7 +406,7 @@ class WarehouseStock extends Component {
                                 value={value}
                                 required
                                 size="small"
-                                inputProps={{ maxLength: title === "会员号" && 4 }}
+                                inputProps={{ maxLength: title === "会员号" && 5 }}
                                 disabled={title === "会员信息" ? true : false}
                                 onChange={(e) => this.handleChange(e.target.value, title)}
                             />
