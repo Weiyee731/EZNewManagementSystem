@@ -30,13 +30,22 @@ function PaperComponent(props) {
 }
 
 export default function AlertDialog(props) {
-
+console.log(props.hideBackdrop)
   return (
     <Dialog
       fullWidth={typeof props.fullWidth === "undefined" ? true : props.fullWidth}
       maxWidth={isStringNullOrEmpty(props.maxWidth) ? "lg" : props.maxWidth}
       open={props.open}
-      onClose={() => props.handleToggleDialog()}
+      hideBackdrop={isStringNullOrEmpty(props.hideBackdrop) ? false:props.hideBackdrop  }   //hide back
+      onClose={(event, reason) => {
+        if (reason !== 'backdropClick') {
+          props.handleToggleDialog()
+        }
+        else{
+          props.handleBackdrop()
+        }
+      }}
+      // onClose={() => props.handleToggleDialog()}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       PaperComponent={props.draggable ? PaperComponent : null}
