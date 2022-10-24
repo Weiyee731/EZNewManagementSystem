@@ -14,8 +14,8 @@ export const setLogonUser = (loginUser, sidebarItem) => {
             localStorage.setItem("userToken", true);
             localStorage.setItem("loginUser", JSON.stringify(loginUser));
             localStorage.setItem("sidebarItem", JSON.stringify(sidebarItem));
-            localStorage.setItem("systemInfo", "EZLogistic");
-            window.location.href = "/Ez/Dashboard"
+            localStorage.setItem("systemInfo", "YaweiLogistic");
+            window.location.href = "/CMS/Dashboard"
         }
         catch (e) {
             toast.error("Error: 1101: Unable to set login status. Please contact your software warehouse.")
@@ -41,7 +41,7 @@ export const resetLogonUser = () => {
     localStorage.removeItem("userToken")
     localStorage.removeItem("loginUser")
     localStorage.removeItem("sidebarItem");
-    window.location.href = "/Ez/Login"
+    window.location.href = "/CMS/Login"
 }
 
 export const updateLogonUser = (key, value) => {

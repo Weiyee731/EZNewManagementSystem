@@ -6,7 +6,7 @@ import './App_modified.css';
 
 
 const App = () => (
-  <Router basename={"/Ez"}>
+  <Router basename={"/CMS"}>
     <Layout />
   </Router>
 );

@@ -17,7 +17,7 @@ export default function Profile(props) {
             }}
         >
             <div style={{ width: '100px', height: '100px', margin: 'auto', marginBottom: '30px' }}>
-                <img style={{borderRadius: ' 50%'}} src={EZLogo} alt="EZ Logistics" width="100%" height="100%" />
+                <img style={{borderRadius: ' 50%'}} src={EZLogo} alt="Yawei Logistics" width="100%" height="100%" />
             </div>
             EZ TRANSIT AND LOGISTICS
         </div>
