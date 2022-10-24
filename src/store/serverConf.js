@@ -1,5 +1,5 @@
 export const ServerConfiguration = {
-    LiveServerUrl: "https://triviix.com/EzLogisticApi/api/EzLogistic/",
-    mediaUrl: "https://triviix.com/LogisticImage/",
-    filesUrl: "https://triviix.com/LogisticImage/",
+    LiveServerUrl: "https://yawei.com.my/YaweiLogisticApi/api/YaweiLogistic/",
+    mediaUrl: "https://yawei.com.my/YaweiLogisticImage/",
+    filesUrl: "https://yawei.com.my/YaweiLogisticImage/",
 }
