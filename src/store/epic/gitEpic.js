@@ -939,13 +939,15 @@ export class GitEpic {
       }
     });
 
+
   Container_UpdateContainer = action$ =>
     action$.ofType(GitAction.Container_Update).switchMap(async ({ payload }) => {
       try {
         const response = await fetch(url +
           "Container_UpdateContainer?" +
           "CONTAINERID=" + payload.ContainerID +
-          "&CONTAINERNAME=" + payload.ContainerName +
+          "&CONTAINERNAME=" + payload.ContainerName + 
+          "&CONTAINERREMARK=" + payload.ContainerRemark +
           "&CONTAINERDATE=" + payload.ContainerDate +
           "&MODIFY=" + payload.ModifyBy
         );

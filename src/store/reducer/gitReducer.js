@@ -396,6 +396,11 @@ export function counterReducer(state = INITIAL_STATE, action) {
         inventoryStockAction: []
       });
 
+    case GitAction.Inventory_ClearStock:
+      return Object.assign({}, state, {
+        inventoryStock: []
+      });
+
     /////////////////////////////////////////////////// Stock Inventory Management ///////////////////////////////////////////////////
 
     case GitAction.Courier_View:

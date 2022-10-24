@@ -25,8 +25,12 @@ import { Paper } from "@mui/material"
 import TextField from "@mui/material/TextField"
 import MenuItem from "@mui/material/MenuItem"
 import Select from "@mui/material/Select"
+import DataManagement from "../../DataManagement/DataManagement"
+import { ModalPopOut } from "../../../components/modal/Modal";
+import CreateIcon from '@mui/icons-material/Create';
 
 import "./ContainerListing.css"
+
 
 function mapStateToProps(state) {
     return {
@@ -54,6 +58,7 @@ function mapDispatchToProps(dispatch) {
         CallAddContainer: (props) => dispatch(GitAction.CallAddContainer(props)),
         CallViewContainerStatus: (props) => dispatch(GitAction.CallViewContainerStatus(props)),
         CallUpdateContainerStatus: (props) => dispatch(GitAction.CallUpdateContainerStatus(props)),
+        CallUpdateContainer: (props) => dispatch(GitAction.CallUpdateContainer(props)),
     }
 }
 
@@ -80,7 +85,7 @@ const headCells = [
         id: "ContainerName",
         align: "left",
         disablePadding: false,
-        label: "Container",
+        label: "Container Name",
     },
     {
         id: "ContainerDate",
@@ -93,6 +98,11 @@ const headCells = [
         align: "left",
         disablePadding: false,
         label: "Current Status",
+    }, {
+        id: "EditContainer",
+        align: "left",
+        disablePadding: false,
+        label: "Edit Container",
     },
     // {
     //     id: "Remark",
@@ -159,13 +169,18 @@ const headCells = [
 const INITIAL_STATE = {
     isDataFetching: false,
     filteredList: null,
-    openModal: false,
+    openCreateContainerModal: false,
+    openDataManagementModal: false,
+    containerID:"",
     containerNo: "",
     containerDate: "",
+    containerRemark:"",
     container: null,
     containerAction: null,
     ContainerStatus: "All",
-    containerStatusReturn: ""
+    containerStatusReturn: "",
+    ClickedRow: null,
+    editContainer: false
 }
 
 class ContainerListing extends Component {
@@ -187,9 +202,9 @@ class ContainerListing extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (isArrayNotEmpty(this.props.container) && (prevProps.container !== this.props.container)) {
-            console.log("call ghere")
+            // console.log("call ghere")
             let list = !isStringNullOrEmpty(this.props.container[0].ReturnVal) && this.props.container[0].ReturnVal == 0 ? [] : this.props.container
-            console.log("list", list)
+            // console.log("list", list)
             this.setState({
                 filteredList: list,
                 isDataFetching: false,
@@ -216,10 +231,11 @@ class ContainerListing extends Component {
 
         if (this.state.containerAction === null && isArrayNotEmpty(this.props.containerAction) && (prevProps.containerAction !== this.props.containerAction)) {
             if (this.props.containerAction[0].ReturnVal = 1) {
-                console.log("this.", this.props.containerAction[0].ReturnMsg)
+                // console.log("this.", this.props.containerAction[0].ReturnMsg)
                 this.props.CallViewContainer()
                 this.setState({
-                    openModal: false
+                    openCreateContainerModal: false,
+
                 })
             } else {
                 console.log("fail", this.props.containerAction[0].ReturnMsg)
@@ -264,9 +280,9 @@ class ContainerListing extends Component {
 
         return (
             <>
-                <TableCell component="th" id={`table-checkbox-${index}`} scope="row" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} >{index + 1} </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.ContainerName} </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.ContainerDate}   </TableCell>
+                <TableCell component="th" id={`table-checkbox-${index}`} scope="row" onClick={(e) => this.onTableRowClick(e, data)} sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} >{index + 1} </TableCell>
+                <TableCell align="left" onClick={(e) => this.onTableRowClick(e, data)} sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.ContainerName} </TableCell>
+                <TableCell align="left" onClick={(e) => this.onTableRowClick(e, data)} sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.ContainerDate}   </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} >
                     <Select
                         labelId="search-filter-category"
@@ -285,26 +301,54 @@ class ContainerListing extends Component {
                         })}
                     </Select>
                 </TableCell>
+                <TableCell align="left" className="sticky" sx={{ fontSize: fontsize }}>
+                    <IconButton onClick={(event) => this.onEditContainer(event, data)}>
+                        <CreateIcon />
+                    </IconButton>
+                </TableCell>
                 {/* <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.Remark}</TableCell> */}
             </>
         )
     }
 
-    onTableRowClick = (data, index) => {
+    onTableRowClick = (event, row) => {
+        this.setState({ openDataManagementModal: !this.state.openDataManagementModal, ClickedRow: row })
+    }
 
+    onEditContainer = (event ,row) =>{
+        console.log(event, row)
+        this.setState({ openCreateContainerModal: !this.state.openCreateContainerModal,
+             ClickedRow: row ,
+             containerNo: row.ContainerName,
+    containerDate: row.ContainerDate,
+    containerRemark: row.Remark?row.Remark:"",
+              editContainer: true})
     }
 
     setAddModalDetails = () => {
-        this.setState({ openModal: !this.state.openModal })
+        this.setState({ openCreateContainerModal: !this.state.openCreateContainerModal })
     }
 
     addNewContainer = () => {
-        var obj = {
-            ContainerName: this.state.containerNo,
-            ContainerDate: this.state.containerDate,
-            ModifyBy: 1
+        console.log("Asd",this.state.containerRemark)
+        if(this.state.editContainer){
+            var obj ={
+                ContainerID : this.state.ClickedRow.ContainerID,
+                ContainerName : this.state.containerNo,
+                ContainerRemark : this.state.containerRemark,
+                ContainerDate : this.state.containerDate,
+                ModifyBy: 1
+            }
+this.props.CallUpdateContainer(obj)
+        }else{
+            var obj = {
+                ContainerName: this.state.containerNo,
+                ContainerDate: this.state.containerDate,
+                ModifyBy: 1
+            }
+            this.props.CallAddContainer(obj)
         }
-        this.props.CallAddContainer(obj)
+       
     }
 
 
@@ -376,12 +420,12 @@ class ContainerListing extends Component {
                         renderTableRows: this.renderTableRows, // required, it is a function, please refer to the example I have done in Table Components
                         checkbox: (this.state.approvePage === true) ? true : false, // optional, by default is true
                         checkboxColor: "primary", // optional, by default is primary, as followed the MUI documentation
-                        onRowClickSelect: true, // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
+                        onRowClickSelect: false, // optional, by default is false. If true, the ** onTableRowClick() ** function will be ignored
                         headerColor: "rgb(200, 200, 200)",
                     }}
                     selectedIndexKey={"StockID"} // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click.
                     Data={isArrayNotEmpty(this.state.filteredList) ? this.state.filteredList : []} // required, the data that listing in the table
-                    onTableRowClick={this.onTableRowClick()} // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row
+                    // onTableRowClick={this.onTableRowClick} // optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row
                     onActionButtonClick={this.onAddButtonClick} // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
                     tableTopRight={renderTableTopRightButtons()}
                     onSelectRow={this.onSelectRow}
@@ -395,18 +439,20 @@ class ContainerListing extends Component {
 
                 />
                 <AlertDialog
-                    open={this.state.openModal} // required, pass the boolean whether modal is open or close
-                    handleToggleDialog={() => this.setState({ openModal: false, containerNo: "", containerDate: "" })} // required, pass the toggle function of modal
+                    open={this.state.openCreateContainerModal} // required, pass the boolean whether modal is open or close
+                    handleToggleDialog={() => this.setState({ openCreateContainerModal: false, containerNo: "", containerDate: "" ,containerRemark:"", editContainer: false})} // required, pass the toggle function of modal
                     handleConfirmFunc={() => this.addNewContainer()} // required, pass the confirm function
                     showAction={true} // required, to show the footer of modal display
-                    title={"Create New Container"} // required, title of the modal
+                    title={this.state.editContainer?"Create New Container": "Update Container"} // required, title of the modal
                     buttonTitle={"Confirm"} // required, title of button
                     singleButton={false} // required, to decide whether to show a single full width button or 2 buttons
                     maxWidth={"md"}
+                    hideBackdrop={false}
+                    handleBackdrop={() => this.setState({ openCreateContainerModal: false, containerNo: "", containerDate: "" ,containerRemark:"",editContainer: false})} 
                     draggable={true}
                 >
                     <div className="container-fluid">
-                        <div className="row">
+                        <div className="row" style={{ paddingTop: "10pt" }}>
                             <TextField
                                 variant="outlined"
                                 style={{ width: "100%" }}
@@ -432,8 +478,39 @@ class ContainerListing extends Component {
                                 onChange={(e) => this.setState({ containerDate: e.target.value })}
                             />
                         </div>
+                        {
+                            this.state.editContainer?(
+                        <div className="row" style={{ paddingTop: "10pt" }}>
+                            <TextField
+                                variant="outlined"
+                                style={{ width: "100%" }}
+                                label="Remarks"
+                                value={this.state.containerRemark}
+                                size="small"
+                                required
+                                multiline
+                                onChange={(e) => this.setState({ containerRemark: e.target.value })}
+                            />
+                        </div>
+                        ):(<></>)
+                    }
                     </div>
                 </AlertDialog>
+                <ModalPopOut fullScreen={true}
+                    open={this.state.openDataManagementModal} // required, pass the boolean whether modal is open or close
+                    handleToggleDialog={() => this.setState({ openDataManagementModal: false })} // required, pass the toggle function of modal
+                    // handleConfirmFunc={() => this.addNewContainer()} // required, pass the confirm function
+                    showAction={true} // required, to show the footer of modal display
+                    title={"Upload Stocks to container"} // required, title of the modal
+                    // buttonTitle={"Confirm"} // required, title of button
+                    singleButton={false} // required, to decide whether to show a single full width button or 2 buttons
+                    maxWidth={"md"}
+                    draggable={true}
+                >
+                    <div className="container-fluid">
+                        <DataManagement />
+                    </div>
+                </ModalPopOut>
             </div>
         )
     }
