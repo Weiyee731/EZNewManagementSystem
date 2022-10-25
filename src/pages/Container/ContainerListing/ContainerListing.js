@@ -244,9 +244,7 @@ class ContainerListing extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (isArrayNotEmpty(this.props.container) && (prevProps.container !== this.props.container)) {
-            // console.log("call ghere")
             let list = !isStringNullOrEmpty(this.props.container[0].ReturnVal) && this.props.container[0].ReturnVal == 0 ? [] : this.props.container
-            // console.log("list", list)
             this.setState({
                 filteredList: list,
                 containerListing: list,
@@ -282,7 +280,6 @@ class ContainerListing extends Component {
 
         if (this.state.containerAction === null && isArrayNotEmpty(this.props.containerAction) && (prevProps.containerAction !== this.props.containerAction)) {
             if (this.props.containerAction[0].ReturnVal = 1) {
-                // console.log("this.", this.props.containerAction[0].ReturnMsg)
                 this.props.CallViewContainer()
                 this.setState({
                     openCreateContainerModal: false,
@@ -370,7 +367,6 @@ class ContainerListing extends Component {
     }
 
     onEditContainer = (event, row) => {
-        console.log(event, row)
         this.setState({
             openCreateContainerModal: !this.state.openCreateContainerModal,
             ClickedRow: row,
@@ -386,7 +382,6 @@ class ContainerListing extends Component {
     }
 
     addNewContainer = () => {
-        console.log("Asd", this.state.containerRemark)
         if (this.state.editContainer) {
             var obj = {
                 ContainerID: this.state.ClickedRow.ContainerID,
@@ -408,7 +403,6 @@ class ContainerListing extends Component {
     }
 
     handleSearchInput(value, title) {
-        console.log("value", value)
         switch (title) {
             case "Containers":
 
@@ -501,7 +495,7 @@ class ContainerListing extends Component {
                             <AddCircleIcon fontSize="large" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Synchronize Data">
+                    {/* <Tooltip title="Synchronize Data">
                         <IconButton
                             aria-label="Pull Data"
                             size="small"
@@ -527,7 +521,7 @@ class ContainerListing extends Component {
                                 />
                             </IconButton>
                         </Tooltip>
-                    </CsvDownloader>
+                    </CsvDownloader> */}
                 </div>
             )
         }

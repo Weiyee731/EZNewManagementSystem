@@ -30,7 +30,6 @@ function PaperComponent(props) {
 }
 
 export default function AlertDialog(props) {
-console.log(props.hideBackdrop)
   return (
     <Dialog
       fullWidth={typeof props.fullWidth === "undefined" ? true : props.fullWidth}

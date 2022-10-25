@@ -333,7 +333,6 @@ class InvoiceDetail extends Component {
     let object = {
       TransactionDetailID: id, ProductHandlingPrice: charge
     }
-    // console.log(object)
     this.props.CallUpdateTransactionDetailHandling(object)
 
     // tempArr[0].TransactionDetailCharges != null && JSON.parse(tempArr[0].TransactionDetailCharges).map((additionalCharges, index) => {

@@ -59,8 +59,6 @@ class Login extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (!this.props.loading && isArrayNotEmpty(this.props.logonUser)) {
-
-            console.log("dadadada",this.props.logonUser )
             this.setState(({ isSubmitting: false }))
             if (this.props.logonUser[0].ReturnVal === "0" || this.props.logonUser[0].ReturnVal === 0) {
                 toast.error("Authentication Failed.")

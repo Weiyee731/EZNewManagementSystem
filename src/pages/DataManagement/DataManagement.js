@@ -56,7 +56,6 @@ class DataManagement extends Component {
     }
 
     componentDidMount() {
-        console.log(typeof this.props.propsData)
         if (isObjectUndefinedOrNull(this.props.propsData)) {
             console.log("do nothing")
         } else {
