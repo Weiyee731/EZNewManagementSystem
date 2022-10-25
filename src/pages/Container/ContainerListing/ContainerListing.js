@@ -21,14 +21,15 @@ import TableCell from "@mui/material/TableCell"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { toast, Flip } from "react-toastify"
 import AlertDialog from "../../../components/modal/Modal"
-import { Paper } from "@mui/material"
 import TextField from "@mui/material/TextField"
-import MenuItem from "@mui/material/MenuItem"
-import Select from "@mui/material/Select"
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import DataManagement from "../../DataManagement/DataManagement"
 import { ModalPopOut } from "../../../components/modal/Modal";
 import CreateIcon from '@mui/icons-material/Create';
-
+import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
+import SearchBar from "../../../components/SearchBar/SearchBar"
+import { Card, CardContent, Typography } from '@mui/material';
 import "./ContainerListing.css"
 
 
@@ -41,11 +42,14 @@ function mapStateToProps(state) {
         containerAction: state.counterReducer["containerAction"],
         containerStatus: state.counterReducer["containerStatus"],
         containerStatusUpdate: state.counterReducer["containerStatusUpdate"],
+        inventoryStock: state.counterReducer["inventoryStock"],
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
+        CallViewInventoryByFilter: (propsData) => dispatch(GitAction.CallViewInventoryByFilter(propsData)),
+        ClearInventoryStock: () => dispatch(GitAction.ClearInventoryStock()),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
         CallFilterInventory: (propsData) => dispatch(GitAction.CallFilterInventory(propsData)),
         CallUpdateStockDetailByGet: (propsData) => dispatch(GitAction.CallUpdateStockDetailByGet(propsData)),
@@ -110,61 +114,91 @@ const headCells = [
         disablePadding: false,
         label: "Edit Container",
     },
-
-
-    // {
-    //     id: "ProductDimensionDeep",
-    //     align: "left",
-    //     disablePadding: false,
-    //     label: "Depth (cm)",
-    // },
-    // {
-    //     id: "ProductDimensionWidth",
-    //     align: "left",
-    //     disablePadding: false,
-    //     label: "Width (cm)",
-    // },
-    // {
-    //     id: "ProductDimensionHeight",
-    //     align: "left",
-    //     disablePadding: false,
-    //     label: "Height (cm)",
-    // },
-
-    // {
-    //     id: "Item",
-    //     align: "left",
-    //     disablePadding: false,
-    //     label: "Item",
-    // },
-    // {
-    //     id: "UserCode",
-    //     align: "center",
-    //     disablePadding: false,
-    //     label: "Member",
-    // },
-    // {
-    //     id: "AreaCode",
-    //     align: "left",
-    //     disablePadding: false,
-    //     label: "Division",
-    // },
-
-    // {
-    //     id: "StockDate",
-    //     align: "left",
-    //     disablePadding: false,
-    //     label: "Stock Date",
-    // },
-
-    // {
-    //     id: "AdditionalCharges",
-    //     align: "left",
-    //     disablePadding: false,
-    //     label: "Additional Charges",
-    // },
-
 ]
+
+const inventoryHeadCell = [
+    {
+        id: 'Index',
+        align: 'left',
+        disablePadding: false,
+        label: '序號',
+    },
+    {
+        id: 'UserCode',
+        align: 'left',
+        disablePadding: false,
+        label: '会员',
+    },
+    {
+        id: 'AreaCode',
+        align: 'center',
+        disablePadding: false,
+        label: '分区',
+    },
+    {
+        id: 'CourierName',
+        align: 'center',
+        disablePadding: false,
+        label: '快递',
+    },
+    {
+        id: 'TrackingNumber',
+        align: 'left',
+        disablePadding: false,
+        label: '单号',
+    },
+    {
+        id: 'ProductQuantity',
+        align: 'left',
+        disablePadding: false,
+        label: '件数',
+    },
+    {
+        id: 'ProductWeight',
+        align: 'left',
+        disablePadding: false,
+        label: '重量',
+    },
+    {
+        id: 'ProductDimensionDeep',
+        align: 'left',
+        disablePadding: false,
+        label: '尺寸长',
+    },
+    {
+        id: 'ProductDimensionWidth',
+        align: 'left',
+        disablePadding: false,
+        label: '尺寸宽',
+    },
+    {
+        id: 'ProductDimensionHeight',
+        align: 'left',
+        disablePadding: false,
+        label: '尺寸高',
+    },
+
+    {
+        id: 'Volume',
+        align: 'left',
+        disablePadding: false,
+        label: '体积',
+    },
+
+    {
+        id: 'Item',
+        align: 'left',
+        disablePadding: false,
+        label: '商品',
+    },
+
+    {
+        id: 'CreatedDate',
+        align: 'left',
+        disablePadding: false,
+        label: '时间',
+    },
+];
 
 
 const INITIAL_STATE = {
@@ -181,7 +215,14 @@ const INITIAL_STATE = {
     ContainerStatus: "All",
     containerStatusReturn: "",
     ClickedRow: null,
-    editContainer: false
+    editContainer: false,
+
+    inventoryStock: [],
+    isInventorySet: false,
+    filteredProduct: [],
+    isFiltered: false,
+    searchKeywords: "",
+    searchCategory: "Tracking",
 }
 
 class ContainerListing extends Component {
@@ -192,6 +233,9 @@ class ContainerListing extends Component {
         this.props.CallViewContainer() //view container
         toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
         this.props.CallViewContainerStatus() //view container
+        this.renderInventoryTableRows = this.renderInventoryTableRows.bind(this)
+        this.handleSearchCategory = this.handleSearchCategory.bind(this)
+
     }
 
     componentDidMount() {
@@ -221,6 +265,13 @@ class ContainerListing extends Component {
                     theme: "dark",
                 })
             }
+
+        }
+
+
+        if (this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== 0 && this.state.isInventorySet === false) {
+            this.setState({ inventoryStock: this.props.inventoryStock, isInventorySet: true })
+            this.props.ClearInventoryStock()
         }
 
 
@@ -318,6 +369,7 @@ class ContainerListing extends Component {
 
     onTableRowClick = (event, row) => {
         this.setState({ openDataManagementModal: !this.state.openDataManagementModal, ClickedRow: row })
+        this.props.CallViewInventoryByFilter({ FilterColumn: "and T_Inventory_Stock.ContainerID=" + row.ContainerID })
     }
 
     onEditContainer = (event, row) => {
@@ -358,8 +410,62 @@ class ContainerListing extends Component {
 
     }
 
+    handleSearchInput(value) {
+        const { searchCategory, inventoryStock } = this.state
+        this.setState({ searchKeywords: value })
+        this.state.filteredProduct.splice(0, this.state.filteredProduct.length)
+
+        let DataSet = inventoryStock
+        let filteredListing = []
+
+
+        DataSet.length > 0 && DataSet.filter((searchedItem) =>
+            searchedItem.UserCode !== null && searchedItem.UserCode.includes(
+                value
+            )
+        ).map((filteredItem) => {
+            filteredListing.push(filteredItem);
+        })
+
+        DataSet.length > 0 && DataSet.filter((searchedItem) =>
+            searchedItem.TrackingNumber !== null && searchedItem.TrackingNumber.toLowerCase().includes(
+                value.toLowerCase()
+            )
+        ).map((filteredItem) => {
+            filteredListing.push(filteredItem);
+        })
+
+        let removeDuplicate = filteredListing.length > 0 ? filteredListing.filter((ele, ind) => ind === filteredListing.findIndex(elem => elem.StockID === ele.StockID)) : []
+        this.setState({ isFiltered: true, filteredProduct: removeDuplicate })
+    }
+
+    handleSearchCategory(e) {
+        this.setState({ searchCategory: e.target.value })
+    }
+
+    renderInventoryTableRows = (data, index) => {
+        return (
+            <>
+                <TableCell component="th" id={`enhanced-table-checkbox-${index}`} scope="row" padding="normal">{index + 1}</TableCell>
+                <TableCell>{data.UserCode}</TableCell>
+                <TableCell>{data.AreaCode}</TableCell>
+                <TableCell>{data.CourierName}</TableCell>
+                <TableCell >{data.TrackingNumber}</TableCell>
+                <TableCell >{data.ProductQuantity}</TableCell>
+                <TableCell >{data.ProductWeight}</TableCell>
+                <TableCell>{data.ProductDimensionDeep}</TableCell>
+                <TableCell>{data.ProductDimensionWidth}</TableCell>
+                <TableCell>{data.ProductDimensionHeight}</TableCell>
+                <TableCell >{data.Volume}</TableCell>
+                <TableCell >{data.Item}</TableCell>
+                <TableCell>{data.CreatedDate}</TableCell>
+            </>
+        )
+    }
+
 
     render() {
+        const { ClickedRow, inventoryStock, filteredProduct, isFiltered, searchCategory } = this.state
         const renderTableTopRightButtons = () => {
             var today = new Date();
             var dd = String(today.getDate()).padStart(2, '0');
@@ -506,7 +612,7 @@ class ContainerListing extends Component {
                 <ModalPopOut
                     fullScreen={true}
                     open={this.state.openDataManagementModal} // required, pass the boolean whether modal is open or close
-                    handleToggleDialog={() => this.setState({ openDataManagementModal: false })} // required, pass the toggle function of modal
+                    handleToggleDialog={() => this.setState({ openDataManagementModal: false, inventoryStock: [], isInventorySet: false, filteredProduct: [], isFiltered: false })} // required, pass the toggle function of modal
                     // handleConfirmFunc={() => this.addNewContainer()} // required, pass the confirm function
                     showAction={true} // required, to show the footer of modal display
                     title={"Upload Stocks to container"} // required, title of the modal
@@ -516,7 +622,76 @@ class ContainerListing extends Component {
                     draggable={true}
                 >
                     <div className="container-fluid">
-                        <DataManagement propsData={this.state.ClickedRow}/>
+                        {
+                            inventoryStock.length > 0 &&
+                            <div className="row">
+                                <Card>
+                                    <CardContent>
+                                        <div className="row" style={{ padding: "10pt 10pt 10pt" }}>
+                                            <SearchBar
+                                                id=""
+                                                placeholder=""
+                                                label="Enter Member No, Tracking number to search"
+                                                buttonOnClick={() => this.onSearch("", "")}
+                                                onChange={(e) => this.handleSearchInput(e.target.value)}
+                                                className="searchbar-input mb-auto"
+                                                disableButton={this.state.isDataFetching}
+                                                tooltipText="Search with current data"
+                                                value={this.state.searchKeywords}
+                                            />
+                                        </div>
+
+                                        <TableComponents
+                                            tableTopLeft={
+                                                <div className="row" >
+                                                    <div className="col" >       <Typography style={{ fontWeight: "bold" }}>柜子号： {ClickedRow !== null && ClickedRow.ContainerName}</Typography></div>
+                                                    <div className="col">   <Typography style={{ fontWeight: "bold" }}>柜子日期： {ClickedRow !== null && ClickedRow.ContainerDate}</Typography></div>
+                                                    <div className="col">        <Typography style={{ fontWeight: "bold" }}>柜子状态： {ClickedRow !== null && ClickedRow.ContainerStatus}</Typography></div>
+                                                </div>
+                                            }
+                                            tableTopRight={<CsvDownloader
+                                                filename={ClickedRow !== null && ClickedRow.ContainerName + " - " + ClickedRow.ContainerDate}
+                                                extension=".xls"
+                                                wrapColumnChar="'"
+                                                separator=","
+                                                columns={inventoryHeadCell}
+                                                datas={isArrayNotEmpty(inventoryStock) ? inventoryStock : []}
+                                            >
+                                                <Tooltip title="Download">
+                                                    <IconButton size="small">
+                                                        <DownloadForOfflineIcon
+                                                            color="primary"
+                                                            fontSize="large"
+                                                            sx={{}}
+                                                        />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </CsvDownloader>}
+                                            tableOptions={{
+                                                dense: true,
+                                                tableOrderBy: 'asc',
+                                                sortingIndex: "fat",
+                                                stickyTableHeader: true,
+                                            }}
+                                            paginationOptions={[20, 50, 100, { label: 'All', value: -1 }]}
+                                            tableHeaders={inventoryHeadCell}
+                                            tableRows={{
+                                                renderTableRows: this.renderInventoryTableRows,
+                                                checkbox: false,
+                                                checkboxColor: "primary",
+                                                onRowClickSelect: false,
+                                                headerColor: 'rgb(200, 200, 200)'
+                                            }}
+
+                                            selectedIndexKey={"pid"}
+                                            Data={isFiltered === true ? filteredProduct : inventoryStock}
+                                        />
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        }
+
+                        <DataManagement propsData={this.state.ClickedRow} />
                     </div>
                 </ModalPopOut>
             </div>

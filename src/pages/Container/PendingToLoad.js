@@ -136,7 +136,6 @@ class PendingToLoad extends Component {
         this.renderTableRows = this.renderTableRows.bind(this)
         this.handleSearchInput = this.handleSearchInput.bind(this)
         this.handleSearchCategory = this.handleSearchCategory.bind(this)
-        this.handleSearchArea = this.handleSearchArea.bind(this)
         this.props.CallViewInventoryByFilter({ FilterColumn: "and T_Inventory_Stock.ContainerID=0" })
     }
 
@@ -172,9 +171,7 @@ class PendingToLoad extends Component {
 
 
     handleSearchInput(value) {
-
         const { searchCategory, OveralStock } = this.state
-
         this.setState({ searchKeywords: value })
         this.state.filteredProduct.splice(0, this.state.filteredProduct.length)
 
@@ -205,11 +202,6 @@ class PendingToLoad extends Component {
 
     handleSearchCategory(e) {
         this.setState({ searchCategory: e.target.value })
-    }
-
-    handleSearchArea(e) {
-        this.onSearch("", e.target.value)
-        this.setState({ searchArea: e.target.value })
     }
 
     renderTotal() {
