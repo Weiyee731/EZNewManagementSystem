@@ -4,7 +4,7 @@ import { GitAction } from "../../store/action/gitAction";
 import { withRouter } from "react-router";
 import Dropzone from "../../components/Dropzone/Dropzone"
 import * as XLSX from 'xlsx';
-import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty, convertDateTimeToString112Format, extractNumberFromStrings } from "../../tools/Helpers";
+import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty, convertDateTimeToString112Format, extractNumberFromStrings, isObjectUndefinedOrNull } from "../../tools/Helpers";
 import TableComponents from "../../components/TableComponents/TableComponents";
 import TableCell from '@mui/material/TableCell';
 import Box from '@mui/material/Box';
@@ -20,6 +20,7 @@ import TextField from '@mui/material/TextField';
 import FormHelperText from '@mui/material/FormHelperText';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import moment from 'moment';
+import { Typography } from '@mui/material';
 
 function mapStateToProps(state) {
     return {
@@ -63,6 +64,15 @@ class DataManagement extends Component {
     }
 
     componentDidMount() {
+        console.log(typeof this.props.propsData)
+        if (isObjectUndefinedOrNull(this.props.propsData)) {
+            console.log("do nothing")
+        } else {
+            this.setState({
+                ContainerName: this.props.propsData.ContainerName,
+                ContainerDate: this.props.propsData.ContainerDate
+            })
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -280,7 +290,15 @@ class DataManagement extends Component {
                 <div className="container">
                     <div className="d-flex px-3">
                         <div className="d-md-flex my-2" style={{ marginLeft: 'auto' }}>
-                            <TextField
+                            <Box>
+                                <Typography variant="h5" >
+                                    Container: {this.state.ContainerName}
+                                </Typography>
+                                <Typography variant="subtitle1" >
+                                    Date: {this.state.ContainerDate}
+                                </Typography>
+                            </Box>
+                            {/* <TextField
                                 label="Container Name"
                                 variant="standard"
                                 name="ContainerName"
@@ -290,11 +308,12 @@ class DataManagement extends Component {
                                 onChange={this.onContainerNameChange}
                                 helperText={this.state.ContainerNameValidated !== null && !this.state.ContainerNameValidated ? "This is required" : ""}
                                 error={this.state.ContainerNameValidated !== null && !this.state.ContainerNameValidated}
+                                disabled={true}
                             />
                             <div style={{ width: '200px', marginLeft: 5 }}>
                                 <ResponsiveDatePickers variant="standard" title="Stock In Date" value={this.state.ContainerDate} onChange={(e) => this.onDateChange(e)} />
                                 {!this.state.ContainerDateValidated && <FormHelperText className='text-danger' >Invalid Date</FormHelperText>}
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                     <Dropzone

@@ -94,6 +94,12 @@ const headCells = [
         label: "Container Date",
     },
     {
+        id: "Remark",
+        align: "left",
+        disablePadding: false,
+        label: "Remarks",
+    },
+    {
         id: "Status",
         align: "left",
         disablePadding: false,
@@ -104,12 +110,7 @@ const headCells = [
         disablePadding: false,
         label: "Edit Container",
     },
-    // {
-    //     id: "Remark",
-    //     align: "left",
-    //     disablePadding: false,
-    //     label: "Remarks",
-    // },
+
 
     // {
     //     id: "ProductDimensionDeep",
@@ -171,10 +172,10 @@ const INITIAL_STATE = {
     filteredList: null,
     openCreateContainerModal: false,
     openDataManagementModal: false,
-    containerID:"",
+    containerID: "",
     containerNo: "",
     containerDate: "",
-    containerRemark:"",
+    containerRemark: "",
     container: null,
     containerAction: null,
     ContainerStatus: "All",
@@ -189,6 +190,7 @@ class ContainerListing extends Component {
         this.state = INITIAL_STATE
 
         this.props.CallViewContainer() //view container
+        toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
         this.props.CallViewContainerStatus() //view container
     }
 
@@ -220,6 +222,7 @@ class ContainerListing extends Component {
                 })
             }
         }
+
 
         if (isArrayNotEmpty(this.props.containerStatusUpdate)) {
             if (!isStringNullOrEmpty(this.props.containerStatusUpdate[0].ReturnVal) && this.props.containerStatusUpdate[0].ReturnVal == 0) {
@@ -283,6 +286,7 @@ class ContainerListing extends Component {
                 <TableCell component="th" id={`table-checkbox-${index}`} scope="row" onClick={(e) => this.onTableRowClick(e, data)} sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} >{index + 1} </TableCell>
                 <TableCell align="left" onClick={(e) => this.onTableRowClick(e, data)} sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.ContainerName} </TableCell>
                 <TableCell align="left" onClick={(e) => this.onTableRowClick(e, data)} sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.ContainerDate}   </TableCell>
+                <TableCell align="left" onClick={(e) => this.onTableRowClick(e, data)} sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} className="long-remark"> {data.ContainerRemark}   </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} >
                     <Select
                         labelId="search-filter-category"
@@ -301,6 +305,7 @@ class ContainerListing extends Component {
                         })}
                     </Select>
                 </TableCell>
+
                 <TableCell align="left" className="sticky" sx={{ fontSize: fontsize }}>
                     <IconButton onClick={(event) => this.onEditContainer(event, data)}>
                         <CreateIcon />
@@ -315,14 +320,16 @@ class ContainerListing extends Component {
         this.setState({ openDataManagementModal: !this.state.openDataManagementModal, ClickedRow: row })
     }
 
-    onEditContainer = (event ,row) =>{
+    onEditContainer = (event, row) => {
         console.log(event, row)
-        this.setState({ openCreateContainerModal: !this.state.openCreateContainerModal,
-             ClickedRow: row ,
-             containerNo: row.ContainerName,
-    containerDate: row.ContainerDate,
-    containerRemark: row.Remark?row.Remark:"",
-              editContainer: true})
+        this.setState({
+            openCreateContainerModal: !this.state.openCreateContainerModal,
+            ClickedRow: row,
+            containerNo: row.ContainerName,
+            containerDate: row.ContainerDate,
+            containerRemark: row.ContainerRemark ? row.ContainerRemark : "",
+            editContainer: true
+        })
     }
 
     setAddModalDetails = () => {
@@ -330,17 +337,17 @@ class ContainerListing extends Component {
     }
 
     addNewContainer = () => {
-        console.log("Asd",this.state.containerRemark)
-        if(this.state.editContainer){
-            var obj ={
-                ContainerID : this.state.ClickedRow.ContainerID,
-                ContainerName : this.state.containerNo,
-                ContainerRemark : this.state.containerRemark,
-                ContainerDate : this.state.containerDate,
+        console.log("Asd", this.state.containerRemark)
+        if (this.state.editContainer) {
+            var obj = {
+                ContainerID: this.state.ClickedRow.ContainerID,
+                ContainerName: this.state.containerNo,
+                ContainerRemark: this.state.containerRemark,
+                ContainerDate: this.state.containerDate,
                 ModifyBy: 1
             }
-this.props.CallUpdateContainer(obj)
-        }else{
+            this.props.CallUpdateContainer(obj)
+        } else {
             var obj = {
                 ContainerName: this.state.containerNo,
                 ContainerDate: this.state.containerDate,
@@ -348,7 +355,7 @@ this.props.CallUpdateContainer(obj)
             }
             this.props.CallAddContainer(obj)
         }
-       
+
     }
 
 
@@ -440,15 +447,15 @@ this.props.CallUpdateContainer(obj)
                 />
                 <AlertDialog
                     open={this.state.openCreateContainerModal} // required, pass the boolean whether modal is open or close
-                    handleToggleDialog={() => this.setState({ openCreateContainerModal: false, containerNo: "", containerDate: "" ,containerRemark:"", editContainer: false})} // required, pass the toggle function of modal
+                    handleToggleDialog={() => this.setState({ openCreateContainerModal: false, containerNo: "", containerDate: "", containerRemark: "", editContainer: false })} // required, pass the toggle function of modal
                     handleConfirmFunc={() => this.addNewContainer()} // required, pass the confirm function
                     showAction={true} // required, to show the footer of modal display
-                    title={this.state.editContainer?"Create New Container": "Update Container"} // required, title of the modal
+                    title={this.state.editContainer ? "Create New Container" : "Update Container"} // required, title of the modal
                     buttonTitle={"Confirm"} // required, title of button
                     singleButton={false} // required, to decide whether to show a single full width button or 2 buttons
                     maxWidth={"md"}
                     hideBackdrop={false}
-                    handleBackdrop={() => this.setState({ openCreateContainerModal: false, containerNo: "", containerDate: "" ,containerRemark:"",editContainer: false})} 
+                    handleBackdrop={() => this.setState({ openCreateContainerModal: false, containerNo: "", containerDate: "", containerRemark: "", editContainer: false })}
                     draggable={true}
                 >
                     <div className="container-fluid">
@@ -479,24 +486,25 @@ this.props.CallUpdateContainer(obj)
                             />
                         </div>
                         {
-                            this.state.editContainer?(
-                        <div className="row" style={{ paddingTop: "10pt" }}>
-                            <TextField
-                                variant="outlined"
-                                style={{ width: "100%" }}
-                                label="Remarks"
-                                value={this.state.containerRemark}
-                                size="small"
-                                required
-                                multiline
-                                onChange={(e) => this.setState({ containerRemark: e.target.value })}
-                            />
-                        </div>
-                        ):(<></>)
-                    }
+                            this.state.editContainer ? (
+                                <div className="row" style={{ paddingTop: "10pt" }}>
+                                    <TextField
+                                        variant="outlined"
+                                        style={{ width: "100%" }}
+                                        label="Remarks"
+                                        value={this.state.containerRemark}
+                                        size="small"
+                                        required
+                                        multiline
+                                        onChange={(e) => this.setState({ containerRemark: e.target.value })}
+                                    />
+                                </div>
+                            ) : (<></>)
+                        }
                     </div>
                 </AlertDialog>
-                <ModalPopOut fullScreen={true}
+                <ModalPopOut
+                    fullScreen={true}
                     open={this.state.openDataManagementModal} // required, pass the boolean whether modal is open or close
                     handleToggleDialog={() => this.setState({ openDataManagementModal: false })} // required, pass the toggle function of modal
                     // handleConfirmFunc={() => this.addNewContainer()} // required, pass the confirm function
@@ -508,7 +516,7 @@ this.props.CallUpdateContainer(obj)
                     draggable={true}
                 >
                     <div className="container-fluid">
-                        <DataManagement />
+                        <DataManagement propsData={this.state.ClickedRow}/>
                     </div>
                 </ModalPopOut>
             </div>
