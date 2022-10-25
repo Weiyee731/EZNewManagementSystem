@@ -7,14 +7,17 @@ import { isStringNullOrEmpty } from "../../tools/Helpers";
  *   @function isUserLogon =>  @returns bool
  *   @function updateLogonUser => @param key, @param value => @returns void
  *   @function resetLogonUser => void
+ * 
  */
+
+const SYSTEM_INFO = "YaweiLogistic"
 export const setLogonUser = (loginUser, sidebarItem) => {
     if (typeof loginUser !== "undefined" && loginUser !== null) {
         try {
             localStorage.setItem("userToken", true);
             localStorage.setItem("loginUser", JSON.stringify(loginUser));
             localStorage.setItem("sidebarItem", JSON.stringify(sidebarItem));
-            localStorage.setItem("systemInfo", "YaweiLogistic");
+            localStorage.setItem("systemInfo", SYSTEM_INFO);
             window.location.href = "/CMS/Dashboard"
         }
         catch (e) {
@@ -31,7 +34,7 @@ export const getSidebaritems = () => {
 }
 
 export const isUserLogon = () => {
-    if (!isStringNullOrEmpty(localStorage.getItem("systemInfo")) && localStorage.getItem("systemInfo") !== "EZLogistic")
+    if (!isStringNullOrEmpty(localStorage.getItem("systemInfo")) && localStorage.getItem("systemInfo") !== SYSTEM_INFO)
         resetLogonUser();
     else
         return localStorage.getItem("userToken")
