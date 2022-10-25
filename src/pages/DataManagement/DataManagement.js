@@ -26,6 +26,7 @@ function mapDispatchToProps(dispatch) {
     return {
         //todo: change upload api
         CallUpdateContainerInventory: propsData => dispatch(GitAction.CallUpdateContainerInventory(propsData)),
+        ClearInventoryAction: propsData => dispatch(GitAction.ClearInventoryAction(propsData)),
         // CallInsertStockByPost: propsData => dispatch(GitAction.CallInsertStockByPost(propsData)),
         // CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
     };
@@ -69,15 +70,20 @@ class DataManagement extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (isArrayNotEmpty(this.props.inventoryStockAction && this.props.inventoryStockAction!== prevProps.inventoryStockAction)) {
+        if (isArrayNotEmpty(this.props.inventoryStockAction )) {
             console.log("retu",this.props.inventoryStockAction[0].ReturnVal)
+            this.props.ClearInventoryAction()
             if (this.props.inventoryStockAction[0].ReturnVal == 0) {
                 // this.props.CallResetUpdatedStockDetail()
-                toast.error(this.props.inventoryStockAction[0].ReturnMsg, { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark", onClose: () => { this.setState(INITIAL_STATE) } })
+                toast.error(this.props.inventoryStockAction[0].ReturnMsg, { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark"
+                // , onClose: () => { this.setState(INITIAL_STATE) } 
+            })
             }
             else {
                 // this.props.CallResetUpdatedStockDetail()
-                toast.success("Data is uploaded successfully", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark", onClose: () => this.props.history.push('/StockGoods') })
+                toast.success("Data is uploaded successfully", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark"
+                // , onClose: () => this.props.history.push('/StockGoods')
+             })
                 this.setState(INITIAL_STATE)
             }
         }
