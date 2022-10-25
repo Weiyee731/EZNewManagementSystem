@@ -30,6 +30,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
 import SearchBar from "../../../components/SearchBar/SearchBar"
 import { Card, CardContent, Typography } from '@mui/material';
+
 import "./ContainerListing.css"
 
 
@@ -204,6 +205,7 @@ const inventoryHeadCell = [
 const INITIAL_STATE = {
     isDataFetching: false,
     filteredList: null,
+    containerListing: null,
     openCreateContainerModal: false,
     openDataManagementModal: false,
     containerID: "",
@@ -253,6 +255,7 @@ class ContainerListing extends Component {
             // console.log("list", list)
             this.setState({
                 filteredList: list,
+                containerListing: list,
                 isDataFetching: false,
                 totalItem: list.length,
                 // container: list
@@ -410,33 +413,52 @@ class ContainerListing extends Component {
 
     }
 
-    handleSearchInput(value) {
-        const { searchCategory, inventoryStock } = this.state
-        this.setState({ searchKeywords: value })
-        this.state.filteredProduct.splice(0, this.state.filteredProduct.length)
+    handleSearchInput(value, title) {
+        console.log("value", value)
+        switch (title) {
+            case "Containers":
 
-        let DataSet = inventoryStock
-        let filteredListing = []
+                if (isStringNullOrEmpty(value)) {
+                    this.setState({ searchKeywords: value, filteredList: this.state.containerListing })
+                } else {
+                    var tempList = this.state.containerListing.filter(x => (x.ContainerName.includes(value)))
+                    this.setState({ searchKeywords: value, filteredList: tempList })
+                }
+                break;
+
+            case "Stocks":
+                const { searchCategory, inventoryStock } = this.state
+                this.setState({ searchKeywords: value })
+                this.state.filteredProduct.splice(0, this.state.filteredProduct.length)
+
+                let DataSet = inventoryStock
+                let filteredListing = []
+
+                DataSet.length > 0 && DataSet.filter((searchedItem) =>
+                    searchedItem.UserCode !== null && searchedItem.UserCode.includes(
+                        value
+                    )
+                ).map((filteredItem) => {
+                    filteredListing.push(filteredItem);
+                })
+
+                DataSet.length > 0 && DataSet.filter((searchedItem) =>
+                    searchedItem.TrackingNumber !== null && searchedItem.TrackingNumber.toLowerCase().includes(
+                        value.toLowerCase()
+                    )
+                ).map((filteredItem) => {
+                    filteredListing.push(filteredItem);
+                })
+
+                let removeDuplicate = filteredListing.length > 0 ? filteredListing.filter((ele, ind) => ind === filteredListing.findIndex(elem => elem.StockID === ele.StockID)) : []
+                this.setState({ isFiltered: true, filteredProduct: removeDuplicate })
+                break;
+
+            default:
+                console.log("default")
+        }
 
 
-        DataSet.length > 0 && DataSet.filter((searchedItem) =>
-            searchedItem.UserCode !== null && searchedItem.UserCode.includes(
-                value
-            )
-        ).map((filteredItem) => {
-            filteredListing.push(filteredItem);
-        })
-
-        DataSet.length > 0 && DataSet.filter((searchedItem) =>
-            searchedItem.TrackingNumber !== null && searchedItem.TrackingNumber.toLowerCase().includes(
-                value.toLowerCase()
-            )
-        ).map((filteredItem) => {
-            filteredListing.push(filteredItem);
-        })
-
-        let removeDuplicate = filteredListing.length > 0 ? filteredListing.filter((ele, ind) => ind === filteredListing.findIndex(elem => elem.StockID === ele.StockID)) : []
-        this.setState({ isFiltered: true, filteredProduct: removeDuplicate })
     }
 
     handleSearchCategory(e) {
@@ -517,6 +539,19 @@ class ContainerListing extends Component {
         }
         return (
             <div className="container-fluid my-2">
+                <div className="row" style={{ padding: "10pt 10pt 10pt" }}>
+                    <SearchBar
+                        id="SearchBarMain"
+                        placeholder=""
+                        label="Enter Container Number to search"
+                        buttonOnClick={() => this.onSearch("", "")}
+                        onChange={(e) => this.handleSearchInput(e.target.value, "Containers")}
+                        className="searchbar-input mb-auto"
+                        disableButton={this.state.isDataFetching}
+                        tooltipText="Search with current data"
+                        value={this.state.searchKeywords}
+                    />
+                </div>
                 <TableComponents
                     // table settings
                     tableOptions={{
@@ -633,7 +668,7 @@ class ContainerListing extends Component {
                                                 placeholder=""
                                                 label="Enter Member No, Tracking number to search"
                                                 buttonOnClick={() => this.onSearch("", "")}
-                                                onChange={(e) => this.handleSearchInput(e.target.value)}
+                                                onChange={(e) => this.handleSearchInput(e.target.value, "Stocks")}
                                                 className="searchbar-input mb-auto"
                                                 disableButton={this.state.isDataFetching}
                                                 tooltipText="Search with current data"
