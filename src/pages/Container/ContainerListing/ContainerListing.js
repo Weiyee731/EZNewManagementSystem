@@ -10,26 +10,20 @@ import {
     convertDateTimeToString112Format,
     volumeCalc
 } from "../../../tools/Helpers"
-import Tooltip from "@mui/material/Tooltip"
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import IconButton from "@mui/material/IconButton"
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline"
 import CachedIcon from "@mui/icons-material/Cached"
 import CsvDownloader from "react-csv-downloader"
 import CheckIcon from "@mui/icons-material/Check"
-import TableCell from "@mui/material/TableCell"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { toast, Flip } from "react-toastify"
 import AlertDialog from "../../../components/modal/Modal"
-import TextField from "@mui/material/TextField"
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import DataManagement from "../../DataManagement/DataManagement"
 import { ModalPopOut } from "../../../components/modal/Modal";
 import CreateIcon from '@mui/icons-material/Create';
 import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
 import SearchBar from "../../../components/SearchBar/SearchBar"
-import { Card, CardContent, Typography } from '@mui/material';
+import { Card, CardContent, Typography, Box, Select, MenuItem, TextField, TableCell, IconButton, Tooltip } from '@mui/material';
 
 import "./ContainerListing.css"
 
@@ -657,6 +651,14 @@ class ContainerListing extends Component {
                     draggable={true}
                 >
                     <div className="container-fluid">
+                        {<Box>
+                            <Typography variant="h5" >
+                                Container: {this.state.ClickedRow?this.state.ClickedRow.ContainerName:""}
+                            </Typography>
+                            <Typography variant="subtitle1" >
+                                Date: {this.state.ClickedRow?this.state.ClickedRow.ContainerDate:""}
+                            </Typography>
+                        </Box>}
                         {
                             inventoryStock.length > 0 &&
                             <div className="row">

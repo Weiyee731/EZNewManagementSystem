@@ -288,7 +288,7 @@ class DataManagement extends Component {
         return (
             <div>
                 <div className="container">
-                    <div className="d-flex px-3">
+                    {/* <div className="d-flex px-3">
                         <div className="d-md-flex my-2" style={{ marginLeft: 'auto' }}>
                             <Box>
                                 <Typography variant="h5" >
@@ -298,7 +298,7 @@ class DataManagement extends Component {
                                     Date: {this.state.ContainerDate}
                                 </Typography>
                             </Box>
-                            {/* <TextField
+                            <TextField
                                 label="Container Name"
                                 variant="standard"
                                 name="ContainerName"
@@ -313,9 +313,9 @@ class DataManagement extends Component {
                             <div style={{ width: '200px', marginLeft: 5 }}>
                                 <ResponsiveDatePickers variant="standard" title="Stock In Date" value={this.state.ContainerDate} onChange={(e) => this.onDateChange(e)} />
                                 {!this.state.ContainerDateValidated && <FormHelperText className='text-danger' >Invalid Date</FormHelperText>}
-                            </div> */}
+                            </div>
                         </div>
-                    </div>
+                    </div> */}
                     <Dropzone
                         placeholder={{
                             text: "Drag and Drop Excel here, or click to select file",
