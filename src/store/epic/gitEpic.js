@@ -1119,7 +1119,7 @@ export class GitEpic {
       try {
         const response = await fetch(url +
           "Inventory_UpdateStockContainer?" +
-          "STOCKID=" + payload.StockID +
+          "TRACKINGNUMBER=" + payload.TrackingNum +
           "&CONTAINERID=" + payload.ContainerID
         );
 

@@ -336,7 +336,7 @@ class ContainerListing extends Component {
                     <Select
                         labelId="search-filter-category"
                         id="search-filter-category"
-                        value={data.ContainerStatusID}
+                        value={data.ContainerStatusID ? data.ContainerStatusID : ""}
                         label="Search By"
                         onChange={(e) => this.handleChangeStatus(data, index, e)}
                         size="small"
@@ -645,17 +645,17 @@ class ContainerListing extends Component {
                     draggable={true}
                 >
                     <div className="container-fluid">
-                        {<Box>
+                        {inventoryStock.length <= 0 && <Box>
                             <Typography variant="h5" >
-                                Container: {this.state.ClickedRow?this.state.ClickedRow.ContainerName:""}
+                                Container: <b>{this.state.ClickedRow ? this.state.ClickedRow.ContainerName : ""}</b>
                             </Typography>
                             <Typography variant="subtitle1" >
-                                Date: {this.state.ClickedRow?this.state.ClickedRow.ContainerDate:""}
+                                Date: <b>{this.state.ClickedRow ? this.state.ClickedRow.ContainerDate : ""}</b>
                             </Typography>
                         </Box>}
                         {
                             inventoryStock.length > 0 &&
-                            <div className="row">
+                            <div className="row" style={{ padding: "10pt 10pt 10pt 10pt" }}>
                                 <Card>
                                     <CardContent>
                                         <div className="row" style={{ padding: "10pt 10pt 10pt" }}>

@@ -17,15 +17,17 @@ import { Typography, TableCell, Box, IconButton, LinearProgress, Button, TextFie
 
 function mapStateToProps(state) {
     return {
-        stockApproval: state.counterReducer["stockApproval"],
+        // stockApproval: state.counterReducer["stockApproval"],
+        inventoryStockAction: state.counterReducer["inventoryStockAction"],
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         //todo: change upload api
-        CallInsertStockByPost: propsData => dispatch(GitAction.CallInsertStockByPost(propsData)),
-        CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
+        CallUpdateContainerInventory: propsData => dispatch(GitAction.CallUpdateContainerInventory(propsData)),
+        // CallInsertStockByPost: propsData => dispatch(GitAction.CallInsertStockByPost(propsData)),
+        // CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
     };
 }
 
@@ -67,17 +69,22 @@ class DataManagement extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (isArrayNotEmpty(this.props.stockApproval)) {
-            if (this.props.stockApproval[0].ReturnVal == 0) {
-                this.props.CallResetUpdatedStockDetail()
-                toast.error(this.props.stockApproval[0].ReturnMsg, { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark", onClose: () => { this.setState(INITIAL_STATE) } })
+        if (isArrayNotEmpty(this.props.inventoryStockAction && this.props.inventoryStockAction!== prevProps.inventoryStockAction)) {
+            console.log("retu",this.props.inventoryStockAction[0].ReturnVal)
+            if (this.props.inventoryStockAction[0].ReturnVal == 0) {
+                // this.props.CallResetUpdatedStockDetail()
+                toast.error(this.props.inventoryStockAction[0].ReturnMsg, { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark", onClose: () => { this.setState(INITIAL_STATE) } })
             }
             else {
-                this.props.CallResetUpdatedStockDetail()
+                // this.props.CallResetUpdatedStockDetail()
                 toast.success("Data is uploaded successfully", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark", onClose: () => this.props.history.push('/StockGoods') })
                 this.setState(INITIAL_STATE)
             }
         }
+
+        console.log("Srgsd", isArrayNotEmpty(this.props.inventoryStockAction))
+        console.log("Srgsd", this.props.inventoryStockAction)
+
     }
 
     uploadHandler = (files) => {
@@ -164,11 +171,15 @@ class DataManagement extends Component {
                 }
             }
             let object = {
-                TRACKINGNUMBER: TrackingNo,
+                TrackingNum: TrackingNo,
+                ContainerID: this.props.propsData.ContainerID
+
             }
+            console.log(object)
             toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
             this.setState({ isSubmit: true })
-            this.props.CallInsertStockByPost(object)
+            // this.props.CallInsertStockByPost(object)
+            this.props.CallUpdateContainerInventory(object)
         }
     }
 

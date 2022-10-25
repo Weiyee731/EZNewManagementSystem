@@ -388,7 +388,7 @@ export function counterReducer(state = INITIAL_STATE, action) {
     case GitAction.Inventory_UpdatedContainer:
       return Object.assign({}, state, {
         loading: false,
-        inventoryStock: action.payload
+        inventoryStockAction: action.payload
       });
 
     case GitAction.Inventory_ClearAction:
