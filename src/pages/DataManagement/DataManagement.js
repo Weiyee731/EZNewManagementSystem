@@ -6,21 +6,14 @@ import Dropzone from "../../components/Dropzone/Dropzone"
 import * as XLSX from 'xlsx';
 import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty, convertDateTimeToString112Format, extractNumberFromStrings, isObjectUndefinedOrNull } from "../../tools/Helpers";
 import TableComponents from "../../components/TableComponents/TableComponents";
-import TableCell from '@mui/material/TableCell';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import LinearProgress from '@mui/material/LinearProgress';
-import Button from '@mui/material/Button';
 import PublishIcon from '@mui/icons-material/Publish';
 import ReportIcon from '@mui/icons-material/Report';
 import { toast, Slide, Zoom, Flip, Bounce } from 'react-toastify';
 import { ModalPopOut } from "../../components/modal/Modal";
 import ResponsiveDatePickers from '../../components/datePicker/datePicker';
-import TextField from '@mui/material/TextField';
-import FormHelperText from '@mui/material/FormHelperText';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import moment from 'moment';
-import { Typography } from '@mui/material';
+import { Typography, TableCell, Box, IconButton, LinearProgress, Button, TextField, FormHelperText } from '@mui/material';
 
 function mapStateToProps(state) {
     return {
@@ -30,6 +23,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
+        //todo: change upload api
         CallInsertStockByPost: propsData => dispatch(GitAction.CallInsertStockByPost(propsData)),
         CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
     };
@@ -59,8 +53,6 @@ class DataManagement extends Component {
         this.renderTableRows = this.renderTableRows.bind(this)
         this.onRemoveAttachment = this.onRemoveAttachment.bind(this)
         this.onViewErrorReport = this.onViewErrorReport.bind(this)
-        this.onDateChange = this.onDateChange.bind(this)
-        this.onContainerNameChange = this.onContainerNameChange.bind(this)
     }
 
     componentDidMount() {
@@ -156,7 +148,7 @@ class DataManagement extends Component {
 
         if (rows.length > 0) {
             rows.map(row => {
-                row["isInvalid"] = (isStringNullOrEmpty(row["Tracking No"]) || isStringNullOrEmpty(row["Member"]) || isStringNullOrEmpty(row["Division"]))
+                row["isInvalid"] = (isStringNullOrEmpty(row["Tracking No"]) || (row["ContainerDate"] !== this.props.propsData.ContainerDate) || (row["ContainerName"] !== this.props.propsData.ContainerName))
             })
         }
         this.setState({ DataHeaders: columns.filter(x => x.name !== ""), DataRows: rows.filter(x => x[columns[0].name] !== ""), loadingData: false })
@@ -165,80 +157,19 @@ class DataManagement extends Component {
     publishData() {
         const { DataRows, ContainerName, ContainerNameValidated, ContainerDate, ContainerDateValidated } = this.state
         if (isArrayNotEmpty(DataRows)) {
-            let Courier = ""
             let TrackingNo = ""
-            let Weight = ""
-            let Depth = ""
-            let Width = ""
-            let Height = ""
-            let Item = ""
-            let Member = ""
-            let Division = ""
-            let StockDate = ""
-            let PackagingDate = ""
-            let AdditionalCost = ""
-            let Remarks = ""
             for (let index = 0; index < DataRows.length; index++) {
-                Courier += (isStringNullOrEmpty(DataRows[index]["Courier"])) ? "-" : DataRows[index]["Courier"].trim();
                 TrackingNo += (isStringNullOrEmpty(DataRows[index]["Tracking No"])) ? "-" : DataRows[index]["Tracking No"].trim();
-                Weight += (isStringNullOrEmpty(DataRows[index]["Weight"])) ? "0" : DataRows[index]["Weight"];
-                Depth += (isStringNullOrEmpty(DataRows[index]["Depth"])) ? "0" : DataRows[index]["Depth"];
-                Height += (isStringNullOrEmpty(DataRows[index]["Height"])) ? "0" : DataRows[index]["Height"];
-                Width += (isStringNullOrEmpty(DataRows[index]["Width"])) ? "0" : DataRows[index]["Width"];
-                Item += (isStringNullOrEmpty(DataRows[index]["Item"])) ? "-" : DataRows[index]["Item"].trim();
-                Member += (isStringNullOrEmpty(DataRows[index]["Member"])) ? "-" : DataRows[index]["Member"].trim();
-                Division += (isStringNullOrEmpty(DataRows[index]["Division"])) ? "-" : DataRows[index]["Division"].trim();
-                StockDate += (isStringNullOrEmpty(DataRows[index]["Stock Date"])) ? "-" : moment(DataRows[index]["Stock Date"].trim(), 'YYYY-MM-DD HH:mm:ss', false).format('YYYY/MM/DD HH:mm:ss')
-                PackagingDate += (isStringNullOrEmpty(DataRows[index]["Packaging Date"])) ? "-" : moment(DataRows[index]["Packaging Date"].trim(), 'YYYY-MM-DD', false).format('YYYY/MM/DD HH:mm:ss')
-                AdditionalCost += (isStringNullOrEmpty(DataRows[index]["Additional Cost"])) ? "-" : DataRows[index]["Additional Cost"].trim();
-                Remarks += (isStringNullOrEmpty(DataRows[index]["Remarks"])) ? "-" : DataRows[index]["Remarks"];
                 if (index !== DataRows.length - 1) {
-                    Courier += ",";
                     TrackingNo += ",";
-                    Weight += ",";
-                    Depth += ",";
-                    Width += ",";
-                    Height += ",";
-                    Item += ",";
-                    Member += ",";
-                    Division += ",";
-                    StockDate += ",";
-                    PackagingDate += ",";
-                    AdditionalCost += ",";
-                    Remarks += ",";
                 }
             }
-
-
             let object = {
-                USERCODE: Member,
                 TRACKINGNUMBER: TrackingNo,
-                PRODUCTWEIGHT: Weight,
-                PRODUCTHEIGHT: Height,
-                PRODUCTWIDTH: Width,
-                PRODUCTDEEP: Depth,
-                AREACODE: Division,
-                ITEM: Item,
-                STOCKDATE: StockDate,
-                PACKAGINGDATE: PackagingDate,
-                REMARK: Remarks,
-                EXTRACHARGE: AdditionalCost,
-                CONTAINERNAME: ContainerName,
-                CONTAINERDATE: convertDateTimeToString112Format(ContainerDate)
             }
-
-
-
-            if (ContainerNameValidated === false || ContainerNameValidated === null || ContainerDateValidated === false) {
-                this.setState({ ContainerNameValidated: false })
-                toast.warning("Container Name or Container Date is empty or invalid.", { autoClose: 2000, position: "top-center", theme: "dark" })
-            }
-            else {
-                toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
-                this.setState({ isSubmit: true })
-                // console.log("object", object)
-                this.props.CallInsertStockByPost(object)
-            }
+            toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
+            this.setState({ isSubmit: true })
+            this.props.CallInsertStockByPost(object)
         }
     }
 
@@ -272,14 +203,6 @@ class DataManagement extends Component {
         )
     }
 
-    onDateChange = (e, type) => {
-        this.setState({ ContainerDate: isStringNullOrEmpty(e) ? "Invalid Date" : e, ContainerDateValidated: (!isStringNullOrEmpty(e) && e !== "Invalid Date") })
-    }
-
-    onContainerNameChange = (e) => {
-        const { value } = e.target
-        this.setState({ ContainerName: isStringNullOrEmpty(value) ? value : value.toUpperCase(), ContainerNameValidated: !isStringNullOrEmpty(value) })
-    }
 
     render() {
         const { DataHeaders, DataRows, loadingData, isSubmit } = this.state
@@ -288,34 +211,6 @@ class DataManagement extends Component {
         return (
             <div>
                 <div className="container">
-                    {/* <div className="d-flex px-3">
-                        <div className="d-md-flex my-2" style={{ marginLeft: 'auto' }}>
-                            <Box>
-                                <Typography variant="h5" >
-                                    Container: {this.state.ContainerName}
-                                </Typography>
-                                <Typography variant="subtitle1" >
-                                    Date: {this.state.ContainerDate}
-                                </Typography>
-                            </Box>
-                            <TextField
-                                label="Container Name"
-                                variant="standard"
-                                name="ContainerName"
-                                value={this.state.ContainerName}
-                                required
-                                sx={{ width: '200px', }}
-                                onChange={this.onContainerNameChange}
-                                helperText={this.state.ContainerNameValidated !== null && !this.state.ContainerNameValidated ? "This is required" : ""}
-                                error={this.state.ContainerNameValidated !== null && !this.state.ContainerNameValidated}
-                                disabled={true}
-                            />
-                            <div style={{ width: '200px', marginLeft: 5 }}>
-                                <ResponsiveDatePickers variant="standard" title="Stock In Date" value={this.state.ContainerDate} onChange={(e) => this.onDateChange(e)} />
-                                {!this.state.ContainerDateValidated && <FormHelperText className='text-danger' >Invalid Date</FormHelperText>}
-                            </div>
-                        </div>
-                    </div> */}
                     <Dropzone
                         placeholder={{
                             text: "Drag and Drop Excel here, or click to select file",
