@@ -492,7 +492,7 @@ class ContainerListing extends Component {
                             onClick={() => { this.setAddModalDetails() }}
                             disabled={this.state.isDataFetching}
                         >
-                            <AddCircleIcon fontSize="large" />
+                            <AddCircleIcon fontSize="large" color="primary" />
                         </IconButton>
                     </Tooltip>
                     {/* <Tooltip title="Synchronize Data">

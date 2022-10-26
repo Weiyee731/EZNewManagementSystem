@@ -15,7 +15,7 @@ import Tooltip from "@mui/material/Tooltip"
 import IconButton from "@mui/material/IconButton"
 import { Typography } from "@mui/material"
 import { toast, Flip } from "react-toastify"
-import AddIcon from '@mui/icons-material/AddCircle';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 function mapStateToProps(state) {
     return {
@@ -220,8 +220,8 @@ class PendingToLoad extends Component {
             return (
                 <div className="d-flex">
                     <Tooltip title="Add Stock">
-                        <IconButton size="large">
-                            <AddIcon onClick={() => window.location.href = "./WarehouseStockManagement"} />
+                        <IconButton size="small">
+                            <AddCircleIcon fontSize="large"   color="primary" onClick={() => window.location.href = "./WarehouseStockManagement"} />
                         </IconButton>
                     </Tooltip>
                     <CsvDownloader

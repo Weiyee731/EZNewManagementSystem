@@ -68,7 +68,7 @@ const ProformaList = (props) => {
 
         let tempArr = []
 
-        items.map((item) => {
+        items !== null && items.length > 0 && items.map((item) => {
             tempArr.push({
                 ...item,
                 unitPrice: unitPrice,
@@ -195,11 +195,11 @@ const ProformaList = (props) => {
     const totalPrice = () => {
         if (selectedType !== 3) {
             let totalArr = []
-            items.map((item) => {
+            items !== null && items.length > 0 && items.map((item) => {
                 totalArr.push(Number(subTotal(item).toFixed(2)))
             })
-            total = !isNaN(roundOffTotal(totalArr.reduce((a, b) => a + b))) ? (parseFloat(roundOffTotal(totalArr.reduce((a, b) => a + b))) - parseFloat(totalArr.reduce((a, b) => a + b))) < 0 ? (parseFloat(roundOffTotal(totalArr.reduce((a, b) => a + b))) + 0.1).toFixed(2) : roundOffTotal(totalArr.reduce((a, b) => a + b)) : 0.00
-            return !isNaN(roundOffTotal(totalArr.reduce((a, b) => a + b))) ? (parseFloat(roundOffTotal(totalArr.reduce((a, b) => a + b))) - parseFloat(totalArr.reduce((a, b) => a + b))) < 0 ? (parseFloat(roundOffTotal(totalArr.reduce((a, b) => a + b))) + 0.1).toFixed(2) : roundOffTotal(totalArr.reduce((a, b) => a + b)) : 0.00
+            total = totalArr.length > 0 && !isNaN(roundOffTotal(totalArr.reduce((a, b) => a + b))) ? (parseFloat(roundOffTotal(totalArr.reduce((a, b) => a + b))) - parseFloat(totalArr.reduce((a, b) => a + b))) < 0 ? (parseFloat(roundOffTotal(totalArr.reduce((a, b) => a + b))) + 0.1).toFixed(2) : roundOffTotal(totalArr.reduce((a, b) => a + b)) : 0.00
+            return  totalArr.length > 0 &&  !isNaN(roundOffTotal(totalArr.reduce((a, b) => a + b))) ? (parseFloat(roundOffTotal(totalArr.reduce((a, b) => a + b))) - parseFloat(totalArr.reduce((a, b) => a + b))) < 0 ? (parseFloat(roundOffTotal(totalArr.reduce((a, b) => a + b))) + 0.1).toFixed(2) : roundOffTotal(totalArr.reduce((a, b) => a + b)) : 0.00
         } else {
             let subKg = weightCompare() - 1
             return !isNaN(roundOffTotal(firstKg + (subKg * subsequentKg))) ? roundOffTotal(firstKg + (subKg * subsequentKg)) : 0.00
@@ -208,7 +208,7 @@ const ProformaList = (props) => {
 
     const AddTotalPrice = () => {
         let totalArr = 0
-        items.map((item) => {
+        items !== null && items.length > 0 &&  items.map((item) => {
             let addprice = 0;
             try {
                 if (JSON.parse(item.AdditionalCharges).length > 0) {

@@ -41,11 +41,11 @@ const routes = [
         exact: true,
         element: <UserManagement />,
     },
-    // {
-    //     path: "/OverallStock",
-    //     exact: true,
-    //     element: <OverallStock typeIndicator="overall" />,
-    // },
+    {
+        path: "/OverallStockListing",
+        exact: true,
+        element: <OverallStock typeIndicator="overall" />,
+    },
     {
         path: "/StockGoods",
         exact: true,
@@ -147,10 +147,10 @@ const routes = [
         exact: true,
         element: <NotificationList />,
     },
-    
+
 
     {
-        path: "/OverallStock",
+        path: "/ContainerListing",
         exact: true,
         element: <ContainerListing typeIndicator="overall" />,
     },

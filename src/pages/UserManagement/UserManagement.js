@@ -604,7 +604,7 @@ class UserManagement extends Component {
         const renderButtonOnTableTopRight = () => {
             return (
                 <div className="d-flex">
-                    <Tooltip title="Add New User">
+                    {/* <Tooltip title="Add New User">
                         <IconButton size="medium" sx={{ border: "2px solid #0074ea", color: "#0074ea", marginRight: 1 }} onClick={() => this.setState({ AddModalOpen: true })}>
                             <GroupAddIcon />
                         </IconButton>
@@ -613,7 +613,7 @@ class UserManagement extends Component {
                         <IconButton size="medium" sx={{ border: "2px solid #818181", color: "#797979" }} onClick={() => this.setState({ addWithCSVModalOpen: true })}>
                             <UploadFileIcon />
                         </IconButton>
-                    </Tooltip>
+                    </Tooltip> */}
                 </div>
             )
         }
