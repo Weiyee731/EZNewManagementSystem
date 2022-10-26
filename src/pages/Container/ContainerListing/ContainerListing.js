@@ -306,7 +306,7 @@ class ContainerListing extends Component {
         var obj = {
             CONTAINERID: data.ContainerID,
             CONTAINERSTATUSID: e.target.value,
-            MODIFY: 1
+            MODIFY: JSON.parse(localStorage.getItem("loginUser"))[0].UserID ? JSON.parse(localStorage.getItem("loginUser"))[0].UserID :1
 
         }
         this.props.CallUpdateContainerStatus(obj)
@@ -388,14 +388,14 @@ class ContainerListing extends Component {
                 ContainerName: this.state.containerNo,
                 ContainerRemark: this.state.containerRemark,
                 ContainerDate: this.state.containerDate,
-                ModifyBy: 1
+                ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID ? JSON.parse(localStorage.getItem("loginUser"))[0].UserID :1
             }
             this.props.CallUpdateContainer(obj)
         } else {
             var obj = {
                 ContainerName: this.state.containerNo,
                 ContainerDate: this.state.containerDate,
-                ModifyBy: 1
+                ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID ? JSON.parse(localStorage.getItem("loginUser"))[0].UserID :1
             }
             this.props.CallAddContainer(obj)
         }
