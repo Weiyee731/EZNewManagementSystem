@@ -17,7 +17,6 @@ import { Typography, TableCell, Box, IconButton, LinearProgress, Button, TextFie
 
 function mapStateToProps(state) {
     return {
-        // stockApproval: state.counterReducer["stockApproval"],
         inventoryStockAction: state.counterReducer["inventoryStockAction"],
     };
 }
@@ -27,8 +26,7 @@ function mapDispatchToProps(dispatch) {
         //todo: change upload api
         CallUpdateContainerInventory: propsData => dispatch(GitAction.CallUpdateContainerInventory(propsData)),
         ClearInventoryAction: propsData => dispatch(GitAction.ClearInventoryAction(propsData)),
-        // CallInsertStockByPost: propsData => dispatch(GitAction.CallInsertStockByPost(propsData)),
-        // CallResetUpdatedStockDetail: () => dispatch(GitAction.CallResetUpdatedStockDetail()),
+        CallViewInventoryByFilter: (propsData) => dispatch(GitAction.CallViewInventoryByFilter(propsData)),
     };
 }
 
@@ -70,20 +68,24 @@ class DataManagement extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (isArrayNotEmpty(this.props.inventoryStockAction )) {
-            console.log("retu",this.props.inventoryStockAction[0].ReturnVal)
-            this.props.ClearInventoryAction()
+        if (isArrayNotEmpty(this.props.inventoryStockAction)) {
+            console.log("retu", this.props.inventoryStockAction[0].ReturnVal)
+
             if (this.props.inventoryStockAction[0].ReturnVal == 0) {
-                // this.props.CallResetUpdatedStockDetail()
-                toast.error(this.props.inventoryStockAction[0].ReturnMsg, { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark"
-                // , onClose: () => { this.setState(INITIAL_STATE) } 
-            })
+                this.props.ClearInventoryAction()
+                toast.error(this.props.inventoryStockAction[0].ReturnMsg, {
+                    autoClose: 2000, position: "top-center", transition: Flip, theme: "dark"
+                    // , onClose: () => { this.setState(INITIAL_STATE) } 
+                })
             }
             else {
-                // this.props.CallResetUpdatedStockDetail()
-                toast.success("Data is uploaded successfully", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark"
-                // , onClose: () => this.props.history.push('/StockGoods')
-             })
+                this.props.ClearInventoryAction()
+                var row = this.props.propsData ? this.props.propsData: [{}]
+                this.props.CallViewInventoryByFilter({ FilterColumn: "and T_Inventory_Stock.ContainerID=" + row.ContainerID })
+                toast.success(this.props.inventoryStockAction[0].ReturnMsg, {
+                    autoClose: 2000, position: "top-center", transition: Flip, theme: "dark"
+                    // , onClose: () => this.props.history.push('/StockGoods')
+                })
                 this.setState(INITIAL_STATE)
             }
         }
