@@ -18,7 +18,7 @@ export const setLogonUser = (loginUser, sidebarItem) => {
             localStorage.setItem("loginUser", JSON.stringify(loginUser));
             localStorage.setItem("sidebarItem", JSON.stringify(sidebarItem));
             localStorage.setItem("systemInfo", SYSTEM_INFO);
-            window.location.href = "/CMS/Dashboard"
+            window.location.href = "/CMS/WarehouseStockManagement"
         }
         catch (e) {
             toast.error("Error: 1101: Unable to set login status. Please contact your software warehouse.")

@@ -514,7 +514,7 @@ class WarehouseStock extends Component {
             }
         }
 
-        const pageStyle = `@page { size:  80mm 60mm;  margin: 5mm; } @media print { body { -webkit-print-color-adjust: exact; }};`
+        const pageStyle = `@page { size: 80mm 60mm;  margin: 5mm; } @media print { body { -webkit-print-color-adjust: exact; }};`
         const buttonLayout = (data) => {
             return (
                 data.length > 0 && data.map((x) => {
@@ -653,10 +653,10 @@ class WarehouseStock extends Component {
                         }
                     </div>
 
-                    <div className="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-xs-12" >
-                        <div className="row" style={{ textAlign: "center" }}>
+                    <div className="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-xs-12" style={{paddingTop:"20pt"}} >
+                        {/* <div className="row" style={{ textAlign: "center" }}>
                             <Typography style={{ fontWeight: "600", fontSize: "15pt", color: "#253949", letterSpacing: 1 }}>未装箱包裹 : {this.state.currentVolume}</Typography>
-                        </div>
+                        </div> */}
                         {buttonLayout([
                             { title: "打印", type: "Print" },
                             { title: "重印", type: "RePrint" },

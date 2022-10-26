@@ -119,7 +119,7 @@ class Login extends Component {
                     </div>
                     <div className="login-inputs-group">
                         <FormControl sx={{ m: 1, marginTop: 5, width: '100%' }} variant="standard">
-                            <InputLabel htmlFor="login-username">Username</InputLabel>
+                            <InputLabel htmlFor="login-username">登录账户</InputLabel>
                             <Input
                                 id="login-username"
                                 value={this.state.username}
@@ -134,7 +134,7 @@ class Login extends Component {
                             />
                         </FormControl>
                         <FormControl sx={{ m: 1, width: '100%' }} variant="standard">
-                            <InputLabel htmlFor="login-password">Password</InputLabel>
+                            <InputLabel htmlFor="login-password">登录密码</InputLabel>
                             <Input
                                 id="login-password"
                                 type={this.state.showPassword ? 'text' : 'password'}
