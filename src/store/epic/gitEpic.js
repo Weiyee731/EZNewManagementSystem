@@ -1172,7 +1172,7 @@ export class GitEpic {
     action$.ofType(GitAction.Notification_View).switchMap(async ({ payload }) => {
       try {
         const response = await fetch(url +
-          "Notification_ViewNotification?" +
+          "Notification_ViewNotification2?" +
           "&NOTIFICATIONSTATUSID=" + payload.NotificationStatusID
         );
 
@@ -1212,7 +1212,7 @@ export class GitEpic {
 
         try {
           const response = await fetch(url +
-            "Notification_ViewNotification?" +
+            "Notification_ViewNotification2?" +
             "&NOTIFICATIONSTATUSID=0"
           );
 
@@ -1262,7 +1262,7 @@ export class GitEpic {
 
         try {
           const response = await fetch(url +
-            "Notification_ViewNotification?" +
+            "Notification_ViewNotification2?" +
             "&NOTIFICATIONSTATUSID=0"
           );
 
@@ -1307,7 +1307,7 @@ export class GitEpic {
         // };
         try {
           const response = await fetch(url +
-            "Notification_ViewNotification?" +
+            "Notification_ViewNotification2?" +
             "&NOTIFICATIONSTATUSID=0"
           );
 
