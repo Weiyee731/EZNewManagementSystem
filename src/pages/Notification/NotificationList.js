@@ -253,15 +253,22 @@ class NotificationList extends Component {
       NotificationDescValidated
     )
     if (isValidated) {
-
-      this.props.CallUpdateNotification({
-        NotificationID: NotificationID,
-        NotificationTitle: NotificationTitle,
-        NotificationDesc: NotificationDesc,
-        NotificationStatusID: 1,
-        ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
-      })
-
+      if (NotificationID === 0) {
+        this.props.CallAddNotification({
+          NotificationTitle: NotificationTitle,
+          NotificationDesc: NotificationDesc,
+          NotificationStatusID: 2,
+          ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
+        })
+      }else{
+        this.props.CallUpdateNotification({
+          NotificationID: NotificationID,
+          NotificationTitle: NotificationTitle,
+          NotificationDesc: NotificationDesc,
+          NotificationStatusID: 1,
+          ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
+        })
+      }
       this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen })
     }
 
