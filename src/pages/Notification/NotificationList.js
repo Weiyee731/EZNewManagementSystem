@@ -113,7 +113,7 @@ class NotificationList extends Component {
       searchArea: "All",
       ButtonTitle: "PUBLISH",
       NotificationID: 0,
-      NotificationStatusID: 0,
+      NotificationStatusID: 1,
       NotificationTitle: "",
       NotificationTitleValidated: false,
       NotificationDesc: "",
@@ -167,7 +167,7 @@ class NotificationList extends Component {
   }
 
   onAddButtonClick = () => {
-    this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen, NotificationTitle: "", NotificationDesc: "", NotificationID: 0, ButtonTitle: "PUBLISH", selectedRows: [], NotificationTitleValidated: false, NotificationDescValidated: false, NotificationStatusID: 0 });
+    this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen, NotificationTitle: "", NotificationDesc: "", NotificationID: 0, ButtonTitle: "PUBLISH", selectedRows: [], NotificationTitleValidated: false, NotificationDescValidated: false, NotificationStatusID: 1 });
   }
 
   onDeleteButtonClick = (event, row) => {
@@ -372,9 +372,10 @@ class NotificationList extends Component {
             DraftInd={this.state.NotificationStatusID === 1 ? true : false}
             showAction={true}                           // required, to show the footer of modal display
             title={this.state.ButtonTitle + " NOTICE"}                      // required, title of the modal
-            buttonTitle={this.state.NotificationStatusID === 0 ? "PUBLISH" : this.state.ButtonTitle}
+            buttonTitle={this.state.NotificationStatusID === 1 ? "PUBLISH" : this.state.ButtonTitle}
             buttonSaveTitle={"SAVE"}                         // required, title of button
             singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
+            handleBackdrop={() => this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen, NotificationTitle: "", NotificationDesc: "", NotificationID: 0, ButtonTitle: "PUBLISH", selectedRows: [], NotificationTitleValidated: false, NotificationDescValidated: false, NotificationStatusID: 1 })}
             maxWidth={"md"}
           >
             <Box component="form" noValidate sx={{ mt: 3 }}>
