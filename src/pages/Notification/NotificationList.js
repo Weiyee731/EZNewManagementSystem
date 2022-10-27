@@ -120,6 +120,7 @@ class NotificationList extends Component {
       NotificationTitleValidated: false,
       NotificationDesc: "",
       searchKeywords: "",
+      filteredList: [],
       NotificationDescValidated: false
     }
     this.renderTableRows = this.renderTableRows.bind(this)
@@ -138,7 +139,9 @@ class NotificationList extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-
+    if (this.props.notification.length > 0 && this.props.notification !== prevProps.notification) { 
+      this.setState({ filteredList: this.props.notification })
+    }
   }
 
   renderTableRows = (data, index) => {
@@ -228,6 +231,10 @@ class NotificationList extends Component {
       NotificationTitleValidated &&
       NotificationDescValidated
     )
+    console.log(NotificationTitleValidated)
+    console.log(isValidated)
+    console.log(NotificationDescValidated)
+    console.log(NotificationID === 0)
     if (isValidated) {
       if (NotificationID === 0) {
         this.props.CallAddNotification({
@@ -338,7 +345,7 @@ class NotificationList extends Component {
     if (isStringNullOrEmpty(value)) {
       this.setState({ searchKeywords: value, filteredList: this.props.notification })
     } else {
-      var tempList = this.props.notification.filter(x => (x.NotificationTitle.includes(value)))
+      var tempList = this.props.notification.filter(x => (x.NotificationTitle.toLowerCase().includes(value.toLowerCase())))
       this.setState({ searchKeywords: value, filteredList: tempList })
     }
   }
