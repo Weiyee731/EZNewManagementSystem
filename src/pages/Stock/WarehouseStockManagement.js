@@ -12,6 +12,7 @@ import FormControl from '@mui/material/FormControl';
 import ReactToPrint, { PrintContextConsumer } from 'react-to-print';
 import moment from 'moment';
 import { Button, TextField, Autocomplete, Box, Typography, } from '@mui/material'
+import QRCode from 'qrcode.react';
 // let { remote } = require("electron");
 // const { PosPrinter } = remote.require("electron-pos-printer");
 
@@ -115,9 +116,10 @@ class WarehouseStock extends Component {
         if (this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== 0 && this.state.isCheckDatabase === true) {
             let arr = this.state.stockData
             if (this.props.inventoryStock[0].ReturnVal !== 0) {
+                console.log("sdasdasd", this.props)
                 arr[0].CourierID = listing.CourierID
                 arr[0].UserCode = listing.UserCode
-                arr[0].areaCode = listing.AreaCode
+                arr[0].areaCode = listing.UserAreaID
                 arr[0].UserData = listing.Username
                 arr[0].Item = listing.Item
                 arr[0].Quantity = listing.ProductQuantity
@@ -286,7 +288,7 @@ class WarehouseStock extends Component {
         let data = ""
 
         if (listing.length > 0 && listing[0].ReturnVal !== 0) {
-            listing.filter((x) => x.UserAreaID === id).map((y) => {
+            listing.filter((x) => x.UserAreaID == id).map((y) => {
                 data = y.AreaCode
             })
         }
@@ -320,7 +322,7 @@ class WarehouseStock extends Component {
             CourierID += (isStringNullOrEmpty(listing.CourierID)) ? "0" : listing.CourierID.CourierID;
             Item += (isStringNullOrEmpty(listing.Item)) ? "-" : listing.Item.replace(/ /g, '');
             Remark += (isStringNullOrEmpty(listing.Remark)) ? "-" : listing.Remark.replace(/ /g, '');
-            areaCode += (isStringNullOrEmpty(listing.areaCode)) ? "-" : listing.areaCode;
+            areaCode += (isStringNullOrEmpty(listing.areaCode)) ? "-" : listing.areaCode ;
             createdDate += (isStringNullOrEmpty(listing.createdDate)) ? "-" : listing.createdDate;
 
             if (index !== listing.Quantity - 1) {
@@ -616,7 +618,7 @@ class WarehouseStock extends Component {
                         CourierID: (isStringNullOrEmpty(listing.CourierID)) ? "0" : listing.CourierID.CourierID,
                         Item: (isStringNullOrEmpty(listing.Item)) ? "-" : listing.Item.replace(/ /g, ''),
                         Remark: (isStringNullOrEmpty(listing.Remark)) ? "-" : listing.Remark.replace(/ /g, ''),
-                        areaCode: (isStringNullOrEmpty(listing.areaCode)) ? "-" : listing.areaCode,
+                        areaCode: (isStringNullOrEmpty(listing.areaCode)) ? "-" : this.verifyAreaCode(listing.areaCode),
                         UserData: (isStringNullOrEmpty(listing.UserData)) ? "-" : listing.UserData,
                     })
                 }
@@ -628,11 +630,16 @@ class WarehouseStock extends Component {
                         <div key={x.TrackingNumber} style={{ width: "300px", paddingLeft: "0px", paddingTop: "3pt" }}>
                             {/* <Typography style={{ fontWeight: "600", fontSize: "16pt", color: "#253949", letterSpacing: 1 }}>{x.areaCode}</Typography> */}
                             <Barcode value={x.TrackingNumber} height='50pt' width='1px' fontSize='23pt' />
-                            <div style={{ textAlign: "left", paddingTop: "4pt" }}>
-                                <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>会员：
-                                    <label style={{ fontSize: "16pt" }}> {x.UserCode} ( {x.areaCode} )</label></Typography>
-                                <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
-                                <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, hh:mm:ss')}</Typography>
+                            <div className="row" style={{ textAlign: "left", paddingTop: "4pt" }}>
+                                <div className="col-2" style={{itemAlign:"center"}}>
+                                    <QRCode value={x.TrackingNumber} size={50}/>,
+                                </div>
+                                <div className="col-10">
+                                    <Typography style={{ fontWeight: "600", fontSize: "11pt", color: "#253949", letterSpacing: 1 }}>会员：
+                                        <label style={{ fontSize: "14pt" }}> {x.UserCode} ( {x.areaCode} )</label></Typography>
+                                    <Typography style={{ fontWeight: "600", fontSize: "11pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
+                                    <Typography style={{ fontWeight: "600", fontSize: "11pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, hh:mm:ss')}</Typography>
+                                </div>
                             </div>
                         </div>
                     )
