@@ -5,15 +5,15 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { withRouter } from "react-router";
 import { isArrayNotEmpty, isStringNullOrEmpty, isNumber } from "../../tools/Helpers";
-import { TextField, Typography } from "@mui/material"
 import { toast } from "react-toastify"
-import Button from '@mui/material/Button';
 import Barcode from 'react-barcode';
-import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import ReactToPrint, { PrintContextConsumer } from 'react-to-print';
 import moment from 'moment';
+import { Button, TextField, Autocomplete, Box, Typography, } from '@mui/material'
+
+// import { Br, Cut, Line, Printer, Text, Row, render } from 'react-thermal-printer';
 
 function mapStateToProps(state) {
     return {
@@ -51,7 +51,7 @@ const INITIAL_STATE = {
     stockData: [{
         TrackingNumber: "",
         isTrackingError: false,
-        CourierID: "",
+        CourierID: { CourierID: "", CourierName: "" },
         isCourierError: false,
         UserCode: "",
         isUserCodeError: false,
@@ -116,7 +116,7 @@ class WarehouseStock extends Component {
                 arr[0].Item = listing.Item
                 arr[0].Quantity = listing.ProductQuantity
                 arr[0].ProductWeight = listing.ProductWeight
-                arr[0].CourierID = listing.CourierID
+                arr[0].CourierID = { CourierID: listing.CourierID, CourierName: listing.CourierName }
                 arr[0].ProductHeight = listing.ProductDimensionHeight
                 arr[0].ProductWidth = listing.ProductDimensionWidth
                 arr[0].ProductDeep = listing.ProductDimensionDeep
@@ -159,7 +159,7 @@ class WarehouseStock extends Component {
         this.setState({
             stockData: [{
                 TrackingNumber: data,
-                isTrackingError: false, CourierID: "", isCourierError: false, UserCode: "", isUserCodeError: false,
+                isTrackingError: false, CourierID: { CourierID: "", CourierName: "" }, isCourierError: false, UserCode: "", isUserCodeError: false,
                 UserData: "", Item: "", isItemError: false, Quantity: 1, isQuantityError: false, ProductWeight: "", isProductWeightError: false,
                 ProductVolumetricWeight: "", isProductVolumetricWeightError: false, ProductHeight: "", isProductHeightError: false, ProductWidth: "",
                 isProductWidthError: false, ProductDeep: "", isProductDeepError: false, Remark: "", areaCode: "", createdDate: "", StockID: "",
@@ -310,7 +310,7 @@ class WarehouseStock extends Component {
             ProductHeight += (isStringNullOrEmpty(listing.ProductHeight)) ? "0" : listing.ProductHeight;
             ProductDeep += (isStringNullOrEmpty(listing.ProductDeep)) ? "0" : listing.ProductDeep;
             ProductWidth += (isStringNullOrEmpty(listing.ProductWidth)) ? "0" : listing.ProductWidth;
-            CourierID += (isStringNullOrEmpty(listing.CourierID)) ? "0" : listing.CourierID;
+            CourierID += (isStringNullOrEmpty(listing.CourierID)) ? "0" : listing.CourierID.CourierID;
             Item += (isStringNullOrEmpty(listing.Item)) ? "-" : listing.Item.replace(/ /g, '');
             Remark += (isStringNullOrEmpty(listing.Remark)) ? "-" : listing.Remark.replace(/ /g, '');
             areaCode += (isStringNullOrEmpty(listing.areaCode)) ? "-" : listing.areaCode;
@@ -374,6 +374,19 @@ class WarehouseStock extends Component {
                     );
                 });
         }
+        const handleFilter = (event, data) => {
+            let arr = []
+            arr = this.state.stockData[0]
+            let finalData = []
+
+            arr.isCourierError = false
+            if (isArrayNotEmpty(data))
+                arr.isCourierError = true
+            arr.CourierID = data
+
+            finalData.push(arr)
+            this.setState({ stockData: finalData })
+        }
 
         const listingLayout = (title, value, error, type) => {
             return (
@@ -385,17 +398,26 @@ class WarehouseStock extends Component {
                         {type === "list" ?
                             <Box sx={{ minWidth: 120 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel id="demo-simple-select-label">{title}</InputLabel>
-                                    <Select
-                                        value={value}
-                                        onChange={(e) => this.handleChange(e.target.value, title)}
-                                        className="select"
+                                    <Autocomplete
+                                        disableCloseOnSelect={true}
+                                        disablePortal
                                         size="small"
-                                        required
-                                        label={title}
-                                    >
-                                        {generateOptions}
-                                    </Select>
+                                        id="combo-box-demo"
+                                        options={this.props.courier}
+                                        getOptionLabel={(option) => option.CourierName}
+                                        renderOption={(props, option) => {
+                                            return (
+                                                <li {...props} key={option.CourierID}>
+                                                    {option.CourierName}
+                                                </li>
+                                            )
+                                        }}
+                                        renderInput={(params) => <TextField {...params} label="快递" />}
+                                        onChange={(e, obj) => {
+                                            handleFilter(e, obj)
+                                        }}
+                                        value={value}
+                                    />
                                 </FormControl>
                             </Box>
                             :
@@ -476,7 +498,8 @@ class WarehouseStock extends Component {
                 case "Save":
                     if (!this.verifyError()) {
                         let Obj = this.createObject()
-                        this.props.CallAddInventory(Obj)
+                        console.log("ddadadasdadda", Obj)
+                        // this.props.CallAddInventory(Obj)
                         this.setState({ isSubmitAdd: true })
                     }
                     else
@@ -486,7 +509,7 @@ class WarehouseStock extends Component {
                 case "Print":
                     if (!this.verifyError()) {
                         let Obj = this.createObject()
-                        this.props.CallAddInventory(Obj)
+                        // this.props.CallAddInventory(Obj)
                         this.setState({ isSubmitAdd: true })
                     }
                     else
@@ -514,7 +537,7 @@ class WarehouseStock extends Component {
             }
         }
 
-        const pageStyle = `@page { size: 80mm 60mm;  margin: 5mm; } @media print { body { -webkit-print-color-adjust: exact; }};`
+        const pageStyle = `@page { size: 40mm 30mm;  margin: 1mm; } @media print { body { -webkit-print-color-adjust: exact; }};`
         const buttonLayout = (data) => {
             return (
                 data.length > 0 && data.map((x) => {
@@ -570,7 +593,7 @@ class WarehouseStock extends Component {
                         ProductHeight: (isStringNullOrEmpty(listing.ProductHeight)) ? "0" : listing.ProductHeight,
                         ProductDeep: (isStringNullOrEmpty(listing.ProductDeep)) ? "0" : listing.ProductDeep,
                         ProductWidth: (isStringNullOrEmpty(listing.ProductWidth)) ? "0" : listing.ProductWidth,
-                        CourierID: (isStringNullOrEmpty(listing.CourierID)) ? "0" : listing.CourierID,
+                        CourierID: (isStringNullOrEmpty(listing.CourierID)) ? "0" : listing.CourierID.CourierID,
                         Item: (isStringNullOrEmpty(listing.Item)) ? "-" : listing.Item.replace(/ /g, ''),
                         Remark: (isStringNullOrEmpty(listing.Remark)) ? "-" : listing.Remark.replace(/ /g, ''),
                         areaCode: (isStringNullOrEmpty(listing.areaCode)) ? "-" : listing.areaCode,
@@ -584,12 +607,12 @@ class WarehouseStock extends Component {
                     return (
                         <div className="row" key={x.TrackingNumber} style={{ display: "block" }}>
                             <div style={{ textAlign: "center" }}>
-                                <Typography style={{ fontWeight: "600", fontSize: "14pt", color: "#253949", letterSpacing: 1 }}>{x.areaCode}</Typography>
-                                <Barcode value={x.TrackingNumber} height='80pt' />
+                                <Typography style={{ fontWeight: "600", fontSize: "10pt", color: "#253949", letterSpacing: 1 }}>{x.areaCode}</Typography>
+                                <Barcode value={x.TrackingNumber} height='30pt' width='1pt' fontSize='10' />
                                 <div className="row" style={{ textAlign: "left" }}>
-                                    <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>会员： {x.UserCode}</Typography>
-                                    <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
-                                    <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, hh:mm:ss')}</Typography>
+                                    <Typography style={{ fontWeight: "600", fontSize: "5pt", color: "#253949", letterSpacing: 1 }}>会员： {x.UserCode}</Typography>
+                                    <Typography style={{ fontWeight: "600", fontSize: "5pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
+                                    <Typography style={{ fontWeight: "600", fontSize: "5pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, hh:mm:ss')}</Typography>
                                 </div>
                             </div>
                         </div>
@@ -653,7 +676,7 @@ class WarehouseStock extends Component {
                         }
                     </div>
 
-                    <div className="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-xs-12" style={{paddingTop:"20pt"}} >
+                    <div className="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-xs-12" style={{ paddingTop: "20pt" }} >
                         {/* <div className="row" style={{ textAlign: "center" }}>
                             <Typography style={{ fontWeight: "600", fontSize: "15pt", color: "#253949", letterSpacing: 1 }}>未装箱包裹 : {this.state.currentVolume}</Typography>
                         </div> */}
