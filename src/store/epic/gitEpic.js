@@ -1244,12 +1244,19 @@ export class GitEpic {
   Notification_UpdateNotification = action$ =>
     action$.ofType(GitAction.Notification_Update).switchMap(async ({ payload }) => {
       try {
-        const response = await fetch(url +
+        console.log(url +
           "Notification_UpdateNotification?" +
           "NOTIFICATIONTITLE=" + payload.NotificationTitle +
           "&NOTIFICATIONSTATUSID=" + payload.NotificationStatusID +
           "&NOTIFICATIONID=" + payload.NotificationID +
           "&NOTIFICATIONDESC=" + payload.NotificationDesc +
+          "&MODIFY=" + payload.ModifyBy)
+        const response = await fetch(url +
+          "Notification_UpdateNotification?" +
+          "NOTIFICATIONTITLE=" + payload.NotificationTitle +
+          "&NOTIFICATIONSTATUSID=" + payload.NotificationStatusID +
+          "&NOTIFICATIONID=" + payload.NotificationID +
+          "&NOTIFICATIONDESC=" + encodeURIComponent(payload.NotificationDesc) +
           "&MODIFY=" + payload.ModifyBy
         );
 
@@ -1282,7 +1289,7 @@ export class GitEpic {
         }
       }
       catch (error) {
-        toast.error("Error Code: Notification_UpdateNotification")
+        toast.error("Error Code: Notification_UpdateNotification" + error)
         return {
           type: GitAction.Notification_Updated,
           payload: [],

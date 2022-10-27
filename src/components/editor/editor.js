@@ -10,8 +10,8 @@ const DescriptionFunction = (props) => {
         <Editor
             id="editor1"
             apiKey='x4mqgazypswvw9k7ylkasipxjmrgp49stwbne96rwg4l1xhi'
-            initialValue={post_content}
-            value={content}
+            value={post_content}
+            // value={content}
             onEditorChange={(e) => handleChange(e)}
             init={{
                 height: 600,
