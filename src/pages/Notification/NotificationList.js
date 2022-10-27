@@ -227,7 +227,7 @@ class NotificationList extends Component {
           NotificationID: NotificationID,
           NotificationTitle: NotificationTitle,
           NotificationDesc: NotificationDesc,
-          NotificationStatusID: 2,
+          NotificationStatusID: 1,
           ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
         })
       }
@@ -257,7 +257,7 @@ class NotificationList extends Component {
         this.props.CallAddNotification({
           NotificationTitle: NotificationTitle,
           NotificationDesc: NotificationDesc,
-          NotificationStatusID: 2,
+          NotificationStatusID: 1,
           ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
         })
       }else{
@@ -369,7 +369,7 @@ class NotificationList extends Component {
             handleToggleDialog={() => this.setState({ AddModalOpen: this.state.user !== null && !this.state.AddModalOpen })}  // required, pass the toggle function of modal
             handleConfirmFunc={this.onSubmit}    // required, pass the confirm function 
             handleSaveFunc={this.onSave}
-            DraftInd={this.state.NotificationStatusID === 0 ? true : false}
+            DraftInd={this.state.NotificationStatusID === 1 ? true : false}
             showAction={true}                           // required, to show the footer of modal display
             title={this.state.ButtonTitle + " NOTICE"}                      // required, title of the modal
             buttonTitle={this.state.NotificationStatusID === 0 ? "PUBLISH" : this.state.ButtonTitle}
