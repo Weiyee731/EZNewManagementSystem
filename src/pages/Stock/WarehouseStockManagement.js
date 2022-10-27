@@ -96,6 +96,7 @@ class WarehouseStock extends Component {
         let listing = this.props.inventoryStock[0]
         let userListing = this.props.userData[0]
 
+
         if (this.state.isCheckUser === true && this.props.userData.length > 0) {
 
             let arr = this.state.stockData
@@ -116,6 +117,7 @@ class WarehouseStock extends Component {
             if (this.props.inventoryStock[0].ReturnVal !== 0) {
                 arr[0].CourierID = listing.CourierID
                 arr[0].UserCode = listing.UserCode
+                arr[0].areaCode = listing.AreaCode
                 arr[0].UserData = listing.Username
                 arr[0].Item = listing.Item
                 arr[0].Quantity = listing.ProductQuantity
@@ -305,6 +307,7 @@ class WarehouseStock extends Component {
         let Remark = ""
         let areaCode = ""
         let createdDate = ""
+        console.log(" listing.UserCode", listing.areaCode)
 
 
         for (let index = 0; index < listing.Quantity; index++) {
@@ -502,8 +505,7 @@ class WarehouseStock extends Component {
                 case "Save":
                     if (!this.verifyError()) {
                         let Obj = this.createObject()
-                        console.log("ddadadasdadda", Obj)
-                        // this.props.CallAddInventory(Obj)
+                        this.props.CallAddInventory(Obj)
                         this.setState({ isSubmitAdd: true })
                     }
                     else
@@ -513,7 +515,7 @@ class WarehouseStock extends Component {
                 case "Print":
                     if (!this.verifyError()) {
                         let Obj = this.createObject()
-                        // this.props.CallAddInventory(Obj)
+                        this.props.CallAddInventory(Obj)
                         this.setState({ isSubmitAdd: true })
                     }
                     else
@@ -542,8 +544,8 @@ class WarehouseStock extends Component {
         }
         const pageStyle = `@media print {
             @page {
-             size: 60mm 80mm;
-             margin:2mm;
+             size: 300px 227px landscape;
+             margin:5px
             }
           }`;
 
@@ -583,7 +585,7 @@ class WarehouseStock extends Component {
                                                     backgroundColor: this.verifyError() ? "grey" : "#0362fc"
                                                 }} disabled={this.verifyError() ? true : false}
                                                 >
-                                                    {x.title}
+                                                    {x.title}111
                                                 </Button>
                                             );
                                         }}
@@ -623,13 +625,14 @@ class WarehouseStock extends Component {
             return (
                 dataListing.length > 0 && dataListing.map((x) => {
                     return (
-                        <div className="row" key={x.TrackingNumber} style={{textAlign: "center" }}>
-                            <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>{x.areaCode}</Typography>
-                            <Barcode value={x.TrackingNumber} height='40pt' width='1pt' fontSize='10' />
-                            <div className="row" style={{ textAlign: "left" }}>
-                                <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>会员： {x.UserCode}</Typography>
-                                <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
-                                <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, hh:mm:ss')}</Typography>
+                        <div key={x.TrackingNumber} style={{ width: "300px", paddingLeft: "0px", paddingTop: "3pt" }}>
+                            {/* <Typography style={{ fontWeight: "600", fontSize: "16pt", color: "#253949", letterSpacing: 1 }}>{x.areaCode}</Typography> */}
+                            <Barcode value={x.TrackingNumber} height='50pt' width='1px' fontSize='23pt' />
+                            <div style={{ textAlign: "left", paddingTop: "4pt" }}>
+                                <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>会员：
+                                    <label style={{ fontSize: "16pt" }}> {x.UserCode} ( {x.areaCode} )</label></Typography>
+                                <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
+                                <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, hh:mm:ss')}</Typography>
                             </div>
                         </div>
                     )
