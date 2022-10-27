@@ -214,20 +214,19 @@ class NotificationList extends Component {
       NotificationDescValidated
     )
     if (isValidated) {
-      if (ButtonTitle === "PUBLISH") {
+      if (NotificationID === 0) {
         this.props.CallAddNotification({
           NotificationTitle: NotificationTitle,
           NotificationDesc: NotificationDesc,
           NotificationStatusID: 2,
           ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
         })
-      } else if (ButtonTitle === "UPDATE") {
-
+      } else{
         this.props.CallUpdateNotification({
           NotificationID: NotificationID,
           NotificationTitle: NotificationTitle,
           NotificationDesc: NotificationDesc,
-          NotificationStatusID: 1,
+          NotificationStatusID: 2,
           ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
         })
       }
