@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>UNIMAS QVAC</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <style>
+    .font-1p2-vw {
+      font-size: 1.2vw;
+    }
+
+    .font-8-pt {
+      font-size: 8pt;
+    }
+
+    .font-10-pt {
+      font-size: 10pt;
+    }
+
+    .font-15-pt {
+      font-size: 15pt;
+    }
+
+    .font-20-pt {
+      font-size: 20pt;
+    }
+
+    .font-30-pt {
+      font-size: 30pt;
+    }
+
+    .font-40-pt {
+      font-size: 40pt;
+    }
+
+    .font-50-pt {
+      font-size: 50pt;
+    }
+
+    .font-60-pt {
+      font-size: 60pt;
+    }
+
+    .font-70-pt {
+      font-size: 70pt;
+    }
+
+    .font-80-pt {
+      font-size: 80pt;
+    }
+
+    .font-90-pt {
+      font-size: 80pt;
+    }
+
+    .font-white {
+      color: white;
+    }
+
+    .font-red {
+      color: #FB4B4E;
+    }
+
+    .font-darksalmon {
+      color: darksalmon;
+    }
+
+    .flex-vertical {
+      flex-direction: column;
+      display: flex;
+      text-align: center;
+      justify-content: center;
+    }
+
+    .width-7-perc {
+      width: 7%;
+    }
+
+    .dashboard-card-title {
+      font: bold 14px Sans-Serif;
+      background: #369;
+      color: #fff;
+      padding: 5px 10px;
+      line-height: 24px;
+      position: relative;
+      right: 10px;
+    }
+
+    .aside {
+      display: block;
+      position: relative;
+      margin: 40px 0;
+      width: 45pt
+    }
+
+    .aside h3 {
+      font: bold 12px Sans-Serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: #369;
+      color: #fff;
+      margin-top: 5pt;
+      padding: 5px 10px;
+      line-height: 24px;
+      transform: rotate(90deg);
+      width: 168px;
+      position: relative;
+      right: 69px;
+    }
+
+    .screen-display-title {
+      position: absolute;
+      margin: auto;
+      top: 60px;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+
+    .dateTimeBox {
+      border: 5px solid #000;
+      border-radius: 5pt;
+      background-color: #FBFAF8;
+      color: black;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 0px #fff, 0 0 1px #fff, 0 0 3px #ff4a4a, 0 0 3px #ff4a4a, 0 0 4px #ff4a4a, 0 0 5px #ff4a4a, 0 0 6px #ff4a4a;
+      }
+
+      to {
+        text-shadow: 0 0 5px #fff, 0 0 6px #ff4d4d, 0 0 10px #ff4d4d, 0 0 8px #ff4d4d, 0 0 9px #ff4d4d, 0 0 10px #ff4d4d, 0 0 11px #ff4d4d;
+      }
+    }
+
+    .numberPrintingLogo {
+      position: relative;
+      z-index: 1;
+    }
+
+    .label-disclaimer {
+      font-size: smaller;
+      color: red;
+    }
+
+    @media print {
+      .hideDisplay {
+        display: none;
+      }
+    }
+
+    .userListing {
+      height: 50vh;
+      overflow-y: scroll;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      box-shadow: inset 0 0 5px #000000;
+    }
+
+    .center {
+      margin-top: 10%;
+      transform: scale(2.0);
+    }
+
+    .button {
+      background-color: #008CBA;
+      /* Green */
+      width: 20%;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="justify-content-center d-flex flex-vertical align-middle center">
+    <div style="width: 100%;">
+      <img style="width: 10%;position: relative;" src="icon.png" />
+    </div>
+    <div class="numberPrintingLogo p-4">
+      <div class="font-weight-bolder font-30-pt">
+        NORMAL LANE
+      </div>
+      <div class="font-weight-bolder font-90-pt" id="DisplayNumber">
+      </div>
+      <div>
+        Currently serving: <b id="CurrentNumber"></b>
+      </div>
+      <div class="mt-2" id="currentDateTime">
+      </div>
+      <input 
+      onclick="test()"
+       type="button" class="button" value="PRINT123" />
+    </div>
+  </div>
+  <script src="./renderer.js"></script>
+  <script>
+    // var url = 'http://10.49.118.157/QueueSystem/api/QueueSystem/Queue_LatestTicket';
+    // setInterval(() => { init(url) }, 500);
+    // function init(url) {
+    //   fetch(url)
+    //     .then((response) => response.json())
+    //     .then((json) => {
+    //       if (json !== "fail") {
+    //         json = JSON.parse(json);
+    //       } else {
+    //         json = [];
+    //       }
+    //       document.getElementById("DisplayNumber").innerHTML = json[0].DisplayNumber
+    //       document.getElementById("CurrentNumber").innerHTML = json[0].CurrentNumber
+    //     })
+    //     .catch((error) =>
+    //       ""
+    //       //  alert("Something is wrong.Please Alert QVAC Team on ERROR 4042")
+    //     );
+    // }
+    function test() {
+
+      console.log("sadaddadad",)
+      // document.getElementById("DisplayNumber").innerHTML = json[0].DisplayNumber
+      // document.getElementById("CurrentNumber").innerHTML = json[0].CurrentNumber
+      document.getElementById("DisplayNumber").innerHTML = 123
+      document.getElementById("CurrentNumber").innerHTML = 456
+      const data = [
+        {
+          type: "text", value: `<html><style>
+                  .font-center{
+                    width:"100%";
+                    text-align: center;
+                  }
+                  .font-60-pt {
+                      font-size: 60pt;
+                  }
+                  .font-20-pt {
+                    font-size: 20pt;
+                  }
+                  .width-100 {
+                    width: 100%;
+                  }
+                  .height-100 {
+                    height: 100%;
+                  }
+                </style>
+                <body>
+                  <div class="p-4 width-100 height-100">
+                    <img style="filter: grayscale(100%);" src='data:image/png;base64, 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' width='150'/>
+                    <div class="font-center font-weight-bolder font-20-pt">
+                      NORMAL LANE
+                    </div>
+                    <div class="font-center font-weight-bolder font-60-pt" id="DisplayNumber">` +
+            document.getElementById("DisplayNumber").textContent +
+            `</div>
+                    <div class="font-center">
+                      Currently serving: <b id="CurrentNumber">` + document.getElementById("CurrentNumber").textContent + `</b>
+                    </div>
+                    <div class="mt-2 font-center">` + date() + `</div>
+                  </div>
+                </body>
+              </html>`,
+          css: { "font-size": "15px", "width": "100%", "height": "100%" }
+        }];
+      let printerName = "XP-80C";
+      let widthPage = 300;
+      const options = {
+        landscape: false,
+        preview: true,
+        width: 301000,
+        height: 71000,
+        margin: "0 0 0 0",
+        copies: 1,
+        printerName: printerName,
+        // timeOutPerLine: 400,
+        silent: true,
+        // pageSize: { height: 6000, width: 8000 }  // page size
+        // pageSize: { height: 301000, width: 71000 } // page size
+      };
+      const d = [...data];
+
+      if (printerName && widthPage) {
+        PosPrinter.print(d, options)
+          .then(() => { })
+          .catch((error) => {
+            console.error(error);
+          });
+      } else {
+        alert("Select the printer and the width");
+      }
+
+      // var url2 = 'http://10.49.118.157/QueueSystem/api/QueueSystem/Queue_InitiateQueue?PRIORITYID=0';
+      // fetch(url2)
+      //   .then((response) => response.json())
+      //   .then((json) => {
+      //     if (json !== "fail") {
+      //       json = JSON.parse(json);
+      //     } else {
+      //       alert("Something is wrong.Please Alert QVAC Team on ERROR 4044")
+      //       json = [];
+      //     }
+      //     document.getElementById("DisplayNumber").innerHTML = json[0].DisplayNumber
+      //     document.getElementById("CurrentNumber").innerHTML = json[0].CurrentNumber
+      //     const data = [
+      //     { type: "text", value: `<html><style>
+      //             .font-center{
+      //               width:"100%";
+      //               text-align: center;
+      //             }
+      //             .font-60-pt {
+      //                 font-size: 60pt;
+      //             }
+      //             .font-20-pt {
+      //               font-size: 20pt;
+      //             }
+      //             .width-100 {
+      //               width: 100%;
+      //             }
+      //             .height-100 {
+      //               height: 100%;
+      //             }
+      //           </style>
+      //           <body>
+      //             <div class="p-4 width-100 height-100">
+      //               <img style="filter: grayscale(100%);" src='data:image/png;base64, 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' width='150'/>
+      //               <div class="font-center font-weight-bolder font-20-pt">
+      //                 NORMAL LANE
+      //               </div>
+      //               <div class="font-center font-weight-bolder font-60-pt" id="DisplayNumber">` +
+      //                   document.getElementById("DisplayNumber").textContent +
+      //                   `</div>
+      //               <div class="font-center">
+      //                 Currently serving: <b id="CurrentNumber">` + document.getElementById("CurrentNumber").textContent + `</b>
+      //               </div>
+      //               <div class="mt-2 font-center">` + date() + `</div>
+      //             </div>
+      //           </body>
+      //         </html>`,
+      //     css: { "font-size": "15px", "width": "100%", "height": "100%" }}];
+      //     let printerName = "XP-80C";
+      //     let widthPage = 300;
+      //     const options = {
+      //       preview: false, 
+      //       width: widthPage, 
+      //       margin: "0 0 0 0", 
+      //       copies: 1, 
+      //       printerName: printerName,
+      //       timeOutPerLine: 400,
+      //       silent: true,
+      //     };
+      //     const d = [...data];
+
+      //     if (printerName && widthPage) {
+      //       PosPrinter.print(d, options)
+      //         .then(() => {})
+      //         .catch((error) => {
+      //           console.error(error);
+      //         });
+      //     } else {
+      //       alert("Select the printer and the width");
+      //     }
+      //   })
+      //   .catch((error) => alert(error));
+    }
+    // function date() {
+    //   const x = new Date();
+    //   const y = "0" + x.getHours();
+    //   const z = "0" + x.getMinutes();
+    //   const s = "0" + x.getSeconds();
+    //   const h = "0" + x.getDate();
+    //   const ano = x.getFullYear().toString().substr(-2);
+    //   const ms = x.getMonth();
+    //   const meses = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+    //   return (h.substr(-2) + "/" + meses[ms] + "/2021 -  " + y.substr(-2) + ":" + z.substr(-2) + ":" + s.substr(-2));
+    // }
+  </script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous">
+    </script> -->
+</body>
+
+</html>

@@ -12,8 +12,12 @@ import FormControl from '@mui/material/FormControl';
 import ReactToPrint, { PrintContextConsumer } from 'react-to-print';
 import moment from 'moment';
 import { Button, TextField, Autocomplete, Box, Typography, } from '@mui/material'
+// let { remote } = require("electron");
+// const { PosPrinter } = remote.require("electron-pos-printer");
 
 // import { Br, Cut, Line, Printer, Text, Row, render } from 'react-thermal-printer';
+
+
 
 function mapStateToProps(state) {
     return {
@@ -536,8 +540,14 @@ class WarehouseStock extends Component {
                     break;
             }
         }
+        const pageStyle = `@media print {
+            @page {
+             size: 60mm 80mm;
+             margin:2mm;
+            }
+          }`;
 
-        const pageStyle = `@page { size: 40mm 30mm;  margin: 1mm; } @media print { body { -webkit-print-color-adjust: exact; }};`
+        // const pageStyle = `@page { size: 40mm 30mm landscape;  } @media print { body { -webkit-print-color-adjust: exact; } };`
         const buttonLayout = (data) => {
             return (
                 data.length > 0 && data.map((x) => {
@@ -555,9 +565,17 @@ class WarehouseStock extends Component {
                                         {x.title}
                                     </Button>
                                     :
+                                    // <Button style={{
+                                    //     paddingTop: "30pt", paddingBottom: "30pt", borderRadius: "20pt", color: "white", fontWeight: "bold", fontSize: "20pt",
+                                    //     backgroundColor: this.verifyError() ? "grey" : "#0362fc"
+                                    // }} disabled={this.verifyError() ? true : false} onClick={() => renderPrintListing()}
+                                    // >
+                                    //     {x.title}
+                                    // </Button>
                                     <ReactToPrint
                                         style={{ width: "100%", display: "inline" }}
                                         pageStyle={pageStyle}
+                                        preview={false}
                                         trigger={(e) => {
                                             return (
                                                 <Button style={{
@@ -579,14 +597,14 @@ class WarehouseStock extends Component {
                 })
             )
         }
-
+        // <script src="./renderer.js"></script>
         const renderPrintListing = () => {
-            let data = []
+            let dataListing = []
             let listing = ""
             if (this.state.stockData.length > 0) {
                 listing = this.state.stockData[0]
                 for (let index = 0; index < listing.Quantity; index++) {
-                    data.push({
+                    dataListing.push({
                         UserCode: listing.UserCode,
                         TrackingNumber: listing.Quantity > 1 ? listing.TrackingNumber.replace(/ /g, '') + "00" + parseInt(index + 1) : listing.TrackingNumber.replace(/ /g, ''),
                         ProductWeight: (isStringNullOrEmpty(listing.ProductWeight)) ? "0" : listing.ProductWeight,
@@ -603,22 +621,83 @@ class WarehouseStock extends Component {
             }
 
             return (
-                data.length > 0 && data.map((x) => {
+                dataListing.length > 0 && dataListing.map((x) => {
                     return (
-                        <div className="row" key={x.TrackingNumber} style={{ display: "block" }}>
-                            <div style={{ textAlign: "center" }}>
-                                <Typography style={{ fontWeight: "600", fontSize: "10pt", color: "#253949", letterSpacing: 1 }}>{x.areaCode}</Typography>
-                                <Barcode value={x.TrackingNumber} height='30pt' width='1pt' fontSize='10' />
-                                <div className="row" style={{ textAlign: "left" }}>
-                                    <Typography style={{ fontWeight: "600", fontSize: "5pt", color: "#253949", letterSpacing: 1 }}>会员： {x.UserCode}</Typography>
-                                    <Typography style={{ fontWeight: "600", fontSize: "5pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
-                                    <Typography style={{ fontWeight: "600", fontSize: "5pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, hh:mm:ss')}</Typography>
-                                </div>
+                        <div className="row" key={x.TrackingNumber} style={{textAlign: "center" }}>
+                            <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>{x.areaCode}</Typography>
+                            <Barcode value={x.TrackingNumber} height='40pt' width='1pt' fontSize='10' />
+                            <div className="row" style={{ textAlign: "left" }}>
+                                <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>会员： {x.UserCode}</Typography>
+                                <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
+                                <Typography style={{ fontWeight: "600", fontSize: "8pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, hh:mm:ss')}</Typography>
                             </div>
                         </div>
                     )
                 })
             )
+
+            // document.getElementById("DisplayNumber").innerHTML = 123
+            // document.getElementById("CurrentNumber").innerHTML = 456
+
+            // const data = [
+            //     {
+            //         type: "text", value: `<html><style>
+            //               .font-center{
+            //                 width:"100%";
+            //                 text-align: center;
+            //               }
+            //               .font-60-pt {
+            //                   font-size: 60pt;
+            //               }
+            //               .font-20-pt {
+            //                 font-size: 20pt;
+            //               }
+            //               .width-100 {
+            //                 width: 100%;
+            //               }
+            //               .height-100 {
+            //                 height: 100%;
+            //               }
+            //             </style>
+            //             <body>
+            //               <div class="p-4 width-100 height-100">
+            //                 <img style="filter: grayscale(100%);" src='data:image/png;base64, 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' width='150'/>
+            //                 <div class="font-center font-weight-bolder font-20-pt">
+            //                   NORMAL LANE
+            //                 </div>
+            //                 <div class="font-center font-weight-bolder font-60-pt" id="DisplayNumber"> 123` 
+            //             `</div>
+            //                 <div class="font-center">
+            //                   Currently serving: <b id="CurrentNumber"> 123`  `</b>
+            //                 </div>
+            //                 <div class="mt-2 font-center">` `</div>
+            //               </div>
+            //             </body>
+            //           </html>`,
+            //         css: { "font-size": "15px", "width": "100%", "height": "100%" }
+            //     }];
+            // let printerName = "XP-80C";
+            // let widthPage = 300;
+            // const options = {
+            //     preview: false,
+            //     width: widthPage,
+            //     margin: "0 0 0 0",
+            //     copies: 1,
+            //     printerName: printerName,
+            //     timeOutPerLine: 400,
+            //     silent: true,
+            // };
+            // const d = [...data];
+
+            // if (printerName && widthPage) {
+            //     PosPrinter.print(d, options)
+            //         .then(() => { })
+            //         .catch((error) => {
+            //             console.error(error);
+            //         });
+            // } else {
+            //     alert("Select the printer and the width");
+            // }
         }
 
         return (
