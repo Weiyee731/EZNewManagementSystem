@@ -313,7 +313,7 @@ export function counterReducer(state = INITIAL_STATE, action) {
         loading: false,
         containerStatus: action.payload
       });
-      
+
     case GitAction.Container_UpdateStatus:
       return Object.assign({}, state, { loading: true });
     case GitAction.Container_UpdatedStatus:
@@ -432,6 +432,14 @@ export function counterReducer(state = INITIAL_STATE, action) {
     case GitAction.Notification_Update:
       return Object.assign({}, state, { loading: true });
     case GitAction.Notification_Updated:
+      return Object.assign({}, state, {
+        loading: false,
+        notificationAction: action.payload
+      });
+
+    case GitAction.Notification_UpdateStatus:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.Notification_UpdatedStatus:
       return Object.assign({}, state, {
         loading: false,
         notificationAction: action.payload

@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import CancelIcon from '@mui/icons-material/Cancel';
+import UndoIcon from '@mui/icons-material/Undo';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TableComponents from "../../components/TableComponents/TableComponents"
@@ -55,6 +56,7 @@ function mapDispatchToProps(dispatch) {
     CallViewINotification: (props) => dispatch(GitAction.CallViewINotification(props)),
     CallAddNotification: (props) => dispatch(GitAction.CallAddNotification(props)),
     CallUpdateNotification: (props) => dispatch(GitAction.CallUpdateNotification(props)),
+    CallUpdateNotificationStatus: (props) => dispatch(GitAction.CallUpdateNotificationStatus(props)),
     CallDeleteNotification: (props) => dispatch(GitAction.CallDeleteNotification(props))
   };
 }
@@ -95,7 +97,7 @@ const headCells = [
     align: 'center',
     disablePadding: false,
     label: '',
-  }
+  },
 ];
 class NotificationList extends Component {
   constructor(props) {
@@ -117,12 +119,14 @@ class NotificationList extends Component {
       NotificationTitle: "",
       NotificationTitleValidated: false,
       NotificationDesc: "",
+      searchKeywords: "",
       NotificationDescValidated: false
     }
     this.renderTableRows = this.renderTableRows.bind(this)
     this.onTableRowClick = this.onTableRowClick.bind(this)
     this.onAddButtonClick = this.onAddButtonClick.bind(this)
     this.onDeleteButtonClick = this.onDeleteButtonClick.bind(this)
+    this.onChangeButtonClick = this.onChangeButtonClick.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.renderDropzoneTableHeaders = this.renderDropzoneTableHeaders.bind(this)
     this.renderDropzoneTableRows = this.renderDropzoneTableRows.bind(this)
@@ -145,7 +149,9 @@ class NotificationList extends Component {
         <TableCell onClick={(e) => this.onTableRowClick(e, data)} align="left"><div dangerouslySetInnerHTML={{ __html: data.NotificationStatus }}></div></TableCell>
         <TableCell onClick={(e) => this.onTableRowClick(e, data)} align="center"><div dangerouslySetInnerHTML={{ __html: data.NotificationDesc }}></div></TableCell>
         <TableCell onClick={(e) => this.onTableRowClick(e, data)} align="left">{data.CreatedDate}</TableCell>
-        <TableCell align="left"><Tooltip sx={{ marginLeft: 5 }} title={"Delete " + data.NotificationTitle} ><IconButton onClick={(e) => this.onDeleteButtonClick(e, data)} ><CancelIcon /></IconButton></Tooltip></TableCell>
+        <TableCell align="left"><Tooltip sx={{ marginLeft: 5 }} title={"Delete " + data.NotificationTitle} ><IconButton onClick={(e) => this.onDeleteButtonClick(e, data)} ><CancelIcon /></IconButton></Tooltip>
+          {data.NotificationStatusID === 2 ? <Tooltip sx={{ marginLeft: 5 }} title={"Change " + data.NotificationTitle} ><IconButton onClick={(e) => this.onChangeButtonClick(e, data)} ><UndoIcon /></IconButton></Tooltip> : null}
+        </TableCell>
       </>
     )
   }
@@ -175,6 +181,15 @@ class NotificationList extends Component {
       NotificationID: row.NotificationID,
       ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
     })
+  }
+
+  onChangeButtonClick = (event, row) => {
+    this.props.CallUpdateNotificationStatus({
+      NotificationID: row.NotificationID,
+      NotificationStatusID: 1,
+      ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
+    })
+
   }
 
   onTextFieldOnChange = (e) => {
@@ -221,7 +236,7 @@ class NotificationList extends Component {
           NotificationStatusID: 2,
           ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
         })
-      } else{
+      } else {
         this.props.CallUpdateNotification({
           NotificationID: NotificationID,
           NotificationTitle: NotificationTitle,
@@ -259,7 +274,7 @@ class NotificationList extends Component {
           NotificationStatusID: 1,
           ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID
         })
-      }else{
+      } else {
         this.props.CallUpdateNotification({
           NotificationID: NotificationID,
           NotificationTitle: NotificationTitle,
@@ -319,6 +334,15 @@ class NotificationList extends Component {
     });
   }
 
+  handleSearchInput(value) {
+    if (isStringNullOrEmpty(value)) {
+      this.setState({ searchKeywords: value, filteredList: this.props.notification })
+    } else {
+      var tempList = this.props.notification.filter(x => (x.NotificationTitle.includes(value)))
+      this.setState({ searchKeywords: value, filteredList: tempList })
+    }
+  }
+
   render() {
     const { DataHeaders, DataRows, loadingData, isSubmit } = this.state
     const renderButtonOnTableTopRight = () => {
@@ -336,6 +360,18 @@ class NotificationList extends Component {
     return (
       <>
         <div className="w-100 container-fluid">
+          <div className="row" style={{ padding: "10pt 10pt 10pt" }}>
+            <SearchBar
+              id="SearchBarMain"
+              placeholder=""
+              label="Enter title to search"
+              onChange={(e) => this.handleSearchInput(e.target.value)}
+              className="searchbar-input mb-auto"
+              disableButton={true}
+              tooltipText="Search with current data"
+              value={this.state.searchKeywords}
+            />
+          </div>
           <TableComponents
             tableTopLeft={<h3 style={{ fontWeight: 700 }}>Notifications</h3>}  // optional, it can pass as string or as children elements
             tableTopRight={renderButtonOnTableTopRight()}                 // optional, it will brings the elements to the table's top right corner
@@ -356,7 +392,7 @@ class NotificationList extends Component {
               headerColor: 'rgb(200, 200, 200)'
             }}
             selectedIndexKey={"UserID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
-            Data={this.props.notification}                                  // required, the data that listing in the table// optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
+            Data={isArrayNotEmpty(this.state.filteredList) ? this.state.filteredList : this.props.notification}                                  // required, the data that listing in the table// optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
             onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
             actionIcon={this.renderTableActionButton()}
             onSelectRow={this.onSelectItem}

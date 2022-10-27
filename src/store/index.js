@@ -47,6 +47,7 @@ const rootEpic = combineEpics(
   gitEpic.Notification_ViewNotification,
   gitEpic.Notification_AddNotification,
   gitEpic.Notification_UpdateNotification,
+  gitEpic.Notification_UpdateNotificationStatus,
   gitEpic.Notification_DeleteNotification,
 
 

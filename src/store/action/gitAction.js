@@ -503,6 +503,16 @@ export class GitAction {
     };
   }
 
+  static Notification_UpdateStatus = "Notification_UpdateStatus";
+  static Notification_UpdatedStatus = "Notification_UpdatedStatus";
+  static CallUpdateNotificationStatus(propsData) {
+    return {
+      type: GitAction.Notification_UpdateStatus,
+      payload: propsData
+    };
+  }
+  
+
   static Notification_Delete = "Notification_Delete";
   static Notification_Deleted = "Notification_Deleted";
   static CallDeleteNotification(propsData) {

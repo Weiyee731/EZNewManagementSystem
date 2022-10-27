@@ -946,7 +946,7 @@ export class GitEpic {
         const response = await fetch(url +
           "Container_UpdateContainer?" +
           "CONTAINERID=" + payload.ContainerID +
-          "&CONTAINERNAME=" + payload.ContainerName + 
+          "&CONTAINERNAME=" + payload.ContainerName +
           "&CONTAINERREMARK=" + payload.ContainerRemark +
           "&CONTAINERDATE=" + payload.ContainerDate +
           "&MODIFY=" + payload.ModifyBy
@@ -1244,13 +1244,6 @@ export class GitEpic {
   Notification_UpdateNotification = action$ =>
     action$.ofType(GitAction.Notification_Update).switchMap(async ({ payload }) => {
       try {
-        console.log(url +
-          "Notification_UpdateNotification?" +
-          "NOTIFICATIONTITLE=" + payload.NotificationTitle +
-          "&NOTIFICATIONSTATUSID=" + payload.NotificationStatusID +
-          "&NOTIFICATIONID=" + payload.NotificationID +
-          "&NOTIFICATIONDESC=" + payload.NotificationDesc +
-          "&MODIFY=" + payload.ModifyBy)
         const response = await fetch(url +
           "Notification_UpdateNotification?" +
           "NOTIFICATIONTITLE=" + payload.NotificationTitle +
@@ -1292,6 +1285,48 @@ export class GitEpic {
         toast.error("Error Code: Notification_UpdateNotification" + error)
         return {
           type: GitAction.Notification_Updated,
+          payload: [],
+        };
+      }
+    });
+
+  Notification_UpdateNotificationStatus = action$ =>
+    action$.ofType(GitAction.Notification_UpdateStatus).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "Notification_UpdateNotificationStatus?" +
+          "NOTIFICATIONSTATUSID=" + payload.NotificationStatusID +
+          "&NOTIFICATIONID=" + payload.NotificationID +
+          "&MODIFY=" + payload.ModifyBy
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        try {
+          const response = await fetch(url +
+            "Notification_ViewNotification2?" +
+            "&NOTIFICATIONSTATUSID=0"
+          );
+
+          let json = await response.json();
+          json = JSON.parse(json)
+          return {
+            type: GitAction.Notification_Viewed,
+            payload: json,
+          };
+        }
+        catch (error) {
+          toast.error("Error Code: Notification_ViewNotification")
+          return {
+            type: GitAction.Notification_Viewed,
+            payload: [],
+          };
+        }
+      }
+      catch (error) {
+        toast.error("Error Code: Notification_UpdateNotification" + error)
+        return {
+          type: GitAction.Notification_UpdatedStatus,
           payload: [],
         };
       }
