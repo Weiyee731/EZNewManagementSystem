@@ -1,5 +1,5 @@
 import React from 'react';
-import EZLogo from "../../assets/logos/android-chrome-512x512.png"
+import YourWayLogo from "../../assets/logos/logo.png"
 
 export default function Profile(props) {
     return (
@@ -17,7 +17,7 @@ export default function Profile(props) {
             }}
         >
             <div style={{ width: '100px', height: '100px', margin: 'auto', marginBottom: '30px' }}>
-                <img style={{borderRadius: ' 50%'}} src={EZLogo} alt="Yawei Logistics" width="100%" height="100%" />
+                <img style={{borderRadius: ' 10%'}} src={YourWayLogo} alt="Yawei Logistics" width="100%" height="70%" />
             </div>
             EZ TRANSIT AND LOGISTICS
         </div>

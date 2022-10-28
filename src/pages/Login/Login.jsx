@@ -21,7 +21,7 @@ import IconButton from '@mui/material/IconButton';
 import { toast } from "react-toastify";
 // import css
 import "./Login.css"
-import EZLogo from "../../assets/logos/android-chrome-192x192.png"
+import YourWayLogo from "../../assets/logos/logo.png"
 
 function mapStateToProps(state) {
     return {
@@ -114,7 +114,7 @@ class Login extends Component {
                 <div className="container login-container m-auto">
                     <div className="logo-container w-100">
                         <div style={{ width: '120px', height: '120px', marginLeft: 'auto', marginRight: 'auto', }}>
-                            <img style={{ borderRadius: '50%', }} src={EZLogo} alt="System Logo" width='100%' height='100%' onError={event => { event.target.src = GetDefaultImage(); event.onerror = null }} />
+                            <img style={{ borderRadius: '20%', }} src={YourWayLogo} alt="System Logo" width='100%' height='70%' onError={event => { event.target.src = GetDefaultImage(); event.onerror = null }} />
                         </div>
                     </div>
                     <div className="login-inputs-group">

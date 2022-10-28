@@ -17,7 +17,8 @@ import QRCode from 'qrcode.react';
 // const { PosPrinter } = remote.require("electron-pos-printer");
 
 // import { Br, Cut, Line, Printer, Text, Row, render } from 'react-thermal-printer';
-
+// const {PosPrinter} = require("modified-electron-pos-printer");
+// const path = require("path");
 
 
 function mapStateToProps(state) {
@@ -92,7 +93,7 @@ class WarehouseStock extends Component {
     }
 
     componentDidMount() {
-        if (!isObjectUndefinedOrNull(this.props.selectedRow) ) {
+        if (!isObjectUndefinedOrNull(this.props.selectedRow)) {
             let arr = this.state.stockData
             arr[0].TrackingNumber = this.props.selectedRow.TrackingNumber
 
@@ -104,13 +105,17 @@ class WarehouseStock extends Component {
         let listing = this.props.inventoryStock[0]
         let userListing = this.props.userData[0]
 
+        console.log("sadasddad", this.props.userAreaCode)
+
+        if (this.props.userAreaCode.length === 0)
+            this.props.CallUserAreaCode()
 
         if (this.state.isCheckUser === true && this.props.userData.length > 0) {
 
             let arr = this.state.stockData
             if (this.props.userData[0].ReturnVal !== 0) {
                 arr[0].UserData = userListing.Username
-                arr[0].areaCode = this.verifyAreaCode(userListing.UserAreaID)
+                arr[0].areaCode = userListing.UserAreaID
             } else {
                 arr[0].UserData = ""
                 arr[0].areaCode = ""
@@ -137,7 +142,7 @@ class WarehouseStock extends Component {
                 arr[0].ProductDeep = listing.ProductDimensionDeep
                 arr[0].Remark = listing.Remark
                 arr[0].StockID = listing.StockID
-                arr[0].createdDate = moment(listing.StockDate).format('DD-MM-YYYY, hh:mm:ss ')
+                arr[0].createdDate = moment(listing.StockDate).format('DD-MM-YYYY, HH:mm:ss ')
             }
             this.setState({ isCheckDatabase: false, stockData: arr })
         }
@@ -147,7 +152,7 @@ class WarehouseStock extends Component {
         }
 
         if (this.props.inventoryStockAction.length > 0 && this.state.isSubmitAdd === true) {
-            console.log("inventoryStockAction",this.props.inventoryStockAction[0])
+            console.log("inventoryStockAction", this.props.inventoryStockAction[0])
             if (this.props.inventoryStockAction[0].ReturnVal === 1) {
                 if (this.state.isSubmitDelete === true) {
                     toast.success("已成功删除")
@@ -302,6 +307,7 @@ class WarehouseStock extends Component {
                 data = y.AreaCode
             })
         }
+        console.log("dasdadada", data)
         return data
     }
 
@@ -446,6 +452,8 @@ class WarehouseStock extends Component {
                                 value={value}
                                 required
                                 size="small"
+
+                                autoFocus={title === "快递单号" ? true : false}
                                 inputProps={{ maxLength: title === "会员号" && 5 }}
                                 disabled={title === "会员信息" ? true : false}
                                 onChange={(e) => this.handleChange(e.target.value, title)}
@@ -555,8 +563,8 @@ class WarehouseStock extends Component {
         }
         const pageStyle = `@media print {
             @page {
-             size: 300px 227px landscape;
-             margin:5px
+             size: 300px 228px landscape;
+             margin:5px;
             }
           }`;
 
@@ -596,7 +604,7 @@ class WarehouseStock extends Component {
                                                     backgroundColor: this.verifyError() ? "grey" : "#0362fc"
                                                 }} disabled={this.verifyError() ? true : false}
                                                 >
-                                                    {x.title}111
+                                                    {x.title}
                                                 </Button>
                                             );
                                         }}
@@ -636,18 +644,18 @@ class WarehouseStock extends Component {
             return (
                 dataListing.length > 0 && dataListing.map((x) => {
                     return (
-                        <div key={x.TrackingNumber} style={{ width: "300px", paddingLeft: "0px", paddingTop: "3pt" }}>
+                        <div key={x.TrackingNumber} style={{ width: "300px", paddingLeft: "20pt", paddingTop: "6pt", paddingBottom: "7pt" }}>
                             {/* <Typography style={{ fontWeight: "600", fontSize: "16pt", color: "#253949", letterSpacing: 1 }}>{x.areaCode}</Typography> */}
                             <Barcode value={x.TrackingNumber} height='50pt' width='1px' fontSize='23pt' />
                             <div className="row" style={{ textAlign: "left", paddingTop: "4pt" }}>
                                 <div className="col-2" style={{ itemAlign: "center" }}>
-                                    <QRCode value={x.TrackingNumber} size={50} />,
+                                    <QRCode value={x.TrackingNumber} size={50} />
                                 </div>
-                                <div className="col-10">
+                                <div className="col-10" style={{paddingLeft:"15pt"}}>
                                     <Typography style={{ fontWeight: "600", fontSize: "11pt", color: "#253949", letterSpacing: 1 }}>会员：
                                         <label style={{ fontSize: "14pt" }}> {x.UserCode} ( {x.areaCode} )</label></Typography>
                                     <Typography style={{ fontWeight: "600", fontSize: "11pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
-                                    <Typography style={{ fontWeight: "600", fontSize: "11pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, hh:mm:ss')}</Typography>
+                                    <Typography style={{ fontWeight: "600", fontSize: "11pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, HH:mm:ss')}</Typography>
                                 </div>
                             </div>
                         </div>
@@ -779,16 +787,16 @@ class WarehouseStock extends Component {
                             <Typography style={{ fontWeight: "600", fontSize: "15pt", color: "#253949", letterSpacing: 1 }}>未装箱包裹 : {this.state.currentVolume}</Typography>
                         </div> */}
                         {
-                        isObjectUndefinedOrNull(this.props.selectedRow)? (buttonLayout([
-                            { title: "打印", type: "Print" },
-                            { title: "重印", type: "RePrint" },
-                            { title: "仅保存", type: "Save" },
-                            { title: "删除", type: "Delete" }
-                        ])):(
-                            buttonLayout([
-                                { title: "仅保存", type: "Save" }
-                            ]))
-                    }
+                            isObjectUndefinedOrNull(this.props.selectedRow) ? (buttonLayout([
+                                { title: "打印", type: "Print" },
+                                { title: "重印", type: "RePrint" },
+                                { title: "仅保存", type: "Save" },
+                                { title: "删除", type: "Delete" }
+                            ])) : (
+                                buttonLayout([
+                                    { title: "仅保存", type: "Save" }
+                                ]))
+                        }
                     </div>
 
                     <div style={{ display: "none" }} >
