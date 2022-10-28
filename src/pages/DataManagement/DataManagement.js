@@ -100,8 +100,10 @@ class DataManagement extends Component {
                 toast.success(this.props.inventoryStockAction[0].ReturnMsg, {
                     autoClose: 2000, position: "top-center", transition: Flip, theme: "dark"
                 })
+                this.onRemoveAttachment()
                 this.setState({ IsReturnedDataError: false, isSubmit: false })
             }
+            this.props.ClearInventoryAction()
         }
     }
 
@@ -360,12 +362,9 @@ class DataManagement extends Component {
                         fullScreen={true}
                     />
                 </ModalPopOut>
-                {/* handleToggleDialog={() => this.onViewErrorReport()}  */}
                 <ModalPopOut fullScreen={true} open={openModalForAddStock} handleToggleDialog={() => { this.setState({ openModalForAddStock: !openModalForAddStock }) }} title=" Report" showAction={false}>
                     <WarehouseStockManagement selectedRow={selectedRow} />
                 </ModalPopOut>
-
-
 
             </div >
         )
