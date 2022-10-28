@@ -4,7 +4,7 @@ import { GitAction } from "../../store/action/gitAction";
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { withRouter } from "react-router";
-import { isArrayNotEmpty, isStringNullOrEmpty, isNumber } from "../../tools/Helpers";
+import { isArrayNotEmpty, isStringNullOrEmpty, isNumber, isObjectUndefinedOrNull } from "../../tools/Helpers";
 import { toast } from "react-toastify"
 import Barcode from 'react-barcode';
 import InputLabel from '@mui/material/InputLabel';
@@ -91,7 +91,16 @@ class WarehouseStock extends Component {
         this.props.CallUserAreaCode()
     }
 
-    componentDidMount() { }
+    componentDidMount() {
+        // console.log(!isObjectUndefinedOrNull(this.props.selectedRow))
+        // console.log(this.props.selectedRow !== prevProps.selectedRow)
+        if (!isObjectUndefinedOrNull(this.props.selectedRow) ) {
+            let arr = this.state.stockData
+            arr[0].TrackingNumber = this.props.selectedRow.TrackingNumber
+
+            this.setState({ stockData: arr })
+        }
+    }
 
     componentDidUpdate(prevProps, prevState) {
         let listing = this.props.inventoryStock[0]
@@ -161,6 +170,8 @@ class WarehouseStock extends Component {
             this.props.ClearInventoryAction()
             this.setState({ isSubmitAdd: false, isSubmitDelete: false })
         }
+
+
     }
 
     setInital(data) {
@@ -322,7 +333,7 @@ class WarehouseStock extends Component {
             CourierID += (isStringNullOrEmpty(listing.CourierID)) ? "0" : listing.CourierID.CourierID;
             Item += (isStringNullOrEmpty(listing.Item)) ? "-" : listing.Item.replace(/ /g, '');
             Remark += (isStringNullOrEmpty(listing.Remark)) ? "-" : listing.Remark.replace(/ /g, '');
-            areaCode += (isStringNullOrEmpty(listing.areaCode)) ? "-" : listing.areaCode ;
+            areaCode += (isStringNullOrEmpty(listing.areaCode)) ? "-" : listing.areaCode;
             createdDate += (isStringNullOrEmpty(listing.createdDate)) ? "-" : listing.createdDate;
 
             if (index !== listing.Quantity - 1) {
@@ -631,8 +642,8 @@ class WarehouseStock extends Component {
                             {/* <Typography style={{ fontWeight: "600", fontSize: "16pt", color: "#253949", letterSpacing: 1 }}>{x.areaCode}</Typography> */}
                             <Barcode value={x.TrackingNumber} height='50pt' width='1px' fontSize='23pt' />
                             <div className="row" style={{ textAlign: "left", paddingTop: "4pt" }}>
-                                <div className="col-2" style={{itemAlign:"center"}}>
-                                    <QRCode value={x.TrackingNumber} size={50}/>,
+                                <div className="col-2" style={{ itemAlign: "center" }}>
+                                    <QRCode value={x.TrackingNumber} size={50} />,
                                 </div>
                                 <div className="col-10">
                                     <Typography style={{ fontWeight: "600", fontSize: "11pt", color: "#253949", letterSpacing: 1 }}>会员：
@@ -710,6 +721,7 @@ class WarehouseStock extends Component {
             // }
         }
 
+        console.log("edfs", stockData)
         return (
             <div className="container-fluid" >
                 <div className="row">
@@ -769,12 +781,17 @@ class WarehouseStock extends Component {
                         {/* <div className="row" style={{ textAlign: "center" }}>
                             <Typography style={{ fontWeight: "600", fontSize: "15pt", color: "#253949", letterSpacing: 1 }}>未装箱包裹 : {this.state.currentVolume}</Typography>
                         </div> */}
-                        {buttonLayout([
+                        {
+                        isObjectUndefinedOrNull(this.props.selectedRow)? (buttonLayout([
                             { title: "打印", type: "Print" },
                             { title: "重印", type: "RePrint" },
                             { title: "仅保存", type: "Save" },
                             { title: "删除", type: "Delete" }
-                        ])}
+                        ])):(
+                            buttonLayout([
+                                { title: "仅保存", type: "Save" }
+                            ]))
+                    }
                     </div>
 
                     <div style={{ display: "none" }} >

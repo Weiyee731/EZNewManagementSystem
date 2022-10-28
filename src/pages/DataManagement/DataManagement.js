@@ -14,6 +14,7 @@ import ResponsiveDatePickers from '../../components/datePicker/datePicker';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import moment from 'moment';
 import { Typography, TableCell, Box, IconButton, LinearProgress, Button, TextField, FormHelperText } from '@mui/material';
+import WarehouseStockManagement from "../Stock/WarehouseStockManagement";
 
 function mapStateToProps(state) {
     return {
@@ -23,7 +24,6 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        //todo: change upload api
         CallUpdateContainerInventory: propsData => dispatch(GitAction.CallUpdateContainerInventory(propsData)),
         ClearInventoryAction: propsData => dispatch(GitAction.ClearInventoryAction(propsData)),
         CallViewInventoryByFilter: (propsData) => dispatch(GitAction.CallViewInventoryByFilter(propsData)),
@@ -41,6 +41,8 @@ const INITIAL_STATE = {
     ContainerNameValidated: null,
     ContainerDate: convertDateTimeToString112Format(new Date()),
     ContainerDateValidated: true,
+    IsReturnedDataError: false,
+    openModalForAddStock: false
 }
 
 class DataManagement extends Component {
@@ -68,31 +70,40 @@ class DataManagement extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (isArrayNotEmpty(this.props.inventoryStockAction)) {
-            console.log("retu", this.props.inventoryStockAction[0].ReturnVal)
+        if (isArrayNotEmpty(this.props.inventoryStockAction) && this.props.inventoryStockAction !== prevProps.inventoryStockAction) {
 
-            if (this.props.inventoryStockAction[0].ReturnVal == 0) {
-                this.props.ClearInventoryAction()
-                toast.error(this.props.inventoryStockAction[0].ReturnMsg, {
-                    autoClose: 2000, position: "top-center", transition: Flip, theme: "dark"
-                    // , onClose: () => { this.setState(INITIAL_STATE) } 
-                })
-            }
-            else {
-                this.props.ClearInventoryAction()
-                var row = this.props.propsData ? this.props.propsData: [{}]
+            var row = this.props.propsData ? this.props.propsData : "empty"
+
+            if (row !== "empty") {
                 this.props.CallViewInventoryByFilter({ FilterColumn: "and T_Inventory_Stock.ContainerID=" + row.ContainerID })
+            }
+
+            //to handle if the inventoryStockAction return have error code
+            var errorRow = []
+
+            var existError = this.props.inventoryStockAction.map((result, index) => {
+                if (result.StockID === "0") {
+                    errorRow.push(result)
+                }
+                return result.StockID === "0"
+            })
+
+            if (existError.length > 0 && existError.includes(true)) {
+                toast.error("Data is successfully update, but there are some data with error. Please check", {
+                    autoClose: 3000, position: "top-center", transition: Flip, theme: "dark"
+                })
+                this.setState({ IsReturnedDataError: true, errorReportData: errorRow, openErrorReport: !this.state.openErrorReport })
+
+            } else {
                 toast.success(this.props.inventoryStockAction[0].ReturnMsg, {
                     autoClose: 2000, position: "top-center", transition: Flip, theme: "dark"
-                    // , onClose: () => this.props.history.push('/StockGoods')
                 })
-                this.setState(INITIAL_STATE)
+                this.setState({ IsReturnedDataError: false })
             }
+
+
+
         }
-
-        console.log("Srgsd", isArrayNotEmpty(this.props.inventoryStockAction))
-        console.log("Srgsd", this.props.inventoryStockAction)
-
     }
 
     uploadHandler = (files) => {
@@ -186,46 +197,69 @@ class DataManagement extends Component {
             console.log(object)
             toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
             this.setState({ isSubmit: true })
-            // this.props.CallInsertStockByPost(object)
             this.props.CallUpdateContainerInventory(object)
         }
     }
 
     renderTableHeaders = () => {
-        const { DataHeaders } = this.state
+        const { DataHeaders, IsReturnedDataError } = this.state
         let headers = []
-        // eslint-disable-next-line array-callback-return
-        DataHeaders.filter(x => x.name !== "").map((el, index) => {
+
+        if (IsReturnedDataError) {
             let obj = {
-                id: el.name,
+                id: "TrackingNo",
                 align: 'left',
                 disablePadding: false,
-                label: el.name,
+                label: "TrackingNo",
             }
             headers.push(obj)
-        })
+        } else {
+            DataHeaders.filter(x => x.name !== "").map((el, index) => {
+                let obj = {
+                    id: el.name,
+                    align: 'left',
+                    disablePadding: false,
+                    label: el.name,
+                }
+                headers.push(obj)
+            })
+        }
         return headers
     }
 
     renderTableRows = (data, index) => {
         const fontsize = '9pt'
-        const { DataHeaders } = this.state
+        const { DataHeaders, IsReturnedDataError } = this.state
         return (
             <>
                 {
-                    DataHeaders.filter(x => x.name !== "").map((el, index) => {
-                        return (<TableCell key={"tc_" + index} align="left" sx={{ fontSize: fontsize, bgcolor: (data.isInvalid === true) ? '#FFD700' : "#ffffff" }}>{data[el.name]}</TableCell>)
-                    })
+                    IsReturnedDataError ?
+                        (
+                            <TableCell key={"tc_" + index} align="left" sx={{ fontSize: fontsize, bgcolor: '#FFD700' }} onClick={(e) => this.ErrorRowClick(e, data)}>{data.TrackingNumber}</TableCell>
+
+                        ) :
+                        (
+                            DataHeaders.filter(x => x.name !== "").map((el, index) => {
+                                return (<TableCell key={"tc_" + index} align="left" sx={{ fontSize: fontsize, bgcolor: (data.isInvalid === true) ? '#FFD700' : "#ffffff" }}>{data[el.name]}</TableCell>)
+                            })
+                        )
+
                 }
             </>
         )
     }
 
+    ErrorRowClick = (event, data) => {
+        console.log("event", event, data)
+        this.setState({ openModalForAddStock: true, selectedRow: data })
+    }
 
     render() {
-        const { DataHeaders, DataRows, loadingData, isSubmit } = this.state
+        const { DataHeaders, DataRows, loadingData, isSubmit, IsReturnedDataError, openModalForAddStock } = this.state
         const isDataExtracted = DataHeaders.length > 0 || DataRows.length > 0
         const invalidRowCount = DataRows.filter(x => x.isInvalid === true).length
+
+        console.log("openModalForAddStock", openModalForAddStock)
         return (
             <div>
                 <div className="container">
@@ -321,10 +355,18 @@ class DataManagement extends Component {
                             headerColor: 'rgb(200, 200, 200)'
                         }}
                         selectedIndexKey={isArrayNotEmpty(DataHeaders) ? DataHeaders[0].name : ""}
+
                         Data={this.state.errorReportData}
                         fullScreen={true}
                     />
                 </ModalPopOut>
+                {/* handleToggleDialog={() => this.onViewErrorReport()}  */}
+                <ModalPopOut fullScreen={true} open={this.state.openModalForAddStock} title=" Report" showAction={false}>
+                    <WarehouseStockManagement selectedRow={this.state.selectedRow} />
+                </ModalPopOut>
+
+
+
             </div >
         )
     }

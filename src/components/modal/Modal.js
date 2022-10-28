@@ -122,7 +122,8 @@ export function ModalPopOut(props) {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       PaperComponent={props.fullScreen ? null : PaperComponent}
-      style={{ zIndex: (props.fullScreen ? 1350 : 1300) }}
+      style={{ zIndex:  1350  }}
+      // style={{ zIndex: (props.fullScreen ? 1350 : 1300) }}
     >
       {
         props.fullScreen &&

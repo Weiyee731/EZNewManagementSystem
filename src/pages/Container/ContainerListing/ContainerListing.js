@@ -234,14 +234,6 @@ class ContainerListing extends Component {
 
     }
 
-    componentDidMount() {
-        // if (this.props.typeIndicator === "approve") {
-        //     this.setState({ approvePage: true })
-        // } else {
-        //     this.setState({ approvePage: false })
-        // }
-    }
-
     componentDidUpdate(prevProps, prevState) {
         if (isArrayNotEmpty(this.props.container) && (prevProps.container !== this.props.container)) {
             let list = !isStringNullOrEmpty(this.props.container[0].ReturnVal) && this.props.container[0].ReturnVal == 0 ? [] : this.props.container
@@ -250,7 +242,6 @@ class ContainerListing extends Component {
                 containerListing: list,
                 isDataFetching: false,
                 totalItem: list.length,
-                // container: list
             })
 
             toast.dismiss()
@@ -263,10 +254,10 @@ class ContainerListing extends Component {
 
         }
 
-
-        if (this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== 0 && this.state.isInventorySet === false) {
+        if (this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== 0 && this.state.isInventorySet === false && this.props.inventoryStock!==prevProps.inventoryStock) {
+            console.log("inventoryStock", this.props.inventoryStock)
             this.setState({ inventoryStock: this.props.inventoryStock, isInventorySet: true })
-            this.props.ClearInventoryStock()
+            // this.props.ClearInventoryStock()
         }
 
 
@@ -306,7 +297,7 @@ class ContainerListing extends Component {
         var obj = {
             CONTAINERID: data.ContainerID,
             CONTAINERSTATUSID: e.target.value,
-            MODIFY: JSON.parse(localStorage.getItem("loginUser"))[0].UserID ? JSON.parse(localStorage.getItem("loginUser"))[0].UserID :1
+            MODIFY: JSON.parse(localStorage.getItem("loginUser"))[0].UserID ? JSON.parse(localStorage.getItem("loginUser"))[0].UserID : 1
 
         }
         this.props.CallUpdateContainerStatus(obj)
@@ -356,7 +347,6 @@ class ContainerListing extends Component {
                         <CreateIcon />
                     </IconButton>
                 </TableCell>
-                {/* <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.Remark}</TableCell> */}
             </>
         )
     }
@@ -388,14 +378,14 @@ class ContainerListing extends Component {
                 ContainerName: this.state.containerNo,
                 ContainerRemark: this.state.containerRemark,
                 ContainerDate: this.state.containerDate,
-                ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID ? JSON.parse(localStorage.getItem("loginUser"))[0].UserID :1
+                ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID ? JSON.parse(localStorage.getItem("loginUser"))[0].UserID : 1
             }
             this.props.CallUpdateContainer(obj)
         } else {
             var obj = {
                 ContainerName: this.state.containerNo,
                 ContainerDate: this.state.containerDate,
-                ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID ? JSON.parse(localStorage.getItem("loginUser"))[0].UserID :1
+                ModifyBy: JSON.parse(localStorage.getItem("loginUser"))[0].UserID ? JSON.parse(localStorage.getItem("loginUser"))[0].UserID : 1
             }
             this.props.CallAddContainer(obj)
         }
@@ -487,7 +477,6 @@ class ContainerListing extends Component {
                 <div className="d-flex">
                     <Tooltip title="Add New Stock">
                         <IconButton
-                            // aria-label="Add Stock"
                             size="small"
                             onClick={() => { this.setAddModalDetails() }}
                             disabled={this.state.isDataFetching}
@@ -495,33 +484,6 @@ class ContainerListing extends Component {
                             <AddCircleIcon fontSize="large" color="primary" />
                         </IconButton>
                     </Tooltip>
-                    {/* <Tooltip title="Synchronize Data">
-                        <IconButton
-                            aria-label="Pull Data"
-                            size="small"
-                            // onClick={() => { this.onDatabaseSearch() }}
-                            disabled={this.state.isDataFetching}
-                        >
-                            <CachedIcon fontSize="large" />
-                        </IconButton>
-                    </Tooltip>
-                    <CsvDownloader
-                        filename={"Container-list_" + today}
-                        extension=".xls"
-                        separator=","
-                        columns={headCells}
-                        datas={isArrayNotEmpty(this.state.filteredList) ? this.state.filteredList : []}
-                    >
-                        <Tooltip title="Download">
-                            <IconButton size="small">
-                                <DownloadForOfflineIcon
-                                    color="primary"
-                                    fontSize="large"
-                                    sx={{}}
-                                />
-                            </IconButton>
-                        </Tooltip>
-                    </CsvDownloader> */}
                 </div>
             )
         }
