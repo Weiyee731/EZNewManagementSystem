@@ -50,6 +50,8 @@ class DataManagement extends Component {
         super(props);
         this.state = INITIAL_STATE
 
+        this.toastRef = React.createRef();
+
         this.uploadHandler = this.uploadHandler.bind(this)
         this.publishData = this.publishData.bind(this)
         this.renderTableHeaders = this.renderTableHeaders.bind(this)
@@ -70,8 +72,8 @@ class DataManagement extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (isArrayNotEmpty(this.props.inventoryStockAction) && this.props.inventoryStockAction !== prevProps.inventoryStockAction) {
-
+        if (isArrayNotEmpty(this.props.inventoryStockAction) && this.props.inventoryStockAction !== prevProps.inventoryStockAction && this.state.isSubmit) {
+            this.dismissloadingToast()
             var row = this.props.propsData ? this.props.propsData : "empty"
 
             if (row !== "empty") {
@@ -92,19 +94,19 @@ class DataManagement extends Component {
                 toast.error("Data is successfully update, but there are some data with error. Please check", {
                     autoClose: 3000, position: "top-center", transition: Flip, theme: "dark"
                 })
-                this.setState({ IsReturnedDataError: true, errorReportData: errorRow, openErrorReport: !this.state.openErrorReport })
+                this.setState({ IsReturnedDataError: true, errorReportData: errorRow, openErrorReport: !this.state.openErrorReport, isSubmit: false })
 
             } else {
                 toast.success(this.props.inventoryStockAction[0].ReturnMsg, {
                     autoClose: 2000, position: "top-center", transition: Flip, theme: "dark"
                 })
-                this.setState({ IsReturnedDataError: false })
+                this.setState({ IsReturnedDataError: false, isSubmit: false })
             }
-
-
-
         }
     }
+
+    loadingToast = () => this.toastRef.current = toast.loading("The data is submitting.", { autoClose: 2000, position: "top-center" })
+    dismissloadingToast = () => toast.dismiss(this.toastRef.current);
 
     uploadHandler = (files) => {
         if (isArrayNotEmpty(files)) {
@@ -194,8 +196,8 @@ class DataManagement extends Component {
                 ContainerID: this.props.propsData.ContainerID
 
             }
-            console.log(object)
-            toast.success("The data is submitting.", { autoClose: 2000, position: "top-center" })
+            this.loadingToast()
+            // toast.loading("The data is submitting.", { autoClose: 2000, position: "top-center" })
             this.setState({ isSubmit: true })
             this.props.CallUpdateContainerInventory(object)
         }
@@ -250,16 +252,14 @@ class DataManagement extends Component {
     }
 
     ErrorRowClick = (event, data) => {
-        console.log("event", event, data)
         this.setState({ openModalForAddStock: true, selectedRow: data })
     }
 
     render() {
-        const { DataHeaders, DataRows, loadingData, isSubmit, IsReturnedDataError, openModalForAddStock } = this.state
+        const { DataHeaders, DataRows, loadingData, isSubmit, IsReturnedDataError, openModalForAddStock, selectedRow } = this.state
         const isDataExtracted = DataHeaders.length > 0 || DataRows.length > 0
         const invalidRowCount = DataRows.filter(x => x.isInvalid === true).length
 
-        console.log("openModalForAddStock", openModalForAddStock)
         return (
             <div>
                 <div className="container">
@@ -361,8 +361,8 @@ class DataManagement extends Component {
                     />
                 </ModalPopOut>
                 {/* handleToggleDialog={() => this.onViewErrorReport()}  */}
-                <ModalPopOut fullScreen={true} open={this.state.openModalForAddStock} title=" Report" showAction={false}>
-                    <WarehouseStockManagement selectedRow={this.state.selectedRow} />
+                <ModalPopOut fullScreen={true} open={openModalForAddStock} handleToggleDialog={() => { this.setState({ openModalForAddStock: !openModalForAddStock }) }} title=" Report" showAction={false}>
+                    <WarehouseStockManagement selectedRow={selectedRow} />
                 </ModalPopOut>
 
 

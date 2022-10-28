@@ -254,8 +254,8 @@ class ContainerListing extends Component {
 
         }
 
-        if (this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== 0 && this.state.isInventorySet === false && this.props.inventoryStock!==prevProps.inventoryStock) {
-            console.log("inventoryStock", this.props.inventoryStock)
+        if (this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== 0 && this.props.inventoryStock!==prevProps.inventoryStock) {
+            console.log("sini lah")
             this.setState({ inventoryStock: this.props.inventoryStock, isInventorySet: true })
             // this.props.ClearInventoryStock()
         }

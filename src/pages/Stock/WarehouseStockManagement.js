@@ -92,8 +92,6 @@ class WarehouseStock extends Component {
     }
 
     componentDidMount() {
-        // console.log(!isObjectUndefinedOrNull(this.props.selectedRow))
-        // console.log(this.props.selectedRow !== prevProps.selectedRow)
         if (!isObjectUndefinedOrNull(this.props.selectedRow) ) {
             let arr = this.state.stockData
             arr[0].TrackingNumber = this.props.selectedRow.TrackingNumber
@@ -149,6 +147,7 @@ class WarehouseStock extends Component {
         }
 
         if (this.props.inventoryStockAction.length > 0 && this.state.isSubmitAdd === true) {
+            console.log("inventoryStockAction",this.props.inventoryStockAction[0])
             if (this.props.inventoryStockAction[0].ReturnVal === 1) {
                 if (this.state.isSubmitDelete === true) {
                     toast.success("已成功删除")
@@ -320,7 +319,6 @@ class WarehouseStock extends Component {
         let Remark = ""
         let areaCode = ""
         let createdDate = ""
-        console.log(" listing.UserCode", listing.areaCode)
 
 
         for (let index = 0; index < listing.Quantity; index++) {
@@ -721,7 +719,6 @@ class WarehouseStock extends Component {
             // }
         }
 
-        console.log("edfs", stockData)
         return (
             <div className="container-fluid" >
                 <div className="row">
