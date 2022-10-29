@@ -563,7 +563,7 @@ class WarehouseStock extends Component {
         }
         const pageStyle = `@media print {
             @page {
-             size: 300px 228px landscape;
+             size: 300px 230px;
              margin:5px;
             }
           }`;
@@ -644,20 +644,21 @@ class WarehouseStock extends Component {
             return (
                 dataListing.length > 0 && dataListing.map((x) => {
                     return (
-                        <div key={x.TrackingNumber} style={{ width: "300px", paddingLeft: "20pt", paddingTop: "6pt", paddingBottom: "7pt" }}>
+                        <div key={x.TrackingNumber} style={{ paddingLeft: "10pt", paddingTop: "15pt", textAlign: "center" }}>
                             {/* <Typography style={{ fontWeight: "600", fontSize: "16pt", color: "#253949", letterSpacing: 1 }}>{x.areaCode}</Typography> */}
-                            <Barcode value={x.TrackingNumber} height='50pt' width='1px' fontSize='23pt' />
-                            <div className="row" style={{ textAlign: "left", paddingTop: "4pt" }}>
-                                <div className="col-2" style={{ itemAlign: "center" }}>
+                            <Barcode value={x.TrackingNumber} height='50pt' width='1px' fontSize='25pt' />
+                            <div className="row" style={{ textAlign: "left", paddingTop: "8pt" }}>
+                                <div className="col-2" style={{ itemAlign: "center", paddingTop: "5pt" }}>
                                     <QRCode value={x.TrackingNumber} size={50} />
                                 </div>
-                                <div className="col-10" style={{paddingLeft:"15pt"}}>
-                                    <Typography style={{ fontWeight: "600", fontSize: "11pt", color: "#253949", letterSpacing: 1 }}>会员：
-                                        <label style={{ fontSize: "14pt" }}> {x.UserCode} ( {x.areaCode} )</label></Typography>
-                                    <Typography style={{ fontWeight: "600", fontSize: "11pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
-                                    <Typography style={{ fontWeight: "600", fontSize: "11pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, HH:mm:ss')}</Typography>
+                                <div className="col-10" style={{ paddingLeft: "15pt" }}>
+                                    <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>会员：
+                                        <label style={{ fontSize: "15pt" }}> {x.UserCode} ( {x.areaCode} )</label></Typography>
+                                    <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
+                                    <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, HH:mm:ss')}</Typography>
                                 </div>
                             </div>
+                            <br />
                         </div>
                     )
                 })
