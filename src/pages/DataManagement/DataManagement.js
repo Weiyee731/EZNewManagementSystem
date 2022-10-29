@@ -42,7 +42,8 @@ const INITIAL_STATE = {
     ContainerDate: convertDateTimeToString112Format(new Date()),
     ContainerDateValidated: true,
     IsReturnedDataError: false,
-    openModalForAddStock: false
+    openModalForAddStock: false,
+    onDropFile:[]
 }
 
 class DataManagement extends Component {
@@ -100,7 +101,9 @@ class DataManagement extends Component {
                 toast.success(this.props.inventoryStockAction[0].ReturnMsg, {
                     autoClose: 2000, position: "top-center", transition: Flip, theme: "dark"
                 })
-                this.onRemoveAttachment()
+                const fileDelete = this.state.onDropFile?this.state.onDropFile[0].name:""
+                console.log("fileDelete",fileDelete)
+                this.onRemoveAttachment(fileDelete)
                 this.setState({ IsReturnedDataError: false, isSubmit: false })
             }
             this.props.ClearInventoryAction()
@@ -113,10 +116,11 @@ class DataManagement extends Component {
     uploadHandler = (files) => {
         if (isArrayNotEmpty(files)) {
             const excelFile = files[0]
+            console.log("files",files)
             const fileExt = getFileExtension(excelFile.name)
 
             if (getFileTypeByExtension(fileExt) === 'excel') {
-                this.setState({ loadingData: true })
+                this.setState({ loadingData: true, onDropFile: files })
                 const reader = new FileReader();
                 reader.onload = (evt) => {
                     /* Parse data */
@@ -135,6 +139,7 @@ class DataManagement extends Component {
     }
 
     onRemoveAttachment(item) {
+        console.log("item",item)
         this.setState({ DataHeaders: [], DataRows: [] })
     }
 
