@@ -13,6 +13,7 @@ import ReactToPrint, { PrintContextConsumer } from 'react-to-print';
 import moment from 'moment';
 import { Button, TextField, Autocomplete, Box, Typography, } from '@mui/material'
 import QRCode from 'qrcode.react';
+import YourWayLogo from "../../assets/logos/logo.png"
 
 function mapStateToProps(state) {
     return {
@@ -557,7 +558,7 @@ class WarehouseStock extends Component {
                 case "Save":
                     if (!this.verifyError()) {
                         let Obj = this.createObject()
-                        this.props.CallAddInventory(Obj)
+                        // this.props.CallAddInventory(Obj)
                         this.setState({ isSubmitAdd: true })
                     }
                     else
@@ -567,7 +568,7 @@ class WarehouseStock extends Component {
                 case "Print":
                     if (!this.verifyError()) {
                         let Obj = this.createObject()
-                        this.props.CallAddInventory(Obj)
+                        // this.props.CallAddInventory(Obj)
                         this.setState({ isSubmitAdd: true })
                     }
                     else
@@ -593,10 +594,6 @@ class WarehouseStock extends Component {
                 default:
                     break;
             }
-        }
-
-        const handleClick = (event) => {
-            console.log("dsdada", event)
         }
 
         const pageStyle = `@media print {
@@ -635,9 +632,8 @@ class WarehouseStock extends Component {
                                         style={{ width: "100%", display: "inline" }}
                                         pageStyle={pageStyle}
                                         preview={false}
-                                        trigger={(e) =>
-                                            <>
-                                                {handleClick(e)}
+                                        trigger={(e) => {
+                                            return (
                                                 <Button style={{
                                                     paddingTop: "30pt", paddingBottom: "30pt", borderRadius: "20pt", color: "white", fontWeight: "bold", fontSize: "20pt",
                                                     backgroundColor: this.verifyError() ? "grey" : "#0362fc"
@@ -645,20 +641,8 @@ class WarehouseStock extends Component {
                                                 >
                                                     {x.title}
                                                 </Button>
-                                            </>
-
-                                            // stockData.length > 0 && stockData[0].TrackingNumber !== ""
-                                            //     {
-                                            //     return (
-                                            //         <Button style={{
-                                            //             paddingTop: "30pt", paddingBottom: "30pt", borderRadius: "20pt", color: "white", fontWeight: "bold", fontSize: "20pt",
-                                            //             backgroundColor: this.verifyError() ? "grey" : "#0362fc"
-                                            //         }} disabled={this.verifyError() ? true : false}
-                                            //         >
-                                            //             {x.title}
-                                            //         </Button>
-                                            //     );
-                                            // }
+                                            );
+                                        }
                                         }
                                         onAfterPrint={() => { window.location.reload(false) }}
                                         content={() => this.componentRef}
@@ -697,7 +681,6 @@ class WarehouseStock extends Component {
                 dataListing.length > 0 && dataListing.map((x) => {
                     return (
                         <div key={x.TrackingNumber} style={{ width: "330px", height: "270px", paddingLeft: "10pt", paddingTop: "20pt", paddingBottom: "10pt" }}>
-                            {/* <Typography style={{ fontWeight: "600", fontSize: "16pt", color: "#253949", letterSpacing: 1 }}>{x.areaCode}</Typography> */}
                             <Barcode value={x.TrackingNumber} height='50pt' width='1px' fontSize='25pt' />
                             <div className="row" style={{ textAlign: "left", paddingTop: "10pt" }}>
                                 <div className="col-2" style={{ itemAlign: "center" }}>
@@ -705,9 +688,12 @@ class WarehouseStock extends Component {
                                 </div>
                                 <div className="col-10" style={{ paddingLeft: "21pt" }}>
                                     <Typography style={{ fontWeight: "600", fontSize: "13pt", color: "#253949", letterSpacing: 1 }}>会员：
-                                        <label style={{ fontSize: "17pt" }}> {x.UserCode} ( {x.areaCode} )</label></Typography>
+                                        <label style={{ fontSize: "18pt" }}> {x.UserCode} ( {x.areaCode} )</label></Typography>
                                     <Typography style={{ fontWeight: "600", fontSize: "13pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
                                     <Typography style={{ fontWeight: "600", fontSize: "13pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, HH:mm:ss')}</Typography>
+                                </div>
+                                <div style={{ textAlign: "right" }}>
+                                    <label style={{ fontSize: "12pt" }}>雅威国际物流</label>
                                 </div>
                             </div>
                         </div>
