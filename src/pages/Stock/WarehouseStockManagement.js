@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useRef } from "react";
 import { connect } from "react-redux";
 import { GitAction } from "../../store/action/gitAction";
 import MenuItem from '@mui/material/MenuItem';
@@ -13,13 +13,6 @@ import ReactToPrint, { PrintContextConsumer } from 'react-to-print';
 import moment from 'moment';
 import { Button, TextField, Autocomplete, Box, Typography, } from '@mui/material'
 import QRCode from 'qrcode.react';
-// let { remote } = require("electron");
-// const { PosPrinter } = remote.require("electron-pos-printer");
-
-// import { Br, Cut, Line, Printer, Text, Row, render } from 'react-thermal-printer';
-// const {PosPrinter} = require("modified-electron-pos-printer");
-// const path = require("path");
-
 
 function mapStateToProps(state) {
     return {
@@ -53,7 +46,8 @@ const INITIAL_STATE = {
     currentVolume: 65.5,
     isSubmitAdd: false,
     isSubmitDelete: false,
-
+    focusID: 1,
+    currentTitle: "快递单号",
     stockData: [{
         TrackingNumber: "",
         isTrackingError: false,
@@ -194,6 +188,9 @@ class WarehouseStock extends Component {
         let arr = []
         arr = this.state.stockData[0]
         let finalData = []
+
+
+        console.log("Dasdsda", data)
 
         switch (title) {
             case "快递单号":
@@ -371,6 +368,25 @@ class WarehouseStock extends Component {
         return Obj
     }
 
+    handleKey = (event) => {
+
+        let data = this.state.focusID
+        let sequence = [{ id: 1, title: "快递单号" }, { id: 2, title: "数量" }, { id: 3, title: "快递公司" }, { id: 4, title: "会员号" }, { id: 5, title: "货物信息" }, { id: 6, title: "实际重量" },
+        { id: 7, title: "长" }, { id: 8, title: "宽" }, { id: 9, title: "高" }, { id: 10, title: "Print" }]
+
+        if (event.key === "Enter") {
+            console.log("here", sequence[data + 1].title)
+            this.setState({ focusID: data + 1, currentTitle: sequence[data + 1].title })
+        }
+
+        // console.log("DASdadasda", event)
+        // if (event.charCode === 13) {
+        //     const form = event.target.form;
+        //     const index = Array.prototype.indexOf.call(form, event.target);
+        //     form.elements[index + 1].focus();
+        //     event.preventDefault();
+        // }
+    }
     render() {
         const { stockData } = this.state
         const calculateVolumetric = (type) => {
@@ -415,7 +431,7 @@ class WarehouseStock extends Component {
         const listingLayout = (title, value, error, type) => {
             return (
                 <div className="row" style={{ paddingTop: "20pt" }} key={title}>
-                    <div className="col-2" >
+                    <div className="col-3" >
                         <Typography style={{ fontWeight: "600", fontSize: "15pt", color: "#253949", letterSpacing: 1 }}>{title} :</Typography>
                     </div>
                     <div className="col-4" >
@@ -428,15 +444,21 @@ class WarehouseStock extends Component {
                                         size="small"
                                         id="combo-box-demo"
                                         options={this.props.courier}
-                                        getOptionLabel={(option) => option.CourierName}
+                                        getOptionLabel={(option) => option.CourierName.length > 0 ? option.CourierName.trim() : ""}
                                         renderOption={(props, option) => {
                                             return (
                                                 <li {...props} key={option.CourierID}>
-                                                    {option.CourierName}
+                                                    {option.CourierName.length > 0 ? option.CourierName.trim() : ""}
                                                 </li>
                                             )
                                         }}
-                                        renderInput={(params) => <TextField {...params} label="快递" />}
+                                        // onKeyPress={(e) => this.handleKey(e)}
+                                        // autoFocus={checkFocus(title)}
+                                        // autoFocus={title === this.state.currentTitle ? true : false}
+                                        renderInput={(params) => <TextField {...params} label="快递"
+                                        // onKeyPress={(e) => this.handleKey(e)}
+                                        //     autoFocus={checkFocus(title) !== undefined ? checkFocus(title).title === title && checkFocus(title).focus : false} 
+                                        />}
                                         onChange={(e, obj) => {
                                             handleFilter(e, obj)
                                         }}
@@ -445,19 +467,23 @@ class WarehouseStock extends Component {
                                 </FormControl>
                             </Box>
                             :
-                            <TextField
-                                variant="outlined"
-                                style={{ width: "100%" }}
-                                label={title}
-                                value={value}
-                                required
-                                size="small"
+                            <>
+                                <TextField
+                                    variant="outlined"
+                                    style={{ width: "100%" }}
+                                    label={title}
+                                    value={value}
+                                    required
+                                    size="small"
+                                    onKeyPress={(e) => this.handleKey(e)}
+                                    // autoFocus={checkFocus(title) !== undefined ? checkFocus(title).title === title && checkFocus(title).focus : false} 
+                                    autoFocus={title === "快递单号" ? true : false}
+                                    inputProps={{ maxLength: title === "会员号" && 5 }}
+                                    disabled={title === "会员信息" ? true : false}
+                                    onChange={(e) => this.handleChange(e.target.value, title)}
+                                />
+                            </>
 
-                                autoFocus={title === "快递单号" ? true : false}
-                                inputProps={{ maxLength: title === "会员号" && 5 }}
-                                disabled={title === "会员信息" ? true : false}
-                                onChange={(e) => this.handleChange(e.target.value, title)}
-                            />
                         }
                         {error && <div><label style={{ color: "red", fontSize: "10pt" }}>请输入对的{title}</label></div>}
                     </div>
@@ -472,6 +498,9 @@ class WarehouseStock extends Component {
                                 type="number"
                                 required
                                 size="small"
+                                // autoFocus={title == this.state.currentTitle ? true : false}
+                                // onKeyPress={(e) => this.handleKey(e)}
+                                // autoFocus={checkFocus(title) !== undefined ? checkFocus(title).title === title && checkFocus(title).focus : false} 
                                 disabled={stockData[0].StockID !== "" ? true : false}
                                 onChange={(e) => this.handleChange(e.target.value, "数量")}
                             />
@@ -490,7 +519,7 @@ class WarehouseStock extends Component {
                 </div>
             )
         }
-
+        console.log("dsdasdas", this.state.currentTitle)
         const listingmultipleColumn = (data) => {
             return (
                 <div className="row">
@@ -506,6 +535,9 @@ class WarehouseStock extends Component {
                                         type="number"
                                         size="small"
                                         required
+                                        // autoFocus={x.title === this.state.currentTitle ? true : false}
+                                        // onKeyPress={(e) => this.handleKey(e)}
+                                        // autoFocus={checkFocus(x.title) !== undefined ? checkFocus(x.title).title === x.title && checkFocus(x.title).focus : false} 
                                         disabled={x.title === "体积重量" || x.title === "体积" ? true : false}
                                         onChange={(e) => this.handleChange(e.target.value, x.title)}
                                     />
@@ -517,6 +549,7 @@ class WarehouseStock extends Component {
                 </div>
             )
         }
+        console.log("FOCUSID", this.state.focusID)
 
 
         const handleButton = (type) => {
@@ -561,9 +594,14 @@ class WarehouseStock extends Component {
                     break;
             }
         }
+
+        const handleClick = (event) => {
+            console.log("dsdada", event)
+        }
+
         const pageStyle = `@media print {
             @page {
-             size: 300px 230px;
+             size: 300px 228px landscape;
              margin:5px;
             }
           }`;
@@ -573,7 +611,7 @@ class WarehouseStock extends Component {
             return (
                 data.length > 0 && data.map((x) => {
                     return (
-                        <div className="row" style={{ padding: "5pt 20pt 15pt" }} onClick={() => handleButton(x.type)} key={x.item} >
+                        <div className="row" style={{ padding: "5pt 20pt 15pt" }} onClick={() => handleButton(x.type)} key={x.item} onKeyDown={(e) => console.log("dsdasasd", e)}>
                             {
                                 x.type === "Delete" || x.type === "Save" ?
                                     <Button style={{
@@ -597,8 +635,9 @@ class WarehouseStock extends Component {
                                         style={{ width: "100%", display: "inline" }}
                                         pageStyle={pageStyle}
                                         preview={false}
-                                        trigger={(e) => {
-                                            return (
+                                        trigger={(e) =>
+                                            <>
+                                                {handleClick(e)}
                                                 <Button style={{
                                                     paddingTop: "30pt", paddingBottom: "30pt", borderRadius: "20pt", color: "white", fontWeight: "bold", fontSize: "20pt",
                                                     backgroundColor: this.verifyError() ? "grey" : "#0362fc"
@@ -606,8 +645,21 @@ class WarehouseStock extends Component {
                                                 >
                                                     {x.title}
                                                 </Button>
-                                            );
-                                        }}
+                                            </>
+
+                                            // stockData.length > 0 && stockData[0].TrackingNumber !== ""
+                                            //     {
+                                            //     return (
+                                            //         <Button style={{
+                                            //             paddingTop: "30pt", paddingBottom: "30pt", borderRadius: "20pt", color: "white", fontWeight: "bold", fontSize: "20pt",
+                                            //             backgroundColor: this.verifyError() ? "grey" : "#0362fc"
+                                            //         }} disabled={this.verifyError() ? true : false}
+                                            //         >
+                                            //             {x.title}
+                                            //         </Button>
+                                            //     );
+                                            // }
+                                        }
                                         onAfterPrint={() => { window.location.reload(false) }}
                                         content={() => this.componentRef}
                                     />
@@ -644,21 +696,20 @@ class WarehouseStock extends Component {
             return (
                 dataListing.length > 0 && dataListing.map((x) => {
                     return (
-                        <div key={x.TrackingNumber} style={{ paddingLeft: "10pt", paddingTop: "15pt", textAlign: "center" }}>
+                        <div key={x.TrackingNumber} style={{ width: "330px", height: "270px", paddingLeft: "10pt", paddingTop: "20pt", paddingBottom: "10pt" }}>
                             {/* <Typography style={{ fontWeight: "600", fontSize: "16pt", color: "#253949", letterSpacing: 1 }}>{x.areaCode}</Typography> */}
                             <Barcode value={x.TrackingNumber} height='50pt' width='1px' fontSize='25pt' />
-                            <div className="row" style={{ textAlign: "left", paddingTop: "8pt" }}>
-                                <div className="col-2" style={{ itemAlign: "center", paddingTop: "5pt" }}>
-                                    <QRCode value={x.TrackingNumber} size={50} />
+                            <div className="row" style={{ textAlign: "left", paddingTop: "10pt" }}>
+                                <div className="col-2" style={{ itemAlign: "center" }}>
+                                    <QRCode value={x.TrackingNumber} size={65} />
                                 </div>
-                                <div className="col-10" style={{ paddingLeft: "15pt" }}>
-                                    <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>会员：
-                                        <label style={{ fontSize: "15pt" }}> {x.UserCode} ( {x.areaCode} )</label></Typography>
-                                    <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
-                                    <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, HH:mm:ss')}</Typography>
+                                <div className="col-10" style={{ paddingLeft: "21pt" }}>
+                                    <Typography style={{ fontWeight: "600", fontSize: "13pt", color: "#253949", letterSpacing: 1 }}>会员：
+                                        <label style={{ fontSize: "17pt" }}> {x.UserCode} ( {x.areaCode} )</label></Typography>
+                                    <Typography style={{ fontWeight: "600", fontSize: "13pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
+                                    <Typography style={{ fontWeight: "600", fontSize: "13pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, HH:mm:ss')}</Typography>
                                 </div>
                             </div>
-                            <br />
                         </div>
                     )
                 })
@@ -728,6 +779,21 @@ class WarehouseStock extends Component {
             // }
         }
 
+        const checkFocus = (data) => {
+            let ID = this.state.focusID
+            let sequence = [{ id: 1, title: "快递单号" }, { id: 2, title: "数量" }, { id: 3, title: "快递公司" }, { id: 4, title: "会员号" }, { id: 5, title: "货物信息" }, { id: 6, title: "实际重量" },
+            { id: 7, title: "长" }, { id: 7, title: "宽" }, { id: 7, title: "高" }, { id: 7, title: "Print" }]
+            let focus = { title: data, focus: false }
+            if (data !== undefined && ID !== undefined) {
+                if (sequence.filter((x) => x.id === ID && x.title === data).length > 0)
+                    focus = { title: data, focus: true }
+
+                sequence.filter((x) => x.id === ID && x.title === data).map((y) => {
+                    console.log("FOCUSID CHECK", y)
+                })
+            }
+            return focus
+        }
         return (
             <div className="container-fluid" >
                 <div className="row">
@@ -739,7 +805,7 @@ class WarehouseStock extends Component {
                             isArrayNotEmpty(stockData) && stockData.map((x) => {
 
                                 return (
-                                    <>
+                                    <form>
                                         {listingLayout("快递单号", x.TrackingNumber, x.isTrackingError, "text")}
                                         {listingLayout("快递公司", x.CourierID, x.isCourierError, "list")}
                                         {listingLayout("会员号", x.UserCode, x.isUserCodeError, "text")}
@@ -748,10 +814,10 @@ class WarehouseStock extends Component {
 
                                         <hr size="5" style={{ marginTop: "20pt" }} />
                                         <div className="row" style={{ paddingTop: "20pt" }}>
-                                            <div className="col-2" >
+                                            <div className="col-3" >
                                                 <Typography style={{ fontWeight: "600", fontSize: "15pt", color: "#253949", letterSpacing: 1 }}>重量 :</Typography>
                                             </div>
-                                            <div className="col-10" >
+                                            <div className="col-9" >
                                                 <div className="row">
                                                     {listingmultipleColumn([
                                                         { title: "实际重量", value: x.ProductWeight, error: x.isProductWeightError },
@@ -763,10 +829,10 @@ class WarehouseStock extends Component {
                                         </div>
 
                                         <div className="row" style={{ paddingTop: "20pt" }}>
-                                            <div className="col-2" >
+                                            <div className="col-3" >
                                                 <Typography style={{ fontWeight: "600", fontSize: "15pt", color: "#253949", letterSpacing: 1 }}>尺寸 :</Typography>
                                             </div>
-                                            <div className="col-10" >
+                                            <div className="col-9" >
                                                 <div className="row">
                                                     {listingmultipleColumn([
                                                         { title: "长", value: x.ProductDeep, error: x.isProductDeepError },
@@ -777,11 +843,12 @@ class WarehouseStock extends Component {
                                             </div>
                                         </div>
                                         {listingLayout("备注", x.Remark, "", "text")}
-                                    </>
+                                    </form>
                                 )
                             })
                         }
                     </div>
+
 
                     <div className="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-xs-12" style={{ paddingTop: "20pt" }} >
                         {/* <div className="row" style={{ textAlign: "center" }}>
