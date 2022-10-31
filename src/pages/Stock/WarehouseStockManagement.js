@@ -354,27 +354,6 @@ export const WarehouseStock = (props) => {
         return Obj
     }
 
-    const handleKey = (event) => {
-        let sequence = [{ id: 1, title: "快递单号" }, { id: 2, title: "数量" }, { id: 3, title: "快递公司" }, { id: 4, title: "会员号" }, { id: 5, title: "货物信息" }, { id: 6, title: "实际重量" },
-        { id: 7, title: "长" }, { id: 8, title: "宽" }, { id: 9, title: "高" }, { id: 10, title: "Print" }]
-
-        if (event.key === "Enter") {
-            setFocusID(focusID + 1)
-            setCurrentTitle(sequence[focusID + 1].title)
-        }
-    }
-
-    const checkFocus = (data) => {
-        let sequence = [{ id: 1, title: "快递单号" }, { id: 2, title: "数量" }, { id: 3, title: "快递公司" }, { id: 4, title: "会员号" }, { id: 5, title: "货物信息" }, { id: 6, title: "实际重量" },
-        { id: 7, title: "长" }, { id: 7, title: "宽" }, { id: 7, title: "高" }, { id: 7, title: "Print" }]
-        let focus = { title: data, focus: false }
-        if (data !== undefined && focusID !== undefined) {
-            if (sequence.filter((x) => x.id === focusID && x.title === data).length > 0)
-                focus = { title: data, focus: true }
-        }
-        return focus
-    }
-
     const renderPrintListing = () => {
         let dataListing = []
         let listing = ""
@@ -663,7 +642,7 @@ export const WarehouseStock = (props) => {
         return (
             data.length > 0 && data.map((x) => {
                 return (
-                    <div className="row" style={{ padding: "5pt 20pt 15pt" }} onClick={() => handleButton(x.type)} key={x.item} onKeyDown={(e) => console.log("dsdasasd", e)}>
+                    <div className="row" style={{ padding: "5pt 20pt 15pt" }} onClick={() => handleButton(x.type)} key={x.item} >
                         {
                             x.type === "Delete" || x.type === "Save" ?
                                 <Button

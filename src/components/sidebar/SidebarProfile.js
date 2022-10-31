@@ -8,7 +8,7 @@ export default function Profile(props) {
                 padding: '24px',
                 textTransform: 'uppercase',
                 fontWeight: 'bold',
-                fontSize: 13,
+                fontSize: 15,
                 letterSpacing: '1px',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -16,10 +16,10 @@ export default function Profile(props) {
                 textAlign: 'center'
             }}
         >
-            <div style={{ width: '100px', height: '100px', margin: 'auto', marginBottom: '30px' }}>
-                <img style={{borderRadius: ' 10%'}} src={YourWayLogo} alt="Yawei Logistics" width="100%" height="70%" />
+            <div style={{ textAlign: "center", padding:"10pt" }}>
+                <img src={YourWayLogo} alt="Yawei Logistics" width="80%" />
             </div>
-            EZ TRANSIT AND LOGISTICS
+            雅威国际物流
         </div>
     )
 }

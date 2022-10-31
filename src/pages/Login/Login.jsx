@@ -113,9 +113,11 @@ class Login extends Component {
             <div style={{ display: 'flex', width: '100%', height: '100vh', }}>
                 <div className="container login-container m-auto">
                     <div className="logo-container w-100">
-                        <div style={{ width: '120px', height: '120px', marginLeft: 'auto', marginRight: 'auto', }}>
-                            <img style={{ borderRadius: '20%', }} src={YourWayLogo} alt="System Logo" width='100%' height='70%' onError={event => { event.target.src = GetDefaultImage(); event.onerror = null }} />
+                        {/* <div style={{ width: '120px', height: '120px', marginLeft: 'auto', marginRight: 'auto', }}> */}
+                        <div style={{ textAlign: "center" }}>
+                            <img src={YourWayLogo} alt="System Logo" width='30%' onError={event => { event.target.src = GetDefaultImage(); event.onerror = null }} />
                         </div>
+                        {/* </div> */}
                     </div>
                     <div className="login-inputs-group">
                         <FormControl sx={{ m: 1, marginTop: 5, width: '100%' }} variant="standard">
