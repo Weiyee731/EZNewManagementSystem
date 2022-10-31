@@ -21,7 +21,7 @@ import ProformaList from "../../../pages/Reporting/Invoice/ProformaList";
 import ArchivedStock from "../../../pages/ArchivedData/ArchivedStock/ArchivedStock.jsx";
 import ArchivedTransaction from "../../../pages/ArchivedData/ArchivedTransaction/ArchivedTransaction.js";
 import PendingToLoad from "../../../pages/Container/PendingToLoad";
-import WarehouseStockManagement from "../../../pages/Stock/WarehouseStockManagement";
+import { WarehouseStock } from "../../../pages/Stock/WarehouseStockManagement";
 import NotificationList from "../../../pages/Notification/NotificationList"
 import ContainerListing from "../../../pages/Container/ContainerListing/ContainerListing.js";
 
@@ -140,7 +140,7 @@ const routes = [
     {
         path: "/WarehouseStockManagement",
         exact: true,
-        element: <WarehouseStockManagement />,
+        element: <WarehouseStock />,
     },
     {
         path: "/notification",

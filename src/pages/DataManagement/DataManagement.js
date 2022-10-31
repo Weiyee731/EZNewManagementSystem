@@ -14,7 +14,7 @@ import ResponsiveDatePickers from '../../components/datePicker/datePicker';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import moment from 'moment';
 import { Typography, TableCell, Box, IconButton, LinearProgress, Button, TextField, FormHelperText } from '@mui/material';
-import WarehouseStockManagement from "../Stock/WarehouseStockManagement";
+import { WarehouseStock } from "../Stock/WarehouseStockManagement";
 
 function mapStateToProps(state) {
     return {
@@ -43,7 +43,7 @@ const INITIAL_STATE = {
     ContainerDateValidated: true,
     IsReturnedDataError: false,
     openModalForAddStock: false,
-    onDropFile:[]
+    onDropFile: []
 }
 
 class DataManagement extends Component {
@@ -101,8 +101,8 @@ class DataManagement extends Component {
                 toast.success(this.props.inventoryStockAction[0].ReturnMsg, {
                     autoClose: 2000, position: "top-center", transition: Flip, theme: "dark"
                 })
-                const fileDelete = this.state.onDropFile?this.state.onDropFile[0].name:""
-                console.log("fileDelete",fileDelete)
+                const fileDelete = this.state.onDropFile ? this.state.onDropFile[0].name : ""
+                console.log("fileDelete", fileDelete)
                 this.onRemoveAttachment(fileDelete)
                 this.setState({ IsReturnedDataError: false, isSubmit: false })
             }
@@ -116,7 +116,7 @@ class DataManagement extends Component {
     uploadHandler = (files) => {
         if (isArrayNotEmpty(files)) {
             const excelFile = files[0]
-            console.log("files",files)
+            console.log("files", files)
             const fileExt = getFileExtension(excelFile.name)
 
             if (getFileTypeByExtension(fileExt) === 'excel') {
@@ -139,7 +139,7 @@ class DataManagement extends Component {
     }
 
     onRemoveAttachment(item) {
-        console.log("item",item)
+        console.log("item", item)
         this.setState({ DataHeaders: [], DataRows: [] })
     }
 
@@ -368,7 +368,7 @@ class DataManagement extends Component {
                     />
                 </ModalPopOut>
                 <ModalPopOut fullScreen={true} open={openModalForAddStock} handleToggleDialog={() => { this.setState({ openModalForAddStock: !openModalForAddStock }) }} title=" Report" showAction={false}>
-                    <WarehouseStockManagement selectedRow={selectedRow} />
+                    <WarehouseStock selectedRow={selectedRow} />
                 </ModalPopOut>
 
             </div >
