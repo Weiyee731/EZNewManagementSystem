@@ -88,7 +88,7 @@ export const WarehouseStock = (props) => {
                         toast.success("已成功入库")
                     else
                         toast.success("已更新成功")
-                }
+                    window.location.reload(false)                }
             } else {
                 if (isSubmitDelete === true)
                     toast.error("包裹未删除成功, 请联系系统管理")
@@ -99,7 +99,7 @@ export const WarehouseStock = (props) => {
             setIsSubmitAdd(false)
             setIsSubmitDelete(false)
         }
-    }, [])
+    }, [inventoryStockAction])
 
     useEffect(() => {
         let listing = inventoryStock[0]
@@ -613,6 +613,7 @@ export const WarehouseStock = (props) => {
                 break;
 
             case "Delete":
+                console.log("dasdadad", stockData[0])
                 if (stockData[0].StockID !== "" && stockData[0].StockID !== undefined) {
                     dispatch(GitAction.CallDeleteInventory({
                         StockID: stockData[0].StockID,

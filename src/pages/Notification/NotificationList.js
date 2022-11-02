@@ -121,7 +121,8 @@ class NotificationList extends Component {
       NotificationDesc: "",
       searchKeywords: "",
       filteredList: [],
-      NotificationDescValidated: false
+      NotificationDescValidated: false,
+      isFiltered: false
     }
     this.renderTableRows = this.renderTableRows.bind(this)
     this.onTableRowClick = this.onTableRowClick.bind(this)
@@ -139,7 +140,7 @@ class NotificationList extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.notification.length > 0 && this.props.notification !== prevProps.notification) { 
+    if (this.props.notification.length > 0 && this.props.notification !== prevProps.notification) {
       this.setState({ filteredList: this.props.notification })
     }
   }
@@ -231,10 +232,6 @@ class NotificationList extends Component {
       NotificationTitleValidated &&
       NotificationDescValidated
     )
-    console.log(NotificationTitleValidated)
-    console.log(isValidated)
-    console.log(NotificationDescValidated)
-    console.log(NotificationID === 0)
     if (isValidated) {
       if (NotificationID === 0) {
         this.props.CallAddNotification({
@@ -346,7 +343,7 @@ class NotificationList extends Component {
       this.setState({ searchKeywords: value, filteredList: this.props.notification })
     } else {
       var tempList = this.props.notification.filter(x => (x.NotificationTitle.toLowerCase().includes(value.toLowerCase())))
-      this.setState({ searchKeywords: value, filteredList: tempList })
+      this.setState({ searchKeywords: value, filteredList: tempList, isFiltered: true })
     }
   }
 
@@ -399,7 +396,7 @@ class NotificationList extends Component {
               headerColor: 'rgb(200, 200, 200)'
             }}
             selectedIndexKey={"UserID"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
-            Data={isArrayNotEmpty(this.state.filteredList) ? this.state.filteredList : this.props.notification}                                  // required, the data that listing in the table// optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
+            Data={this.state.isFiltered ? this.state.filteredList : this.props.notification}                                  // required, the data that listing in the table// optional, onTableRowClick = (event, row) => { }. The function should follow the one shown, as it will return the data from the selected row 
             onActionButtonClick={this.onAddButtonClick}     // optional, onAddButtonClick = () => { }. The function should follow the one shown, as it will return the action that set in this page
             actionIcon={this.renderTableActionButton()}
             onSelectRow={this.onSelectItem}
