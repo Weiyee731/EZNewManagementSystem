@@ -704,6 +704,8 @@ class UserDetail extends Component {
       USERID: UserID,
       USERCODE: userCode,
       USERAREAID: (selectedAreaCode.length > 0) ? selectedAreaCode[0].UserAreaID : "1",
+      WECHATID: this.props.userProfile[0].UserWechatID,
+      USERNICKNAME: this.props.userProfile[0].UserNickname,
       FULLNAME: (!isStringNullOrEmpty(userFullname) ? userFullname : "-"),
       CONTACTNO: (!isStringNullOrEmpty(userContact) ? userContact : "-"),
       USEREMAIL: (!isStringNullOrEmpty(userEmail) ? userEmail : "-"),
