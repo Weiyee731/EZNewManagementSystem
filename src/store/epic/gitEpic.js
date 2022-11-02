@@ -1041,8 +1041,6 @@ export class GitEpic {
 
         let json = await response.json();
         json = JSON.parse(json)
-
-        console.log("Inventory_AddStock", json)
         return {
           type: GitAction.Inventory_Added,
           payload: json,

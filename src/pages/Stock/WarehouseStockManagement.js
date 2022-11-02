@@ -613,7 +613,6 @@ export const WarehouseStock = (props) => {
                 break;
 
             case "Delete":
-                console.log("dasdadad", stockData[0])
                 if (stockData[0].StockID !== "" && stockData[0].StockID !== undefined) {
                     dispatch(GitAction.CallDeleteInventory({
                         StockID: stockData[0].StockID,

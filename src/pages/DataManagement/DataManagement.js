@@ -102,7 +102,6 @@ class DataManagement extends Component {
                     autoClose: 2000, position: "top-center", transition: Flip, theme: "dark"
                 })
                 const fileDelete = this.state.onDropFile ? this.state.onDropFile[0].name : ""
-                console.log("fileDelete", fileDelete)
                 this.onRemoveAttachment(fileDelete)
                 this.setState({ IsReturnedDataError: false, isSubmit: false })
             }
@@ -116,7 +115,6 @@ class DataManagement extends Component {
     uploadHandler = (files) => {
         if (isArrayNotEmpty(files)) {
             const excelFile = files[0]
-            console.log("files", files)
             const fileExt = getFileExtension(excelFile.name)
 
             if (getFileTypeByExtension(fileExt) === 'excel') {
@@ -139,7 +137,6 @@ class DataManagement extends Component {
     }
 
     onRemoveAttachment(item) {
-        console.log("item", item)
         this.setState({ DataHeaders: [], DataRows: [] })
     }
 
