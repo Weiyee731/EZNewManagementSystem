@@ -254,7 +254,7 @@ class ContainerListing extends Component {
 
         }
 
-        if (this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== 0 && this.props.inventoryStock!==prevProps.inventoryStock) {
+        if (this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== 0 && this.props.inventoryStock !== prevProps.inventoryStock) {
             console.log("sini lah")
             this.setState({ inventoryStock: this.props.inventoryStock, isInventorySet: true })
             // this.props.ClearInventoryStock()
@@ -389,7 +389,7 @@ class ContainerListing extends Component {
             }
             this.props.CallAddContainer(obj)
         }
-
+        this.setState({ openCreateContainerModal: false, containerNo: "", containerDate: "", containerRemark: "", editContainer: false })
     }
 
     handleSearchInput(value, title) {
