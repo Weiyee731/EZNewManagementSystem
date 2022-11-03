@@ -58,10 +58,11 @@ class Login extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (!this.props.loading && isArrayNotEmpty(this.props.logonUser)) {
+        if (!this.props.loading && isArrayNotEmpty(this.props.logonUser) && this.state.isSubmitting === true) {
             this.setState(({ isSubmitting: false }))
-            if (this.props.logonUser[0].ReturnVal === "0" || this.props.logonUser[0].ReturnVal === 0) {
-                toast.error("Authentication Failed.")
+
+            if (this.props.logonUser[0].ReturnVal === "0" || this.props.logonUser[0].ReturnVal === 0 || this.props.logonUser[0].UserTypeID > 2) {
+                toast.error("请填写正确账号与密码")
                 // this.props.CallClearLogonUserCache();
             }
             else {
@@ -98,7 +99,7 @@ class Login extends Component {
                 username: this.state.username,
                 password: this.state.password,
             }
-            // this.setState(({ isSubmitting: true }))
+            this.setState(({ isSubmitting: true }))
             this.props.CallUserLogin(object)
         }
     }

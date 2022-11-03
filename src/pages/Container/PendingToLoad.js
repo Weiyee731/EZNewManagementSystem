@@ -208,7 +208,7 @@ class PendingToLoad extends Component {
         let listing = this.props.inventoryStock
         let data = 0.00
 
-        if (listing.length > 0)
+        if (listing.length > 0 && listing[0].ReturnVal !== 0)
             data = listing.reduce((volume, item) => volume + item.Volume, 0)
 
         return data
@@ -221,7 +221,7 @@ class PendingToLoad extends Component {
                 <div className="d-flex">
                     <Tooltip title="Add Stock">
                         <IconButton size="small">
-                            <AddCircleIcon fontSize="large"   color="primary" onClick={() => window.location.href = "./WarehouseStockManagement"} />
+                            <AddCircleIcon fontSize="large" color="primary" onClick={() => window.location.href = "./WarehouseStockManagement"} />
                         </IconButton>
                     </Tooltip>
                     <CsvDownloader
@@ -288,7 +288,7 @@ class PendingToLoad extends Component {
                 </div>
                 <div className="row" style={{ paddingTop: "5pt" }} >
                     <div className="col-2">
-                        <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>总数量 : {this.props.inventoryStock.length}</Typography>
+                        <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>总数量 : {this.props.inventoryStock.length > 0 && this.props.inventoryStock[0].ReturnVal !== 0 ? this.props.inventoryStock.length : 0}</Typography>
                     </div>
                     <div className="col-2">
                         <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>总立方 : {parseFloat(this.renderTotal()).toFixed(3)}</Typography>
@@ -317,7 +317,7 @@ class PendingToLoad extends Component {
                     }}
 
                     selectedIndexKey={"pid"}                     // required, as follow the data targetting key of the row, else the data will not be chosen when checkbox is click. 
-                    Data={isFiltered === true ? filteredProduct : OveralStock}                                  // required, the data that listing in the table
+                    Data={isFiltered === true ? filteredProduct : OveralStock.length > 0 && OveralStock[0].ReturnVal !== 0 ? OveralStock : []}                                  // required, the data that listing in the table
                 />
             </div>
         )
