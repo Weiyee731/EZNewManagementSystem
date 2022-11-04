@@ -79,6 +79,13 @@ const headCells = [
         disablePadding: false,
         label: 'Name',
     },
+    
+    {
+        id: 'UserWechatID',
+        align: 'center',
+        disablePadding: false,
+        label: 'Wechat ID',
+    },
     {
         id: 'UserContactNo',
         align: 'center',
@@ -236,6 +243,7 @@ class UserManagement extends Component {
                 </TableCell>
                 <TableCell align="center">{data.AreaCode}</TableCell>
                 <TableCell align="center">{data.Fullname}</TableCell>
+                <TableCell align="center">{data.UserWechatID}</TableCell>
                 <TableCell align="center">{data.UserContactNo}</TableCell>
                 <TableCell align="center">{data.UserEmailAddress}</TableCell>
             </>

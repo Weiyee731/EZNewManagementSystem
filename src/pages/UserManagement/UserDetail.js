@@ -1143,6 +1143,7 @@ class UserDetail extends Component {
                       helperText={this.state.userCubicSelfPickupValidated !== null && !this.state.userCubicSelfPickupValidated ? "Required" : ""}
                     />
                   </Grid>
+                  {console.log("dsdsad", this.props.userProfile)}
                   <Grid item xs={4} md={2}>
                     <TextField
                       required
@@ -1296,6 +1297,8 @@ class UserDetail extends Component {
                         <div className="mb-2 col-8 col-md-3">{this.state.UserProfile[0].UserEmailAddress}</div>
                         <div className="mb-2 col-4 col-md-3 information-label">Contact</div>
                         <div className="mb-2 col-8 col-md-3 ">{this.state.UserProfile[0].UserContactNo}</div>
+                        <div className="mb-2 col-4 col-md-3 information-label">Wechat ID</div>
+                        <div className="mb-2 col-8 col-md-3 ">{this.state.UserProfile[0].UserWechatID}</div>
                         <div className="mb-2 col-4 col-md-3 information-label">Address</div>
                         <div className="mb-2 col-8 col-md-3 ">{this.state.UserProfile[0].UserAddress}</div>
                         <div className="col-12">
