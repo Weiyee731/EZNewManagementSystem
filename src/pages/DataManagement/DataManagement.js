@@ -178,8 +178,9 @@ class DataManagement extends Component {
         }));
 
         if (rows.length > 0) {
+            const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
             rows.map(row => {
-                row["isInvalid"] = (isStringNullOrEmpty(row["Tracking No"]) || (row["ContainerDate"] !== this.props.propsData.ContainerDate) || (row["ContainerName"] !== this.props.propsData.ContainerName))
+                row["isInvalid"] = (isStringNullOrEmpty(row["Tracking No"]) || specialChars.test(row["Tracking No"]) || (moment(row["ContainerDate"]).format("DD/MM/YYYY") !== moment(this.props.propsData.ContainerDate).format("DD/MM/YYYY")) || (row["ContainerName"] !== this.props.propsData.ContainerName))
             })
         }
         this.setState({ DataHeaders: columns.filter(x => x.name !== ""), DataRows: rows.filter(x => x[columns[0].name] !== ""), loadingData: false })
@@ -267,6 +268,7 @@ class DataManagement extends Component {
         return (
             <div>
                 <div className="container">
+                    <Typography style={{ color: "red" }}>** Excel Header: Tracking No , ContainerDate, ContainerName </Typography>
                     <Dropzone
                         placeholder={{
                             text: "Drag and Drop Excel here, or click to select file",

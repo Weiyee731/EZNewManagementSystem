@@ -48,7 +48,7 @@ function mapStateToProps(state) {
         stocks: state.counterReducer["stocks"],
         userAreaCode: state.counterReducer["userAreaCode"],
         stockApproval: state.counterReducer["stockApproval"],
-        AllContainer: state.counterReducer["AllContainer"],
+        container: state.counterReducer["container"],
     }
 }
 
@@ -288,11 +288,11 @@ class OverallStock extends Component {
             setTimeout(() => { this.setState({ CallResetSelected: false }) }, 300)
         }
 
-        if (isArrayNotEmpty(this.props.AllContainer) && this.state.isContainerSet === false) {
+        if (isArrayNotEmpty(this.props.container) && this.state.isContainerSet === false) {
             this.setState({
-                ContainerName: this.props.AllContainer[0].ContainerName,
-                ContainerDate: this.props.AllContainer[0].ContainerDate,
-                ContainerID: this.props.AllContainer[0].ContainerID,
+                ContainerName: this.props.container[0].ContainerName,
+                ContainerDate: this.props.container[0].ContainerDate,
+                ContainerID: this.props.container[0].ContainerID,
                 isContainerSet: true,
             })
         }
@@ -368,8 +368,8 @@ class OverallStock extends Component {
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.Item}</TableCell>
                 <TableCell align="center" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.UserCode} {data.UserID ? '' : <div><span style={{ color: "#880808" }}>The user was not register in the system</span></div>} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.AreaCode + " - " + data.AreaName} </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.StockDate} </TableCell>
-                <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.PackagingDate} </TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {moment(data.StockDate).format('DD/MM/YYYY hh:mm:ss') == "Invalid date" ? "-" : moment(data.StockDate).format('DD/MM/YYYY hh:mm:ss')}</TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {moment(data.PackagingDate).format('DD/MM/YYYY hh:mm:ss') == "Invalid date" ? "-" : moment(data.PackagingDate).format('DD/MM/YYYY hh:mm:ss')} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.ContainerName}   </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {!isStringNullOrEmpty(data.AdditionalCharges) && renderAdditionalCost(data.AdditionalCharges)}  </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.Remark}</TableCell>
@@ -392,8 +392,8 @@ class OverallStock extends Component {
         tempFormValue.StockID = row.StockID
         tempFormValue.Item = row.Item
         tempFormValue.TrackingStatusID = row.TrackingStatusID
-        tempFormValue.ContainerName = row.EstimatedContainerName
-        tempFormValue.ContainerDate = row.EstimatedContainerDate
+        tempFormValue.ContainerName = row.ContainerName
+        tempFormValue.ContainerDate = row.ContainerDate
         tempFormValue.StockDate = row.StockDate
         tempFormValue.TrackingNumber = row.TrackingNumber
         tempFormValue.TrackingNumberVerified = !isStringNullOrEmpty(row.TrackingNumber)
@@ -561,7 +561,7 @@ class OverallStock extends Component {
                         Remark: object.REMARK,
                         AdditionalCharges: object.EXTRACHARGE,
                     }
-                    
+
                     this.props.CallUpdateStockDetailByPost(postObject)
                 } else {
                     let postObject = {
@@ -580,7 +580,7 @@ class OverallStock extends Component {
                         CONTAINERNAME: object.CONTAINERNAME,
                         CONTAINERDATE: object.CONTAINERDATE,
                     }
-                    
+
                     this.props.CallInsertStockByPost(postObject)
                 }
             } else {
@@ -1110,8 +1110,6 @@ class OverallStock extends Component {
             { children: "Checked", key: "Checked" },
         ]
 
-        console.log("dsadda", this.props)
-        
         const validateForm = this.state.formValue.TrackingNumberVerified &&
             this.state.formValue.MemberNumberVerified &&
             this.state.formValue.DepthVerified &&
@@ -1185,8 +1183,8 @@ class OverallStock extends Component {
                                     name="Division"
                                     value={this.state.ContainerID}
                                     onChange={(e) => {
-                                        isArrayNotEmpty(this.props.AllContainer) &&
-                                            this.props.AllContainer.map((container) => {
+                                        isArrayNotEmpty(this.props.container) &&
+                                            this.props.container.map((container) => {
                                                 if (container.ContainerID === e.target.value) {
                                                     this.setState({
                                                         ContainerName: container.ContainerName,
@@ -1198,8 +1196,8 @@ class OverallStock extends Component {
                                     }}
                                     label="Division"
                                 >
-                                    {isArrayNotEmpty(this.props.AllContainer) &&
-                                        this.props.AllContainer.map((el, idx) => {
+                                    {isArrayNotEmpty(this.props.container) &&
+                                        this.props.container.map((el, idx) => {
                                             return (
                                                 <MenuItem value={el.ContainerID} key={idx}>
                                                     {el.ContainerName + " ( " + el.ContainerDate + " )"}
@@ -1383,6 +1381,7 @@ class OverallStock extends Component {
                 >
                     <div className="py-md-3 py-1">
                         <FormControl >
+                            {console.log("dsdasdsad", this.props)}
                             <div className="row">
                                 <div className="col-12" style={{ fontSize: "9pt" }}>
                                     <div className="clearfix">
@@ -1395,7 +1394,7 @@ class OverallStock extends Component {
                                                     </div>
                                                     <div className="float-end">
                                                         <b>Expected Container Date: </b>
-                                                        {!isStringNullOrEmpty(formValue.ContainerDate) ? formValue.ContainerDate : " N/A "}
+                                                        {!isStringNullOrEmpty(formValue.ContainerDate) ? moment(formValue.ContainerDate).format("DD/MM/YYYY") : " N/A "}
                                                     </div>
                                                 </>
                                                 :
@@ -1409,8 +1408,8 @@ class OverallStock extends Component {
                                                                 name="Container"
                                                                 value={this.state.formValue.NewContainerID}
                                                                 onChange={(e) => {
-                                                                    isArrayNotEmpty(this.props.AllContainer) &&
-                                                                        this.props.AllContainer.map((container) => {
+                                                                    isArrayNotEmpty(this.props.container) &&
+                                                                        this.props.container.map((container) => {
                                                                             if (container.ContainerID === e.target.value) {
                                                                                 let tempForm = this.state.formValue
 
@@ -1423,8 +1422,8 @@ class OverallStock extends Component {
                                                                 }}
                                                                 label="Container"
                                                             >
-                                                                {isArrayNotEmpty(this.props.AllContainer) &&
-                                                                    this.props.AllContainer.map((el, idx) => {
+                                                                {isArrayNotEmpty(this.props.container) &&
+                                                                    this.props.container.map((el, idx) => {
                                                                         return (
                                                                             <MenuItem value={el.ContainerID} key={idx}>
                                                                                 {el.ContainerName + " ( " + el.ContainerDate + " )"}
