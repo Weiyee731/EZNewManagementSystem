@@ -88,7 +88,37 @@ export const WarehouseStock = (props) => {
                         toast.success("已成功入库")
                     else
                         toast.success("已更新成功")
-                    window.location.reload(false)                }
+
+                    setStockData([{
+                        TrackingNumber: "",
+                        isTrackingError: false,
+                        CourierID: { CourierID: "", CourierName: "" },
+                        isCourierError: false,
+                        UserCode: "",
+                        isUserCodeError: false,
+                        UserData: "",
+                        Item: "",
+                        isItemError: false,
+                        Quantity: 1,
+                        isQuantityError: false,
+                        ProductWeight: "",
+                        isProductWeightError: false,
+                        ProductVolumetricWeight: "",
+                        isProductVolumetricWeightError: false,
+                        ProductHeight: "",
+                        isProductHeightError: false,
+                        ProductWidth: "",
+                        isProductWidthError: false,
+                        ProductDeep: "",
+                        isProductDeepError: false,
+                        Remark: "",
+                        areaCode: "",
+                        createdDate: "",
+                        StockID: "",
+                    }])
+         
+                    // window.location.reload(false)
+                }
             } else {
                 if (isSubmitDelete === true)
                     toast.error("包裹未删除成功, 请联系系统管理")
@@ -96,8 +126,11 @@ export const WarehouseStock = (props) => {
                     toast.error("包裹未入库成功，请联系系统管理")
             }
             dispatch(GitAction.ClearInventoryAction())
+            dispatch(GitAction.ClearInventoryStock())
             setIsSubmitAdd(false)
             setIsSubmitDelete(false)
+            setIsCheckDatabase(false)
+            setIsCheckUser(false)
         }
     }, [inventoryStockAction])
 
@@ -601,6 +634,7 @@ export const WarehouseStock = (props) => {
             case "Print":
                 if (!verifyError()) {
                     let Obj = createObject()
+                    toast.warning("SENDING Inventory_AddStock ")
                     dispatch(GitAction.CallAddInventory(Obj))
                     setIsSubmitAdd(true)
                 }
@@ -676,7 +710,7 @@ export const WarehouseStock = (props) => {
                                         );
                                     }
                                     }
-                                    onAfterPrint={() => { window.location.reload(false) }}
+                                    // onAfterPrint={() => { window.location.reload(false) }}
                                     content={() => componentRef}
                                 />
                         }

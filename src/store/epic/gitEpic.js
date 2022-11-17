@@ -1024,6 +1024,7 @@ export class GitEpic {
 
   Inventory_AddStock = action$ =>
     action$.ofType(GitAction.Inventory_Add).switchMap(async ({ payload }) => {
+      toast.warning("Inventory_AddStock IN GIT")
       try {
         const response = await fetch(url +
           "Inventory_AddStock?" +
@@ -1041,6 +1042,7 @@ export class GitEpic {
 
         let json = await response.json();
         json = JSON.parse(json)
+        toast.success("Inventory_AddStock GIT RETURN ", json)
         return {
           type: GitAction.Inventory_Added,
           payload: json,
