@@ -188,6 +188,8 @@ class UserDetail extends Component {
       //form data
       userCode: "",
       userCodeValidated: null,
+      userName: "",
+      userNameValidated: null,
       userAreaId: 1,
       userAreaIdValidated: true,
       userFullname: "",
@@ -256,6 +258,8 @@ class UserDetail extends Component {
           //form data
           userCode: (userProfile.length > 0) ? userProfile[0].UserCode : "",
           userCodeValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].UserCode)) ? true : false,
+          userName: (userProfile.length > 0) ? userProfile[0].Username : "",
+          userNameValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].Username)) ? true : false,
           userAreaId: (userProfile.length > 0) ? userProfile[0].UserAreaID : 1,
           userAreaIdValidated: true,
           userFullname: (userProfile.length > 0) ? userProfile[0].Fullname : "",
@@ -314,6 +318,8 @@ class UserDetail extends Component {
 
       //form data
       userCode: "",
+      userName: "",
+      userNameValidated: null,
       userCodeValidated: null,
       userAreaId: 1,
       userAreaIdValidated: true,
@@ -362,6 +368,8 @@ class UserDetail extends Component {
           UserProfile: this.props.userProfile,
           userCode: (userProfile.length > 0) ? userProfile[0].UserCode : "",
           userCodeValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].UserCode)) ? true : false,
+          userName: (userProfile.length > 0) ? userProfile[0].Username : "",
+          userNameValidated: (userProfile.length > 0 && !isStringNullOrEmpty(userProfile[0].Username)) ? true : false,
           userAreaId: (userProfile.length > 0) ? userProfile[0].UserAreaID : 1,
           userAreaIdValidated: true,
           userFullname: (userProfile.length > 0) ? userProfile[0].Fullname : "",
@@ -400,6 +408,7 @@ class UserDetail extends Component {
           UserProfile: prevProps.userProfile,
           FullName: prevProps.userProfile[0].Fullname,
           UserCode: prevProps.userProfile[0].UserCode,
+          Username: prevProps.userProfile[0].Username,
           Email: prevProps.userProfile[0].UserEmailAddress,
           Contact: prevProps.userProfile[0].UserContactNo,
           Address: prevProps.userProfile[0].UserAddress,
@@ -429,6 +438,7 @@ class UserDetail extends Component {
           if (isArrayNotEmpty(userData)) {
             userData[0].Fullname = this.state.userFullname;
             userData[0].UserCode = this.state.userCode;
+            userData[0].Username = this.state.userName;
             userData[0].UserAreaID = this.state.userAreaId;
             userData[0].UserContactNo = this.state.userContact;
             userData[0].UserAddress = this.state.userAddress;
@@ -529,6 +539,12 @@ class UserDetail extends Component {
         this.setState({
           userCode: value,
           userCodeValidated: !isStringNullOrEmpty(value)
+        })
+        break;
+      case "username":
+        this.setState({
+          userName: value,
+          userNameValidated: !isStringNullOrEmpty(value)
         })
         break;
       case "areaCode":
@@ -679,6 +695,8 @@ class UserDetail extends Component {
       userFullname,
       userFullnameValidated,
       userContact,
+      userName,
+      userNameValidated,
       userEmail,
       userAddress,
       userMinSelfPickup,
@@ -707,6 +725,7 @@ class UserDetail extends Component {
       WECHATID: this.props.userProfile[0].UserWechatID,
       USERNICKNAME: this.props.userProfile[0].UserNickname,
       FULLNAME: (!isStringNullOrEmpty(userFullname) ? userFullname : "-"),
+      USERNAME: (!isStringNullOrEmpty(userName) ? userName : "-"),
       CONTACTNO: (!isStringNullOrEmpty(userContact) ? userContact : "-"),
       USEREMAIL: (!isStringNullOrEmpty(userEmail) ? userEmail : "-"),
       USERADDRESS: (!isStringNullOrEmpty(userAddress) ? userAddress : "-"),
@@ -720,6 +739,7 @@ class UserDetail extends Component {
 
     const isValidated = (
       userCodeValidated &&
+      userNameValidated &&
       userAreaIdValidated &&
       userFullnameValidated &&
       userMinSelfPickupValidated &&
@@ -1040,6 +1060,20 @@ class UserDetail extends Component {
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
+                    <TextField
+                      required
+                      fullWidth
+                      id="username"
+                      label="Username"
+                      name="username"
+                      onChange={this.onTextFieldOnChange}
+                      size="small"
+                      value={this.state.userName}
+                      error={this.state.userNameValidated !== null && !this.state.userNameValidated}
+                      helperText={this.state.userNameValidated !== null && !this.state.userNameValidated ? "Required" : ""}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
                     <FormControl fullWidth>
                       <InputLabel id="areaCode">Area Code</InputLabel>
                       <Select
@@ -1287,6 +1321,8 @@ class UserDetail extends Component {
                       <div className="row">
                         <div className="mb-2 col-4 col-md-3 information-label">MemberID </div>
                         <div className="mb-2 col-8 col-md-3">{this.state.UserProfile[0].UserCode}</div>
+                        <div className="mb-2 col-4 col-md-3 information-label">Username </div>
+                        <div className="mb-2 col-8 col-md-3">{this.state.UserProfile[0].Username}</div>
                         <div className="mb-2 col-4 col-md-3 information-label">Status </div>
                         <div className="mb-2 col-8 col-md-3 text-uppercase"><b className={this.state.UserProfile[0].UserStatus === "Pending" ? "text-danger" : "text-normal"}>{this.state.UserProfile[0].UserStatus}</b></div>
                         <div className="mb-2 col-4 col-md-3 information-label">Name</div>

@@ -783,6 +783,7 @@ export class GitEpic {
           "USERID=" + payload.USERID +
           "&USERCODE=" + payload.USERCODE +
           "&USERAREAID=" + payload.USERAREAID +
+          "&USERNAME=" + payload.USERNAME +
           "&FULLNAME=" + payload.FULLNAME +
           "&USERWECHATID=" + payload.WECHATID +
           "&USERNICKNAME=" + payload.USERNICKNAME +
