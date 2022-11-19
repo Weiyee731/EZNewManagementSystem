@@ -1117,29 +1117,55 @@ export class GitEpic {
       }
     });
 
+  // Inventory_UpdateStockContainer = action$ =>
+  //   action$.ofType(GitAction.Inventory_UpdateContainer).switchMap(async ({ payload }) => {
+  //     try {
+  //       const response = await fetch(url +
+  //         "Inventory_UpdateStockContainer?" +
+  //         "TRACKINGNUMBER=" + payload.TrackingNum +
+  //         "&CONTAINERID=" + payload.ContainerID
+  //       );
+
+  //       let json = await response.json();
+  //       json = JSON.parse(json)
+  //       return {
+  //         type: GitAction.Inventory_UpdatedContainer,
+  //         payload: json,
+  //       };
+  //     }
+  //     catch (error) {
+  //       toast.error("Error Code: Inventory_DeleteStock")
+  //       return {
+  //         type: GitAction.Inventory_UpdatedContainer,
+  //         payload: [],
+  //       };
+  //     }
+  //   });
+
   Inventory_UpdateStockContainer = action$ =>
     action$.ofType(GitAction.Inventory_UpdateContainer).switchMap(async ({ payload }) => {
-      try {
-        const response = await fetch(url +
-          "Inventory_UpdateStockContainer?" +
-          "TRACKINGNUMBER=" + payload.TrackingNum +
-          "&CONTAINERID=" + payload.ContainerID
-        );
-
-        let json = await response.json();
-        json = JSON.parse(json)
-        return {
-          type: GitAction.Inventory_UpdatedContainer,
-          payload: json,
-        };
-      }
-      catch (error) {
-        toast.error("Error Code: Inventory_DeleteStock")
-        return {
-          type: GitAction.Inventory_UpdatedContainer,
-          payload: [],
-        };
-      }
+      return fetch(
+        url + "Inventory_UpdateStockContainerByPost"
+        , {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            TRACKINGNUMBER: payload.TrackingNum,
+            CONTAINERID: payload.ContainerID,
+          })
+        }
+      )
+        .then(response => response.json())
+        .then(json => {
+          return {
+            type: GitAction.Inventory_UpdatedContainer,
+            payload: json,
+          };
+        })
+        .catch(error => toast.error("Error code: 8003"));
     });
 
 
