@@ -105,7 +105,7 @@ function EnhancedTableHead(props) {
               sx={{
                 fontWeight: "medium",
                 bgcolor: headerColor,
-                fontSize: "9pt",
+                fontSize: "8.5pt",
               }} // change table header bg color
             >
               <TableSortLabel

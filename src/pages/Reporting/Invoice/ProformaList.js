@@ -269,13 +269,13 @@ const ProformaList = (props) => {
     const singleUnitPrice = (volume) => {
         if (selectedType === 1) {
             if (totalVolume < 5) {
-                if (volume < 0.013) {
+                if (volume < 0.01) {
                     return selfPickupPrice
                 } else {
                     return unitPrice
                 }
             } else {
-                if (volume < 0.013) {
+                if (volume < 0.01) {
                     return selfPickupPrice
                 } else {
                     return unitPrice
@@ -355,7 +355,7 @@ const ProformaList = (props) => {
         let price = 0
         let volume = volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)
         if (selectedType === 1) {
-            if (volume < 0.013) {
+            if (volume < 0.01) {
                 if (data.isFollowStandard && selfPickupPrice !== "") {
                     return Number(selfPickupPrice)
                 } else if (!data.isFollowStandard) {
@@ -447,13 +447,13 @@ const ProformaList = (props) => {
     const renderTableTopLeft = () => {
         return (
             <div className='d-flex'>
-                {selectedType === 1 && (isArrayNotEmpty(items) && items.filter(x => volumeCalc(x.ProductDimensionDeep, x.ProductDimensionWidth, x.ProductDimensionHeight) < 0.013).length > 0) &&
+                {selectedType === 1 && (isArrayNotEmpty(items) && items.filter(x => volumeCalc(x.ProductDimensionDeep, x.ProductDimensionWidth, x.ProductDimensionHeight) < 0.01).length > 0) &&
                     <>
                         <TextField
                             variant="standard"
                             size="small"
                             type={'number'}
-                            label="Unit Price (< 0.013 m³)"
+                            label="Unit Price (< 0.01 m³)"
                             name="unitPrice"
                             value={selfPickupPrice}
                             onChange={(e) => handleChangeMinSingleUnitPrice(e)}
@@ -463,7 +463,7 @@ const ProformaList = (props) => {
                     </>
 
                 }
-                {selectedType === 1 && (isArrayNotEmpty(items) && items.filter(x => volumeCalc(x.ProductDimensionDeep, x.ProductDimensionWidth, x.ProductDimensionHeight) >= 0.013).length > 0) &&
+                {selectedType === 1 && (isArrayNotEmpty(items) && items.filter(x => volumeCalc(x.ProductDimensionDeep, x.ProductDimensionWidth, x.ProductDimensionHeight) >= 0.01).length > 0) &&
                     <TextField
                         className="mx-3"
                         variant="standard"

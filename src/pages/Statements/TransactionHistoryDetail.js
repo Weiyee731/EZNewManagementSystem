@@ -51,7 +51,7 @@ const style = {
   p: 4,
 };
 
-const noOfArrShow = 16
+const noOfArrShow = 14
 
 const headCells = [
   {
@@ -66,12 +66,12 @@ const headCells = [
     disablePadding: false,
     label: 'Description',
   },
-  {
-    id: 'ProductQuantity',
-    align: 'left',
-    disablePadding: false,
-    label: 'Qty',
-  },
+  // {
+  //   id: 'ProductQuantity',
+  //   align: 'left',
+  //   disablePadding: false,
+  //   label: 'Qty',
+  // },
   {
     id: 'Dimension',
     align: 'left',
@@ -111,12 +111,12 @@ const smallItemHeadCells = [
     disablePadding: false,
     label: 'Description',
   },
-  {
-    id: 'ProductQuantity',
-    align: 'left',
-    disablePadding: false,
-    label: 'Qty',
-  },
+  // {
+  //   id: 'ProductQuantity',
+  //   align: 'left',
+  //   disablePadding: false,
+  //   label: 'Qty',
+  // },
   {
     id: 'weight',
     align: 'left',
@@ -160,29 +160,29 @@ const cashbill_headcells = [
 
 const companyTitle = {
   fontWeight: "bolder",
-  fontSize: "16px",
+  fontSize: "13px",
   textAlign: "center"
 };
 
 const companyDetailTitle = {
   fontWeight: "bold",
-  fontSize: "12px",
+  fontSize: "11px",
   float: "center",
   textAlign: "center"
 };
 
 const companyDetail = {
-  fontSize: "11px",
+  fontSize: "10px",
   fontWeight: "bold",
 };
 
 const total = {
   float: "right",
-  paddingRight: '16px'
+  paddingRight: '13px'
 };
 
 const tncTitle = {
-  fontSize: "12px",
+  fontSize: "11px",
   color: "#0070C0",
 };
 
@@ -237,7 +237,7 @@ class TransactionHistoryDetail extends Component {
           })
         })
 
-        let actualVolume = JSON.parse(this.props.transaction[0].TransactionDetail).reduce((dimension, item) => dimension + volumeCalc(item.ProductDimensionDeep,item.ProductDimensionHeight,item.ProductDimensionWidth), 0).toFixed(3)
+        let actualVolume = JSON.parse(this.props.transaction[0].TransactionDetail).reduce((dimension, item) => dimension + volumeCalc(item.ProductDimensionDeep, item.ProductDimensionHeight, item.ProductDimensionWidth), 0).toFixed(3)
 
         if (this.props.transaction[0].CalculationType === "4") {
           let totalPrice = JSON.parse(this.props.transaction[0].TransactionDetail).filter((data) => data.Description !== "Delivery Fee").reduce((price, item) => price + item.ProductPrice, 0)
@@ -333,7 +333,7 @@ class TransactionHistoryDetail extends Component {
   }
 
   renderTableRows = (data, index) => {
-    const fontsize = '9pt'
+    const fontsize = '8pt'
     let DBextraCharge = []
     let charges = data.TransactionDetailCharges !== "[]" && data.TransactionDetailCharges !== undefined ? JSON.parse(data.TransactionDetailCharges).reduce((price, item) => price + parseFloat(item.ProductPrice), 0).toFixed(2) : 0
     let dataIndex = this.state.TransactionDetail.findIndex(x => parseInt(x.TransactionDetailID) === parseInt(data.TransactionDetailID))
@@ -353,10 +353,11 @@ class TransactionHistoryDetail extends Component {
               id={`table-checkbox-${(index + 1)}`}
               scope="row"
               sx={{ fontSize: fontsize }}
+              style={{ width: '5%' }}
             >
               {dataIndex + 1}
             </TableCell>
-            <TableCell align="left" sx={{ fontSize: fontsize }}>{this.props.transaction[0].CalculationType === "4" && data.Description === "Delivery Fee" || this.props.transaction[0].CalculationType === "4" && data.Description === undefined ? "Delivery Min 0.5m³" : data.TrackingNumber}
+            <TableCell align="left" style={{ width: '30%' }} sx={{ fontSize: fontsize }}>{this.props.transaction[0].CalculationType === "4" && data.Description === "Delivery Fee" || this.props.transaction[0].CalculationType === "4" && data.Description === undefined ? "Delivery Min 0.5m³" : data.TrackingNumber}
               {data.TransactionDetailCharges !== "[]" && data.TransactionDetailCharges !== undefined &&
                 JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
                   return (
@@ -367,12 +368,12 @@ class TransactionHistoryDetail extends Component {
                 })
               }
             </TableCell>
-            <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? "-" : data.ProductQuantity}</TableCell>
+            {/* <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? "-" : data.ProductQuantity}</TableCell> */}
             {
               this.props.transaction[0].CalculationType === "3" &&
-              <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? "-" : data.ProductWeight !== null && data.ProductWeight !== undefined && (data.ProductWeight).toFixed(2)}</TableCell>
+              <TableCell align="left" sx={{ fontSize: fontsize }} style={{ width: '10%' }}>{data.Description === "Delivery Fee" ? "-" : data.ProductWeight !== null && data.ProductWeight !== undefined && (data.ProductWeight).toFixed(2)}</TableCell>
             }
-            <TableCell align="left" sx={{ fontSize: fontsize }}>
+            <TableCell align="left" sx={{ fontSize: fontsize }} style={{ width: '10%' }}>
               {
                 data.Description === "Delivery Fee" ? "-" : !isNaN(volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)) ?
                   volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight).toFixed(3)
@@ -380,11 +381,11 @@ class TransactionHistoryDetail extends Component {
               }
             </TableCell>
             {this.state.isPrinting ?
-              <TableCell align="left" sx={{ fontSize: fontsize }}>
+              <TableCell align="left" sx={{ fontSize: fontsize }} style={{ width: '30%' }}>
                 {data.handlingCharge !== 0 && data.handlingCharge !== undefined ? parseFloat(data.handlingCharge).toFixed(2) : "-"}
               </TableCell>
               :
-              <TableCell align="left" sx={{ fontSize: fontsize }}>
+              <TableCell align="left" sx={{ fontSize: fontsize }}   style={{width: '30%'}}>
                 {data.Description === "Delivery Fee" || data.Description === undefined ? "" :
                   <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>
                     {data.handlingCharge}
@@ -401,16 +402,16 @@ class TransactionHistoryDetail extends Component {
             }
             {
               this.props.transaction[0].CalculationType !== "3" &&
-              <TableCell align="left" sx={{ fontSize: fontsize }}>
+              <TableCell align="left" sx={{ fontSize: fontsize }}   style={{width: '10%'}}>
                 {
                   this.props.transaction[0].CalculationType === "1" ?
-                    volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) > 0.013 ? (data.ProductPrice / volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)).toFixed(2) : parseFloat(data.ProductPrice).toFixed(2)
+                    volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) > 0.01 ? (data.ProductPrice / volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)).toFixed(2) : parseFloat(data.ProductPrice).toFixed(2)
                     :
                     volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) > 0 ? (data.ProductPrice / volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)).toFixed(2) : data.Description === "Delivery Fee" || data.Description === undefined ? "-" : <p style={{ color: "red" }}>0 m³</p>
                 }
               </TableCell>
             }
-            <TableCell align="right" sx={{ fontSize: fontsize }}>
+            <TableCell align="right" sx={{ fontSize: fontsize }}   style={{width: '15%'}} >
               {data.Description === "Delivery Fee" ? (parseFloat(data.ProductPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)
                 : this.props.transaction[0].CalculationType === "3" ? "-" : (parseFloat(data.totalPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)}
             </TableCell>
@@ -456,9 +457,9 @@ class TransactionHistoryDetail extends Component {
 
     return (
       <div
-        className="letter-page-size w-100"
+        className="letter-pageA5-size w-100"
         style={{
-          padding: '10px 50px 0px'
+          padding: '15px 3px 0px',
         }}
       >
         {isArrayNotEmpty(transaction) &&
@@ -466,16 +467,16 @@ class TransactionHistoryDetail extends Component {
             {/* header */}
             <div className="row">
               <div style={companyTitle}>
-                EZ TRANSIT AND LOGISTICS SDN BHD
+                YOURWAY LOGISTIC
               </div>
               <div style={companyDetailTitle}>
-                NO.2, LORONG A, TAMAN BDC
+                HONGNION GARDEN, 93150 KUCHING SARAWAK
               </div>
               <div style={companyDetailTitle}>
-                JALAN STUTONG 93350 KUCHING, SARAWAK
+
               </div>
               <div style={companyDetailTitle}>
-                TEL: 019 - 883 6783 / 012 - 895 7769
+                TEL: 011 - 5584 2203
               </div>
               <div
                 style={{
@@ -486,7 +487,7 @@ class TransactionHistoryDetail extends Component {
                   borderImage: "initial",
                   borderBottom: "1pt solid rgb(0, 112, 192)",
                   padding: "0 5px",
-                  height: "20px",
+                  height: "21.5px",
                   verticalAlign: "top",
                 }}
               />
@@ -494,23 +495,23 @@ class TransactionHistoryDetail extends Component {
                 INVOICE
               </div>
               <div className="row" style={companyDetail}>
-                <span className="col-9">{`${transaction[0].UserCode} - ${transaction[0].AreaCode} ${transaction[0].Fullname}`}</span>
+                <span className="col-8">{`${transaction[0].UserCode} - ${transaction[0].AreaCode} ${transaction[0].Fullname}`}</span>
                 <span className="col-1">No</span>
-                <span className="col-2">: {transaction[0].TransactionName}</span>
+                <span className="col-3">: {transaction[0].TransactionName}</span>
               </div>
               <div className="row" style={companyDetail}>
-                <span className="col-9">{transaction[0].UserAddress}</span>
+                <span className="col-8">{transaction[0].UserAddress}</span>
                 <span className="col-1">Terms</span>
-                <span className="col-2">: C.O.D</span>
+                <span className="col-3">: C.O.D</span>
               </div>
               <div className="row" style={companyDetail} >
-                <span className="col-9">Tel : {transaction[0].UserContactNo}</span>
+                <span className="col-8">Tel : {transaction[0].UserContactNo}</span>
                 <span className="col-1">Date</span>
-                <span className="col-2">: {transaction[0].OrderDate}</span>
+                <span className="col-3">: {transaction[0].OrderDate}</span>
               </div>
               <div className="row" style={companyDetail}>
-                <span className="col-1 offset-9">Page</span>
-                <span className="col-2">{`: ${index + 1} of ${splitArray(TransactionDetail, noOfArrShow).length}`}</span>
+                <span className="col-1 offset-8">Page</span>
+                <span className="col-3">{`: ${index + 1} of ${splitArray(TransactionDetail, noOfArrShow).length}`}</span>
               </div>
             </div>
 
@@ -537,7 +538,8 @@ class TransactionHistoryDetail extends Component {
                   checkbox: false,
                   checkboxColor: "primary",
                   onRowClickSelect: false,
-                  headerColor: ''
+                  headerColor: '',
+                  fontSize: "7pt",
                 }}
                 selectedIndexKey={"TransactionDetailID"}
                 Data={arr}
@@ -571,10 +573,10 @@ class TransactionHistoryDetail extends Component {
                   }
                   <div className="row">
                     <div style={tncDiv} className="col-5 mt-4">
-                      <div style={tncTitle}>Terms and Conditions</div>
-                      <br />
-                      <div>
-                        <p>
+                      {/* <div style={tncTitle}>Terms and Conditions</div> */}
+                      {/* <br /> */}
+                      {/* <div> */}
+                      {/* <p>
                           1. All payment should be make payable to
                           <br />
                           EZ TAO BAO ENTERPRISE
@@ -585,14 +587,14 @@ class TransactionHistoryDetail extends Component {
                         </p>
                         <p>
                           2. Payment must be cleared within 3 days after the billing date
-                        </p>
-                      </div>
+                        </p> */}
+                      {/* </div> */}
                     </div>
-                    <div style={tncDiv} className="col-3 mt-4">
-                      <div >Payment can be make through SPay Global</div>
-                      <img style={img} src={`https://tourism.denoo.my/Ez/spay.jpeg`} alt="SPAY_QR" ></img>
+                    <div style={tncDiv} className="col-2 mt-4">
+                      {/* <div >Payment can be make through SPay Global</div>
+                      <img style={img} src={`https://tourism.denoo.my/Ez/spay.jpeg`} alt="SPAY_QR" ></img> */}
                     </div>
-                    <div style={tncDiv} className="col-3 offset-1">
+                    <div style={tncDiv} className="col-4 offset-1">
                       {this.props.transaction[0].CalculationType === "3" &&
                         <>
                           Total Weight (kg):
@@ -626,8 +628,8 @@ class TransactionHistoryDetail extends Component {
                     <div style={tncDiv} className="col-3 mt-4">
                       <div className="text-center">
                         __________________________________
-                        <div>EZ TRANSIT AND LOGISTICS</div>
-                        <div>SDN BHD</div>
+                        <div>YOURWAY LOGISTIC</div>
+                        <div></div>
                       </div>
                     </div>
                     <div style={tncDiv} className="col-5 mt-4">
