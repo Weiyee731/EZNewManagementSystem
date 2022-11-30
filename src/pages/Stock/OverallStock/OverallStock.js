@@ -140,6 +140,12 @@ const headCells = [
         label: "Container",
     },
     {
+        id: "ContainerRemark",
+        align: "left",
+        disablePadding: false,
+        label: "Container Header",
+    },
+    {
         id: "AdditionalCharges",
         align: "left",
         disablePadding: false,
@@ -149,7 +155,7 @@ const headCells = [
         id: "Remark",
         align: "left",
         disablePadding: false,
-        label: "Remarks",
+        label: "Stock Remarks",
     },
 ]
 
@@ -220,6 +226,7 @@ class OverallStock extends Component {
 
         this.changeTab = this.changeTab.bind(this)
         this.handleAddChrgModal = this.handleAddChrgModal.bind(this)
+        this.handleBackdrop = this.handleBackdrop.bind(this)
         this.handleSubmitUpdate = this.handleSubmitUpdate.bind(this)
         this.handleFormInput = this.handleFormInput.bind(this)
         this.handleAdditionalCostInputs = this.handleAdditionalCostInputs.bind(this)
@@ -326,6 +333,11 @@ class OverallStock extends Component {
         }
     }
 
+    handleBackdrop =()=>{
+        // if(this.state.openAddChrgModal)
+        this.setState({openAddChrgModal: false})
+    }
+
     renderTableRows = (data, index) => {
         const fontsize = "9pt"
 
@@ -346,7 +358,6 @@ class OverallStock extends Component {
 
         var color = ""
         var fontcolor = "#000000"
-        console.log("ddadada", data)
         if (data.AreaCode === null || data.AreaName === null) {
             color = "#f44336"
             fontcolor = "#FFF4EF"
@@ -371,6 +382,7 @@ class OverallStock extends Component {
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {moment(data.StockDate).format('DD/MM/YYYY hh:mm:ss') == "Invalid date" ? "-" : moment(data.StockDate).format('DD/MM/YYYY hh:mm:ss')}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {moment(data.PackagingDate).format('DD/MM/YYYY hh:mm:ss') == "Invalid date" ? "-" : moment(data.PackagingDate).format('DD/MM/YYYY hh:mm:ss')} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.ContainerName}   </TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.ContainerRemark}  </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {!isStringNullOrEmpty(data.AdditionalCharges) && renderAdditionalCost(data.AdditionalCharges)}  </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }} style={{ backgroundColor: color, color: fontcolor, cursor: 'pointer' }} > {data.Remark}</TableCell>
                 {
@@ -394,6 +406,7 @@ class OverallStock extends Component {
         tempFormValue.TrackingStatusID = row.TrackingStatusID
         tempFormValue.ContainerName = row.ContainerName
         tempFormValue.ContainerDate = row.ContainerDate
+        tempFormValue.ContainerRemark = row.ContainerRemark
         tempFormValue.StockDate = row.StockDate
         tempFormValue.TrackingNumber = row.TrackingNumber
         tempFormValue.TrackingNumberVerified = !isStringNullOrEmpty(row.TrackingNumber)
@@ -1368,6 +1381,8 @@ class OverallStock extends Component {
 
                 />
                 <AlertDialog
+                    onClose={""}
+                    handleBackdrop={this.handleBackdrop}
                     open={this.state.openAddChrgModal} // required, pass the boolean whether modal is open or close
                     handleToggleDialog={this.handleAddChrgModal} // required, pass the toggle function of modal
                     handleConfirmFunc={this.handleSubmitUpdate} // required, pass the confirm function
@@ -1381,7 +1396,6 @@ class OverallStock extends Component {
                 >
                     <div className="py-md-3 py-1">
                         <FormControl >
-                            {console.log("dsdasdsad", this.props)}
                             <div className="row">
                                 <div className="col-12" style={{ fontSize: "9pt" }}>
                                     <div className="clearfix">
@@ -1391,11 +1405,17 @@ class OverallStock extends Component {
                                                     <div className="float-start">
                                                         <b>Expected Container: </b>
                                                         {!isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : " N/A "}
+                                                        <div className="row">
+                                                            <b>Container Status:             {!isStringNullOrEmpty(formValue.ContainerRemark) ? formValue.ContainerRemark : " N/A "} </b>
+
+                                                        </div>
                                                     </div>
+
                                                     <div className="float-end">
                                                         <b>Expected Container Date: </b>
                                                         {!isStringNullOrEmpty(formValue.ContainerDate) ? moment(formValue.ContainerDate).format("DD/MM/YYYY") : " N/A "}
                                                     </div>
+
                                                 </>
                                                 :
                                                 <div className="row">
