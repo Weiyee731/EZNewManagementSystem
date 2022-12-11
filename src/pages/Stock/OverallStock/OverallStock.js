@@ -22,6 +22,7 @@ import TableComponents from "../../../components/TableComponents/TableComponents
 import ToggleTabsComponent from "../../../components/ToggleTabsComponent/ToggleTabComponents"
 import { ModalPopOut } from "../../../components/modal/Modal"
 import AlertDialog from "../../../components/modal/Modal"
+
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import {
     isArrayNotEmpty,
@@ -40,7 +41,7 @@ import Tooltip from "@mui/material/Tooltip"
 import CheckIcon from "@mui/icons-material/Check"
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import "./OverallStock.css"
-import { Paper } from "@mui/material"
+import { Dialog, Paper, DialogContent, DialogTitle, Typography } from "@mui/material"
 import moment from 'moment';
 
 function mapStateToProps(state) {
@@ -333,9 +334,9 @@ class OverallStock extends Component {
         }
     }
 
-    handleBackdrop =()=>{
+    handleBackdrop = () => {
         // if(this.state.openAddChrgModal)
-        this.setState({openAddChrgModal: false})
+        this.setState({ openAddChrgModal: false })
     }
 
     renderTableRows = (data, index) => {
@@ -1178,16 +1179,14 @@ class OverallStock extends Component {
         }
         return (
             <div className="container-fluid my-2">
-                {/* Show out when enter approve page to fill in stock in container name and date */}
-                <ModalPopOut
+                <Dialog
                     open={this.state.open && this.state.approvePage}
-                    classes="true"
                     showCancel={false}
-                    handleToggleDialog={() => this.handleCancel("filter")}
-                    handleConfirmFunc={() => this.handleSearchfilter("open")}
-                    title={"Please select the container number and date desired"}
-                    message={
-                        <div className="row" style={{ minWidth: "40vw" }}>
+                    onClose={(event, reason) => this.handleCancel("filter")}
+                >
+                    <DialogContent>
+                        <div className="row">
+                            <Typography>Please select the container number and date desired</Typography>
                             <FormControl variant="standard" size="small" fullWidth>
                                 <InputLabel id="Division-label">Container Number and Date</InputLabel>
                                 <Select
@@ -1219,9 +1218,12 @@ class OverallStock extends Component {
                                         })}
                                 </Select>
                             </FormControl>
+                            <div style={{ textAlign: "right", padding: "10px" }}>
+                                <Button variant="contained" onClick={() => this.handleSearchfilter("open")}>CONFIRM</Button>
+                            </div>
                         </div>
-                    }
-                />
+                    </DialogContent>
+                </Dialog>
                 <div className="row">
                     <div className="col-md-6 col-12 mb-2 stock-date-range-picker d-flex">
                         <label className="my-auto" style={{ marginRight: '10px' }}>Packaging Date: </label>
