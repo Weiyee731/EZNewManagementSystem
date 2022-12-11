@@ -6,6 +6,7 @@ import { gitEpic } from "./epic/gitEpic"; //epics
 const rootEpic = combineEpics(
   gitEpic.User_Login,
   gitEpic.User_Logout,
+  gitEpic.User_UpdateUserPassword,
   gitEpic.User_Profile,
   gitEpic.User_ProfileByID,
   gitEpic.User_ViewPage,

@@ -10,6 +10,17 @@ export class GitAction {
     };
   }
 
+
+  static UpdatePassword = "UpdatePassword";
+  static PasswordUpdated = "PasswordUpdated";
+  static CallUpdatePassword(propsData) {
+    return {
+      type: GitAction.UpdatePassword,
+      payload: propsData
+    };
+  }
+
+
   static Logout = "USER_LOGOUT";
   static LoggedOutSuccess = "USER_LOGGED_OUT_SUCCESS";
   static ClearLogonUser = "USER_CLEAR_CACHE";

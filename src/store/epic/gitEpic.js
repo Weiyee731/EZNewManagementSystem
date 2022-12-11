@@ -65,6 +65,32 @@ export class GitEpic {
       }
     });
 
+
+    User_UpdateUserPassword = action$ =>
+    action$.ofType(GitAction.UpdatePassword).switchMap(async ({ payload }) => {
+
+      try {
+        const response = await fetch(url + "User_UpdateUserPassword"
+        + "?USERID=" + payload.USERID
+        + '&USERPASSWORD=' + payload.password
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.PasswordUpdated,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: PasswordUpdated")
+        return {
+          type: GitAction.PasswordUpdated,
+          payload: [],
+        };
+      }
+    });
+
   User_Logout = action$ =>
     action$.ofType(GitAction.Logout).switchMap(async ({ payload }) => {
 

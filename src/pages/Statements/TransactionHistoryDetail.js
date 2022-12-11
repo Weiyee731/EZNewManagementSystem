@@ -51,7 +51,7 @@ const style = {
   p: 4,
 };
 
-const noOfArrShow = 14
+const noOfArrShow = 22
 
 const headCells = [
   {
@@ -66,12 +66,12 @@ const headCells = [
     disablePadding: false,
     label: 'Description',
   },
-  // {
-  //   id: 'ProductQuantity',
-  //   align: 'left',
-  //   disablePadding: false,
-  //   label: 'Qty',
-  // },
+  {
+    id: 'ProductQuantity',
+    align: 'left',
+    disablePadding: false,
+    label: 'Qty',
+  },
   {
     id: 'Dimension',
     align: 'left',
@@ -111,12 +111,12 @@ const smallItemHeadCells = [
     disablePadding: false,
     label: 'Description',
   },
-  // {
-  //   id: 'ProductQuantity',
-  //   align: 'left',
-  //   disablePadding: false,
-  //   label: 'Qty',
-  // },
+  {
+    id: 'ProductQuantity',
+    align: 'left',
+    disablePadding: false,
+    label: 'Qty',
+  },
   {
     id: 'weight',
     align: 'left',
@@ -160,29 +160,29 @@ const cashbill_headcells = [
 
 const companyTitle = {
   fontWeight: "bolder",
-  fontSize: "13px",
+  fontSize: "16px",
   textAlign: "center"
 };
 
 const companyDetailTitle = {
   fontWeight: "bold",
-  fontSize: "11px",
+  fontSize: "12px",
   float: "center",
   textAlign: "center"
 };
 
 const companyDetail = {
-  fontSize: "10px",
+  fontSize: "11px",
   fontWeight: "bold",
 };
 
 const total = {
   float: "right",
-  paddingRight: '13px'
+  paddingRight: '16px'
 };
 
 const tncTitle = {
-  fontSize: "11px",
+  fontSize: "12px",
   color: "#0070C0",
 };
 
@@ -333,7 +333,7 @@ class TransactionHistoryDetail extends Component {
   }
 
   renderTableRows = (data, index) => {
-    const fontsize = '8pt'
+    const fontsize = '9pt'
     let DBextraCharge = []
     let charges = data.TransactionDetailCharges !== "[]" && data.TransactionDetailCharges !== undefined ? JSON.parse(data.TransactionDetailCharges).reduce((price, item) => price + parseFloat(item.ProductPrice), 0).toFixed(2) : 0
     let dataIndex = this.state.TransactionDetail.findIndex(x => parseInt(x.TransactionDetailID) === parseInt(data.TransactionDetailID))
@@ -353,11 +353,10 @@ class TransactionHistoryDetail extends Component {
               id={`table-checkbox-${(index + 1)}`}
               scope="row"
               sx={{ fontSize: fontsize }}
-              style={{ width: '5%' }}
             >
               {dataIndex + 1}
             </TableCell>
-            <TableCell align="left" style={{ width: '30%' }} sx={{ fontSize: fontsize }}>{this.props.transaction[0].CalculationType === "4" && data.Description === "Delivery Fee" || this.props.transaction[0].CalculationType === "4" && data.Description === undefined ? "Delivery Min 0.5m³" : data.TrackingNumber}
+            <TableCell align="left" sx={{ fontSize: fontsize }}>{this.props.transaction[0].CalculationType === "4" && data.Description === "Delivery Fee" || this.props.transaction[0].CalculationType === "4" && data.Description === undefined ? "Delivery Min 0.5m³" : data.TrackingNumber}
               {data.TransactionDetailCharges !== "[]" && data.TransactionDetailCharges !== undefined &&
                 JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
                   return (
@@ -368,12 +367,12 @@ class TransactionHistoryDetail extends Component {
                 })
               }
             </TableCell>
-            {/* <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? "-" : data.ProductQuantity}</TableCell> */}
+            <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? "-" : data.ProductQuantity}</TableCell>
             {
               this.props.transaction[0].CalculationType === "3" &&
-              <TableCell align="left" sx={{ fontSize: fontsize }} style={{ width: '10%' }}>{data.Description === "Delivery Fee" ? "-" : data.ProductWeight !== null && data.ProductWeight !== undefined && (data.ProductWeight).toFixed(2)}</TableCell>
+              <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? "-" : data.ProductWeight !== null && data.ProductWeight !== undefined && (data.ProductWeight).toFixed(2)}</TableCell>
             }
-            <TableCell align="left" sx={{ fontSize: fontsize }} style={{ width: '10%' }}>
+            <TableCell align="left" sx={{ fontSize: fontsize }}>
               {
                 data.Description === "Delivery Fee" ? "-" : !isNaN(volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)) ?
                   volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight).toFixed(3)
@@ -381,11 +380,11 @@ class TransactionHistoryDetail extends Component {
               }
             </TableCell>
             {this.state.isPrinting ?
-              <TableCell align="left" sx={{ fontSize: fontsize }} style={{ width: '30%' }}>
+              <TableCell align="left" sx={{ fontSize: fontsize }}>
                 {data.handlingCharge !== 0 && data.handlingCharge !== undefined ? parseFloat(data.handlingCharge).toFixed(2) : "-"}
               </TableCell>
               :
-              <TableCell align="left" sx={{ fontSize: fontsize }}   style={{width: '30%'}}>
+              <TableCell align="left" sx={{ fontSize: fontsize }}>
                 {data.Description === "Delivery Fee" || data.Description === undefined ? "" :
                   <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>
                     {data.handlingCharge}
@@ -402,16 +401,16 @@ class TransactionHistoryDetail extends Component {
             }
             {
               this.props.transaction[0].CalculationType !== "3" &&
-              <TableCell align="left" sx={{ fontSize: fontsize }}   style={{width: '10%'}}>
+              <TableCell align="left" sx={{ fontSize: fontsize }}>
                 {
                   this.props.transaction[0].CalculationType === "1" ?
-                    volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) > 0.01 ? (data.ProductPrice / volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)).toFixed(2) : parseFloat(data.ProductPrice).toFixed(2)
+                    volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) > 0.013 ? (data.ProductPrice / volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)).toFixed(2) : parseFloat(data.ProductPrice).toFixed(2)
                     :
                     volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) > 0 ? (data.ProductPrice / volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)).toFixed(2) : data.Description === "Delivery Fee" || data.Description === undefined ? "-" : <p style={{ color: "red" }}>0 m³</p>
                 }
               </TableCell>
             }
-            <TableCell align="right" sx={{ fontSize: fontsize }}   style={{width: '15%'}} >
+            <TableCell align="right" sx={{ fontSize: fontsize }}>
               {data.Description === "Delivery Fee" ? (parseFloat(data.ProductPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)
                 : this.props.transaction[0].CalculationType === "3" ? "-" : (parseFloat(data.totalPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)}
             </TableCell>
@@ -425,7 +424,6 @@ class TransactionHistoryDetail extends Component {
       DeliveryFee,
       transaction,
     } = this.state
-
 
     let TransactionDetail = isArrayNotEmpty(transaction) ? JSON.parse(transaction[0].TransactionDetail) : transaction
     let actualWeight = 0
@@ -457,10 +455,10 @@ class TransactionHistoryDetail extends Component {
 
     return (
       <div
-        className="letter-pageA5-size w-100"
-        style={{
-          padding: '15px 3px 0px',
-        }}
+        className="letter-page-size w-100"
+      // style={{
+      //   padding: '10px 50px 0px'
+      // }}
       >
         {isArrayNotEmpty(transaction) &&
           <>
@@ -473,7 +471,7 @@ class TransactionHistoryDetail extends Component {
                 HONGNION GARDEN, 93150 KUCHING SARAWAK
               </div>
               <div style={companyDetailTitle}>
-
+                {/* JALAN STUTONG 93350 KUCHING, SARAWAK */}
               </div>
               <div style={companyDetailTitle}>
                 TEL: 011 - 5584 2203
@@ -487,7 +485,7 @@ class TransactionHistoryDetail extends Component {
                   borderImage: "initial",
                   borderBottom: "1pt solid rgb(0, 112, 192)",
                   padding: "0 5px",
-                  height: "21.5px",
+                  height: "20px",
                   verticalAlign: "top",
                 }}
               />
@@ -495,23 +493,23 @@ class TransactionHistoryDetail extends Component {
                 INVOICE
               </div>
               <div className="row" style={companyDetail}>
-                <span className="col-8">{`${transaction[0].UserCode} - ${transaction[0].AreaCode} ${transaction[0].Fullname}`}</span>
+                <span className="col-9">{`${transaction[0].UserCode} - ${transaction[0].AreaCode} ${transaction[0].Fullname}`}</span>
                 <span className="col-1">No</span>
-                <span className="col-3">: {transaction[0].TransactionName}</span>
+                <span className="col-2">: {transaction[0].TransactionName}</span>
               </div>
               <div className="row" style={companyDetail}>
-                <span className="col-8">{transaction[0].UserAddress}</span>
-                <span className="col-1">Terms</span>
-                <span className="col-3">: C.O.D</span>
+                <span className="col-9">{transaction[0].UserAddress}</span>
+                {/* <span className="col-1">Terms</span>
+                <span className="col-2">: C.O.D</span> */}
               </div>
               <div className="row" style={companyDetail} >
-                <span className="col-8">Tel : {transaction[0].UserContactNo}</span>
+                <span className="col-9">Tel : {transaction[0].UserContactNo}</span>
                 <span className="col-1">Date</span>
-                <span className="col-3">: {transaction[0].OrderDate}</span>
+                <span className="col-2">: {transaction[0].OrderDate}</span>
               </div>
               <div className="row" style={companyDetail}>
-                <span className="col-1 offset-8">Page</span>
-                <span className="col-3">{`: ${index + 1} of ${splitArray(TransactionDetail, noOfArrShow).length}`}</span>
+                <span className="col-1 offset-9">Page</span>
+                <span className="col-2">{`: ${index + 1} of ${splitArray(this.checkDelivery(TransactionDetail), noOfArrShow).length}`}</span>
               </div>
             </div>
 
@@ -538,15 +536,14 @@ class TransactionHistoryDetail extends Component {
                   checkbox: false,
                   checkboxColor: "primary",
                   onRowClickSelect: false,
-                  headerColor: '',
-                  fontSize: "7pt",
+                  headerColor: ''
                 }}
                 selectedIndexKey={"TransactionDetailID"}
                 Data={arr}
               />
             </div>
             {
-              arr.length < noOfArrShow &&
+              arr.length < noOfArrShow || splitArray(this.checkDelivery(TransactionDetail), noOfArrShow).length === 1 &&
               <div className="d-flex">
                 <div className="invoice-footer">
                   <hr />
@@ -573,28 +570,10 @@ class TransactionHistoryDetail extends Component {
                   }
                   <div className="row">
                     <div style={tncDiv} className="col-5 mt-4">
-                      {/* <div style={tncTitle}>Terms and Conditions</div> */}
-                      {/* <br /> */}
-                      {/* <div> */}
-                      {/* <p>
-                          1. All payment should be make payable to
-                          <br />
-                          EZ TAO BAO ENTERPRISE
-                          <br />
-                          25301009073
-                          <br />
-                          HONG LEONG BANK
-                        </p>
-                        <p>
-                          2. Payment must be cleared within 3 days after the billing date
-                        </p> */}
-                      {/* </div> */}
                     </div>
-                    <div style={tncDiv} className="col-2 mt-4">
-                      {/* <div >Payment can be make through SPay Global</div>
-                      <img style={img} src={`https://tourism.denoo.my/Ez/spay.jpeg`} alt="SPAY_QR" ></img> */}
+                    <div style={tncDiv} className="col-3 mt-4">
                     </div>
-                    <div style={tncDiv} className="col-4 offset-1">
+                    <div style={tncDiv} className="col-3 offset-1">
                       {this.props.transaction[0].CalculationType === "3" &&
                         <>
                           Total Weight (kg):
@@ -629,7 +608,7 @@ class TransactionHistoryDetail extends Component {
                       <div className="text-center">
                         __________________________________
                         <div>YOURWAY LOGISTIC</div>
-                        <div></div>
+                        {/* <div>SDN BHD</div> */}
                       </div>
                     </div>
                     <div style={tncDiv} className="col-5 mt-4">
@@ -638,8 +617,8 @@ class TransactionHistoryDetail extends Component {
                     <div style={{ textAlign: 'left', ...tncDiv }} className="col-3 mt-4">
                       __________________________________
                       <div>Name  : </div>
-                      <div>IC NO : </div>
-                      <div>DATE  : </div>
+                      {/* <div>IC NO : </div> */}
+                      <div>Date  : </div>
                     </div>
                   </div>
                 </div>
@@ -652,8 +631,20 @@ class TransactionHistoryDetail extends Component {
     )
   }
 
+  checkDelivery = (data) => {
+    let detailsData = data
+    if (isArrayNotEmpty(data)) {
+      if (data.filter((x) => x.Description === "Delivery Fee" && x.ProductPrice === 0).length > 0) {
+        detailsData = data.filter((x) => x.Description !== "Delivery Fee")
+      }
+    }
+    console.log("checkDelivery3", detailsData)
+    return detailsData
+  }
+
   render() {
     const { TransactionDetail } = this.state
+
     return (
       <Card>
         <CardContent>
@@ -680,7 +671,7 @@ class TransactionHistoryDetail extends Component {
             />
           </div>
           <div ref={(el) => (this.componentRef = el)}>
-            {splitArray(TransactionDetail, noOfArrShow).map((arr, index) => {
+            {splitArray(this.checkDelivery(TransactionDetail), noOfArrShow).map((arr, index) => {
               return (
                 this.renderPage(arr, index)
               )

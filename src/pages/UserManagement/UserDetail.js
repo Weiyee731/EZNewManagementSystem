@@ -32,11 +32,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ResponsiveDatePickers from '../../components/datePicker/datePicker';
 import PaidIcon from '@mui/icons-material/Paid';
 
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import './UserDetail.css'
 
 function mapStateToProps(state) {
   return {
     userProfile: state.counterReducer["userProfile"],
+    userPassword: state.counterReducer["userPassword"],
     loading: state.counterReducer["loading"],
     userAreaCode: state.counterReducer["userAreaCode"],
     userManagementApproval: state.counterReducer["userManagementApproval"],
@@ -47,6 +49,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     CallUserProfileByID: (data) => dispatch(GitAction.CallUserProfileByID(data)),
+    CallUpdatePassword: (data) => dispatch(GitAction.CallUpdatePassword(data)),
     CallUpdateTransactionPayment: (data) => dispatch(GitAction.CallUpdateTransactionPayment(data)),
     CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
     CallUpdateUserData: (data) => dispatch(GitAction.CallUpdateUserData(data)),
@@ -480,6 +483,11 @@ class UserDetail extends Component {
         }
       } else toast.error("Update failed, please check your internet connection and input", { autoClose: 2000, position: "top-center", transition: Flip, theme: "dark" })
     }
+
+    if (this.props.userPassword !== prevProps.userPassword && this.props.userPassword !== undefined && this.props.userPassword[0].ReturnVal == 1 && this.state.passwordValidated === true) {
+      toast.success("Password Updated")
+      this.setState({ passwordManagerOpen: false, passwordValidated: false })
+    }
   }
 
   onSelectRow(row, i) {
@@ -769,6 +777,8 @@ class UserDetail extends Component {
         USERID: UserProfile[0].UserID,
         password: newPassword
       }
+
+      this.props.CallUpdatePassword(object)
     }
   }
 
@@ -1177,7 +1187,6 @@ class UserDetail extends Component {
                       helperText={this.state.userCubicSelfPickupValidated !== null && !this.state.userCubicSelfPickupValidated ? "Required" : ""}
                     />
                   </Grid>
-                  {console.log("dsdsad", this.props.userProfile)}
                   <Grid item xs={4} md={2}>
                     <TextField
                       required
@@ -1244,11 +1253,11 @@ class UserDetail extends Component {
                   </Grid>
 
                   {/* The comment below is prepared for the future used, as if the members are allow to manage their own dashboard */}
-                  {/* <Grid item xs={12} md={12}>
+                  <Grid item xs={12} md={12}>
                     <hr />
                     <h4>User Account Information</h4>
                   </Grid>
-                  <Grid item xs={6} md={6}>
+                  {/* <Grid item xs={6} md={6}>
                     <TextField
                       required
                       fullWidth
@@ -1262,7 +1271,7 @@ class UserDetail extends Component {
                       helperText={this.state.userAccountNameValidated !== null && !this.state.userAccountNameValidated ? "Required" : ""}
                       length={30}
                     />
-                  </Grid>
+                  </Grid> */}
                   <Grid item xs={6} md={6}>
                     <div className="d-flex w-100" >
                       <TextField
@@ -1283,7 +1292,7 @@ class UserDetail extends Component {
                       </Button>
                     </div>
                   </Grid>
-                  <Grid item xs={12} md={12}>
+                  {/* <Grid item xs={12} md={12}>
                     <TextField
                       required
                       fullWidth

@@ -4,6 +4,7 @@ const INITIAL_STATE = {
   loading: false,
   logonUser: [],
   user: [],
+  userPassword: [],
   userProfile: [],
   userData: [],
 
@@ -43,6 +44,14 @@ export function counterReducer(state = INITIAL_STATE, action) {
         loading: false,
         logonUser: action.payload,
         sidebars: action.payload2
+      });
+
+    case GitAction.UpdatePassword:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.PasswordUpdated:
+      return Object.assign({}, state, {
+        loading: false,
+        userPassword: action.payload
       });
 
     case GitAction.Logout:
