@@ -43,6 +43,7 @@ function mapStateToProps(state) {
     userAreaCode: state.counterReducer["userAreaCode"],
     userManagementApproval: state.counterReducer["userManagementApproval"],
     transactionReturn: state.counterReducer["transactionReturn"],
+    commission: state.counterReducer["commission"],
   };
 }
 
@@ -57,6 +58,7 @@ function mapDispatchToProps(dispatch) {
     CallResetUserProfile: () => dispatch(GitAction.CallResetUserProfile()),
     CallUserProfile: () => dispatch(GitAction.CallUserProfile()),
     CallDeleteUser: (data) => dispatch(GitAction.CallDeleteUser(data)),
+    CallViewCommissionByUserCode: (data) => dispatch(GitAction.CallViewCommissionByUserCode(data)),
   };
 }
 
@@ -231,7 +233,8 @@ class UserDetail extends Component {
       deleteManagerOpen: false,
 
       enableCheckbox: false,
-      totalDebt: 0
+      totalDebt: 0,
+      referenceCodePayment: []
     }
     this.onTextFieldOnChange = this.onTextFieldOnChange.bind(this)
     this.toggleEditMode = this.toggleEditMode.bind(this)
@@ -241,12 +244,20 @@ class UserDetail extends Component {
     this.handlePaymentCategoryCategory = this.handlePaymentCategoryCategory.bind(this)
     this.onSelectRow = this.onSelectRow.bind(this)
     this.onSelectAllRow = this.onSelectAllRow.bind(this)
+    this.handleReferencePayment = this.handleReferencePayment.bind(this)
     this.OnEnterToUpdatePayment = this.OnEnterToUpdatePayment.bind(this)
 
   }
 
   componentDidMount() {
     this.props.CallUserProfileByID(this.state)
+
+    if (window.location.pathname.split("/").length > 0) {
+      let length = window.location.pathname.split("/").length
+      let UserCode = window.location.pathname.split("/")[length - 1]
+      this.props.CallViewCommissionByUserCode({ UserCode: UserCode })
+    }
+
     if (this.props.userProfile.length !== this.state.UserProfile.length) {
       if (typeof this.props.userProfile !== "undefined" && typeof this.props.userProfile[0] !== "undefined") {
         let piechart_data = (isArrayNotEmpty(this.props.userProfile)) ? [
@@ -294,6 +305,8 @@ class UserDetail extends Component {
           isPieChartNoData: (piechart_data[0].value === 0 && piechart_data[0].value === 0),
           Payment: (isStringNullOrEmpty(this.props.userProfile[0].Payment)) ? [] : JSON.parse(this.props.userProfile[0].Payment)
         });
+
+
 
         // binding form data with selected data
 
@@ -793,14 +806,17 @@ class UserDetail extends Component {
     var AllTransactionID = []
     var pays = [];
     var pay = []
+    let commissionID = []
 
     if (isArrayNotEmpty(selectedRow)) {
       selectedRow.map(el => {
         AllTransactionID.push(el.TransactionID)
+        commissionID.push("-")
         pays.push(el.OrderTotalAmount - el.OrderPaidAmount)
         return AllTransactionID
       })
     }
+
 
     if (payment === totalDebt) {
       pay = pays
@@ -848,6 +864,7 @@ class UserDetail extends Component {
       pay = pay.join(';')
       let object = {
         TransactionID: AllTransactionID,
+        CommissionID: commissionID.join(';'),
         PaymentAmmount: pay,
         PaymentMethod: PaymentMethod,
         ReferenceNo: ReferenceNo,
@@ -958,6 +975,22 @@ class UserDetail extends Component {
       default:
         break;
     }
+  }
+
+  handleReferencePayment(e) {
+    let value = e.target.value
+    let listing = this.props.commission
+
+    let total = 0
+    if (listing.length > 0) {
+
+      value.map((y) => {
+        listing.filter((x) => x.CommissionID == y).map((data) => {
+          total = total + parseFloat(data.BalancedAmount)
+        })
+      })
+    }
+    this.setState({ referenceCodePayment: value, payment: total, isPayAmountValid: false })
   }
 
 
@@ -1519,6 +1552,7 @@ class UserDetail extends Component {
                       <MenuItem key="spay_payment" value="SPay">S Pay Global</MenuItem>
                     </Select>
                   </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <TextField
                       autoComplete="given-name"
@@ -1546,6 +1580,7 @@ class UserDetail extends Component {
                       variant="outlined"
                     />
                   </Grid>
+                  
                   <Grid item xs={12} sm={12}>
                     <TextField
                       required
@@ -1567,7 +1602,7 @@ class UserDetail extends Component {
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
                   onClick={() => this.onUpdateTransactionPayment()}
-                  disabled={this.state.PaymentMethod === "" || this.state.ReferenceNo === "" || this.state.Datetime === "" || this.state.PaymentMethod === ""}
+                  disabled={this.state.PaymentMethod === "" || this.state.Datetime === ""}
                 >
                   Update Payment
                 </Button>

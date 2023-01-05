@@ -34,6 +34,7 @@ function mapStateToProps(state) {
         transactions: state.counterReducer["transactions"],
         transactionReturn: state.counterReducer["transactionReturn"],
         userAreaCode: state.counterReducer["userAreaCode"],
+        commission: state.counterReducer["commission"],
     };
 }
 
@@ -41,6 +42,7 @@ function mapDispatchToProps(dispatch) {
     return {
         CallFetchAllTransaction: (data) => dispatch(GitAction.CallFetchAllTransaction(data)),
         CallUpdateTransactionPayment: (data) => dispatch(GitAction.CallUpdateTransactionPayment(data)),
+        CallViewCommissionByUserCode: (data) => dispatch(GitAction.CallViewCommissionByUserCode(data)),
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
     };
 }
@@ -134,6 +136,7 @@ class TransactionHistory extends Component {
             searchArea: "All",
             onSearchText: "",
             searchKeys: "",
+            referenceCodePayment: []
         }
         this.renderTableRows = this.renderTableRows.bind(this)
         this.handleInputChange = this.handleInputChange.bind(this)
@@ -143,6 +146,7 @@ class TransactionHistory extends Component {
         this.handleSearchInput = this.handleSearchInput.bind(this)
         this.handleSearchCategory = this.handleSearchCategory.bind(this)
         this.handleSearchArea = this.handleSearchArea.bind(this)
+        this.handleReferencePayment = this.handleReferencePayment.bind(this)
         this.renderAreaCodeName = this.renderAreaCodeName.bind(this)
         this.OnEnterToUpdatePayment = this.OnEnterToUpdatePayment.bind(this)
         this.props.CallFetchAllTransaction(this.state);
@@ -178,7 +182,9 @@ class TransactionHistory extends Component {
                 toast.success(this.props.transactionReturn[0].ReturnMsg)
                 this.props.CallFetchAllTransaction(this.state);
                 this.setState({
-                    AddModalOpen: false
+                    AddModalOpen: false,
+                    referenceCodePayment: [],
+                    PaymentMethod: "Cash"
                 })
             }
         }
@@ -244,6 +250,7 @@ class TransactionHistory extends Component {
     }
 
     onAddButtonClick = (event, row) => {
+        this.props.CallViewCommissionByUserCode({ UserCode: row.UserCode })
         this.setState({
             AddModalOpen: true,
             selectedRow: row,
@@ -255,7 +262,6 @@ class TransactionHistory extends Component {
             Datetime: new Date()
         });
     }
-
     OnEnterToUpdatePayment = (e) => {
         if (e.key === 'Enter' || e.keyCode === 13)
             this.onUpdateTransactionPayment()
@@ -265,18 +271,57 @@ class TransactionHistory extends Component {
 
     }
 
-    onUpdateTransactionPayment = () => {
+    onUpdateTransactionPayment = (selectedRow) => {
         const { TransactionID, Payment, PaymentMethod, ReferenceNo, Datetime } = this.state
-        let object = {
-            TransactionID: TransactionID,
-            PaymentAmmount: Payment,
-            PaymentMethod: PaymentMethod,
-            ReferenceNo: ReferenceNo,
-            Datetime: convertDateTimeToString112Format(Datetime),
+
+        let object = ""
+        if (PaymentMethod == "Reference Code") {
+            let listing = this.state.referenceCodePayment
+            let data = this.props.commission
+            let totalUnpaid = selectedRow.OrderTotalAmount - selectedRow.OrderPaidAmount
+            let amount = []
+            let commissionID = []
+            let TransactionIDList = []
+
+            isArrayNotEmpty(listing) && listing.map((x) => {
+                isArrayNotEmpty(data) && data.filter((z) => z.CommissionID == x).map((y) => {
+                    if (totalUnpaid >= y.BalancedAmount) {
+                        amount.push(y.BalancedAmount)
+                        TransactionIDList.push(TransactionID)
+                        commissionID.push(y.CommissionID)
+                        totalUnpaid = totalUnpaid - y.BalancedAmount
+                    } else {
+                        if (totalUnpaid > 0) {
+                            commissionID.push(y.CommissionID)
+                            TransactionIDList.push(TransactionID)
+                            amount.push(totalUnpaid)
+                            totalUnpaid = totalUnpaid - y.BalancedAmount
+                        }
+                    }
+                })
+            })
+            object = {
+                TransactionID: TransactionIDList.join(';'),
+                PaymentAmmount: amount.join(';'),
+                CommissionID: commissionID.join(';'),
+                PaymentMethod: PaymentMethod,
+                ReferenceNo: ReferenceNo != "" ? ReferenceNo : "-",
+                Datetime: convertDateTimeToString112Format(Datetime),
+            }
+        } else {
+            object = {
+                TransactionID: TransactionID,
+                CommissionID: "-",
+                PaymentAmmount: Payment,
+                PaymentMethod: PaymentMethod,
+                ReferenceNo: ReferenceNo != "" ? ReferenceNo : "-",
+                Datetime: convertDateTimeToString112Format(Datetime),
+            }
         }
 
-        if (!isStringNullOrEmpty(this.state.Payment) && !isStringNullOrEmpty(this.state.ReferenceNo))
+        if (!isStringNullOrEmpty(this.state.Payment)) {
             this.props.CallUpdateTransactionPayment(object)
+        }
         else
             toast.error("Please fill in all the fields.")
     }
@@ -458,6 +503,22 @@ class TransactionHistory extends Component {
         this.setState({ searchArea: e.target.value })
     }
 
+    handleReferencePayment(e) {
+        let value = e.target.value
+        let listing = this.props.commission
+
+        let total = 0
+        if (listing.length > 0) {
+
+            value.map((y) => {
+                listing.filter((x) => x.CommissionID == y).map((data) => {
+                    total = total + parseFloat(data.BalancedAmount)
+                })
+            })
+        }
+        this.setState({ referenceCodePayment: value, Payment: total, isPayAmountValid: false })
+    }
+
     render() {
         const ToggleTabs = [
             { children: "All", key: "All" },
@@ -619,24 +680,63 @@ class TransactionHistory extends Component {
                                             <MenuItem key="bank_payment" value="Bank Transfer">Bank Transfer</MenuItem>
                                             <MenuItem key="boost_payment" value="Boost">Boost</MenuItem>
                                             <MenuItem key="spay_payment" value="SPay">S Pay Global</MenuItem>
+                                            <MenuItem key="reference_payment" value="Reference Code">Reference Code</MenuItem>
                                         </Select>
                                     </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            autoComplete="given-name"
-                                            name="payment"
-                                            required
-                                            type="number"
-                                            fullWidth
-                                            onChange={(e) => this.handleInputChange(e)}
-                                            onKeyDown={(e) => { this.OnEnterToUpdatePayment(e) }}
-                                            id="payment"
-                                            label="Pay Amount(RM)"
-                                            autoFocus
-                                            error={this.state.isPayAmountValid}
-                                            helperText={this.state.isPayAmountValid ? "Invalid amount" : ""}
-                                        />
-                                    </Grid>
+                                    {
+                                        this.state.PaymentMethod === "Reference Code" && isArrayNotEmpty(this.props.commission) && this.props.commission[0].ReturnVal != 0 &&
+                                        <Grid item xs={12} sm={12}>
+                                            <Typography style={{ fontWeight: "bold" }}>Deduction Amount : <label style={{ color: "red" }}>{this.state.Payment}</label></Typography>
+                                        </Grid>
+                                    }
+                                    {
+                                        this.state.PaymentMethod === "Reference Code" ?
+                                            <Grid item xs={12} sm={6}>
+                                                {
+                                                    isArrayNotEmpty(this.props.commission) && this.props.commission[0].ReturnVal != 0 ?
+                                                        <>
+                                                            <TextField
+                                                                fullWidth
+                                                                select
+                                                                name="referenceCodePayment"
+                                                                id="referenceCodePayment"
+                                                                variant="outlined"
+                                                                label="referenceCodePayment"
+                                                                SelectProps={{
+                                                                    multiple: true,
+                                                                    value: this.state.referenceCodePayment,
+                                                                    onChange: this.handleReferencePayment
+                                                                }}
+                                                            >
+                                                                {
+                                                                    isArrayNotEmpty(this.props.commission) && this.props.commission.filter((x) => x.BalancedAmount > 0 && x.ReferalUserCode == selectedRow.UserCode).map((el, idx) => {
+                                                                        return <MenuItem key={el.CommissionID + "_" + idx} value={el.CommissionID}>{el.UserCode + " ( " + el.BalancedAmount + " ) "}</MenuItem>
+                                                                    })
+                                                                }
+                                                            </TextField>
+                                                        </>
+                                                        :
+                                                        <Typography style={{ color: "red" }}>咱无可用推荐金额</Typography>
+                                                }
+                                            </Grid>
+                                            :
+                                            <Grid item xs={12} sm={6}>
+                                                <TextField
+                                                    autoComplete="given-name"
+                                                    name="payment"
+                                                    required
+                                                    type="number"
+                                                    fullWidth
+                                                    onChange={(e) => this.handleInputChange(e)}
+                                                    onKeyDown={(e) => { this.OnEnterToUpdatePayment(e) }}
+                                                    id="payment"
+                                                    label="Pay Amount(RM)"
+                                                    autoFocus
+                                                    error={this.state.isPayAmountValid}
+                                                    helperText={this.state.isPayAmountValid ? "Invalid amount" : ""}
+                                                />
+                                            </Grid>
+                                    }
                                     <Grid item xs={12} sm={6}>
                                         <ResponsiveDatePickers
                                             // rangePicker
@@ -648,20 +748,25 @@ class TransactionHistory extends Component {
                                             variant="outlined"
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={12}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            name="reference"
-                                            label="Reference"
-                                            id="reference"
-                                            onChange={(e) => this.handleInputChange(e)}
-                                            onKeyDown={(e) => { this.OnEnterToUpdatePayment(e) }}
-                                            autoComplete="reference"
-                                            error={this.state.isReferenceValid}
-                                            helperText={this.state.isReferenceValid ? "Invalid reference" : ""}
-                                        />
-                                    </Grid>
+                                    {
+                                        this.state.PaymentMethod != "Reference Code" &&
+                                        <Grid item xs={12} sm={12}>
+                                            <TextField
+                                                required
+                                                fullWidth
+                                                name="reference"
+                                                label="Reference"
+                                                id="reference"
+                                                onChange={(e) => this.handleInputChange(e)}
+                                                onKeyDown={(e) => { this.OnEnterToUpdatePayment(e) }}
+                                                autoComplete="reference"
+                                                error={this.state.isReferenceValid}
+                                                helperText={this.state.isReferenceValid ? "Invalid reference" : ""}
+                                            />
+                                        </Grid>
+                                    }
+
+
                                     {/*<Grid item xs={12}>
                                     <TextField
                                     required
@@ -678,8 +783,8 @@ class TransactionHistory extends Component {
                                     fullWidth
                                     variant="contained"
                                     sx={{ mt: 3, mb: 2 }}
-                                    onClick={() => this.onUpdateTransactionPayment()}
-                                    disabled={this.state.Payment === "" || this.state.ReferenceNo === ""}
+                                    onClick={() => this.onUpdateTransactionPayment(selectedRow)}
+                                    disabled={this.state.Payment === ""}
                                 >
                                     Update Payment
                                 </Button>

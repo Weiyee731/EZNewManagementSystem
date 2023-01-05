@@ -631,6 +631,7 @@ export class GitEpic {
         const response = await fetch(url +
           "Transaction_UpdateTransactionPayment?" +
           "TRANSACTIONID=" + payload.TransactionID +
+          "&COMMISSIONID=" + payload.CommissionID +
           "&PAYMENTAMMOUNT=" + payload.PaymentAmmount +
           "&PAYMENTMETHOD=" + payload.PaymentMethod +
           "&REFERENCENO=" + payload.ReferenceNo +
@@ -1555,6 +1556,30 @@ export class GitEpic {
         toast.error("Error Code: User_ViewProfileByUserCode")
         return {
           type: GitAction.User_ViewedByUserCode,
+          payload: [],
+        };
+      }
+    });
+
+    User_ViewCommissionList = action$ =>
+    action$.ofType(GitAction.User_ViewCommissionList).switchMap(async ({ payload }) => {
+      try {
+        const response = await fetch(url +
+          "User_ViewCommissionList?" +
+          "USERCODE=" + payload.UserCode
+        );
+
+        let json = await response.json();
+        json = JSON.parse(json)
+        return {
+          type: GitAction.User_ViewedCommissionList,
+          payload: json,
+        };
+      }
+      catch (error) {
+        toast.error("Error Code: User_ViewedCommissionList")
+        return {
+          type: GitAction.User_ViewedCommissionList,
           payload: [],
         };
       }

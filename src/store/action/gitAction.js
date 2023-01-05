@@ -580,6 +580,15 @@ export class GitAction {
     };
   }
 
+  static User_ViewCommissionList = "User_ViewCommissionList";
+  static User_ViewedCommissionList = "User_ViewedCommissionList";
+  static CallViewCommissionByUserCode(propsData) {
+    return {
+      type: GitAction.User_ViewCommissionList,
+      payload: propsData
+    };
+  }
+
   static User_ClearUserCode = "User_ClearUserCode";
   static ClearUserCodeData() {
     return {

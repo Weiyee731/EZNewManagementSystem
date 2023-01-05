@@ -57,7 +57,7 @@ const style = {
   p: 4,
 };
 
-const noOfArrShow = 22
+const noOfArrShow = 20
 
 const headCells = [
   {
@@ -164,23 +164,27 @@ const smallItemHeadCells = [
 const companyTitle = {
   fontWeight: "bolder",
   fontSize: "16px",
+  fontFamily: "Arial",
   textAlign: "center"
 };
 
 const companyDetailTitle = {
   fontWeight: "bold",
   fontSize: "12px",
+  fontFamily: "Arial",
   float: "center",
   textAlign: "center"
 };
 
 const companyDetail = {
   fontSize: "11px",
+  fontFamily: "Arial",
   fontWeight: "bold",
 };
 
 const total = {
   float: "right",
+  fontFamily: "Arial",
   paddingRight: '16px'
 };
 
@@ -192,8 +196,15 @@ const tncTitle = {
 const tncDiv = {
   // margin: "1%",
   fontWeight: "bold",
+  fontFamily: "Arial",
   fontSize: "10px",
 };
+
+const tableCellStyle = {
+  fontSize: "9pt",
+  fontFamily: "Arial",
+  fontWeight: "bolder"
+}
 
 const img = {
   width: 'auto',
@@ -354,6 +365,7 @@ class InvoiceDetail extends Component {
 
   renderTableRows = (data, index) => {
     const fontsize = '9pt'
+    const fontFamily = "Arial"
     let DBextraCharge = []
     let charges = data.TransactionDetailCharges !== "[]" && data.TransactionDetailCharges !== undefined ? JSON.parse(data.TransactionDetailCharges).reduce((price, item) => price + parseFloat(item.ProductPrice), 0).toFixed(2) : 0
 
@@ -372,11 +384,11 @@ class InvoiceDetail extends Component {
               component="th"
               id={`table-checkbox-${(index + 1)}`}
               scope="row"
-              sx={{ fontSize: fontsize }}
+              sx={tableCellStyle}
             >
               {dataIndex + 1}
             </TableCell>
-            <TableCell align="left" sx={{ fontSize: fontsize }}>{this.props.transaction[0].CalculationType === "4" && data.Description === "Delivery Fee" || this.props.transaction[0].CalculationType === "4" && data.Description === undefined ? "Delivery Min 0.5m³" : data.TrackingNumber}
+            <TableCell align="left" sx={tableCellStyle}>{this.props.transaction[0].CalculationType === "4" && data.Description === "Delivery Fee" || this.props.transaction[0].CalculationType === "4" && data.Description === undefined ? "Delivery Min 0.5m³" : data.TrackingNumber}
               {data.TransactionDetailCharges !== "[]" && data.TransactionDetailCharges !== undefined &&
                 JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
                   return (
@@ -401,12 +413,12 @@ class InvoiceDetail extends Component {
                 })
               } */}
             </TableCell>
-            <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? "-" : data.ProductQuantity}</TableCell>
+            <TableCell align="left" sx={tableCellStyle}>{data.Description === "Delivery Fee" ? "-" : data.ProductQuantity}</TableCell>
             {
               this.props.transaction[0].CalculationType === "3" &&
-              <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? "-" : data.ProductWeight !== null && data.ProductWeight !== undefined && (data.ProductWeight).toFixed(2)}</TableCell>
+              <TableCell align="left" sx={tableCellStyle}>{data.Description === "Delivery Fee" ? "-" : data.ProductWeight !== null && data.ProductWeight !== undefined && (data.ProductWeight).toFixed(2)}</TableCell>
             }
-            <TableCell align="left" sx={{ fontSize: fontsize }}>
+            <TableCell align="left" sx={tableCellStyle}>
               {
                 data.Description === "Delivery Fee" ? "-" : !isNaN(volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)) ?
                   volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight).toFixed(3)
@@ -414,18 +426,18 @@ class InvoiceDetail extends Component {
               }
             </TableCell>
             {this.state.isPrinting ?
-              <TableCell align="left" sx={{ fontSize: fontsize }}>
+              <TableCell align="left" sx={tableCellStyle}>
                 {data.handlingCharge !== 0 && data.handlingCharge !== undefined ? parseFloat(data.handlingCharge).toFixed(2) : "-"}
                 {data.TransactionDetailCharges !== undefined && data.TransactionDetailCharges !== "[]" && JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
                   return (
-                    <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>
+                    <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0", fontFamily: fontFamily }}>
                       {parseFloat(additionalCharges.ProductPrice).toFixed(2)}
                     </div>
                   )
                 })}
               </TableCell>
               :
-              <TableCell align="left" sx={{ fontSize: fontsize }}>
+              <TableCell align="left" sx={tableCellStyle}>
                 {
                   data.Description === "Delivery Fee" || data.Description === undefined ? "" :
                     <>
@@ -450,7 +462,7 @@ class InvoiceDetail extends Component {
                 }
                 {data.TransactionDetailCharges !== undefined && data.TransactionDetailCharges !== "[]" && JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
                   return (
-                    <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>
+                    <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0", fontFamily: fontFamily, fontWeight: "bolder" }}>
                       {(additionalCharges.ProductPrice).toFixed(2)}
                     </div>
                   )
@@ -470,7 +482,7 @@ class InvoiceDetail extends Component {
             {/* Only Show price when not using small item calculation */}
             {
               this.props.transaction[0].CalculationType !== "3" &&
-              <TableCell align="left" sx={{ fontSize: fontsize }}>
+              <TableCell align="left" sx={tableCellStyle}>
                 {
                   this.props.transaction[0].CalculationType === "1" ?
                     volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) > 0.013 ? (data.ProductPrice / volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)).toFixed(2) : parseFloat(data.ProductPrice).toFixed(2)
@@ -479,7 +491,7 @@ class InvoiceDetail extends Component {
                 }
               </TableCell>
             }
-            <TableCell align="right" sx={{ fontSize: fontsize }}>
+            <TableCell align="right" sx={tableCellStyle}>
               {data.Description === "Delivery Fee" ? (parseFloat(data.ProductPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)
                 : this.props.transaction[0].CalculationType === "3" ? "-" : (parseFloat(data.totalPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)}
 
@@ -623,7 +635,7 @@ class InvoiceDetail extends Component {
     }
   };
 
-  renderPage = (arr, index) => {
+  renderPage = (arr, index, lastArray) => {
     const {
       DeliveryFee,
       transaction,
@@ -812,7 +824,9 @@ class InvoiceDetail extends Component {
             }
 
             {/* footer */}
-            {(arr.length < noOfArrShow || splitArray(TransactionDetail, noOfArrShow).length === 1) && this.state.isPrinting &&
+            {
+              // (arr.length < noOfArrShow || splitArray(TransactionDetail, noOfArrShow).length === 1) && this.state.isPrinting &&
+              index === lastArray - 1 && this.state.isPrinting &&
               <div className="d-flex">
                 <div className="invoice-footer">
                   <hr />
@@ -970,12 +984,12 @@ class InvoiceDetail extends Component {
           <div style={{ display: this.state.isPrinting ? 'inline' : 'none' }} ref={(el) => (this.componentRef = el)}>
             {splitArray(TransactionDetail, noOfArrShow).map((arr, index) => {
               return (
-                this.renderPage(arr, index)
+                this.renderPage(arr, index, splitArray(TransactionDetail, noOfArrShow).length)
               )
             })}
           </div>
 
-          {this.renderPage(TransactionDetail, 0)}
+          {this.renderPage(TransactionDetail, 0, splitArray(TransactionDetail, noOfArrShow).length)}
 
           <Modal
             open={AddModalOpen}

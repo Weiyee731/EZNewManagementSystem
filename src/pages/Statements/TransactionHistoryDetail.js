@@ -51,7 +51,7 @@ const style = {
   p: 4,
 };
 
-const noOfArrShow = 22
+const noOfArrShow = 20
 
 const headCells = [
   {
@@ -161,6 +161,7 @@ const cashbill_headcells = [
 const companyTitle = {
   fontWeight: "bolder",
   fontSize: "16px",
+  fontFamily: "Arial",
   textAlign: "center"
 };
 
@@ -168,17 +169,21 @@ const companyDetailTitle = {
   fontWeight: "bold",
   fontSize: "12px",
   float: "center",
+  fontFamily: "Arial",
   textAlign: "center"
 };
 
 const companyDetail = {
   fontSize: "11px",
+  fontFamily: "Arial",
   fontWeight: "bold",
 };
 
 const total = {
   float: "right",
-  paddingRight: '16px'
+  paddingRight: '16px',
+
+  fontFamily: "Arial",
 };
 
 const tncTitle = {
@@ -190,7 +195,15 @@ const tncDiv = {
   // margin: "1%",
   fontWeight: "bold",
   fontSize: "10px",
+  fontFamily: "Arial",
 };
+
+const tableCellStyle = {
+  fontSize: "9pt",
+  fontFamily: "Arial",
+  fontWeight: "bolder"
+}
+
 
 const img = {
   width: 'auto',
@@ -352,11 +365,11 @@ class TransactionHistoryDetail extends Component {
               component="th"
               id={`table-checkbox-${(index + 1)}`}
               scope="row"
-              sx={{ fontSize: fontsize }}
+              sx={tableCellStyle}
             >
               {dataIndex + 1}
             </TableCell>
-            <TableCell align="left" sx={{ fontSize: fontsize }}>{this.props.transaction[0].CalculationType === "4" && data.Description === "Delivery Fee" || this.props.transaction[0].CalculationType === "4" && data.Description === undefined ? "Delivery Min 0.5m³" : data.TrackingNumber}
+            <TableCell align="left" sx={tableCellStyle}>{this.props.transaction[0].CalculationType === "4" && data.Description === "Delivery Fee" || this.props.transaction[0].CalculationType === "4" && data.Description === undefined ? "Delivery Min 0.5m³" : data.TrackingNumber}
               {data.TransactionDetailCharges !== "[]" && data.TransactionDetailCharges !== undefined &&
                 JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
                   return (
@@ -367,12 +380,12 @@ class TransactionHistoryDetail extends Component {
                 })
               }
             </TableCell>
-            <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? "-" : data.ProductQuantity}</TableCell>
+            <TableCell align="left" sx={tableCellStyle}>{data.Description === "Delivery Fee" ? "-" : data.ProductQuantity}</TableCell>
             {
               this.props.transaction[0].CalculationType === "3" &&
               <TableCell align="left" sx={{ fontSize: fontsize }}>{data.Description === "Delivery Fee" ? "-" : data.ProductWeight !== null && data.ProductWeight !== undefined && (data.ProductWeight).toFixed(2)}</TableCell>
             }
-            <TableCell align="left" sx={{ fontSize: fontsize }}>
+            <TableCell align="left" sx={tableCellStyle}>
               {
                 data.Description === "Delivery Fee" ? "-" : !isNaN(volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)) ?
                   volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight).toFixed(3)
@@ -380,19 +393,19 @@ class TransactionHistoryDetail extends Component {
               }
             </TableCell>
             {this.state.isPrinting ?
-              <TableCell align="left" sx={{ fontSize: fontsize }}>
+              <TableCell align="left" sx={tableCellStyle}>
                 {data.handlingCharge !== 0 && data.handlingCharge !== undefined ? parseFloat(data.handlingCharge).toFixed(2) : "-"}
               </TableCell>
               :
-              <TableCell align="left" sx={{ fontSize: fontsize }}>
+              <TableCell align="left" sx={tableCellStyle}>
                 {data.Description === "Delivery Fee" || data.Description === undefined ? "" :
-                  <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>
+                  <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0", fontFamily: "Arial", fontWeight: "bolder" }}>
                     {data.handlingCharge}
                   </div>
                 }
                 {data.TransactionDetailCharges !== undefined && data.TransactionDetailCharges !== "[]" && JSON.parse(data.TransactionDetailCharges).map((additionalCharges, index) => {
                   return (
-                    <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0" }}>
+                    <div align="left" key={index} sx={{ fontSize: fontsize, borderBottom: "0px", paddingLeft: "0", fontFamily: "Arial", fontWeight: "bolder" }}>
                       {(additionalCharges.ProductPrice).toFixed(2)}
                     </div>
                   )
@@ -401,7 +414,7 @@ class TransactionHistoryDetail extends Component {
             }
             {
               this.props.transaction[0].CalculationType !== "3" &&
-              <TableCell align="left" sx={{ fontSize: fontsize }}>
+              <TableCell align="left" sx={tableCellStyle}>
                 {
                   this.props.transaction[0].CalculationType === "1" ?
                     volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight) > 0.013 ? (data.ProductPrice / volumeCalc(data.ProductDimensionDeep, data.ProductDimensionWidth, data.ProductDimensionHeight)).toFixed(2) : parseFloat(data.ProductPrice).toFixed(2)
@@ -410,7 +423,7 @@ class TransactionHistoryDetail extends Component {
                 }
               </TableCell>
             }
-            <TableCell align="right" sx={{ fontSize: fontsize }}>
+            <TableCell align="right" sx={tableCellStyle}>
               {data.Description === "Delivery Fee" ? (parseFloat(data.ProductPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)
                 : this.props.transaction[0].CalculationType === "3" ? "-" : (parseFloat(data.totalPrice) + parseFloat(this.state.TransactionDetail[index].handlingCharge) + parseFloat(charges)).toFixed(2)}
             </TableCell>
@@ -419,7 +432,7 @@ class TransactionHistoryDetail extends Component {
     )
   }
 
-  renderPage = (arr, index) => {
+  renderPage = (arr, index, lastArray) => {
     const {
       DeliveryFee,
       transaction,
@@ -543,7 +556,9 @@ class TransactionHistoryDetail extends Component {
               />
             </div>
             {
-              arr.length < noOfArrShow || splitArray(this.checkDelivery(TransactionDetail), noOfArrShow).length === 1 &&
+              // arr.length < noOfArrShow &&
+              //  || splitArray(this.checkDelivery(TransactionDetail), noOfArrShow).length === 1 &&
+              index === lastArray - 1 &&
               <div className="d-flex">
                 <div className="invoice-footer">
                   <hr />
@@ -673,7 +688,7 @@ class TransactionHistoryDetail extends Component {
           <div ref={(el) => (this.componentRef = el)}>
             {splitArray(this.checkDelivery(TransactionDetail), noOfArrShow).map((arr, index) => {
               return (
-                this.renderPage(arr, index)
+                this.renderPage(arr, index, splitArray(this.checkDelivery(TransactionDetail), noOfArrShow).length)
               )
             })}
           </div>

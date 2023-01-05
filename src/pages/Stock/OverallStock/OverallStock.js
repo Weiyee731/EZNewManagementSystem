@@ -530,7 +530,7 @@ class OverallStock extends Component {
             ITEM: isStringNullOrEmpty(formValue.Item) ? "-" : formValue.Item,
             TRACKINGSTATUSID: formValue.TrackingStatusID,
             CONTAINERNAME: this.state.isAddNewStock ? !isStringNullOrEmpty(formValue.NewContainerName) ? formValue.NewContainerName : "-" : !isStringNullOrEmpty(formValue.ContainerName) ? formValue.ContainerName : "-",
-            CONTAINERDATE: this.state.isAddNewStock ? !isStringNullOrEmpty(formValue.NewContainerDate) ? formValue.NewContainerDate : "-" : !isStringNullOrEmpty(formValue.ContainerDate) ? formValue.ContainerDate : "-",
+            CONTAINERDATE: this.state.isAddNewStock ? !isStringNullOrEmpty(formValue.NewContainerDate) ? moment(formValue.NewContainerDate).format("YYYY-MM-DD") : "-" : !isStringNullOrEmpty(formValue.ContainerDate) ? moment(formValue.ContainerDate).format("YYYY-MM-DD") : "-",
             REMARK: !isStringNullOrEmpty(formValue.Remark) ? formValue.Remark : "-",
             EXTRACHARGE: extraChangesValue,
         }
@@ -571,7 +571,7 @@ class OverallStock extends Component {
                         Item: object.ITEM,
                         TRACKINGSTATUSID: 2,
                         ContainerName: object.CONTAINERNAME,
-                        ContainerDate: object.CONTAINERDATE,
+                        ContainerDate: moment(object.CONTAINERDATE).format("YYYY-MM-DD"),
                         Remark: object.REMARK,
                         AdditionalCharges: object.EXTRACHARGE,
                     }
@@ -592,7 +592,7 @@ class OverallStock extends Component {
                         REMARK: object.REMARK,
                         EXTRACHARGE: object.EXTRACHARGE,
                         CONTAINERNAME: object.CONTAINERNAME,
-                        CONTAINERDATE: object.CONTAINERDATE,
+                        CONTAINERDATE: moment(object.CONTAINERDATE).format("YYYY-MM-DD"),
                     }
 
                     this.props.CallInsertStockByPost(postObject)
@@ -616,7 +616,7 @@ class OverallStock extends Component {
                         REMARK: object.REMARK,
                         EXTRACHARGE: object.EXTRACHARGE,
                         CONTAINERNAME: object.CONTAINERNAME,
-                        CONTAINERDATE: object.CONTAINERDATE,
+                        CONTAINERDATE: moment(object.CONTAINERDATE).format("YYYY-MM-DD")
                     }
                     this.props.CallInsertStockByPost(postObject)
                 }
@@ -1068,7 +1068,7 @@ class OverallStock extends Component {
             Item.push(row.Item)
             TRACKINGSTATUSID.push(2)
             ContainerName.push(this.state.ContainerName)
-            ContainerDate.push(this.state.ContainerDate)
+            ContainerDate.push(moment(this.state.ContainerDate).format("YYYY-MM-DD"))
             Remark.push(row.Remark)
             AdditionalCharges.push(row.AdditionalChargesOrig)
         })

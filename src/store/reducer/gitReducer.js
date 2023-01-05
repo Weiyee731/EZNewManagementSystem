@@ -31,7 +31,8 @@ const INITIAL_STATE = {
   notificationAction: [],
   notification: [],
   userAreaCode: [],
-  userAreaCodeAction: []
+  userAreaCodeAction: [],
+  commission:[]
 };
 
 export function counterReducer(state = INITIAL_STATE, action) {
@@ -504,6 +505,14 @@ export function counterReducer(state = INITIAL_STATE, action) {
       return Object.assign({}, state, {
         loading: false,
         userData: action.payload
+      });
+
+    case GitAction.User_ViewCommissionList:
+      return Object.assign({}, state, { loading: true });
+    case GitAction.User_ViewedCommissionList:
+      return Object.assign({}, state, {
+        loading: false,
+        commission: action.payload
       });
 
     case GitAction.User_ClearUserCode:
