@@ -186,7 +186,12 @@ const inventoryHeadCell = [
         disablePadding: false,
         label: '商品',
     },
-
+    {
+        id: 'Remark',
+        align: 'left',
+        disablePadding: false,
+        label: '备注',
+    },
     {
         id: 'CreatedDate',
         align: 'left',
@@ -458,6 +463,7 @@ class ContainerListing extends Component {
                 <TableCell>{data.ProductDimensionHeight}</TableCell>
                 <TableCell >{data.Volume}</TableCell>
                 <TableCell >{data.Item}</TableCell>
+                <TableCell >{data.Remark}</TableCell>
                 <TableCell>{data.CreatedDate}</TableCell>
             </>
         )
