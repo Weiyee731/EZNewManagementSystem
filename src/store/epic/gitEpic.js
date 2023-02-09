@@ -66,13 +66,13 @@ export class GitEpic {
     });
 
 
-    User_UpdateUserPassword = action$ =>
+  User_UpdateUserPassword = action$ =>
     action$.ofType(GitAction.UpdatePassword).switchMap(async ({ payload }) => {
 
       try {
         const response = await fetch(url + "User_UpdateUserPassword"
-        + "?USERID=" + payload.USERID
-        + '&USERPASSWORD=' + payload.password
+          + "?USERID=" + payload.USERID
+          + '&USERPASSWORD=' + payload.password
         );
 
         let json = await response.json();
@@ -1050,40 +1050,75 @@ export class GitEpic {
       }
     });
 
-  Inventory_AddStock = action$ =>
-    action$.ofType(GitAction.Inventory_Add).switchMap(async ({ payload }) => {
-      toast.warning("Inventory_AddStock IN GIT")
-      try {
-        const response = await fetch(url +
-          "Inventory_AddStock?" +
-          "USERCODE=" + payload.UserCode +
-          "&TRACKINGNUMBER=" + payload.TrackingNumber +
-          "&PRODUCTWEIGHT=" + payload.ProductWeight +
-          "&PRODUCTHEIGHT=" + payload.ProductHeight +
-          "&PRODUCTWIDTH=" + payload.ProductWidth +
-          "&PRODUCTDEEP=" + payload.ProductDeep +
-          "&COURIERID=" + payload.CourierID +
-          "&ITEM=" + payload.Item +
-          "&REMARK=" + payload.Remark +
-          "&MODIFY=" + payload.ModifyBy
-        );
+  // Inventory_AddStock = action$ =>
+  //   action$.ofType(GitAction.Inventory_Add).switchMap(async ({ payload }) => {
+  //     toast.warning("Inventory_AddStock IN GIT")
+  //     try {
+  //       const response = await fetch(url +
+  //         "Inventory_AddStock?" +
+  //         "USERCODE=" + payload.UserCode +
+  //         "&TRACKINGNUMBER=" + payload.TrackingNumber +
+  //         "&PRODUCTWEIGHT=" + payload.ProductWeight +
+  //         "&PRODUCTHEIGHT=" + payload.ProductHeight +
+  //         "&PRODUCTWIDTH=" + payload.ProductWidth +
+  //         "&PRODUCTDEEP=" + payload.ProductDeep +
+  //         "&COURIERID=" + payload.CourierID +
+  //         "&ITEM=" + payload.Item +
+  //         "&REMARK=" + payload.Remark +
+  //         "&MODIFY=" + payload.ModifyBy
+  //       );
 
-        let json = await response.json();
-        json = JSON.parse(json)
-        toast.success("Inventory_AddStock GIT RETURN ", json)
-        return {
-          type: GitAction.Inventory_Added,
-          payload: json,
-        };
-      }
-      catch (error) {
-        toast.error("Error Code: Inventory_AddStock")
-        return {
-          type: GitAction.Inventory_Added,
-          payload: [],
-        };
-      }
+  //       let json = await response.json();
+  //       json = JSON.parse(json)
+  //       toast.success("Inventory_AddStock GIT RETURN ", json)
+  //       return {
+  //         type: GitAction.Inventory_Added,
+  //         payload: json,
+  //       };
+  //     }
+  //     catch (error) {
+  //       toast.error("Error Code: Inventory_AddStock")
+  //       return {
+  //         type: GitAction.Inventory_Added,
+  //         payload: [],
+  //       };
+  //     }
+  //   });
+
+    Inventory_AddStock = action$ =>
+    action$.ofType(GitAction.Inventory_Add).switchMap(async ({ payload }) => {
+      return fetch(
+        url + "Inventory_AddStockByPost"
+        , {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            USERCODE: payload.UserCode,
+            TRACKINGNUMBER: payload.TrackingNumber,
+            PRODUCTWEIGHT: payload.ProductWeight,
+            PRODUCTHEIGHT: payload.ProductHeight,
+            PRODUCTWIDTH: payload.ProductWidth,
+            PRODUCTDEEP: payload.ProductDeep,
+            COURIERID: payload.CourierID,
+            ITEM: payload.Item,
+            REMARK: payload.Remark,
+            MODIFY: payload.ModifyBy,
+          })
+        }
+      )
+        .then(response => response.json())
+        .then(json => {
+          return {
+            type: GitAction.Inventory_AddStock,
+            payload: json,
+          };
+        })
+        .catch(error => toast.error("Error code: Inventory_AddStock"));
     });
+
 
   Inventory_UpdateStock = action$ =>
     action$.ofType(GitAction.Inventory_Update).switchMap(async ({ payload }) => {
@@ -1561,7 +1596,7 @@ export class GitEpic {
       }
     });
 
-    User_ViewCommissionList = action$ =>
+  User_ViewCommissionList = action$ =>
     action$.ofType(GitAction.User_ViewCommissionList).switchMap(async ({ payload }) => {
       try {
         const response = await fetch(url +

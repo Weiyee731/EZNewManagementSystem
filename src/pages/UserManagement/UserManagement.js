@@ -28,6 +28,12 @@ import Dropzone from "../../components/Dropzone/Dropzone"
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { isArrayNotEmpty, getFileExtension, getWindowDimensions, getFileTypeByExtension, isStringNullOrEmpty } from "../../tools/Helpers";
 import * as XLSX from 'xlsx';
+// import Table from '@mui/material/Table';
+// import TableBody from '@mui/material/TableBody';
+// import TableContainer from '@mui/material/TableContainer';
+// import TableRow from '@mui/material/TableRow';
+
+import { TableHead, TableRow, TableContainer, TableBody, Table, Typography } from "@mui/material";
 
 const style = {
     position: 'absolute',
@@ -47,6 +53,7 @@ function mapStateToProps(state) {
         user: state.counterReducer["user"],
         userAreaCode: state.counterReducer["userAreaCode"],
         userManagementApproval: state.counterReducer["userManagementApproval"],
+        commission: state.counterReducer["commission"],
     };
 }
 
@@ -56,6 +63,7 @@ function mapDispatchToProps(dispatch) {
         CallUserAreaCode: () => dispatch(GitAction.CallUserAreaCode()),
         CallUserRegistration: (propData) => dispatch(GitAction.CallUserRegistration(propData)),
         CallInsertUserDataByPost: (propData) => dispatch(GitAction.CallInsertUserDataByPost(propData)),
+        CallViewCommissionByUserCode: (propData) => dispatch(GitAction.CallViewCommissionByUserCode(propData)),
         CallResetUserApprovalReturn: () => dispatch(GitAction.CallResetUserApprovalReturn()),
     };
 }
@@ -79,7 +87,7 @@ const headCells = [
         disablePadding: false,
         label: 'Name',
     },
-    
+
     {
         id: 'UserWechatID',
         align: 'center',
@@ -104,6 +112,7 @@ class UserManagement extends Component {
         super(props);
         this.state = {
             AddModalOpen: false,
+            referalListModal: false,
             UserListing: [],
             selectedRows: [],
             UserListingfiltered: [],
@@ -156,6 +165,7 @@ class UserManagement extends Component {
 
         this.props.CallUserProfile();
         this.props.CallUserAreaCode();
+        this.props.CallViewCommissionByUserCode({ UserCode: 0 })
     }
 
     componentDidMount() {
@@ -612,15 +622,20 @@ class UserManagement extends Component {
         const renderButtonOnTableTopRight = () => {
             return (
                 <div className="d-flex">
+                    <Tooltip title="View Referal List">
+                        <IconButton size="medium" sx={{ border: "2px solid #0074ea", color: "#0074ea", marginRight: 1 }} onClick={() => this.setState({ referalListModal: true })}>
+                            <GroupAddIcon />
+                        </IconButton>
+                    </Tooltip>
                     {/* <Tooltip title="Add New User">
                         <IconButton size="medium" sx={{ border: "2px solid #0074ea", color: "#0074ea", marginRight: 1 }} onClick={() => this.setState({ AddModalOpen: true })}>
                             <GroupAddIcon />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Add new user via csv">
-                        <IconButton size="medium" sx={{ border: "2px solid #818181", color: "#797979" }} onClick={() => this.setState({ addWithCSVModalOpen: true })}>
+                     <IconButton size="medium" sx={{ border: "2px solid #818181", color: "#797979" }} onClick={() => this.setState({ addWithCSVModalOpen: true })}>
                             <UploadFileIcon />
-                        </IconButton>
+                        </IconButton> 
                     </Tooltip> */}
                 </div>
             )
@@ -923,6 +938,57 @@ class UserManagement extends Component {
                                 </Grid>
                             </Grid>
                         </Box>
+                    </AlertDialog>
+                </div>
+                <div>
+
+                    <AlertDialog
+                        open={this.state.referalListModal}              // required, pass the boolean whether modal is open or close
+                        handleToggleDialog={() => this.setState({ referalListModal: false })}  // required, pass the toggle function of modal
+                        // handleConfirmFunc={() => this.setState({ referalListModal: false })}    // required, pass the confirm function 
+                        // showAction={true}                           // required, to show the footer of modal display
+                        title={"推薦列表"}                      // required, title of the modal
+                        // buttonTitle={"Cancel"}                         // required, title of button
+                        // singleButton={true}                         // required, to decide whether to show a single full width button or 2 buttons
+                        maxWidth={"md"}
+                    >
+                        <TableContainer>
+                            <Table size="medium" aria-label="referal table">
+                                <TableHead>
+                                    <TableRow style={{ backgroundColor: "#adb5bd" }}>
+                                        <TableCell>会员号</TableCell>
+                                        <TableCell>会员名字</TableCell>
+                                        <TableCell>推荐金额</TableCell>
+                                        <TableCell>可用推荐金额</TableCell>
+                                        <TableCell>推荐人会员号</TableCell>
+                                        <TableCell>推荐人名字</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {
+                                        isArrayNotEmpty(this.props.commission) && this.props.commission[0].ReturnVal != 0 ?
+                                            this.props.commission.map((data) => {
+                                                return (
+                                                    <TableRow key={"Contact Person"}>
+                                                        <TableCell > {data.UserCode}</TableCell>
+                                                        <TableCell  > {data.Fullname}</TableCell>
+                                                        <TableCell> {data.TotalCommission !== null ? parseFloat(data.TotalCommission).toFixed(2) : 0}</TableCell>
+                                                        <TableCell > {data.BalancedAmount !== null ? parseFloat(data.BalancedAmount).toFixed(2) : 0}</TableCell>
+                                                        <TableCell > {data.ReferalUserCode}</TableCell>
+                                                        <TableCell  > {data.ReferalFullName}</TableCell>
+                                                    </TableRow>
+                                                )
+                                            })
+                                            :
+                                            <Typography style={{ padding: "10px", textAlign: "center" }}>暂还没推荐资料</Typography>
+                                    }
+
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <div style={{ textAlign: "right", padding: "2px" }}>
+                            <Button onClick={() => this.setState({ referalListModal: false })}>Cancel</Button>
+                        </div>
                     </AlertDialog>
                 </div>
 
