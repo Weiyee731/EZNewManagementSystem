@@ -1085,7 +1085,7 @@ export class GitEpic {
   //     }
   //   });
 
-    Inventory_AddStock = action$ =>
+  Inventory_AddStock = action$ =>
     action$.ofType(GitAction.Inventory_Add).switchMap(async ({ payload }) => {
       return fetch(
         url + "Inventory_AddStockByPost"
@@ -1111,12 +1111,14 @@ export class GitEpic {
       )
         .then(response => response.json())
         .then(json => {
+          // console.log("inventoryStockAction1 return", json)
+          // toast.success("操作成功")
           return {
-            type: GitAction.Inventory_AddStock,
+            type: GitAction.Inventory_Added,
             payload: json,
           };
         })
-        .catch(error => toast.error("Error code: Inventory_AddStock"));
+        .catch(error => toast.error("Error code: Inventory_Added"));
     });
 
 

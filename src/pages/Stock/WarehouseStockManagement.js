@@ -77,13 +77,17 @@ export const WarehouseStock = (props) => {
         if (userAreaCode.length === 0) {
             dispatch(GitAction.CallUserAreaCode())
         }
+        console.log("inventoryStockAction1", inventoryStockAction)
 
         if (inventoryStockAction.length > 0 && isSubmitAdd === true) {
+            console.log("inventoryStockAction2", inventoryStockAction)
             if (inventoryStockAction[0].ReturnVal === 1) {
+                console.log("inventoryStockAction3", inventoryStockAction)
                 if (isSubmitDelete === true) {
                     toast.success("已成功删除")
                     window.location.reload(false)
                 } else {
+                    console.log("inventoryStockAction4", inventoryStockAction)
                     if (stockData[0].StockID === "")
                         toast.success("已成功入库")
                     else
@@ -116,7 +120,7 @@ export const WarehouseStock = (props) => {
                         createdDate: "",
                         StockID: "",
                     }])
-         
+
                     // window.location.reload(false)
                 }
             } else {
