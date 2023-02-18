@@ -65,6 +65,12 @@ const headCells = [
         label: 'Tracking No. ',
     },
     {
+        id: 'TransactionName',
+        align: 'left',
+        disablePadding: false,
+        label: 'Transaction No. ',
+    },
+    {
         id: 'ProductWeight',
         align: 'left',
         disablePadding: false,
@@ -237,6 +243,7 @@ class ArchivedStock extends Component {
                 >
                     {data.TrackingNumber}
                 </TableCell>
+                <TableCell align="left" sx={{ fontSize: fontsize }}>{data.TransactionName}</TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductWeight) ? data.ProductWeight.toFixed(2) : 0} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionDeep) ? data.ProductDimensionDeep.toFixed(1) : 0} </TableCell>
                 <TableCell align="left" sx={{ fontSize: fontsize }}>{!isNaN(data.ProductDimensionWidth) ? data.ProductDimensionWidth.toFixed(1) : 0} </TableCell>
@@ -267,6 +274,7 @@ class ArchivedStock extends Component {
     onFetchLatestData() {
         this.props.CallResetArchivedData()
         this.props.CallFetchArchivedStock({ STARTDATE: new Date().getFullYear() + '/1/1', ENDDATE: new Date().getFullYear() + '/12/31', })
+        this.props.CallFetchArchivedStock({ STARTDATE: 0, ENDDATE: new Date().getFullYear() + '/12/31', })
         toast.loading("Pulling data... Please wait...", { autoClose: false, position: "top-center", transition: Flip, theme: "dark" })
         this.setState({ filteredList: null, isDataFetching: true })
     }
