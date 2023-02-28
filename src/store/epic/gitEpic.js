@@ -1285,103 +1285,218 @@ export class GitEpic {
       }
     });
 
+
   Notification_AddNotification = action$ =>
     action$.ofType(GitAction.Notification_Add).switchMap(async ({ payload }) => {
-      try {
-        const response = await fetch(url +
-          "Notification_AddNotification?" +
-          "NOTIFICATIONTITLE=" + payload.NotificationTitle +
-          "&NOTIFICATIONDESC=" + payload.NotificationDesc +
-          "&NOTIFICATIONSTATUSID=" + payload.NotificationStatusID +
-          "&MODIFY=" + payload.ModifyBy
-        );
+      return fetch(
+        url + "Notification_AddNotificationByPost"
+        , {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            NOTIFICATIONTITLE: payload.NotificationTitle,
+            NOTIFICATIONDESC: payload.NotificationDesc,
+            NOTIFICATIONSTATUSID: payload.NotificationStatusID,
+            MODIFY: payload.ModifyBy
+          })
+        }
+      )
+        .then(response => response.json())
+        .then(json => {
+          if (json !== "fail") {
+            json = json;
+            toast.success("Successfully update stock. Fetching the latest data..", { autoClose: 3000 })
+            window.location.reload(false)
+            // try {
+            //   const response = fetch(url +
+            //     "Notification_ViewNotification2?" +
+            //     "&NOTIFICATIONSTATUSID=0"
+            //   );
 
-        let json = await response.json();
-        json = JSON.parse(json)
-        // return {
-        //   type: GitAction.Notification_Added,
-        //   payload: json,
-        // };
+            //   let json = response.json();
+            //   json = JSON.parse(json)
+            //   return {
+            //     type: GitAction.Notification_Viewed,
+            //     payload: json,
+            //   };
+            // }
+            // catch (error) {
+            //   toast.error("Error Code: Notification_ViewNotification")
+            //   return {
+            //     type: GitAction.Notification_Viewed,
+            //     payload: [],
+            //   };
+            // }
 
-        try {
-          const response = await fetch(url +
-            "Notification_ViewNotification2?" +
-            "&NOTIFICATIONSTATUSID=0"
-          );
-
-          let json = await response.json();
-          json = JSON.parse(json)
+          } else {
+            json = [];
+          }
           return {
-            type: GitAction.Notification_Viewed,
+            type: GitAction.Notification_Added,
             payload: json,
           };
-        }
-        catch (error) {
-          toast.error("Error Code: Notification_ViewNotification")
-          return {
-            type: GitAction.Notification_Viewed,
-            payload: [],
-          };
-        }
-
-      }
-      catch (error) {
-        toast.error("Error Code: Notification_AddNotification")
-        return {
-          type: GitAction.Notification_Added,
-          payload: [],
-        };
-      }
+        })
+        .catch(error => toast.error("Error code: 8003"));
     });
+
+  // Notification_AddNotification = action$ =>
+  //   action$.ofType(GitAction.Notification_Add).switchMap(async ({ payload }) => {
+  //     try {
+  //       const response = await fetch(url +
+  //         "Notification_AddNotification?" +
+  //         "NOTIFICATIONTITLE=" + payload.NotificationTitle +
+  //         "&NOTIFICATIONDESC=" + payload.NotificationDesc +
+  //         "&NOTIFICATIONSTATUSID=" + payload.NotificationStatusID +
+  //         "&MODIFY=" + payload.ModifyBy
+  //       );
+
+  //       let json = await response.json();
+  //       json = JSON.parse(json)
+  //       // return {
+  //       //   type: GitAction.Notification_Added,
+  //       //   payload: json,
+  //       // };
+
+  //       try {
+  //         const response = await fetch(url +
+  //           "Notification_ViewNotification2?" +
+  //           "&NOTIFICATIONSTATUSID=0"
+  //         );
+
+  //         let json = await response.json();
+  //         json = JSON.parse(json)
+  //         return {
+  //           type: GitAction.Notification_Viewed,
+  //           payload: json,
+  //         };
+  //       }
+  //       catch (error) {
+  //         toast.error("Error Code: Notification_ViewNotification")
+  //         return {
+  //           type: GitAction.Notification_Viewed,
+  //           payload: [],
+  //         };
+  //       }
+
+  //     }
+  //     catch (error) {
+  //       toast.error("Error Code: Notification_AddNotification")
+  //       return {
+  //         type: GitAction.Notification_Added,
+  //         payload: [],
+  //       };
+  //     }
+  //   });
+
 
   Notification_UpdateNotification = action$ =>
     action$.ofType(GitAction.Notification_Update).switchMap(async ({ payload }) => {
-      try {
-        const response = await fetch(url +
-          "Notification_UpdateNotification?" +
-          "NOTIFICATIONTITLE=" + payload.NotificationTitle +
-          "&NOTIFICATIONSTATUSID=" + payload.NotificationStatusID +
-          "&NOTIFICATIONID=" + payload.NotificationID +
-          "&NOTIFICATIONDESC=" + encodeURIComponent(payload.NotificationDesc) +
-          "&MODIFY=" + payload.ModifyBy
-        );
+      return fetch(
+        url + "Notification_UpdateNotificationByPost"
+        , {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            NOTIFICATIONID: payload.NotificationID,
+            NOTIFICATIONTITLE: payload.NotificationTitle,
+            NOTIFICATIONDESC: payload.NotificationDesc,
+            NOTIFICATIONSTATUSID: payload.NotificationStatusID,
+            MODIFY: payload.ModifyBy
+          })
+        }
+      )
+        .then(response => response.json())
+        .then(json => {
+          if (json !== "fail") {
+            json = json;
+            toast.success("Successfully update stock. Fetching the latest data..", { autoClose: 3000 })
+            window.location.reload(false)
+            // try {
+            //   const response = fetch(url +
+            //     "Notification_ViewNotification2?" +
+            //     "&NOTIFICATIONSTATUSID=0"
+            //   );
 
-        let json = await response.json();
-        json = JSON.parse(json)
-        // return {
-        //   type: GitAction.Notification_Updated,
-        //   payload: json,
-        // };
+            //   let json = response.json();
+            //   json = JSON.parse(json)
+            //   return {
+            //     type: GitAction.Notification_Viewed,
+            //     payload: json,
+            //   };
+            // }
+            // catch (error) {
+            //   toast.error("Error Code: Notification_ViewNotification")
+            //   return {
+            //     type: GitAction.Notification_Viewed,
+            //     payload: [],
+            //   };
+            // }
 
-        try {
-          const response = await fetch(url +
-            "Notification_ViewNotification2?" +
-            "&NOTIFICATIONSTATUSID=0"
-          );
-
-          let json = await response.json();
-          json = JSON.parse(json)
+          } else {
+            json = [];
+          }
           return {
-            type: GitAction.Notification_Viewed,
+            type: GitAction.Notification_Updated,
             payload: json,
           };
-        }
-        catch (error) {
-          toast.error("Error Code: Notification_ViewNotification")
-          return {
-            type: GitAction.Notification_Viewed,
-            payload: [],
-          };
-        }
-      }
-      catch (error) {
-        toast.error("Error Code: Notification_UpdateNotification" + error)
-        return {
-          type: GitAction.Notification_Updated,
-          payload: [],
-        };
-      }
+        })
+        .catch(error => toast.error("Error code: 8003"));
     });
+
+  // Notification_UpdateNotification = action$ =>
+  //   action$.ofType(GitAction.Notification_Update).switchMap(async ({ payload }) => {
+  //     try {
+  //       const response = await fetch(url +
+  //         "Notification_UpdateNotification?" +
+  //         "NOTIFICATIONTITLE=" + payload.NotificationTitle +
+  //         "&NOTIFICATIONSTATUSID=" + payload.NotificationStatusID +
+  //         "&NOTIFICATIONID=" + payload.NotificationID +
+  //         "&NOTIFICATIONDESC=" + encodeURIComponent(payload.NotificationDesc) +
+  //         "&MODIFY=" + payload.ModifyBy
+  //       );
+
+  //       let json = await response.json();
+  //       json = JSON.parse(json)
+  //       // return {
+  //       //   type: GitAction.Notification_Updated,
+  //       //   payload: json,
+  //       // };
+
+  //       try {
+  //         const response = await fetch(url +
+  //           "Notification_ViewNotification2?" +
+  //           "&NOTIFICATIONSTATUSID=0"
+  //         );
+
+  //         let json = await response.json();
+  //         json = JSON.parse(json)
+  //         return {
+  //           type: GitAction.Notification_Viewed,
+  //           payload: json,
+  //         };
+  //       }
+  //       catch (error) {
+  //         toast.error("Error Code: Notification_ViewNotification")
+  //         return {
+  //           type: GitAction.Notification_Viewed,
+  //           payload: [],
+  //         };
+  //       }
+  //     }
+  //     catch (error) {
+  //       toast.error("Error Code: Notification_UpdateNotification" + error)
+  //       return {
+  //         type: GitAction.Notification_Updated,
+  //         payload: [],
+  //       };
+  //     }
+  //   });
 
   Notification_UpdateNotificationStatus = action$ =>
     action$.ofType(GitAction.Notification_UpdateStatus).switchMap(async ({ payload }) => {
