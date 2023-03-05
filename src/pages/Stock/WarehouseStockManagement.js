@@ -12,7 +12,7 @@ import ReactToPrint, { PrintContextConsumer } from 'react-to-print';
 import moment from 'moment';
 import { Button, TextField, Autocomplete, Box, Typography, } from '@mui/material'
 import QRCode from 'qrcode.react';
-import YourWayLogo from "../../assets/logos/logo.png"
+import EZLogo from "../../assets/logos/logo.png"
 import { useSelector, useDispatch } from "react-redux";
 
 export const WarehouseStock = (props) => {
@@ -241,7 +241,7 @@ export const WarehouseStock = (props) => {
                     arr.isUserCodeError = true
                 arr.UserCode = data
 
-                if (data.length === 5 && isCheckUser === false) {
+                if (data.length === 4 && isCheckUser === false) {
                     dispatch(GitAction.CallViewProfileByUserCode({ UserCode: arr.UserCode }))
                     setIsCheckUser(true)
                 }
@@ -429,7 +429,7 @@ export const WarehouseStock = (props) => {
                                 <Typography style={{ fontWeight: "600", fontSize: "13pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, HH:mm:ss')}</Typography>
                             </div>
                             <div style={{ textAlign: "right" }}>
-                                <label style={{ fontSize: "12pt" }}>雅威国际物流</label>
+                                <label style={{ fontSize: "12pt" }}>壹智国际物流</label>
                             </div>
                         </div>
                     </div>
@@ -542,7 +542,7 @@ export const WarehouseStock = (props) => {
                                         nextRef.current.focus();
                                     }
                                 },
-                                maxLength: title === "会员号" ? 5 : 9999
+                                maxLength: title === "会员号" ? 4 : 9999
                             }}
                         />
                     }
@@ -729,7 +729,11 @@ export const WarehouseStock = (props) => {
         <div className="container-fluid" >
             <div className="row">
                 <div className="row" style={{ textAlign: "center" }}>
-                    <Typography style={{ fontWeight: "600", fontSize: "20pt", color: "#253949", letterSpacing: 1 }}>快递入库</Typography>
+                    <label style={{ fontWeight: "600", fontSize: "20pt", color: "#253949", letterSpacing: 1 }}>
+                        <img src={EZLogo} height="45px" style={{ paddingLeft: "20px", paddingRight: "10px" }} />  壹智快递入库  </label>
+                    {/* <Typography style={{ fontWeight: "600", fontSize: "20pt", color: "#253949", letterSpacing: 1 }}>
+                       壹智快递入库 
+                    </Typography> */}
                 </div>
                 <div className="col-xl-9 col-lg-9 col-md-9 col-sm-7 col-xs-12" style={{ paddingTop: "10pt" }}>
                     {

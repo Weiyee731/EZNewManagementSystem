@@ -1,5 +1,5 @@
 import React from 'react';
-import YourWayLogo from "../../assets/logos/logo.png"
+import EZLogo from "../../assets/logos/logo.png"
 
 export default function Profile(props) {
     return (
@@ -17,9 +17,9 @@ export default function Profile(props) {
             }}
         >
             <div style={{ textAlign: "center", padding:"10pt" }}>
-                <img src={YourWayLogo} alt="Yawei Logistics" width="80%" />
+                <img src={EZLogo} alt="Yawei Logistics" width="80%" />
             </div>
-            雅威国际物流
+            壹智国际物流
         </div>
     )
 }

@@ -6,6 +6,8 @@ import { setLogonUser } from "../../components/auth/AuthManagement"
 import { GetDefaultImage } from "../../tools/MediaHelpers"
 import { isStringNullOrEmpty, isArrayNotEmpty } from "../../tools/Helpers"
 
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
@@ -21,7 +23,7 @@ import IconButton from '@mui/material/IconButton';
 import { toast } from "react-toastify";
 // import css
 import "./Login.css"
-import YourWayLogo from "../../assets/logos/logo.png"
+import EZLogo from "../../assets/logos/logo.png"
 
 function mapStateToProps(state) {
     return {
@@ -111,16 +113,27 @@ class Login extends Component {
 
     render() {
         return (
-            <div style={{ display: 'flex', width: '100%', height: '100vh', }}>
+            <Grid
+                container
+                spacing={0}
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
+                style={{ minHeight: '80vh' }}
+            >
                 <div className="container login-container m-auto">
                     <div className="logo-container w-100">
                         {/* <div style={{ width: '120px', height: '120px', marginLeft: 'auto', marginRight: 'auto', }}> */}
                         <div style={{ textAlign: "center" }}>
-                            <img src={YourWayLogo} alt="System Logo" width='30%' onError={event => { event.target.src = GetDefaultImage(); event.onerror = null }} />
+                            <img src={EZLogo} alt="System Logo" width='%' onError={event => { event.target.src = GetDefaultImage(); event.onerror = null }} />
+                            <Typography style={{ fontWeight: "bold", fontSize: "25px" }} variant="body" component="p" gutterBottom>
+                                壹智国际物流
+                            </Typography>
                         </div>
+
                         {/* </div> */}
                     </div>
-                    <div className="login-inputs-group">
+                    <div className="login-inputs-group" style={{ paddingTop: "20px" }}> 
                         <FormControl sx={{ m: 1, marginTop: 5, width: '100%' }} variant="standard">
                             <InputLabel htmlFor="login-username">登录账户</InputLabel>
                             <Input
@@ -176,7 +189,7 @@ class Login extends Component {
                         {/* <a href="#" title="Forget Password?" style={{ marginLeft: '0.5em', fontSize: '11pt' }}>Problem on login?</a> */}
                     </div>
                 </div>
-            </div >
+            </Grid >
 
         )
     }

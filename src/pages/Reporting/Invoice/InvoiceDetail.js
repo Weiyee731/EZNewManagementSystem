@@ -25,6 +25,8 @@ import Input from '@mui/material/Input';
 import Switch from '@mui/material/Switch';
 import ReactToPrint from "react-to-print";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
+import EZSpay from "../../../assets/EZ_Spay.jpg"
 import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined';
 function mapStateToProps(state) {
   return {
@@ -684,16 +686,16 @@ class InvoiceDetail extends Component {
             {/* header */}
             <div className="row">
               <div style={companyTitle}>
-                YOURWAY LOGISTIC
+                EZ TRANSIT AND LOGISTICS SDN BHD
               </div>
               <div style={companyDetailTitle}>
-                HONGNION GARDEN, 93150 KUCHING SARAWAK
+                NO.2, LORONG A, TAMAN BDC
               </div>
-              {/* <div style={companyDetailTitle}>
+              <div style={companyDetailTitle}>
                 JALAN STUTONG 93350 KUCHING, SARAWAK
-              </div> */}
+              </div>
               <div style={companyDetailTitle}>
-                TEL: 011 - 5584 2203
+                TEL: 019 - 883 6783 / 012 - 895 7769
               </div>
               <div
                 style={{
@@ -853,8 +855,26 @@ class InvoiceDetail extends Component {
                   }
                   <div className="row">
                     <div style={tncDiv} className="col-5 mt-4">
+                      <div style={tncTitle}>Terms and Conditions</div>
+                      <br />
+                      <div>
+                        <p>
+                          1. All payment should be make payable to
+                          <br />
+                          EZ TAO BAO ENTERPRISE
+                          <br />
+                          25301009073
+                          <br />
+                          HONG LEONG BANK
+                        </p>
+                        <p>
+                          2. Payment must be cleared within 3 days after the billing date
+                        </p>
+                      </div>
                     </div>
                     <div style={tncDiv} className="col-3 mt-4">
+                      <div >Payment can be make through SPay Global</div>
+                      <img style={img} src={EZSpay} alt="SPAY_QR" ></img>
                     </div>
                     <div style={tncDiv} className="col-3 offset-1">
                       {this.props.transaction[0].CalculationType === "3" &&
@@ -897,19 +917,19 @@ class InvoiceDetail extends Component {
                   <div className="row mt-4">
                     <div style={tncDiv} className="col-3 mt-4">
                       <div className="text-center">
-                        __________________________________
-                        <div>YOURWAY LOGISTIC</div>
-                        {/* <div>SDN BHD</div> */}
+                       
+                     __________________________________
+                        <div>EZ TRANSIT AND LOGISTICS</div>    <div>SDN BHD</div>
                       </div>
                     </div>
                     <div style={tncDiv} className="col-5 mt-4">
 
                     </div>
                     <div style={{ textAlign: 'left', ...tncDiv }} className="col-3 mt-4">
-                      __________________________________
+                      __________________________________        
                       <div>Name  : </div>
-                      {/* <div>IC NO : </div> */}
-                      <div>Date  : </div>
+                      <div>IC NO : </div>
+                      <div>DATE  : </div>
                     </div>
                   </div>
                 </div>
