@@ -77,17 +77,12 @@ export const WarehouseStock = (props) => {
         if (userAreaCode.length === 0) {
             dispatch(GitAction.CallUserAreaCode())
         }
-        console.log("inventoryStockAction1", inventoryStockAction)
-
         if (inventoryStockAction.length > 0 && isSubmitAdd === true) {
-            console.log("inventoryStockAction2", inventoryStockAction)
             if (inventoryStockAction[0].ReturnVal === 1) {
-                console.log("inventoryStockAction3", inventoryStockAction)
                 if (isSubmitDelete === true) {
                     toast.success("已成功删除")
                     window.location.reload(false)
                 } else {
-                    console.log("inventoryStockAction4", inventoryStockAction)
                     if (stockData[0].StockID === "")
                         toast.success("已成功入库")
                     else
@@ -241,7 +236,7 @@ export const WarehouseStock = (props) => {
                     arr.isUserCodeError = true
                 arr.UserCode = data
 
-                if (data.length === 4 && isCheckUser === false) {
+                if (data.length === 5 && isCheckUser === false) {
                     dispatch(GitAction.CallViewProfileByUserCode({ UserCode: arr.UserCode }))
                     setIsCheckUser(true)
                 }
@@ -412,24 +407,22 @@ export const WarehouseStock = (props) => {
                 })
             }
         }
-
         return (
             dataListing.length > 0 && dataListing.map((x) => {
                 return (
                     <div key={x.TrackingNumber} style={{ width: "330px", height: "270px", paddingLeft: "10pt", paddingTop: "20pt", paddingBottom: "10pt" }}>
+                        <div className="row" style={{ textAlign: "center", borderTop: "1px solid black", borderBottom: "1px solid black" }}>
+                            <Typography style={{ fontWeight: "600", fontSize: "16pt", letterSpacing: 1 }}>EZ 转运 ({x.areaCode})</Typography>
+                        </div>
                         <Barcode value={x.TrackingNumber} />
                         <div className="row" style={{ textAlign: "left", paddingTop: "10pt" }}>
-                            <div className="col-2" style={{ itemAlign: "center" }}>
+                            <div className="col-2" style={{ itemAlign: "center", paddingTop: "5px" }}>
                                 <QRCode value={x.TrackingNumber} size={65} />
                             </div>
                             <div className="col-10" style={{ paddingLeft: "21pt" }}>
-                                <Typography style={{ fontWeight: "600", fontSize: "13pt", color: "#253949", letterSpacing: 1 }}>会员：
-                                    <label style={{ fontSize: "18pt" }}> {x.UserCode} ( {x.areaCode} )</label></Typography>
-                                <Typography style={{ fontWeight: "600", fontSize: "13pt", color: "#253949", letterSpacing: 1 }}>称号： {x.UserData}</Typography>
-                                <Typography style={{ fontWeight: "600", fontSize: "13pt", color: "#253949", letterSpacing: 1 }}>入库：{moment(new Date()).format('DD-MM-YYYY, HH:mm:ss')}</Typography>
-                            </div>
-                            <div style={{ textAlign: "right" }}>
-                                <label style={{ fontSize: "12pt" }}>壹智国际物流</label>
+                                <Typography style={{ fontWeight: "600", fontSize: "13pt", color: "#253949", letterSpacing: 1 }}>会员： <label style={{ fontSize: "18pt" }}> {x.UserCode} 已验视</label></Typography>
+                                <Typography style={{ fontWeight: "600", fontSize: "12pt", color: "#253949", letterSpacing: 1 }}>名称： {x.UserData}</Typography>
+                                <Typography style={{ fontWeight: "600", fontSize: "9pt", color: "#253949", letterSpacing: 1 }}>打印：{moment(new Date()).format('DD-MM-YYYY, HH:mm:ss')} EZ ({x.areaCode}) </Typography>
                             </div>
                         </div>
                     </div>
@@ -542,7 +535,7 @@ export const WarehouseStock = (props) => {
                                         nextRef.current.focus();
                                     }
                                 },
-                                maxLength: title === "会员号" ? 4 : 9999
+                                maxLength: title === "会员号" ? 5 : 9999
                             }}
                         />
                     }
