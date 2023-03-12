@@ -686,7 +686,7 @@ class InvoiceDetail extends Component {
             {/* header */}
             <div className="row">
               <div style={companyTitle}>
-                EZ TRANSIT AND LOGISTICS SDN BHD
+                EZ TAO BAO ENTERPRISE
               </div>
               <div style={companyDetailTitle}>
                 NO.2, LORONG A, TAMAN BDC
@@ -923,7 +923,7 @@ class InvoiceDetail extends Component {
                       <div className="text-center">
                        
                      __________________________________
-                        <div>EZ TRANSIT AND LOGISTICS</div>    <div>SDN BHD</div>
+                        <div>EZ TAO BAO ENTERPRISE</div>    <div></div>
                       </div>
                     </div>
                     <div style={tncDiv} className="col-5 mt-4">
