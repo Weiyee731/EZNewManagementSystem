@@ -236,7 +236,7 @@ export const WarehouseStock = (props) => {
                     arr.isUserCodeError = true
                 arr.UserCode = data
 
-                if (data.length === 5 && isCheckUser === false) {
+                if (data.length === 4 && isCheckUser === false) {
                     dispatch(GitAction.CallViewProfileByUserCode({ UserCode: arr.UserCode }))
                     setIsCheckUser(true)
                 }
@@ -535,7 +535,7 @@ export const WarehouseStock = (props) => {
                                         nextRef.current.focus();
                                     }
                                 },
-                                maxLength: title === "会员号" ? 5 : 9999
+                                maxLength: title === "会员号" ? 4 : 9999
                             }}
                         />
                     }

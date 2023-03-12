@@ -508,17 +508,21 @@ class TransactionHistoryDetail extends Component {
                 INVOICE
               </div>
               <div className="row" style={companyDetail}>
-                <span className="col-9">{`${transaction[0].UserCode} - ${transaction[0].AreaCode} ${transaction[0].Fullname}`}</span>
+                <span className="col-9">{`${transaction[0].UserCode}  ${transaction[0].AreaCode} `}</span>
                 <span className="col-1">No</span>
                 <span className="col-2">: {transaction[0].TransactionName}</span>
               </div>
               <div className="row" style={companyDetail}>
-                <span className="col-9">{transaction[0].UserAddress}</span>
-                {/* <span className="col-1">Terms</span>
-                <span className="col-2">: C.O.D</span> */}
+                <span className="col-9">
+                  {/* {transaction[0].UserAddress} */}
+                </span>
+                <span className="col-1">Terms</span>
+                <span className="col-2">: C.O.D</span>
               </div>
               <div className="row" style={companyDetail} >
-                <span className="col-9">Tel : {transaction[0].UserContactNo}</span>
+                <span className="col-9">
+                  {/* Tel : {transaction[0].UserContactNo} */}
+                </span>
                 <span className="col-1">Date</span>
                 <span className="col-2">: {transaction[0].OrderDate}</span>
               </div>
